@@ -25,94 +25,94 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  */
 public class NonStandardLicense {
-	
-	/**
-	 * Required license ID.  Must be of the form "LicenseRef-"[idString] 
-	 * where [idString] is a unique string containing letters, numbers, “.”, “-” or “+”.
-	 * Note that this is required for the Maven use of non standard licenses.  The SPDX
-	 * standard does not generally require this parameter.
-	 */
-	@Parameter(required = true)
-	private String licenseId;
-	
-	/**
-	 * Required verbatim license or licensing notice text
-	 */
-	@Parameter(required = true)
-	private String extractedText;
-	
-	/**
-	 * Optional: Common name of the license not on the SPDX list. 
-	 * If there is no common name or it is not known, please use NOASSERTION.
-	 */
-	@Parameter
-	private String name;
-	/**
-	 * 
-	 */
-	@Parameter
-	private String comment;
-	
-	/**
-	 * Provide a pointer to the official source of a license that is not included 
-	 * in the SPDX table, that is referenced by the id.
-	 */
-	@Parameter
-	URL[] crossReference;
+    
+    /**
+     * Required license ID.  Must be of the form "LicenseRef-"[idString] 
+     * where [idString] is a unique string containing letters, numbers, “.”, “-” or “+”.
+     * Note that this is required for the Maven use of non standard licenses.  The SPDX
+     * standard does not generally require this parameter.
+     */
+    @Parameter( required = true )
+    private String licenseId;
+    
+    /**
+     * Required verbatim license or licensing notice text
+     */
+    @Parameter( required = true )
+    private String extractedText;
+    
+    /**
+     * Optional: Common name of the license not on the SPDX list. 
+     * If there is no common name or it is not known, please use NOASSERTION.
+     */
+    @Parameter
+    private String name;
+    /**
+     * 
+     */
+    @Parameter
+    private String comment;
+    
+    /**
+     * Provide a pointer to the official source of a license that is not included 
+     * in the SPDX table, that is referenced by the id.
+     */
+    @Parameter
+    URL[] crossReference;
 
-	/**
-	 * Create a default, non standard license
-	 */
-	public NonStandardLicense() {
-		
-	}
+    /**
+     * Create a default, non standard license
+     */
+    public NonStandardLicense() {
+        
+    }
 
-	/**
-	 * @return the licenseId
-	 */
-	public String getLicenseId() {
-		return licenseId;
-	}
+    /**
+     * @return the licenseId
+     */
+    public String getLicenseId() {
+        return licenseId;
+    }
 
-	/**
-	 * @return the extractedText
-	 */
-	public String getExtractedText() {
-		return extractedText;
-	}
+    /**
+     * @return the extractedText
+     */
+    public String getExtractedText() {
+        return extractedText;
+    }
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		if (name == null) {
-			return "";
-		}
-		return name;
-	}
+    /**
+     * @return the name
+     */
+    public String getName() {
+        if ( name == null ) {
+            return "";
+        }
+        return name;
+    }
 
-	/**
-	 * @return the comment
-	 */
-	public String getComment() {
-		if (comment == null) {
-			return "";
-		}
-		return comment;
-	}
+    /**
+     * @return the comment
+     */
+    public String getComment() {
+        if ( comment == null ) {
+            return "";
+        }
+        return comment;
+    }
 
-	/**
-	 * @return the crossReference
-	 */
-	public String[] getCrossReference() {
-		if (this.crossReference == null) {
-			return new String[0];
-		}
-		String[] retval = new String[this.crossReference.length];
-		for (int i = 0; i < retval.length; i++) {
-			retval[i] = this.crossReference[i].toString();
-		}
-		return retval;
-	}
+    /**
+     * @return the crossReference
+     */
+    public String[] getCrossReference() {
+        if ( this.crossReference == null ) {
+            return new String[0];
+        }
+        String[] retval = new String[this.crossReference.length];
+        for ( int i = 0; i < retval.length; i++ ) {
+            retval[i] = this.crossReference[i].toString();
+        }
+        return retval;
+    }
 
 }
