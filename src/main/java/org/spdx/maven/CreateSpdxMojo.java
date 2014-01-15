@@ -69,8 +69,18 @@ import java.util.regex.Pattern;
  * SPDX standard licenses ID's should be used.  If no SPDX standard license
  * is available, a nonStandardLicense must be declared as a parameter including
  * a unique license ID and the verbatim license text.
+ * 
+ * The following SPDX fields are populated from the POM project information:
+ *  - package name: project name or artifactId if the project name is not provided
+ *  - package description: project description
+ *  - package shortDescription: poject description
+ *  - package downloadUrl: distributionManager url
+ *  - package homePage: project url
+ *  - package supplier: project organization
+ *  - package versionInfo: project version
+ *  
+ * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
-//TODO: Document POM information mappings
 @Mojo( name = "createSPDX", defaultPhase = LifecyclePhase.PREPARE_PACKAGE )
 @Execute ( goal = "createSPDX", phase = LifecyclePhase.PREPARE_PACKAGE )
 public class CreateSpdxMojo
@@ -128,7 +138,8 @@ public class CreateSpdxMojo
     private String[] defaultFileContributors;
 
     /**
-     * Required default file copyright text.
+     * Default file copyright text.
+     * If no copyright text is specified, NOASSERTION will be used
      * The copyrightText field Identifies the copyright holder of the file, 
      * as well as any dates present. The text must much the copyright notice found in the file. 
      * The options to populate this field are limited to:
@@ -136,7 +147,7 @@ public class CreateSpdxMojo
      * (b) NONE, if the file contains no license information whatsoever; or
      * (c) NOASSERTION, if the SPDX creator has not examined the contents of the actual file or if the SPDX creator has intentionally provided no information(no meaning should be implied from the absence of an assertion).
      */
-    @Parameter( required = true )
+    @Parameter( defaultValue ="NOASSERTION" )
     private String defaultFileCopyright;
 
     /**
@@ -156,9 +167,10 @@ public class CreateSpdxMojo
     private String defaultFileNotice;
 
     /**
-     * Required default file concluded license.
+     * Concluded license.
      * This field contains the license the SPDX file creator has concluded as governing the file or alternative values 
      * if the governing license cannot be determined.
+     * If no concluded license is specified "NOASSERTION" will be used.
      * The options to populate this field are limited to:
      * (a) the SPDX standardized license short form identifier, if the concluded license is on the SPDX License List;
      * (b) a reference to the licenses, denoted by LicenseRef-#LicenseRef-[idString], 
@@ -174,11 +186,12 @@ public class CreateSpdxMojo
      * Similarly when multiple licenses need to be applied (“conjunctive license”), 
      * they should be separated with “and” and enclosed in parentheses.
      */
-    @Parameter( required = true )
+    @Parameter( defaultValue ="NOASSERTION" )
     private String defaultFileConcludedLicense;
 
      /**
-     * Required default license information in file.
+     * Default license information in file.
+     * If no licenseInformationInFile is specified, NOASSERTION will be used
      * This field contains the license information actually found in the file, 
      * if any. Any license information not actually in the file, e.g., “COPYING.txt” file in a toplevel directory, should not be reflected in this field. This information is most commonly found in the header of the file, although it may be in other areas of the actual file. The options to populate this field are limited to:
      * (a) the SPDX License List short form identifier, if the license is on the SPDX License List;
@@ -190,7 +203,7 @@ public class CreateSpdxMojo
      * Similarly when multiple licenses need to be applied (“conjunctive license”), 
      * they should be separated with “and” and enclosed in parentheses.
      */
-    @Parameter( required = true )
+    @Parameter( defaultValue ="NOASSERTION" )
     private String defaultLicenseInformationInFile;
     
     /**
@@ -354,38 +367,19 @@ public class CreateSpdxMojo
         logIncludedDirectories( includedDirectories );
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
-        logDefaultFileInformation( defaultFileInformation );
-//        createSpdxFromProject( f, spdxDoc, spdxDocumentUrl, excludedFilePatterns, includedDirectories,
-//                                projectInformation, defaultFileInformation );
-    }
-
-    /**
-     * Primarily for debugging purposes - logs defaultFileInformation as info
-     * @param defaultFileInformation
-     */
-    private void logDefaultFileInformation(
-            SpdxDefaultFileInformation defaultFileInformation ) {
-        if ( defaultFileInformation == null ) {
-            return;
-        }
-        this.getLog().info( "Default File Comment: "+defaultFileInformation.getComment() );
-        this.getLog().info( "Default File Copyright: "+defaultFileInformation.getCopyright() );
-        this.getLog().info( "Default File License Comment: "+defaultFileInformation.getLicenseComment() );
-        this.getLog().info( "Default File Notice: "+defaultFileInformation.getNotice() );
-        this.getLog().info( "Default File Concluded License: "+defaultFileInformation.getConcludedLicense().toString() );
-        this.getLog().info( "Default File Declared License: "+defaultFileInformation.getDeclaredLicense().toString() );
-        DOAPProject[] artifactOfs = defaultFileInformation.getArtifactOf();
-        if ( artifactOfs != null ) {
-            for ( int i = 0; i < artifactOfs.length; i++ ) {
-                this.getLog().info( "Default ArtifactOf Project Name: "+artifactOfs[i].getName() );
-                this.getLog().info( "Default ArtifactOf Project HomePage: "+artifactOfs[i].getHomePage() );
+        defaultFileInformation.logInfo( this.getLog() );
+        createSpdxFromProject( f, spdxDoc, spdxDocumentUrl, excludedFilePatterns, includedDirectories,
+                                projectInformation, defaultFileInformation );
+        ArrayList<String> spdxErrors = spdxDoc.verify();
+        if ( spdxErrors != null && spdxErrors.size() > 0 ) {
+            // report error
+            StringBuilder sb = new StringBuilder("The following errors were found in the SPDX file:\n");
+            sb.append( spdxErrors.get( 0 ) );
+            for ( int i = 0; i < spdxErrors.size(); i++ ) {
+                sb.append( '\n' );
+                sb.append( spdxErrors.get( i ) );
             }
-        }
-        String[] contributors = defaultFileInformation.getContributors();
-        if ( contributors != null ) {
-            for ( int i = 0; i < contributors.length; i++ ) {
-                this.getLog().info( "Default File Contributors: "+contributors[i] );
-            }
+            this.getLog().warn( sb.toString() );
         }
     }
 
@@ -521,6 +515,7 @@ public class CreateSpdxMojo
      * @return
      * @throws MojoExecutionException 
      */
+    @SuppressWarnings( "unused" )
     private SpdxProjectInformation getSpdxProjectInfoFromParameters() throws MojoExecutionException {
         SpdxProjectInformation retval = new SpdxProjectInformation();
         SPDXLicenseInfo declaredLicense = null;
@@ -566,14 +561,17 @@ public class CreateSpdxMojo
         retval.setHomePage( mavenProject.getUrl() );
         retval.setLicenseComment( this.licenseComments );
         retval.setOriginator( this.originator );
-        String packageFileName;
-        File packageFile = mavenProject.getArtifact().getFile();
-        if ( packageFile != null ) {
-            packageFileName = packageFile.getName();
-        } else {
-            packageFileName = "NOASSERTION";
-        }
-        retval.setPackageArchiveFileName( packageFileName );
+//        String packageFileName;
+//        File packageFile = mavenProject.getArtifact().getFile();
+//        if ( packageFile != null ) {
+//            packageFileName = packageFile.getName();
+//        } else {
+//            packageFileName = "NOASSERTION";
+//        }
+//        retval.setPackageArchiveFileName( packageFileName );
+        retval.setPackageArchiveFileName( "NOASSERTION" );
+        File packageFile = null;
+        //TODO Determine the package file based on the packaging and properly fill in
         String sha1 = null;
         if ( packageFile != null ) {
             try

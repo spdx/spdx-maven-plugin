@@ -15,6 +15,7 @@
  */
 package org.spdx.maven;
 
+import org.apache.maven.plugin.logging.Log;
 import org.spdx.rdfparser.DOAPProject;
 import org.spdx.rdfparser.SPDXLicenseInfo;
 import org.spdx.rdfparser.SpdxNoAssertionLicense;
@@ -97,5 +98,32 @@ public class SpdxDefaultFileInformation {
     
     public void setLicenseComment( String licenseComment ) {
         this.licenseComment = licenseComment;
+    }
+
+    /**
+     * Primarily for debugging purposes.  Dump all the field information to the log Info
+     * @param log
+     */
+    public void logInfo( Log log )
+    {
+        log.info( "Default File Comment: "+getComment() );
+        log.info( "Default File Copyright: "+getCopyright() );
+        log.info( "Default File License Comment: "+getLicenseComment() );
+        log.info( "Default File Notice: "+getNotice() );
+        log.info( "Default File Concluded License: "+getConcludedLicense().toString() );
+        log.info( "Default File Declared License: "+getDeclaredLicense().toString() );
+        DOAPProject[] artifactOfs = getArtifactOf();
+        if ( artifactOfs != null ) {
+            for ( int i = 0; i < artifactOfs.length; i++ ) {
+                log.info( "Default ArtifactOf Project Name: "+artifactOfs[i].getName() );
+                log.info( "Default ArtifactOf Project HomePage: "+artifactOfs[i].getHomePage() );
+            }
+        }
+        String[] contributors = getContributors();
+        if ( contributors != null ) {
+            for ( int i = 0; i < contributors.length; i++ ) {
+                log.info( "Default File Contributors: "+contributors[i] );
+            }
+        }
     }
 }
