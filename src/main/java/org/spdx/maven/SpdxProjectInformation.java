@@ -40,6 +40,8 @@ class SpdxProjectInformation {
     String licenseComment;
     String sha1;
     String name;
+    private String sourceInfo;
+    private String copyrightText;
     /**
      * @return the sha1
      */
@@ -230,6 +232,7 @@ class SpdxProjectInformation {
         log.info( "SPDX SHA1: "+this.getSha1() );
         log.info( "SPDX Short description: "+this.getShortDescription() );
         log.info( "SPDX Supplier: "+this.getSupplier() );
+        log.info( "SPDX Source Info:  "+this.getSourceInfo() );
         log.info( "SPDX Version info: "+this.getVersionInfo() );
         log.info( "SPDX Concluded license: "+this.getConcludedLicense().toString() );
         log.info( "SPDX Declared license: "+this.getDeclaredLicense().toString() );
@@ -241,5 +244,21 @@ class SpdxProjectInformation {
                 log.info( "SPDX Creator: "+creators[i] );
             }
         }
+    }
+    public String getSourceInfo()
+    {
+        return this.sourceInfo;
+    }
+    
+    public void setSourceInfo( String sourceInformation ) {
+        this.sourceInfo = sourceInformation;
+    }
+    public void setCopyrightText( String copyrightText )
+    {
+        this.copyrightText = copyrightText;
+    }
+    public String getCopyrightText()
+    {
+        return this.copyrightText;
     }
 }

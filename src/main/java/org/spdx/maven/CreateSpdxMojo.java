@@ -17,6 +17,7 @@ package org.spdx.maven;
  */
 
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -51,6 +52,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -73,7 +76,7 @@ import java.util.regex.Pattern;
  * The following SPDX fields are populated from the POM project information:
  *  - package name: project name or artifactId if the project name is not provided
  *  - package description: project description
- *  - package shortDescription: poject description
+ *  - package shortDescription: project description
  *  - package downloadUrl: distributionManager url
  *  - package homePage: project url
  *  - package supplier: project organization
@@ -167,24 +170,9 @@ public class CreateSpdxMojo
     private String defaultFileNotice;
 
     /**
-     * Concluded license.
      * This field contains the license the SPDX file creator has concluded as governing the file or alternative values 
      * if the governing license cannot be determined.
      * If no concluded license is specified "NOASSERTION" will be used.
-     * The options to populate this field are limited to:
-     * (a) the SPDX standardized license short form identifier, if the concluded license is on the SPDX License List;
-     * (b) a reference to the licenses, denoted by LicenseRef-#LicenseRef-[idString], 
-     * if the concluded license is not on the SPDX License List.  The license must be specified as a license.
-     * (c) NOASSERTION should be used if:
-     * (i) the SPDX file creator has attempted to but cannot reach a reasonable objective determination of the concluded license;
-     * (ii) the SPDX file creator is uncomfortable concluding a license, despite some license information being available;
-     * (iii) the SPDX file creator has made no attempt to arrive at a concluded license;
-     * (iv) the SPDX file creator has intentionally provided no information (no meaning should be implied by doing so); or
-     * (v) there is no license information from which to conclude a license for the file.
-     * For a license set, when there is a choice between licenses (“disjunctive license”), 
-     * they should be separated with “or” and enclosed in brackets. 
-     * Similarly when multiple licenses need to be applied (“conjunctive license”), 
-     * they should be separated with “and” and enclosed in parentheses.
      */
     @Parameter( defaultValue ="NOASSERTION" )
     private String defaultFileConcludedLicense;
@@ -294,9 +282,26 @@ public class CreateSpdxMojo
     @Parameter( required = true )
     private File[] includedDirectories;
 
+    /**
+     * This field provides a place for the SPDX file creator to record any relevant 
+     * background information or additional comments about the origin of the package.
+     * For example, this field might include comments indicating whether the package 
+     * been was pulled from a source code management system or has been repackaged.
+     */
+    @Parameter
+    private String sourceInfo;
 
-
-
+    /**
+     * Identify the copyright holders of the package, as well as any dates present. This will be a free form text field extracted from the package information files.  The options to populate this field are limited to:
+     *   (a) any text related to a copyright notice, even if not complete; 
+     *   (b) NONE if the package contains no license information whatsoever; or 
+     *   (c) NOASSERTION, if the SPDX file creator has not examined the contents of 
+     *         the       package or if the SPDX file creator has intentionally provided no 
+     *        iInformation(no 
+      *  meaning should be implied by doing so).
+     */
+    @Parameter( defaultValue ="NOASSERTION" )
+    private String copyrightText;
 
     public void execute()
         throws MojoExecutionException
@@ -358,8 +363,9 @@ public class CreateSpdxMojo
         }
         Pattern[] excludedFilePatterns = getPatternFromParameters();
         File[] includedDirectories = getIncludedDirectoriesFromParameters();
-        processNonStandardLicenses( spdxDoc );
-        SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters();
+        LicenseManager licenseManager = new LicenseManager( spdxDoc, getLog() );
+        processNonStandardLicenses( licenseManager );
+        SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( licenseManager );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
         
         // The following is for debugging purposes
@@ -369,7 +375,7 @@ public class CreateSpdxMojo
         projectInformation.logInfo( this.getLog() );
         defaultFileInformation.logInfo( this.getLog() );
         createSpdxFromProject( f, spdxDoc, spdxDocumentUrl, excludedFilePatterns, includedDirectories,
-                                projectInformation, defaultFileInformation );
+                                projectInformation, defaultFileInformation, licenseManager );
         ArrayList<String> spdxErrors = spdxDoc.verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) {
             // report error
@@ -437,22 +443,17 @@ public class CreateSpdxMojo
      * @param spdxDoc
      * @throws MojoExecutionException 
      */
-    private void processNonStandardLicenses( SPDXDocument spdxDoc ) throws MojoExecutionException {
+    private void processNonStandardLicenses( LicenseManager licenseManager ) throws MojoExecutionException {
         if ( this.nonStandardLicenses != null ) {
             for ( int i = 0; i < this.nonStandardLicenses.length; i++ ) {
-                NonStandardLicense license = this.nonStandardLicenses[i];
-                SPDXNonStandardLicense spdxLicense = new SPDXNonStandardLicense(
-                        license.getLicenseId(), license.getExtractedText(), license.getName(),
-                        license.getCrossReference(), license.getComment() );
-                try {
-                    spdxDoc.addNewExtractedLicenseInfo( spdxLicense );
-                } catch ( InvalidSPDXAnalysisException e ) {
-                    String licenseId = license.getLicenseId();
-                    if ( licenseId == null ) {
-                        licenseId = "[NullLicenseId]";
-                    }
-                    this.getLog().error( "Error adding license "+licenseId, e );
-                    throw( new MojoExecutionException( "Unable to add non standard license "+licenseId+": "+e.getMessage(),e ) );
+                try
+                {
+                    licenseManager.addNonStandardLicense( nonStandardLicenses[i] );
+                }
+                catch ( LicenseManagerException e )
+                {
+                    this.getLog().error( "Error adding license "+e.getMessage(), e );
+                    throw(new MojoExecutionException("Error adding non standard license: "+e.getMessage(), e));
                 }
             }
         }
@@ -507,20 +508,30 @@ public class CreateSpdxMojo
      *   declaredLicense - mapped by the license parameter in the project.  Can be overriden by specifying a plugin configuration declaredLicense string
      *   concludedLicense - same as the declared license unless overridden by the plugin configuration parameter concludedLicense
      *   name - name of the project.  If not provided, the artifactId is used
-     *   distributionManagement().downloadUrl - If not provided, a default value of 'NOASSERTION' is used
+     *   downloadUrl - distributionManagement().downloadUrl - If not provided, a default value of 'NOASSERTION' is used
      *   packageFileName is the artifact().getFile fileName if it can be found.  The checksum is also calculated from this value.  If no file
-     *     could be determined, a 'NOASSERTION' value is used
-     *   description - The project description is used for the SPDX package description and SPDX package summary
-     *   organization - the project organization is used for the supplier.  "ORGANIZATION: " is prepended
+     *     could be determined, a 'NOASSERTION' value is used [currently not implemented] 
+     *   description, summary - The project description is used for the SPDX package description and SPDX package summary
+     *   supplier - the project organization is used for the supplier.  "ORGANIZATION: " is prepended
      * @return
      * @throws MojoExecutionException 
      */
     @SuppressWarnings( "unused" )
-    private SpdxProjectInformation getSpdxProjectInfoFromParameters() throws MojoExecutionException {
+    private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager ) throws MojoExecutionException {
         SpdxProjectInformation retval = new SpdxProjectInformation();
         SPDXLicenseInfo declaredLicense = null;
         if ( this.licenseDeclared == null ) {
-            declaredLicense = mapProjectLicense();
+            @SuppressWarnings( "unchecked" )
+            List<License> mavenLicenses = mavenProject.getLicenses();
+            try
+            {
+                declaredLicense = licenseManager.mavenLicenseListToSpdxLicense( mavenLicenses );
+            }
+            catch ( LicenseManagerException e )
+            {
+               this.getLog().warn( "Unable to map maven licenses to a declared license.  Using NOASSERTION" );
+               declaredLicense = new SpdxNoAssertionLicense();
+            }
         } else {
             try {
                 declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( this.licenseDeclared.trim() );
@@ -543,6 +554,7 @@ public class CreateSpdxMojo
         retval.setConcludedLicense( concludedLicense );
         retval.setCreatorComment( this.creatorComment );
         retval.setCreators( this.creators );
+        retval.setCopyrightText( this.copyrightText );
         retval.setDeclaredLicense( declaredLicense );
         String projectName = mavenProject.getName();
         if ( projectName == null || projectName.isEmpty() ) {
@@ -590,6 +602,7 @@ public class CreateSpdxMojo
             supplier = "ORGANIZATION: "+supplier;
             retval.setSupplier( supplier );
         }        
+        retval.setSourceInfo( this.sourceInfo );
         retval.setVersionInfo( mavenProject.getVersion() );
         return retval;
     }
@@ -601,15 +614,6 @@ public class CreateSpdxMojo
      */
     private String getDefaultProjectName() {
         return this.mavenProject.getArtifactId();
-    }
-
-    /**
-     * Map the license declared in the POM file to an SPDX license
-     * @return
-     */
-    private SPDXLicenseInfo mapProjectLicense() {
-        // TODO Auto-generated method stub
-        return new SpdxNoAssertionLicense();
     }
 
     private File[] getIncludedDirectoriesFromParameters() {
@@ -635,7 +639,7 @@ public class CreateSpdxMojo
 
     public void createSpdxFromProject( File spdxFile, SPDXDocument spdxDoc, URL spdxDocumentUrl, Pattern[] excludedFilePatterns,
             File[] includedDirectories, SpdxProjectInformation projectInformation,
-            SpdxDefaultFileInformation defaultFileInformation ) throws MojoExecutionException {
+            SpdxDefaultFileInformation defaultFileInformation, LicenseManager licenseManager ) throws MojoExecutionException {
 
         FileOutputStream spdxOut = null;
         try {
@@ -684,12 +688,16 @@ public class CreateSpdxMojo
             spdxDoc.getSpdxPackage().setFileName( projectInformation.getPackageArchiveFileName() );
             // home page
             spdxDoc.getSpdxPackage().setHomePage( projectInformation.getHomePage() );
+            // source information
+            spdxDoc.getSpdxPackage().setSourceInfo( projectInformation.getSourceInfo() );
             // license comment
             spdxDoc.getSpdxPackage().setLicenseComment( projectInformation.getLicenseComment() );
             // originator
             spdxDoc.getSpdxPackage().setOriginator( projectInformation.getOriginator() );
             // sha1 checksum
             spdxDoc.getSpdxPackage().setSha1( projectInformation.getSha1() );
+            // copyright text
+            spdxDoc.getSpdxPackage().setDeclaredCopyright( projectInformation.getCopyrightText() );
             // short description
             spdxDoc.getSpdxPackage().setShortDescription( projectInformation.getShortDescription() );
             // supplier
