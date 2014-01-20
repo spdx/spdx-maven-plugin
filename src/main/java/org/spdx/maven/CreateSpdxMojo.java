@@ -363,7 +363,7 @@ public class CreateSpdxMojo
         }
         Pattern[] excludedFilePatterns = getPatternFromParameters();
         File[] includedDirectories = getIncludedDirectoriesFromParameters();
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, getLog() );
+        LicenseManager licenseManager = new LicenseManager( spdxDoc, getLog(), false ); //TODO: Add a parameter for matching cross reference URL's
         processNonStandardLicenses( licenseManager );
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( licenseManager );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
@@ -597,11 +597,13 @@ public class CreateSpdxMojo
         }
         retval.setSha1( sha1 );
         retval.setShortDescription( mavenProject.getDescription() );
-        String supplier = mavenProject.getOrganization().getName();
-        if ( supplier != null && !supplier.isEmpty() ) {
-            supplier = "ORGANIZATION: "+supplier;
-            retval.setSupplier( supplier );
-        }        
+        if ( mavenProject.getOrganization() != null ) {
+            String supplier = mavenProject.getOrganization().getName();
+            if ( supplier != null && !supplier.isEmpty() ) {
+                supplier = "Organization: "+supplier;
+                retval.setSupplier( supplier );
+            }        
+        }
         retval.setSourceInfo( this.sourceInfo );
         retval.setVersionInfo( mavenProject.getVersion() );
         return retval;
@@ -671,45 +673,71 @@ public class CreateSpdxMojo
             // creator
             fillCreatorInfo( spdxDoc, projectInformation );
             // data license
-            SPDXStandardLicense dataLicense = (SPDXStandardLicense )(SPDXLicenseInfoFactory.parseSPDXLicenseString( SPDXDocument.SPDX_DATA_LICENSE_ID ) );
+            SPDXStandardLicense dataLicense = (SPDXStandardLicense)(SPDXLicenseInfoFactory.parseSPDXLicenseString( SPDXDocument.SPDX_DATA_LICENSE_ID ) );
             spdxDoc.setDataLicense( dataLicense );
             // reviewers - not implemented
             // packageName
-            spdxDoc.getSpdxPackage().setDeclaredName( projectInformation.getName() );
+            if ( projectInformation.getName() != null ) {
+                spdxDoc.getSpdxPackage().setDeclaredName( projectInformation.getName() );
+            }
             // concluded license
             spdxDoc.getSpdxPackage().setConcludedLicenses( projectInformation.getConcludedLicense() );
             // declared license
             spdxDoc.getSpdxPackage().setDeclaredLicense( projectInformation.getDeclaredLicense() );
             // description
-            spdxDoc.getSpdxPackage().setDescription( projectInformation.getDescription() );
+            if ( projectInformation.getDescription() != null ) {
+                spdxDoc.getSpdxPackage().setDescription( projectInformation.getDescription() );
+            }
             // download url
-            spdxDoc.getSpdxPackage().setDownloadUrl( projectInformation.getDownloadUrl() );
+            if ( projectInformation.getDownloadUrl() != null ) {
+                spdxDoc.getSpdxPackage().setDownloadUrl( projectInformation.getDownloadUrl() );
+            }
             // archive file name
-            spdxDoc.getSpdxPackage().setFileName( projectInformation.getPackageArchiveFileName() );
+            if ( projectInformation.getPackageArchiveFileName() != null ) {
+                spdxDoc.getSpdxPackage().setFileName( projectInformation.getPackageArchiveFileName() );
+            }
             // home page
-            spdxDoc.getSpdxPackage().setHomePage( projectInformation.getHomePage() );
+            if ( projectInformation.getHomePage() != null ) {
+                spdxDoc.getSpdxPackage().setHomePage( projectInformation.getHomePage() );
+            }
             // source information
-            spdxDoc.getSpdxPackage().setSourceInfo( projectInformation.getSourceInfo() );
+            if ( projectInformation.getSourceInfo() != null ) {
+                spdxDoc.getSpdxPackage().setSourceInfo( projectInformation.getSourceInfo() );
+            }
             // license comment
-            spdxDoc.getSpdxPackage().setLicenseComment( projectInformation.getLicenseComment() );
+            if ( projectInformation.getLicenseComment() != null ) {
+                spdxDoc.getSpdxPackage().setLicenseComment( projectInformation.getLicenseComment() );
+            }
             // originator
-            spdxDoc.getSpdxPackage().setOriginator( projectInformation.getOriginator() );
+            if ( projectInformation.getOriginator() != null ) {
+                spdxDoc.getSpdxPackage().setOriginator( projectInformation.getOriginator() );
+            }
             // sha1 checksum
-            spdxDoc.getSpdxPackage().setSha1( projectInformation.getSha1() );
+            if ( projectInformation.getSha1() != null ) {
+                spdxDoc.getSpdxPackage().setSha1( projectInformation.getSha1() );
+            }
             // copyright text
-            spdxDoc.getSpdxPackage().setDeclaredCopyright( projectInformation.getCopyrightText() );
+            if ( projectInformation.getCopyrightText() != null ) {
+                spdxDoc.getSpdxPackage().setDeclaredCopyright( projectInformation.getCopyrightText() );
+            }
             // short description
-            spdxDoc.getSpdxPackage().setShortDescription( projectInformation.getShortDescription() );
+            if ( projectInformation.getShortDescription() != null ) {
+                spdxDoc.getSpdxPackage().setShortDescription( projectInformation.getShortDescription() );
+            }
             // supplier
-            spdxDoc.getSpdxPackage().setSupplier( projectInformation.getSupplier() );
+            if ( projectInformation.getSupplier() != null ) {
+                spdxDoc.getSpdxPackage().setSupplier( projectInformation.getSupplier() );
+            }
             // version info        
-            spdxDoc.getSpdxPackage().setVersionInfo( projectInformation.getVersionInfo() );
+            if ( projectInformation.getVersionInfo() != null ) {
+                spdxDoc.getSpdxPackage().setVersionInfo( projectInformation.getVersionInfo() );
+            }
         } catch ( InvalidSPDXAnalysisException e ) {
             this.getLog().error( "SPDX error filling SPDX information", e );
-            throw( new MojoExecutionException( "Error adding package information to SPDX document: "+e.getMessage() ) );
+            throw( new MojoExecutionException( "Error adding package information to SPDX document: "+e.getMessage(), e ) );
         } catch ( InvalidLicenseStringException e ) {
             this.getLog().error( "SPDX error creating license", e );
-            throw( new MojoExecutionException( "Error adding package information to SPDX document: "+e.getMessage() ) );
+            throw( new MojoExecutionException( "Error adding package information to SPDX document: "+e.getMessage(), e ) );
         }
     }
 

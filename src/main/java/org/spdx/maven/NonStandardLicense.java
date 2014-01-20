@@ -115,4 +115,30 @@ public class NonStandardLicense {
         return retval;
     }
 
+    public void setComment( String comment )
+    {
+        this.comment = comment;
+        
+    }
+
+    public void setCrossReference( URL[] crossRefs )
+    {
+        this.crossReference = crossRefs;
+    }
+
+    public void setExtractedText( String extractedText )
+    {
+        this.extractedText = extractedText;
+    }
+
+    public void setLicenseId( String licenseId )
+    {
+        this.licenseId = licenseId;
+    }
+
+    public void setName( String name )
+    {
+        this.name = name;
+    }
+
 }

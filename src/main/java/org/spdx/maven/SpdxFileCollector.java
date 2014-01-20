@@ -239,7 +239,7 @@ public class SpdxFileCollector {
      * @return all license information used in the SPDX files
      */
     public SPDXLicenseInfo[] getLicenseInfoFromFiles() {
-        return new SPDXLicenseInfo[licensesFromFiles.size()];
+        return licensesFromFiles.toArray( new SPDXLicenseInfo[licensesFromFiles.size()] );
     }
 
     public SpdxPackageVerificationCode getVerificationCode( String spdxFileName ) throws NoSuchAlgorithmException {
