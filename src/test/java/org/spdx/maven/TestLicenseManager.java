@@ -108,6 +108,7 @@ public class TestLicenseManager
     @Test
     public void testLicenseManager()
     {
+        @SuppressWarnings( "unused" )
         LicenseManager licenseManager = new LicenseManager(spdxDoc, log, false);
     }
 

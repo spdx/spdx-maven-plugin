@@ -32,7 +32,6 @@ import org.spdx.rdfparser.SPDXCreatorInformation;
 import org.spdx.rdfparser.SPDXDocument;
 import org.spdx.rdfparser.SPDXLicenseInfo;
 import org.spdx.rdfparser.SPDXLicenseInfoFactory;
-import org.spdx.rdfparser.SPDXNonStandardLicense;
 import org.spdx.rdfparser.SPDXStandardLicense;
 import org.spdx.rdfparser.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.SpdxRdfConstants;
@@ -52,7 +51,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -767,12 +765,11 @@ public class CreateSpdxMojo
             SpdxDefaultFileInformation defaultFileInformation,
             String spdxFileName ) throws InvalidSPDXAnalysisException, MojoExecutionException {
         
-        SpdxFileCollector fileCollector = new SpdxFileCollector( spdxDoc, 
-                excludedFilePatterns, defaultFileInformation );
+        SpdxFileCollector fileCollector = new SpdxFileCollector( excludedFilePatterns );
 
         for ( int i = 0; i < includedDirectories.length; i++ ) {
             try {
-                fileCollector.collectFilesInDirectory( includedDirectories[i] );
+                fileCollector.collectFilesInDirectory( includedDirectories[i], defaultFileInformation );
             } catch ( SpdxCollectionException e ) {
                 this.getLog().error( "SPDX error collecting file information", e );
                 throw( new MojoExecutionException( "Error collecting SPDX file information: "+e.getMessage() ) );

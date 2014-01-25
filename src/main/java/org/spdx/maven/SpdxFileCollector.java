@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 
 
 import org.spdx.rdfparser.DOAPProject;
-import org.spdx.rdfparser.SPDXDocument;
 import org.spdx.rdfparser.SPDXFile;
 import org.spdx.rdfparser.SPDXLicenseInfo;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
@@ -82,7 +81,8 @@ public class SpdxFileCollector {
         SOURCE_EXTENSION.add( "RB" ); SOURCE_EXTENSION.add( "RBX" );        
         SOURCE_EXTENSION.add( "RHTML" ); SOURCE_EXTENSION.add( "RUBY" );
     }
-    
+ 
+    //TODO: These static hashsets should be converted to using properties rather than constants
     static HashSet<String> BINARY_EXTENSIONS = new HashSet<String>();
     static {
         BINARY_EXTENSIONS.add( "EXE" );    BINARY_EXTENSIONS.add( "DLL" );
@@ -90,6 +90,7 @@ public class SpdxFileCollector {
         BINARY_EXTENSIONS.add( "SO" );    BINARY_EXTENSIONS.add( "A" );
     }
     
+    //TODO: These static hashsets should be converted to using properties rather than constants
     static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<String>();
     static {
         ARCHIVE_EXTENSIONS.add( "ZIP" ); ARCHIVE_EXTENSIONS.add( "EAR" );
@@ -110,9 +111,7 @@ public class SpdxFileCollector {
     }
     
     
-    private SPDXDocument spdxDoc;
     private Pattern[] excludedFilePatterns;
-    private SpdxDefaultFileInformation defaultFileInformation;
     /**
      * All licenses found within the files
      */
@@ -127,27 +126,43 @@ public class SpdxFileCollector {
      * SpdxFileCollector collects SPDX file information for files
      * @param spdxDoc SPDX document containing any existing license information.  Any new license created will be added to the SPDX document.
      * @param excludedFilePatterns Array of patterns which, if a file name or directory name is matched, will be skipped. 
-     * @param defaultFileInformation Information on default SPDX field data for the files
      */
-    public SpdxFileCollector( SPDXDocument spdxDoc,
-            Pattern[] excludedFilePatterns,
-            SpdxDefaultFileInformation defaultFileInformation ) {
-        this.spdxDoc = spdxDoc;
+    public SpdxFileCollector( Pattern[] excludedFilePatterns ) {
         this.excludedFilePatterns = excludedFilePatterns;
-        this.defaultFileInformation = defaultFileInformation;
     }
+    
+    /**
+     * Collect file information in the directory (including subdirectories).  
+     * @param directory Directory containing the files.  The directory is assumed to be at the top level of the archive file containing the SPDX files for distribution.
+     * @param defaultFileInformation Information on default SPDX field data for the files
+     * @throws SpdxCollectionException 
+     */
+    public void collectFilesInDirectory( File directory, 
+                                         SpdxDefaultFileInformation defaultFileInformation ) throws SpdxCollectionException {
+        String pathPrefix;
+        if ( directory.getPath().contains( File.separator )) {
+            pathPrefix = directory.getPath().substring( 0, directory.getPath().lastIndexOf( File.separatorChar ) + 1 );
+        } else {
+            pathPrefix = "";
+        }
+        collectFilesInDirectory( directory, pathPrefix, defaultFileInformation );
+    }
+ 
 
     /**
      * Collect file information in the directory (including subdirectories).  
      * @param directory
+     * @param pathPrefix Path string which should be removed when creating the SPDX file name.
+     * @param defaultFileInformation Information on default SPDX field data for the files
      * @throws SpdxCollectionException 
      */
-    public void collectFilesInDirectory( File directory ) throws SpdxCollectionException {
+    private void collectFilesInDirectory( File directory, String pathPrefix,
+                                          SpdxDefaultFileInformation defaultFileInformation) throws SpdxCollectionException {
         if ( isExcluded( directory.getName() ) ) {
             return;
         }
         if ( !directory.isDirectory() ) {
-            SPDXFile spdxFile = convertToSpdxFile( directory );
+            SPDXFile spdxFile = convertToSpdxFile( directory, pathPrefix, defaultFileInformation );
             spdxFiles.put( directory.getPath(), spdxFile );
             SPDXLicenseInfo[] seenLicenses = spdxFile.getSeenLicenses();
             for ( int j = 0; j < seenLicenses.length; j++ ) {
@@ -161,10 +176,10 @@ public class SpdxFileCollector {
                 continue;
             }
             if ( children[i].isDirectory() ) {
-                collectFilesInDirectory( children[i] );
+                collectFilesInDirectory( children[i], pathPrefix, defaultFileInformation );
             } else {
-                SPDXFile spdxFile = convertToSpdxFile( children[i] );
-                spdxFiles.put( directory.getPath(), spdxFile );
+                SPDXFile spdxFile = convertToSpdxFile( children[i], pathPrefix, defaultFileInformation );
+                spdxFiles.put( children[i].getPath(), spdxFile );
                 SPDXLicenseInfo[] seenLicenses = spdxFile.getSeenLicenses();
                 for ( int j = 0; j < seenLicenses.length; j++ ) {
                     licensesFromFiles.add( seenLicenses[j] );
@@ -173,23 +188,53 @@ public class SpdxFileCollector {
         }
     }
     
-    private SPDXFile convertToSpdxFile( File file ) throws SpdxCollectionException {
-        String relativePath = file.getPath();
+    /**
+     * @param file
+     * @param pathPrefix
+     * @param defaultFileInformation Information on default SPDX field data for the files
+     * @return
+     * @throws SpdxCollectionException
+     */
+    private SPDXFile convertToSpdxFile( File file, String pathPrefix,
+                                        SpdxDefaultFileInformation defaultFileInformation) throws SpdxCollectionException {
+        String relativePath = convertFilePathToSpdxFileName( file.getPath(), pathPrefix );
         String fileType = extensionToFileType( getExtension( file ) );
         String sha1 = generateSha1( file );
         SPDXLicenseInfo license;
-        license = this.defaultFileInformation.getDeclaredLicense();
-        String copyright = this.defaultFileInformation.getCopyright();
-        String notice = this.defaultFileInformation.getNotice();
-        String comment = this.defaultFileInformation.getComment();
-        String[] contributors = this.defaultFileInformation.getContributors();
-        DOAPProject[] artifactOf = this.defaultFileInformation.getArtifactOf();
-        SPDXLicenseInfo concludedLicense = this.defaultFileInformation.getConcludedLicense();
-        String licenseComment = this.defaultFileInformation.getLicenseComment();
+        license = defaultFileInformation.getDeclaredLicense();
+        String copyright = defaultFileInformation.getCopyright();
+        String notice = defaultFileInformation.getNotice();
+        String comment = defaultFileInformation.getComment();
+        String[] contributors = defaultFileInformation.getContributors();
+        DOAPProject[] artifactOf = defaultFileInformation.getArtifactOf();
+        SPDXLicenseInfo concludedLicense = defaultFileInformation.getConcludedLicense();
+        String licenseComment = defaultFileInformation.getLicenseComment();
         return new SPDXFile( relativePath, fileType, 
                 sha1, concludedLicense, new SPDXLicenseInfo[] {license}, 
                 licenseComment, copyright, artifactOf, comment, null, 
                 contributors, notice );
+    }
+
+    /**
+     * Create the SPDX file name from a path name and a path prefix
+     * @param path Path of the file
+     * @param pathPrefix Part of the path which should be removed - the SPDX file is relative
+     * to the top of the archive directory where the file is stored.
+     * @return
+     */
+    public String convertFilePathToSpdxFileName( String path, String pathPrefix )
+    {
+        String result;
+        if ( pathPrefix != null && !pathPrefix.isEmpty() && path.startsWith( pathPrefix )) {
+            result = path.substring( pathPrefix.length() );
+        } else {
+            result = path;
+        }
+        result = result.replace( '\\', '/' );
+        if ( !result.startsWith( "./" )) {
+            result = "./" + result;
+        }
+        return result;
     }
 
     public String getExtension( File file ) {
@@ -242,11 +287,17 @@ public class SpdxFileCollector {
         return licensesFromFiles.toArray( new SPDXLicenseInfo[licensesFromFiles.size()] );
     }
 
-    public SpdxPackageVerificationCode getVerificationCode( String spdxFileName ) throws NoSuchAlgorithmException {
+    /**
+     * Create a verification code from all SPDX files collected
+     * @param spdxFilePath Complete file path for the SPDX file - this will be excluded from the verification code
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath ) throws NoSuchAlgorithmException {
         ArrayList<String> excludedFileNamesFromVerificationCode = new ArrayList<String>();
 
-        if ( spdxFiles.containsKey( spdxFileName ) ) {
-            excludedFileNamesFromVerificationCode.add( spdxFileName );
+        if ( spdxFiles.containsKey( spdxFilePath ) ) {
+            excludedFileNamesFromVerificationCode.add( spdxFiles.get( spdxFilePath ).getName() );
         }            
         SpdxPackageVerificationCode verificationCode;
         verificationCode = calculatePackageVerificationCode( spdxFiles.values(), excludedFileNamesFromVerificationCode );
