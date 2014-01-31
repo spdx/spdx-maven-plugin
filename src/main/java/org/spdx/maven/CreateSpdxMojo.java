@@ -87,6 +87,10 @@ import java.util.regex.Pattern;
 public class CreateSpdxMojo
     extends AbstractMojo
 {
+    //TODO: Refactor to a separate Jar file for most of the functionality
+    //TODO: Use a previous SPDX to document file specific information and update
+    //TODO: Add file specific parameters
+    //TODO: Create actual SPDX distribution package
 
     static DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
 
@@ -304,40 +308,38 @@ public class CreateSpdxMojo
     public void execute()
         throws MojoExecutionException
     {
+        if ( this.getLog() == null ) {
+            throw( new MojoExecutionException( "Null log for Mojo" ) );
+        }
+        if ( this.spdxFile == null ) {
+            throw( new MojoExecutionException( "No SPDX file referenced.  " +
+            		"Specify a configuration paramaeter spdxFile to resolve." ) );
+        }
         this.getLog().info( "Creating SPDX File "+spdxFile.getPath() );
-        File f = spdxFile;
 
-        if ( !f.exists() )
+        if ( !spdxFile.exists() )
         {
-            File parentDir = f.getParentFile();
-            if ( !parentDir.exists() ) {
-                if ( !f.mkdirs() ) {
+            File parentDir = spdxFile.getParentFile();
+            if ( parentDir != null && !parentDir.exists() ) {
+                if ( !parentDir.mkdirs() ) {
                     this.getLog().error( "Unable to create directory containing the SPDX file: "+parentDir.getPath() );
                     throw( new MojoExecutionException( "Unable to create directories for SPDX file" ) );
                 }
             }
 
             try {
-                if ( !f.createNewFile() ) {
-                       this.getLog().error( "Unable to create the SPDX file: "+f.getPath() );
+                if ( !spdxFile.createNewFile() ) {
+                       this.getLog().error( "Unable to create the SPDX file: "+spdxFile.getPath() );
                     throw( new MojoExecutionException( "Unable to create the SPDX file" ) );
                 }
             } catch ( IOException e ) {
-                   this.getLog().error( "IO error creating the SPDX file "+f.getPath() + ":"+e.getMessage(),e );
+                   this.getLog().error( "IO error creating the SPDX file "+spdxFile.getPath() + ":"+e.getMessage(),e );
                 throw( new MojoExecutionException( "IO error creating the SPDX file" ) );
             }
         }
-        if ( !f.canWrite() ) {
-            this.getLog().error( "Can not write to SPDX file "+f.getPath() );
-            throw( new MojoExecutionException( "Unable to write to SPDX file - check permissions: "+f.getPath() ) ) ;
-        }
-        if ( !spdxFile.exists() ) {
-            this.getLog().error( "Can not create SPDX from project - file "+spdxFile.getName()+ " does not exist." );
-            throw( new MojoExecutionException( "Can not create SPDX from project - file "+spdxFile.getName()+ " does not exist." ) );
-        }
         if ( !spdxFile.canWrite() ) {
-            this.getLog().error( "Can not write to SPDX file "+spdxFile.getName() + "." );
-            throw( new MojoExecutionException( "Can not write to SPDX file "+spdxFile.getName()+ "." ) );
+            this.getLog().error( "Can not write to SPDX file "+spdxFile.getPath() );
+            throw( new MojoExecutionException( "Unable to write to SPDX file - check permissions: "+spdxFile.getPath() ) ) ;
         }
         Model model = ModelFactory.createDefaultModel();
         SPDXDocument spdxDoc;
@@ -346,6 +348,10 @@ public class CreateSpdxMojo
         } catch ( InvalidSPDXAnalysisException e ) {
             this.getLog().error( "Error creating SPDX document", e );
             throw( new MojoExecutionException( "Error creating SPDX document: "+e.getMessage() ) );
+        }
+        if ( spdxDocumentUrl == null ) {
+            this.getLog().error( "spdxDocumentUrl must be specified as a configuration parameter" );
+            throw( new MojoExecutionException( "Missing spdxDocumentUrl" ) );
         }
         try {
             spdxDoc.createSpdxAnalysis( spdxDocumentUrl.toString() );
@@ -372,7 +378,7 @@ public class CreateSpdxMojo
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
         defaultFileInformation.logInfo( this.getLog() );
-        createSpdxFromProject( f, spdxDoc, spdxDocumentUrl, excludedFilePatterns, includedDirectories,
+        createSpdxFromProject( spdxFile, spdxDoc, spdxDocumentUrl, excludedFilePatterns, includedDirectories,
                                 projectInformation, defaultFileInformation, licenseManager );
         ArrayList<String> spdxErrors = spdxDoc.verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) {

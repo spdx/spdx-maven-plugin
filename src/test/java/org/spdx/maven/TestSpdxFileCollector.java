@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.junit.After;
@@ -25,8 +26,6 @@ import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 import com.google.common.io.Files;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 
 public class TestSpdxFileCollector {

@@ -1,0 +1,160 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.spdx</groupId>
+  <artifactId>spdx-maven-plugin-test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>Test SPDX Plugin</name>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <url>http://spdx.org/tools</url>
+    <organization>
+        <name>Linux Foundation</name>
+        <url>http://www.linuxfoundation.org</url>
+    </organization>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>Test</testSourceDirectory>
+        <resources>
+            <resource>
+                <targetPath>resources</targetPath>
+                <filtering>false</filtering>
+                <directory>resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <targetPath>META-INF</targetPath>
+                <filtering>false</filtering>
+                <directory>.</directory>
+                <includes>
+                    <include>NOTICE</include>
+                    <include>LICENSE</include>
+                    <include>README.txt</include>
+                    <include>changelog</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>Test</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>TestFiles</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.spdx</groupId>
+                <artifactId>spdx-maven-plugin</artifactId>
+                <version>0.0.2-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>build-spdx</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>createSPDX</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx</spdxFile>
+                    <spdxDocumentUrl>http://spdx.org/documents/test-maven-plugin</spdxDocumentUrl>
+                    <nonStandardLicenses>
+                        <param>
+                            <licenseId>LicenseRef-testLicense</licenseId>
+                            <extractedText>Test license text</extractedText>
+                            <name>Test License</name>
+                            <crossReference>
+                                <param>http://www.test.url/testLicense.html</param>
+                            </crossReference>
+                            <comment>Test license comment</comment>
+                        </param>
+                        <param>
+                            <licenseId>LicenseRef-testLicense2</licenseId>
+                            <extractedText>Second est license text</extractedText>
+                            <name>Second Test License</name>
+                            <crossReference>
+                                <param>http://www.test.url/testLicense2.html</param>
+                                <param>http://www.test.url/testLicense2-alt.html</param>
+                            </crossReference>
+                            <comment>Second Test license comment</comment>
+                        </param>
+                    </nonStandardLicenses>
+                    <includedDirectories>
+                        <param>src/test/resources/unit/spdx-maven-plugin-test/src</param>
+                    </includedDirectories>
+                    <defaultFileCopyright>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</defaultFileCopyright>
+                    <defaultFileComment>Default file comment</defaultFileComment>
+                    <defaultFileContributors>
+                        <param>First contributor</param>
+                        <param>Second contributor</param>
+                    </defaultFileContributors>
+                    <defaultLicenseInformationInFile>Apache-2.0</defaultLicenseInformationInFile>
+                    <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
+                    <defaultFileLicenseComment>Default file comment</defaultFileLicenseComment>
+                    <defaultFileNotice>Default file notice</defaultFileNotice>
+                    <defaultFileArtifactOfs>
+                        <param>
+                            <name>Artifact1 Name</name>
+                            <homePage>http://home.page.one.html</homePage>
+                        </param>
+                        <param>
+                            <name>Artifact2 Name</name>
+                            <homePage>http://home.page.two.html</homePage>
+                        </param>
+                    </defaultFileArtifactOfs>
+                    <licenseDeclared>BSD-2-Clause</licenseDeclared>
+                    <licenseConcluded>BSD-3-Clause</licenseConcluded>
+                    <creatorComment>Creator comment</creatorComment>
+                    <creators>
+                        <param>PERSON: Creator1</param>
+                        <param>PERSON: Creator2</param>
+                    </creators>
+                    <licenseComments>License comments</licenseComments>
+                    <originator>Organization: Originating org.</originator>
+                    <excludedFilePatterns>
+                        <param>pattern.*</param>
+                        <param>pattern2.*</param>
+                    </excludedFilePatterns>
+                </configuration>
+                </plugin>
+        </plugins>
+    </build>
+</project>
