@@ -27,30 +27,16 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.spdx.rdfparser.DOAPProject;
-import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.SPDXCreatorInformation;
-import org.spdx.rdfparser.SPDXDocument;
 import org.spdx.rdfparser.SPDXLicenseInfo;
 import org.spdx.rdfparser.SPDXLicenseInfoFactory;
-import org.spdx.rdfparser.SPDXStandardLicense;
 import org.spdx.rdfparser.SpdxNoAssertionLicense;
-import org.spdx.rdfparser.SpdxRdfConstants;
-import org.spdx.rdfparser.SpdxVerificationHelper;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -87,14 +73,8 @@ import java.util.regex.Pattern;
 public class CreateSpdxMojo
     extends AbstractMojo
 {
-    //TODO: Refactor to a separate Jar file for most of the functionality
-    //TODO: Use a previous SPDX to document file specific information and update
-    //TODO: Add file specific parameters
-    //TODO: Create actual SPDX distribution package
 
-    static DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
-
-    private static final String CREATOR_TOOL_MAVEN_PLUGIN = "tool: spdx-maven-plugin";
+    private static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
     
     /**
      * @parameter default-value="${project}"
@@ -124,6 +104,16 @@ public class CreateSpdxMojo
      */
     @Parameter
     private NonStandardLicense[] nonStandardLicenses;
+    
+    /**
+     * Optional parameter if set to true will match a Maven license to an SPDX
+     * standard license if the Maven license URL matches any of the cross-reference
+     * license URLs for a standard license.  Default value is false.
+     * Note: Several SPDX standard licenses contain the same cross-reference license
+     * URL.  In this case, the SPDX standard license used in indeterminate.
+     */
+    @Parameter( defaultValue = "false")
+    private boolean matchLicensedOnCrossReferenceUrls;
 
     /**
      * optional default SPDX file comment field.  
@@ -316,60 +306,33 @@ public class CreateSpdxMojo
             		"Specify a configuration paramaeter spdxFile to resolve." ) );
         }
         this.getLog().info( "Creating SPDX File "+spdxFile.getPath() );
-
-        if ( !spdxFile.exists() )
+        
+        SpdxDocumentBuilder builder;
+        try
         {
-            File parentDir = spdxFile.getParentFile();
-            if ( parentDir != null && !parentDir.exists() ) {
-                if ( !parentDir.mkdirs() ) {
-                    this.getLog().error( "Unable to create directory containing the SPDX file: "+parentDir.getPath() );
-                    throw( new MojoExecutionException( "Unable to create directories for SPDX file" ) );
-                }
+            builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, spdxDocumentUrl,
+                                               this.matchLicensedOnCrossReferenceUrls );
+        }
+        catch ( SpdxBuilderException e )
+        {
+            this.getLog().error( "Error creating SPDX Document Builder: "+e.getMessage(), e );
+            throw( new MojoExecutionException( "Error creating SPDX Document Builder: "+e.getMessage(), e ) );
+        }
+        if ( nonStandardLicenses != null ) {
+            try
+            {
+                builder.addNonStandardLicenses( nonStandardLicenses );
             }
-
-            try {
-                if ( !spdxFile.createNewFile() ) {
-                       this.getLog().error( "Unable to create the SPDX file: "+spdxFile.getPath() );
-                    throw( new MojoExecutionException( "Unable to create the SPDX file" ) );
-                }
-            } catch ( IOException e ) {
-                   this.getLog().error( "IO error creating the SPDX file "+spdxFile.getPath() + ":"+e.getMessage(),e );
-                throw( new MojoExecutionException( "IO error creating the SPDX file" ) );
+            catch ( SpdxBuilderException e )
+            {
+                this.getLog().error( "Error adding non standard licenses: "+e.getMessage(), e );
+                throw( new MojoExecutionException( "Error adding non standard licenses: "+e.getMessage(), e ) );
             }
-        }
-        if ( !spdxFile.canWrite() ) {
-            this.getLog().error( "Can not write to SPDX file "+spdxFile.getPath() );
-            throw( new MojoExecutionException( "Unable to write to SPDX file - check permissions: "+spdxFile.getPath() ) ) ;
-        }
-        Model model = ModelFactory.createDefaultModel();
-        SPDXDocument spdxDoc;
-        try {
-            spdxDoc = new SPDXDocument( model );
-        } catch ( InvalidSPDXAnalysisException e ) {
-            this.getLog().error( "Error creating SPDX document", e );
-            throw( new MojoExecutionException( "Error creating SPDX document: "+e.getMessage() ) );
-        }
-        if ( spdxDocumentUrl == null ) {
-            this.getLog().error( "spdxDocumentUrl must be specified as a configuration parameter" );
-            throw( new MojoExecutionException( "Missing spdxDocumentUrl" ) );
-        }
-        try {
-            spdxDoc.createSpdxAnalysis( spdxDocumentUrl.toString() );
-        } catch ( InvalidSPDXAnalysisException e ) {
-            this.getLog().error( "Error creating SPDX analysis", e );
-            throw( new MojoExecutionException( "Error creating SPDX analysis: "+e.getMessage() ) );
-        }
-        try {
-            spdxDoc.createSpdxPackage();
-        } catch ( InvalidSPDXAnalysisException e ) {
-            this.getLog().error( "Error creating SPDX package", e );
-            throw( new MojoExecutionException( "Error creating SPDX package: "+e.getMessage() ) );
         }
         Pattern[] excludedFilePatterns = getPatternFromParameters();
         File[] includedDirectories = getIncludedDirectoriesFromParameters();
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, getLog(), false ); //TODO: Add a parameter for matching cross reference URL's
-        processNonStandardLicenses( licenseManager );
-        SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( licenseManager );
+
+        SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
         
         // The following is for debugging purposes
@@ -378,9 +341,18 @@ public class CreateSpdxMojo
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
         defaultFileInformation.logInfo( this.getLog() );
-        createSpdxFromProject( spdxFile, spdxDoc, spdxDocumentUrl, excludedFilePatterns, includedDirectories,
-                                projectInformation, defaultFileInformation, licenseManager );
-        ArrayList<String> spdxErrors = spdxDoc.verify();
+        
+        try
+        {
+            builder.buildDocumentFromFiles( excludedFilePatterns, includedDirectories, 
+                                            projectInformation, defaultFileInformation );
+        }
+        catch ( SpdxBuilderException e )
+        {
+            this.getLog().error( "Error building SPDX document from project files: "+e.getMessage(), e );
+            throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
+        }
+        ArrayList<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) {
             // report error
             StringBuilder sb = new StringBuilder("The following errors were found in the SPDX file:\n");
@@ -439,27 +411,6 @@ public class CreateSpdxMojo
         }
         for ( int i = 0; i < excludedFilePatterns.length; i++ ) {
             this.getLog().info( "Excluded File Pattern: "+excludedFilePatterns[i].pattern() );
-        }
-    }
-
-    /**
-     * Run through the non standard licenses and add them to the SPDX document
-     * @param spdxDoc
-     * @throws MojoExecutionException 
-     */
-    private void processNonStandardLicenses( LicenseManager licenseManager ) throws MojoExecutionException {
-        if ( this.nonStandardLicenses != null ) {
-            for ( int i = 0; i < this.nonStandardLicenses.length; i++ ) {
-                try
-                {
-                    licenseManager.addNonStandardLicense( nonStandardLicenses[i] );
-                }
-                catch ( LicenseManagerException e )
-                {
-                    this.getLog().error( "Error adding license "+e.getMessage(), e );
-                    throw(new MojoExecutionException("Error adding non standard license: "+e.getMessage(), e));
-                }
-            }
         }
     }
 
@@ -557,7 +508,12 @@ public class CreateSpdxMojo
         }
         retval.setConcludedLicense( concludedLicense );
         retval.setCreatorComment( this.creatorComment );
-        retval.setCreators( this.creators );
+        if ( this.creators == null ) {
+            this.creators = new String[0];
+        }
+        String[] allCreators = (String[]) Arrays.copyOf( creators, creators.length + 1 );
+        allCreators[allCreators.length - 1] = CREATOR_TOOL_MAVEN_PLUGIN;
+        retval.setCreators( allCreators );
         retval.setCopyrightText( this.copyrightText );
         retval.setDeclaredLicense( declaredLicense );
         String projectName = mavenProject.getName();
@@ -587,7 +543,7 @@ public class CreateSpdxMojo
 //        retval.setPackageArchiveFileName( packageFileName );
         retval.setPackageArchiveFileName( "NOASSERTION" );
         File packageFile = null;
-        //TODO Determine the package file based on the packaging and properly fill in
+        //TODO Create the archive file for SPDX redistribution
         String sha1 = null;
         if ( packageFile != null ) {
             try
@@ -641,156 +597,5 @@ public class CreateSpdxMojo
             }
         }
         return retval;
-    }
-
-    public void createSpdxFromProject( File spdxFile, SPDXDocument spdxDoc, URL spdxDocumentUrl, Pattern[] excludedFilePatterns,
-            File[] includedDirectories, SpdxProjectInformation projectInformation,
-            SpdxDefaultFileInformation defaultFileInformation, LicenseManager licenseManager ) throws MojoExecutionException {
-
-        FileOutputStream spdxOut = null;
-        try {
-            spdxOut = new FileOutputStream ( spdxFile );
-            fillSpdxDocumentInformation( spdxDoc, projectInformation );
-            collectSpdxFileInformation( spdxDoc, excludedFilePatterns, includedDirectories,
-                    defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ) );
-            spdxDoc.getModel().write( spdxOut );
-        } catch ( FileNotFoundException e ) {
-            this.getLog().error( "Error saving SPDX data to file", e );
-            throw( new MojoExecutionException( "Error saving SPDX data to file: "+e.getMessage() ) ) ;
-        } catch ( InvalidSPDXAnalysisException e ) {
-            this.getLog().error( "Error collecting SPDX file data", e );
-            throw( new MojoExecutionException( "Error collecting SPDX file data: "+e.getMessage() ) );
-        } finally {
-            if ( spdxOut != null ) {
-                try {
-                    spdxOut.close();
-                } catch ( IOException e ) {
-                    this.getLog().warn( "Error closing SPDX output file", e );
-                }
-            }
-        }
-    }
-
-    private void fillSpdxDocumentInformation( SPDXDocument spdxDoc,
-            SpdxProjectInformation projectInformation ) throws MojoExecutionException {
-        try {
-            // creator
-            fillCreatorInfo( spdxDoc, projectInformation );
-            // data license
-            SPDXStandardLicense dataLicense = (SPDXStandardLicense)(SPDXLicenseInfoFactory.parseSPDXLicenseString( SPDXDocument.SPDX_DATA_LICENSE_ID ) );
-            spdxDoc.setDataLicense( dataLicense );
-            // reviewers - not implemented
-            // packageName
-            if ( projectInformation.getName() != null ) {
-                spdxDoc.getSpdxPackage().setDeclaredName( projectInformation.getName() );
-            }
-            // concluded license
-            spdxDoc.getSpdxPackage().setConcludedLicenses( projectInformation.getConcludedLicense() );
-            // declared license
-            spdxDoc.getSpdxPackage().setDeclaredLicense( projectInformation.getDeclaredLicense() );
-            // description
-            if ( projectInformation.getDescription() != null ) {
-                spdxDoc.getSpdxPackage().setDescription( projectInformation.getDescription() );
-            }
-            // download url
-            if ( projectInformation.getDownloadUrl() != null ) {
-                spdxDoc.getSpdxPackage().setDownloadUrl( projectInformation.getDownloadUrl() );
-            }
-            // archive file name
-            if ( projectInformation.getPackageArchiveFileName() != null ) {
-                spdxDoc.getSpdxPackage().setFileName( projectInformation.getPackageArchiveFileName() );
-            }
-            // home page
-            if ( projectInformation.getHomePage() != null ) {
-                spdxDoc.getSpdxPackage().setHomePage( projectInformation.getHomePage() );
-            }
-            // source information
-            if ( projectInformation.getSourceInfo() != null ) {
-                spdxDoc.getSpdxPackage().setSourceInfo( projectInformation.getSourceInfo() );
-            }
-            // license comment
-            if ( projectInformation.getLicenseComment() != null ) {
-                spdxDoc.getSpdxPackage().setLicenseComment( projectInformation.getLicenseComment() );
-            }
-            // originator
-            if ( projectInformation.getOriginator() != null ) {
-                spdxDoc.getSpdxPackage().setOriginator( projectInformation.getOriginator() );
-            }
-            // sha1 checksum
-            if ( projectInformation.getSha1() != null ) {
-                spdxDoc.getSpdxPackage().setSha1( projectInformation.getSha1() );
-            }
-            // copyright text
-            if ( projectInformation.getCopyrightText() != null ) {
-                spdxDoc.getSpdxPackage().setDeclaredCopyright( projectInformation.getCopyrightText() );
-            }
-            // short description
-            if ( projectInformation.getShortDescription() != null ) {
-                spdxDoc.getSpdxPackage().setShortDescription( projectInformation.getShortDescription() );
-            }
-            // supplier
-            if ( projectInformation.getSupplier() != null ) {
-                spdxDoc.getSpdxPackage().setSupplier( projectInformation.getSupplier() );
-            }
-            // version info        
-            if ( projectInformation.getVersionInfo() != null ) {
-                spdxDoc.getSpdxPackage().setVersionInfo( projectInformation.getVersionInfo() );
-            }
-        } catch ( InvalidSPDXAnalysisException e ) {
-            this.getLog().error( "SPDX error filling SPDX information", e );
-            throw( new MojoExecutionException( "Error adding package information to SPDX document: "+e.getMessage(), e ) );
-        } catch ( InvalidLicenseStringException e ) {
-            this.getLog().error( "SPDX error creating license", e );
-            throw( new MojoExecutionException( "Error adding package information to SPDX document: "+e.getMessage(), e ) );
-        }
-    }
-
-    private void fillCreatorInfo( SPDXDocument spdxDoc,
-            SpdxProjectInformation projectInformation ) throws InvalidSPDXAnalysisException {
-        ArrayList<String> creators = new ArrayList<String>();
-        creators.add( CREATOR_TOOL_MAVEN_PLUGIN );
-        String[] parameterCreators = projectInformation.getCreators();
-        for ( int i = 0; i < parameterCreators.length; i++ ) {
-            String verify = SpdxVerificationHelper.verifyCreator( parameterCreators[i] );
-            if ( verify == null ) {
-                creators.add( parameterCreators[i] );
-            } else {
-                this.getLog().warn( "Invalid creator string ( "+verify+" ), "+
-                            parameterCreators[i]+" will be skipped." );
-            }
-        }
-        SPDXCreatorInformation spdxCreator = new SPDXCreatorInformation(
-                creators.toArray( new String[creators.size()] ), format.format( new Date() ),
-                projectInformation.getCreatorComment(), 
-                SPDXLicenseInfoFactory.DEFAULT_LICENSE_LIST_VERSION );
-        spdxDoc.setCreationInfo( spdxCreator );        
-    }
-
-    private void collectSpdxFileInformation( SPDXDocument spdxDoc,
-            Pattern[] excludedFilePatterns, File[] includedDirectories,
-            SpdxDefaultFileInformation defaultFileInformation,
-            String spdxFileName ) throws InvalidSPDXAnalysisException, MojoExecutionException {
-        
-        SpdxFileCollector fileCollector = new SpdxFileCollector( excludedFilePatterns );
-
-        for ( int i = 0; i < includedDirectories.length; i++ ) {
-            try {
-                fileCollector.collectFilesInDirectory( includedDirectories[i], defaultFileInformation );
-            } catch ( SpdxCollectionException e ) {
-                this.getLog().error( "SPDX error collecting file information", e );
-                throw( new MojoExecutionException( "Error collecting SPDX file information: "+e.getMessage() ) );
-            }
-        }
-        spdxDoc.getSpdxPackage().setFiles( fileCollector.getFiles() );
-        spdxDoc.getSpdxPackage().setLicenseInfoFromFiles( fileCollector.getLicenseInfoFromFiles() );
-        try {
-            spdxDoc.getSpdxPackage().setVerificationCode( fileCollector.getVerificationCode( spdxFileName ) );
-        } catch ( NoSuchAlgorithmException e )  {
-            this.getLog().error( "Error calculating verification code", e );
-            throw( new MojoExecutionException( "Unable to calculate verification code" ) );
-        } catch ( InvalidSPDXAnalysisException e ) {
-            this.getLog().error( "SPDX Error updating verification code", e );
-            throw( new MojoExecutionException( "Unable to update verification code" ) );
-        }
     }
 }

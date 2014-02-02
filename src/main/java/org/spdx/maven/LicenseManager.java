@@ -25,7 +25,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SPDXConjunctiveLicenseSet;
 import org.spdx.rdfparser.SPDXDocument;
-import org.spdx.rdfparser.SPDXLicense;
 import org.spdx.rdfparser.SPDXLicenseInfo;
 import org.spdx.rdfparser.SPDXLicenseInfoFactory;
 import org.spdx.rdfparser.SPDXNonStandardLicense;
