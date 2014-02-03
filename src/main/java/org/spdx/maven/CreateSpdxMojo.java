@@ -37,7 +37,10 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 /**
@@ -294,6 +297,23 @@ public class CreateSpdxMojo
      */
     @Parameter( defaultValue ="NOASSERTION" )
     private String copyrightText;
+    
+    // Path specific data
+    /**
+     * File or directories which have SPDX information different from the project
+     * defaults.  The fileOrDirectory field of the PathSpecificSpdxInfo is required.
+     * All files within the directory (or just the specific file) will use the 
+     * SPDX data specified in the PathSpecificSpdxInfo parameters.  All of the SPDX
+     * data parameters are optional.  If any SPDX field is not specified, the project level default
+     * data will be used.
+     * 
+     * If a file or directory is nested within another pathsWithSpcificSpdxInfo, the
+     * lowest level values will be used.  Note: in this case the non-specified SPDX
+     * fields for the lowest level PathSpecificSpdxInfo will use the default project
+     * level fields NOT the higher level PathSpecificSpdxInfo.
+     */
+    @Parameter( required = false )
+    private List<PathSpecificSpdxInfo> pathsWithSpecificSpdxInfo;
 
     public void execute()
         throws MojoExecutionException
@@ -334,6 +354,7 @@ public class CreateSpdxMojo
 
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
+        HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation );
         
         // The following is for debugging purposes
         logExcludedFilePatterns( excludedFilePatterns );
@@ -341,11 +362,13 @@ public class CreateSpdxMojo
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
         defaultFileInformation.logInfo( this.getLog() );
+        logFileSpecificInfo( pathSpecificInformation );
         
         try
         {
             builder.buildDocumentFromFiles( excludedFilePatterns, includedDirectories, 
-                                            projectInformation, defaultFileInformation );
+                                            projectInformation, defaultFileInformation,
+                                            pathSpecificInformation );
         }
         catch ( SpdxBuilderException e )
         {
@@ -363,6 +386,40 @@ public class CreateSpdxMojo
             }
             this.getLog().warn( sb.toString() );
         }
+    }
+
+    private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
+    {
+        Iterator<Entry<String, SpdxDefaultFileInformation>> iter = fileSpecificInformation.entrySet().iterator();
+        while ( iter.hasNext() ) {
+            Entry<String, SpdxDefaultFileInformation> entry = iter.next();
+            this.getLog().info( "File Specific Information for "+entry.getKey() );
+            entry.getValue().logInfo( this.getLog() );
+        }
+    }
+
+    private HashMap<String, SpdxDefaultFileInformation> getPathSpecificInfoFromParameters(
+                                                  SpdxDefaultFileInformation projectDefault ) throws MojoExecutionException
+    {
+        HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<String, SpdxDefaultFileInformation>();
+        if ( this.pathsWithSpecificSpdxInfo != null ) {
+            Iterator<PathSpecificSpdxInfo> iter = this.pathsWithSpecificSpdxInfo.iterator();
+            while ( iter.hasNext() ) {
+                PathSpecificSpdxInfo spdxInfo = iter.next();
+                SpdxDefaultFileInformation value = null;
+                try
+                {
+                    value = spdxInfo.getDefaultFileInformation( projectDefault );
+                }
+                catch ( InvalidLicenseStringException e )
+                {
+                    this.getLog().error( "Invalid license string used in the path specific SPDX information for file "+spdxInfo.getPath(), e );
+                    throw( new MojoExecutionException( "Invalid license string used in the path specific SPDX information for file "+spdxInfo.getPath(), e ) );
+                } 
+                retval.put( spdxInfo.getPath(), value );            
+            }
+        }
+        return retval;
     }
 
     /**

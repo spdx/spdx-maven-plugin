@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.junit.After;
@@ -139,7 +140,8 @@ public class TestSpdxFileCollector {
         SPDXFile[] spdxFiles = collector.getFiles();
         assertEquals( 0, spdxFiles.length );
         
-        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation );
+        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation,
+                                           new HashMap<String, SpdxDefaultFileInformation>() );
         spdxFiles = collector.getFiles();
         assertEquals( filePaths.length, spdxFiles.length );
         Arrays.sort(  spdxFiles );
@@ -155,7 +157,8 @@ public class TestSpdxFileCollector {
         SPDXFile[] spdxFiles = collector.getFiles();
         assertEquals( 0, spdxFiles.length );
         
-        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation );
+        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation,
+                                           new HashMap<String, SpdxDefaultFileInformation>() );
         spdxFiles = collector.getFiles();
         assertEquals( filePaths.length - 1, spdxFiles.length );
         Arrays.sort(  spdxFiles );
@@ -188,7 +191,8 @@ public class TestSpdxFileCollector {
         SPDXFile[] spdxFiles = collector.getFiles();
         assertEquals( 0, spdxFiles.length );
         
-        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation );
+        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation,
+                                           new HashMap<String, SpdxDefaultFileInformation>() );
         spdxFiles = collector.getFiles();
         assertEquals( filePaths.length, spdxFiles.length );
         Arrays.sort(  spdxFiles );
@@ -217,6 +221,100 @@ public class TestSpdxFileCollector {
             assertEquals( DEFAULT_NOTICE, spdxFiles[i].getNoticeText() );
         }
 	}
+	
+	   @Test
+	    public void testCollectFilesWithPattern() throws SpdxCollectionException {
+	        SpdxFileCollector collector = new SpdxFileCollector( new Pattern[] {} );
+	        SPDXFile[] spdxFiles = collector.getFiles();
+	        assertEquals( 0, spdxFiles.length );
+	        HashMap<String, SpdxDefaultFileInformation> fileSpecificInfo = 
+	                        new HashMap<String, SpdxDefaultFileInformation>();
+	        SpdxDefaultFileInformation file2Info = new SpdxDefaultFileInformation();
+	        DOAPProject file2DoapProject = new DOAPProject( "file2project", "http://file2homepage.net");
+	        DOAPProject[] file2ArtifactOf = new DOAPProject[] { file2DoapProject };
+	        file2Info.setArtifactOf( file2ArtifactOf );
+	        String file2Comment = "File 2 comment";
+            file2Info.setComment( file2Comment  );
+            SPDXLicenseInfo file2License = defaultFileInformation.getDeclaredLicense();
+            file2Info.setConcludedLicense( file2License );
+            String[] file2Contributors = new String[] {"Person: File 2 contributor"};
+            file2Info.setContributors( file2Contributors  );
+            String file2Copyright = "File 2 copyright";
+            file2Info.setCopyright( file2Copyright  );
+            SPDXLicenseInfo file2DeclaredLicense = defaultFileInformation.getConcludedLicense();
+            file2Info.setDeclaredLicense( file2DeclaredLicense  );
+            String file2LicenseComment = "File 2 license comment";
+            file2Info.setLicenseComment( file2LicenseComment  );
+            String file2Notice = "file 2 notice";
+            file2Info.setNotice( file2Notice  );
+            fileSpecificInfo.put( filePaths[1], file2Info );
+	        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation,
+	                                           fileSpecificInfo );
+	        spdxFiles = collector.getFiles();
+	        assertEquals( filePaths.length, spdxFiles.length );
+	        Arrays.sort(  spdxFiles );
+            assertEquals( spdxFileNames[0], spdxFiles[0].getName() );
+            DOAPProject[] artifactOfs = spdxFiles[0].getArtifactOf();
+            assertEquals( ARTIFACT_OF_NAMES.length, artifactOfs.length );
+            if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[0] )) {
+                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[0].getHomePage() );
+                assertEquals( ARTIFACT_OF_NAMES[1], artifactOfs[1].getName());
+                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[1].getHomePage() );
+            } else if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[1] )) {
+                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[0].getHomePage() );
+                assertEquals( ARTIFACT_OF_NAMES[0], artifactOfs[1].getName());
+                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[1].getHomePage() );
+            } else {
+                fail( "ArtifactOf not found" );
+            }
+            assertEquals( DEFAULT_COMMENT, spdxFiles[0].getComment() );
+            assertEquals( DEFAULT_CONCLUDED_LICENSE, spdxFiles[0].getConcludedLicenses().toString());
+            assertEquals( DEFAULT_CONTRIBUTORS.length, spdxFiles[0].getContributors().length );
+            TestLicenseManager.assertArraysEqual( DEFAULT_CONTRIBUTORS, spdxFiles[0].getContributors() );
+            assertEquals( DEFAULT_COPYRIGHT, spdxFiles[0].getCopyright() );
+            assertEquals( DEFAULT_DECLARED_LICENSE, spdxFiles[0].getSeenLicenses()[0].toString() );
+            assertEquals( DEFAULT_LICENSE_COMMENT, spdxFiles[0].getLicenseComments() );
+            assertEquals( DEFAULT_NOTICE, spdxFiles[0].getNoticeText() );
+            
+            assertEquals( spdxFileNames[1], spdxFiles[1].getName() );
+            artifactOfs = spdxFiles[1].getArtifactOf();
+            assertEquals( file2ArtifactOf.length, artifactOfs.length );
+            assertEquals( file2ArtifactOf[0].getName(), artifactOfs[0].getName() );
+            assertEquals( file2ArtifactOf[0].getHomePage(), artifactOfs[0].getHomePage() );
+            assertEquals( file2Comment, spdxFiles[1].getComment() );
+            assertEquals( file2License.toString(), spdxFiles[1].getConcludedLicenses().toString());
+            assertEquals( file2Contributors.length, spdxFiles[1].getContributors().length );
+            TestLicenseManager.assertArraysEqual( file2Contributors, spdxFiles[1].getContributors() );
+            assertEquals( file2Copyright, spdxFiles[1].getCopyright() );
+            assertEquals( file2DeclaredLicense.toString(), spdxFiles[1].getSeenLicenses()[0].toString() );
+            assertEquals( file2LicenseComment, spdxFiles[1].getLicenseComments() );
+            assertEquals( file2Notice, spdxFiles[1].getNoticeText() );            
+            
+	        for ( int i = 2; i < spdxFiles.length; i++ ) {
+	            assertEquals( spdxFileNames[i], spdxFiles[i].getName() );
+	            artifactOfs = spdxFiles[i].getArtifactOf();
+	            assertEquals( ARTIFACT_OF_NAMES.length, artifactOfs.length );
+	            if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[0] )) {
+	                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[0].getHomePage() );
+	                assertEquals( ARTIFACT_OF_NAMES[1], artifactOfs[1].getName());
+	                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[1].getHomePage() );
+	            } else if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[1] )) {
+	                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[0].getHomePage() );
+	                assertEquals( ARTIFACT_OF_NAMES[0], artifactOfs[1].getName());
+	                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[1].getHomePage() );
+	            } else {
+	                fail( "ArtifactOf not found" );
+	            }
+	            assertEquals( DEFAULT_COMMENT, spdxFiles[i].getComment() );
+	            assertEquals( DEFAULT_CONCLUDED_LICENSE, spdxFiles[i].getConcludedLicenses().toString());
+	            assertEquals( DEFAULT_CONTRIBUTORS.length, spdxFiles[i].getContributors().length );
+	            TestLicenseManager.assertArraysEqual( DEFAULT_CONTRIBUTORS, spdxFiles[i].getContributors() );
+	            assertEquals( DEFAULT_COPYRIGHT, spdxFiles[i].getCopyright() );
+	            assertEquals( DEFAULT_DECLARED_LICENSE, spdxFiles[i].getSeenLicenses()[0].toString() );
+	            assertEquals( DEFAULT_LICENSE_COMMENT, spdxFiles[i].getLicenseComments() );
+	            assertEquals( DEFAULT_NOTICE, spdxFiles[i].getNoticeText() );
+	        }
+	    }
 
 	@Test
 	public void testGetLicenseInfoFromFiles() throws SpdxCollectionException, IOException, InvalidLicenseStringException {
@@ -224,7 +322,8 @@ public class TestSpdxFileCollector {
         SPDXLicenseInfo[] result = collector.getLicenseInfoFromFiles();
         assertEquals( 0, result.length );
         
-        collector.collectFilesInDirectory( directory, this.defaultFileInformation );
+        collector.collectFilesInDirectory( directory, this.defaultFileInformation,
+                                           new HashMap<String, SpdxDefaultFileInformation>() );
         result = collector.getLicenseInfoFromFiles();
         assertEquals( 1, result.length );
         assertEquals( DEFAULT_DECLARED_LICENSE, result[0].toString() );
@@ -240,7 +339,8 @@ public class TestSpdxFileCollector {
             String newLicenseName = "LicenseRef-newLicense";
             SPDXLicenseInfo newDeclaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( newLicenseName );
             info2.setDeclaredLicense( newDeclaredLicense );
-            collector.collectFilesInDirectory( tempDir2, info2 );
+            collector.collectFilesInDirectory( tempDir2, info2,
+                                               new HashMap<String, SpdxDefaultFileInformation>() );
             result = collector.getLicenseInfoFromFiles();
             assertEquals( 2, result.length );
             if ( result[0].toString().equals( DEFAULT_DECLARED_LICENSE )) {
@@ -260,7 +360,8 @@ public class TestSpdxFileCollector {
         SPDXFile[] spdxFiles = collector.getFiles();
         assertEquals( 0, spdxFiles.length );
         
-        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation );
+        collector.collectFilesInDirectory( this.directory, this.defaultFileInformation,
+                                           new HashMap<String, SpdxDefaultFileInformation>() );
         File spdxFile = new File( this.directory.getPath() + File.separator + FILE_NAMES[0] );
         SpdxPackageVerificationCode result = collector.getVerificationCode( spdxFile.getPath() );
         assertTrue( !result.getValue().isEmpty() );

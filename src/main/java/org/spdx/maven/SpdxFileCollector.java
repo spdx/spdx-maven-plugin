@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -135,39 +136,38 @@ public class SpdxFileCollector {
      * Collect file information in the directory (including subdirectories).  
      * @param directory Directory containing the files.  The directory is assumed to be at the top level of the archive file containing the SPDX files for distribution.
      * @param defaultFileInformation Information on default SPDX field data for the files
+     * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @throws SpdxCollectionException 
      */
     public void collectFilesInDirectory( File directory, 
-                                         SpdxDefaultFileInformation defaultFileInformation ) throws SpdxCollectionException {
+                                         SpdxDefaultFileInformation defaultFileInformation,
+                                         Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxCollectionException {
         String pathPrefix;
         if ( directory.getPath().contains( File.separator )) {
             pathPrefix = directory.getPath().substring( 0, directory.getPath().lastIndexOf( File.separatorChar ) + 1 );
         } else {
             pathPrefix = "";
         }
-        collectFilesInDirectory( directory, pathPrefix, defaultFileInformation );
+        collectFilesInDirectory( directory, pathPrefix, defaultFileInformation, pathSpecificInformation );
     }
  
 
     /**
      * Collect file information in the directory (including subdirectories).  
      * @param directory
-     * @param pathPrefix Path string which should be removed when creating the SPDX file name.
+     * @param pathPrefix Path string which should be removed when creating the SPDX file name
      * @param defaultFileInformation Information on default SPDX field data for the files
+     * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @throws SpdxCollectionException 
      */
     private void collectFilesInDirectory( File directory, String pathPrefix,
-                                          SpdxDefaultFileInformation defaultFileInformation) throws SpdxCollectionException {
+                                          SpdxDefaultFileInformation defaultFileInformation,
+                                          Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxCollectionException {
         if ( isExcluded( directory.getName() ) ) {
             return;
         }
         if ( !directory.isDirectory() ) {
-            SPDXFile spdxFile = convertToSpdxFile( directory, pathPrefix, defaultFileInformation );
-            spdxFiles.put( directory.getPath(), spdxFile );
-            SPDXLicenseInfo[] seenLicenses = spdxFile.getSeenLicenses();
-            for ( int j = 0; j < seenLicenses.length; j++ ) {
-                licensesFromFiles.add( seenLicenses[j] );
-            }
+            collectFile( directory, pathPrefix, defaultFileInformation, pathSpecificInformation );
             return;
         }
         File[] children = directory.listFiles();
@@ -176,18 +176,43 @@ public class SpdxFileCollector {
                 continue;
             }
             if ( children[i].isDirectory() ) {
-                collectFilesInDirectory( children[i], pathPrefix, defaultFileInformation );
-            } else {
-                SPDXFile spdxFile = convertToSpdxFile( children[i], pathPrefix, defaultFileInformation );
-                spdxFiles.put( children[i].getPath(), spdxFile );
-                SPDXLicenseInfo[] seenLicenses = spdxFile.getSeenLicenses();
-                for ( int j = 0; j < seenLicenses.length; j++ ) {
-                    licensesFromFiles.add( seenLicenses[j] );
+                SpdxDefaultFileInformation directoryDefault = pathSpecificInformation.get( children[i].getPath() );
+                if ( directoryDefault == null ) {
+                    directoryDefault = pathSpecificInformation.get( directory.getPath() );  // just in case the highest level directory has an override
                 }
+                if ( directoryDefault == null ) {
+                    directoryDefault = defaultFileInformation;
+                }
+                collectFilesInDirectory( children[i], pathPrefix, directoryDefault, pathSpecificInformation );
+            } else {
+                collectFile( children[i], pathPrefix, defaultFileInformation, pathSpecificInformation );
             }
         }
     }
     
+    /**
+     * Collect SPDX information for a specific file
+     * @param file
+     * @param pathPrefix Path string which should be removed when creating the SPDX file name
+     * @param defaultFileInformation Information on default SPDX field data for the files
+     * @param fileSpecificInformation Map of file path to file information used to override the default file information
+     * @throws SpdxCollectionException
+     */
+    private void collectFile( File file, String pathPrefix, SpdxDefaultFileInformation defaultFileInformation,
+                              Map<String, SpdxDefaultFileInformation> fileSpecificInformation ) throws SpdxCollectionException
+    {
+        SpdxDefaultFileInformation fileInfo = fileSpecificInformation.get( file.getPath() );
+        if ( fileInfo == null ) {
+            fileInfo = defaultFileInformation;
+        }
+        SPDXFile spdxFile = convertToSpdxFile( file, pathPrefix, fileInfo );
+        spdxFiles.put( file.getPath(), spdxFile );
+        SPDXLicenseInfo[] seenLicenses = spdxFile.getSeenLicenses();
+        for ( int j = 0; j < seenLicenses.length; j++ ) {
+            licensesFromFiles.add( seenLicenses[j] );
+        }
+    }
+
     /**
      * @param file
      * @param pathPrefix

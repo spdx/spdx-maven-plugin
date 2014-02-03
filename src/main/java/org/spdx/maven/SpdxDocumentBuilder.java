@@ -25,6 +25,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.logging.Log;
@@ -49,7 +50,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 public class SpdxDocumentBuilder
 {
     //TODO: Use a previous SPDX to document file specific information and update
-    //TODO: Add file specific parameters
     //TODO: Create actual SPDX distribution package
     static DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
 
@@ -164,21 +164,24 @@ public class SpdxDocumentBuilder
     /**
      * Build the SPDX document from the files and save the information to the SPDX file
      * @param excludedFilePatterns File patterns to exclude - any files or directories matching any of the patterns will be skipped
-     * @param includedDirectories Directories to be included in the documen
+     * @param includedDirectories Directories to be included in the document
      * @param projectInformation Project level SPDX information
      * @param defaultFileInformation Default SPDX file information
+     * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @throws SpdxBuilderException
      */
     public void buildDocumentFromFiles( Pattern[] excludedFilePatterns, File[] includedDirectories,
                                         SpdxProjectInformation projectInformation,
-                                        SpdxDefaultFileInformation defaultFileInformation ) throws SpdxBuilderException
+                                        SpdxDefaultFileInformation defaultFileInformation,
+                                        Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxBuilderException
     {
         FileOutputStream spdxOut = null;
         try {
             spdxOut = new FileOutputStream ( spdxFile );
             fillSpdxDocumentInformation( projectInformation );
             collectSpdxFileInformation( excludedFilePatterns, includedDirectories,
-                    defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ) );
+                    defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ),
+                    pathSpecificInformation );
             spdxDoc.getModel().write( spdxOut );
         } catch ( FileNotFoundException e ) {
             this.getLog().error( "Error saving SPDX data to file", e );
@@ -303,21 +306,23 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
   /**
    * Collect information at the file level, fill in the SPDX document
    * @param excludedFilePatterns File patterns to exclude - any files or directories matching any of the patterns will be skipped
-   * @param includedDirectories Directories to be included in the documen
+   * @param includedDirectories Directories to be included in the document
    * @param projectInformation Project level SPDX information
    * @param spdxFileName SPDX file name - will be used for the skipped file names in the verification code
+   * @param pathSpecificInformation Map of path to file information used to override the default file information
    * @throws InvalidSPDXAnalysisException
    * @throws SpdxBuilderException
  */
 private void collectSpdxFileInformation( Pattern[] excludedFilePatterns, File[] includedDirectories,
           SpdxDefaultFileInformation defaultFileInformation,
-          String spdxFileName ) throws InvalidSPDXAnalysisException, SpdxBuilderException {
+          String spdxFileName, 
+          Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException {
       
       SpdxFileCollector fileCollector = new SpdxFileCollector( excludedFilePatterns );
 
       for ( int i = 0; i < includedDirectories.length; i++ ) {
           try {
-              fileCollector.collectFilesInDirectory( includedDirectories[i], defaultFileInformation );
+              fileCollector.collectFilesInDirectory( includedDirectories[i], defaultFileInformation, pathSpecificInformation );
           } catch ( SpdxCollectionException e ) {
               this.getLog().error( "SPDX error collecting file information", e );
               throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );
