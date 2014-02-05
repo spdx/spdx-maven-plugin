@@ -18,6 +18,7 @@ package org.spdx.maven;
 
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -26,6 +27,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.rdfparser.DOAPProject;
 import org.spdx.rdfparser.SPDXLicenseInfo;
 import org.spdx.rdfparser.SPDXLicenseInfoFactory;
@@ -41,7 +43,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 /**
  * NOTE: Currently this is a prototype plugin for supporting SPDX in a Maven build.
@@ -68,6 +69,7 @@ import java.util.regex.Pattern;
  *  - package homePage: project url
  *  - package supplier: project organization
  *  - package versionInfo: project version
+ *  - files for analysis: build source files + project resource files
  *  
  * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
@@ -75,7 +77,8 @@ import java.util.regex.Pattern;
 @Execute ( goal = "createSPDX", phase = LifecyclePhase.PREPARE_PACKAGE )
 public class CreateSpdxMojo
     extends AbstractMojo
-{
+{    
+    static final String INCLUDE_ALL = "**/*";
 
     private static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
     
@@ -134,6 +137,7 @@ public class CreateSpdxMojo
      */
     @Parameter
     private String[] defaultFileContributors;
+    //TODO: Take this from developers project parameter
 
     /**
      * Default file copyright text.
@@ -261,23 +265,6 @@ public class CreateSpdxMojo
     //TODO: Determine if the POM organization should be the originator or the supplier or both
 
     /**
-     * Regular expressions for any file or directory names which should be excluded from the SPDX verification code.
-     * These typically are meta data files which are not included in the distribution of the source files.  
-     * See http://spdx.org/rdf/terms#PackageVerificationCode
-     */
-    @Parameter
-    private String[] excludedFilePatterns;
-
-    /**
-     * Directory of files which are included in the package.  This is used to create
-     * the SPDXFiles and the verification code.  If there are files in the directory
-     * which should not be included, the <code>excludedFilePatterns</code> parameter
-     * can be used to specify any patterns for file or directory names which should be skipped
-     */
-    @Parameter( required = true )
-    private File[] includedDirectories;
-
-    /**
      * This field provides a place for the SPDX file creator to record any relevant 
      * background information or additional comments about the origin of the package.
      * For example, this field might include comments indicating whether the package 
@@ -318,10 +305,12 @@ public class CreateSpdxMojo
     public void execute()
         throws MojoExecutionException
     {
-        if ( this.getLog() == null ) {
+        if ( this.getLog() == null ) 
+        {
             throw( new MojoExecutionException( "Null log for Mojo" ) );
         }
-        if ( this.spdxFile == null ) {
+        if ( this.spdxFile == null ) 
+        {
             throw( new MojoExecutionException( "No SPDX file referenced.  " +
             		"Specify a configuration paramaeter spdxFile to resolve." ) );
         }
@@ -338,7 +327,8 @@ public class CreateSpdxMojo
             this.getLog().error( "Error creating SPDX Document Builder: "+e.getMessage(), e );
             throw( new MojoExecutionException( "Error creating SPDX Document Builder: "+e.getMessage(), e ) );
         }
-        if ( nonStandardLicenses != null ) {
+        if ( nonStandardLicenses != null ) 
+        {
             try
             {
                 builder.addNonStandardLicenses( nonStandardLicenses );
@@ -349,15 +339,12 @@ public class CreateSpdxMojo
                 throw( new MojoExecutionException( "Error adding non standard licenses: "+e.getMessage(), e ) );
             }
         }
-        Pattern[] excludedFilePatterns = getPatternFromParameters();
-        File[] includedDirectories = getIncludedDirectoriesFromParameters();
+        FileSet[] includedDirectories = getIncludedDirectoriesFromParameters();
 
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation );
-        
         // The following is for debugging purposes
-        logExcludedFilePatterns( excludedFilePatterns );
         logIncludedDirectories( includedDirectories );
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
@@ -366,7 +353,7 @@ public class CreateSpdxMojo
         
         try
         {
-            builder.buildDocumentFromFiles( excludedFilePatterns, includedDirectories, 
+            builder.buildDocumentFromFiles( includedDirectories, 
                                             projectInformation, defaultFileInformation,
                                             pathSpecificInformation );
         }
@@ -376,12 +363,14 @@ public class CreateSpdxMojo
             throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
         }
         ArrayList<String> spdxErrors = builder.getSpdxDoc().verify();
-        if ( spdxErrors != null && spdxErrors.size() > 0 ) {
+        if ( spdxErrors != null && spdxErrors.size() > 0 ) 
+        {
             // report error
-            StringBuilder sb = new StringBuilder("The following errors were found in the SPDX file:\n");
+            StringBuilder sb = new StringBuilder("The following errors were found in the SPDX file:\n ");
             sb.append( spdxErrors.get( 0 ) );
-            for ( int i = 0; i < spdxErrors.size(); i++ ) {
-                sb.append( '\n' );
+            for ( int i = 0; i < spdxErrors.size(); i++ ) 
+            {
+                sb.append( "\n " );
                 sb.append( spdxErrors.get( i ) );
             }
             this.getLog().warn( sb.toString() );
@@ -391,7 +380,8 @@ public class CreateSpdxMojo
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
     {
         Iterator<Entry<String, SpdxDefaultFileInformation>> iter = fileSpecificInformation.entrySet().iterator();
-        while ( iter.hasNext() ) {
+        while ( iter.hasNext() ) 
+        {
             Entry<String, SpdxDefaultFileInformation> entry = iter.next();
             this.getLog().info( "File Specific Information for "+entry.getKey() );
             entry.getValue().logInfo( this.getLog() );
@@ -402,9 +392,11 @@ public class CreateSpdxMojo
                                                   SpdxDefaultFileInformation projectDefault ) throws MojoExecutionException
     {
         HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<String, SpdxDefaultFileInformation>();
-        if ( this.pathsWithSpecificSpdxInfo != null ) {
+        if ( this.pathsWithSpecificSpdxInfo != null ) 
+        {
             Iterator<PathSpecificSpdxInfo> iter = this.pathsWithSpecificSpdxInfo.iterator();
-            while ( iter.hasNext() ) {
+            while ( iter.hasNext() ) 
+            {
                 PathSpecificSpdxInfo spdxInfo = iter.next();
                 SpdxDefaultFileInformation value = null;
                 try
@@ -416,6 +408,10 @@ public class CreateSpdxMojo
                     this.getLog().error( "Invalid license string used in the path specific SPDX information for file "+spdxInfo.getPath(), e );
                     throw( new MojoExecutionException( "Invalid license string used in the path specific SPDX information for file "+spdxInfo.getPath(), e ) );
                 } 
+                if ( retval.containsKey( spdxInfo.getPath() )) 
+                {
+                    this.getLog().warn( "Multiple file path specific SPDX data for "+spdxInfo.getPath() );
+                }
                 retval.put( spdxInfo.getPath(), value );            
             }
         }
@@ -427,19 +423,23 @@ public class CreateSpdxMojo
      * @param nonStandardLicenses
      */
     private void logNonStandardLicenses(
-            NonStandardLicense[] nonStandardLicenses ) {
-        if ( nonStandardLicenses == null ) {
+            NonStandardLicense[] nonStandardLicenses ) 
+    {
+        if ( nonStandardLicenses == null ) 
+        {
             return;
         }
-        for ( int i = 0; i < nonStandardLicenses.length; i++ ) {
-            this.getLog().info( "Non standard license ID: "+nonStandardLicenses[i].getLicenseId() );
-            this.getLog().info( "Non standard license Text: "+nonStandardLicenses[i].getExtractedText() );
-            this.getLog().info( "Non standard license Comment: "+nonStandardLicenses[i].getComment() );
-            this.getLog().info( "Non standard license Name: "+nonStandardLicenses[i].getName() );
+        for ( int i = 0; i < nonStandardLicenses.length; i++ ) 
+        {
+            this.getLog().debug( "Non standard license ID: "+nonStandardLicenses[i].getLicenseId() );
+            this.getLog().debug( "Non standard license Text: "+nonStandardLicenses[i].getExtractedText() );
+            this.getLog().debug( "Non standard license Comment: "+nonStandardLicenses[i].getComment() );
+            this.getLog().debug( "Non standard license Name: "+nonStandardLicenses[i].getName() );
             String[] crossReferences = nonStandardLicenses[i].getCrossReference();
-            if ( crossReferences != null ) {
+            if ( crossReferences != null ) 
+            {
                 for ( int j = 0; j < crossReferences.length; j++ ) {
-                    this.getLog().info( "Non standard license cross reference: "+crossReferences[j] );
+                    this.getLog().debug( "Non standard license cross reference: "+crossReferences[j] );
                 }
             }
         }
@@ -449,25 +449,40 @@ public class CreateSpdxMojo
      * Primarily for debugging purposes - logs includedDirectories as info
      * @param includedDirectories
      */
-    private void logIncludedDirectories( File[] includedDirectories ) {
+    private void logIncludedDirectories( FileSet[] includedDirectories ) 
+    {
         if ( includedDirectories == null ) {
             return;
         }
-        for ( int i = 0; i < includedDirectories.length; i++ ) {
-            this.getLog().info( "Included Directory: "+includedDirectories[i].getPath() );
-        }
-    }
-
-    /**
-     * Primarily for debugging purposes - logs excludedFilePatterns as info
-     * @param excludedFilePatterns
-     */
-    private void logExcludedFilePatterns( Pattern[] excludedFilePatterns ) {
-        if ( excludedFilePatterns == null ) {
-            return;
-        }
-        for ( int i = 0; i < excludedFilePatterns.length; i++ ) {
-            this.getLog().info( "Excluded File Pattern: "+excludedFilePatterns[i].pattern() );
+        this.getLog().debug( "Logging "+String.valueOf( includedDirectories.length ) + " filesets." );
+        for ( int i = 0; i < includedDirectories.length; i++ ) 
+        {
+            StringBuilder sb = new StringBuilder( "Included Directory: "+includedDirectories[i].getDirectory() );
+            @SuppressWarnings( "unchecked" )
+            List<String> includes = includedDirectories[i].getIncludes();
+            if ( includes != null && includes.size() > 0) 
+            {                
+                sb.append( "; Included=" );
+                sb.append( includes.get( 0 ) );
+                for ( int j = 1; j < includes.size(); j++ ) 
+                {
+                    sb.append( "," );
+                    sb.append( includes.get(j) );
+                }
+            }
+            @SuppressWarnings( "unchecked" )
+            List<String> excludes = includedDirectories[i].getExcludes();
+            if ( excludes != null && excludes.size() > 0 ) 
+            {
+                sb.append( "; Excluded=" );
+                sb.append( excludes.get( 0 ) );
+                for ( int j = 1; j < excludes.size(); j++ ) 
+                {
+                    sb.append( "," );
+                    sb.append( excludes.get( j ) );
+                }
+            }
+            this.getLog().debug( sb.toString() );
         }
     }
 
@@ -475,14 +490,17 @@ public class CreateSpdxMojo
      * @return default file information from the plugin parameters
      * @throws MojoExecutionException 
      */
-    private SpdxDefaultFileInformation getDefaultFileInfoFromParameters() throws MojoExecutionException {
+    private SpdxDefaultFileInformation getDefaultFileInfoFromParameters() throws MojoExecutionException 
+    {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         retval.setArtifactOf( getDefaultFileProjects() );
         retval.setComment( defaultFileComment );
         SPDXLicenseInfo concludedLicense = null;
-        try {
+        try 
+        {
             concludedLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( defaultFileConcludedLicense.trim() );
-        } catch ( InvalidLicenseStringException e ) {
+        } catch ( InvalidLicenseStringException e ) 
+        {
             this.getLog().error( "Invalid default file concluded license: "+e.getMessage() );
             throw( new MojoExecutionException( "Invalid default file concluded license: "+e.getMessage() ) );
         }
@@ -490,9 +508,11 @@ public class CreateSpdxMojo
         retval.setContributors( defaultFileContributors );
         retval.setCopyright( defaultFileCopyright );
         SPDXLicenseInfo declaredLicense = null;
-        try {
+        try 
+        {
             declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( defaultLicenseInformationInFile.trim() );
-        } catch ( InvalidLicenseStringException e ) {
+        } catch ( InvalidLicenseStringException e ) 
+        {
             this.getLog().error( "Invalid default file declared license: "+e.getMessage() );
             throw( new MojoExecutionException( "Invalid default file declared license: "+e.getMessage() ) );
         }
@@ -502,12 +522,15 @@ public class CreateSpdxMojo
         return retval;
     }
 
-    private DOAPProject[] getDefaultFileProjects() {
-        if ( this.defaultFileArtifactOfs == null ) {
+    private DOAPProject[] getDefaultFileProjects() 
+    {
+        if ( this.defaultFileArtifactOfs == null ) 
+        {
             return new DOAPProject[0];
         }
         DOAPProject[] retval = new DOAPProject[this.defaultFileArtifactOfs.length];
-        for ( int i = 0; i < retval.length; i++ ) {
+        for ( int i = 0; i < retval.length; i++ ) 
+        {
             retval[i] = new DOAPProject( defaultFileArtifactOfs[i].getName(), 
                     defaultFileArtifactOfs[i].getHomePage().toString() );
         }
@@ -529,10 +552,12 @@ public class CreateSpdxMojo
      * @throws MojoExecutionException 
      */
     @SuppressWarnings( "unused" )
-    private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager ) throws MojoExecutionException {
+    private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager ) throws MojoExecutionException 
+    {
         SpdxProjectInformation retval = new SpdxProjectInformation();
         SPDXLicenseInfo declaredLicense = null;
-        if ( this.licenseDeclared == null ) {
+        if ( this.licenseDeclared == null ) 
+        {
             @SuppressWarnings( "unchecked" )
             List<License> mavenLicenses = mavenProject.getLicenses();
             try
@@ -544,28 +569,36 @@ public class CreateSpdxMojo
                this.getLog().warn( "Unable to map maven licenses to a declared license.  Using NOASSERTION" );
                declaredLicense = new SpdxNoAssertionLicense();
             }
-        } else {
-            try {
+        } else 
+        {
+            try 
+            {
                 declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( this.licenseDeclared.trim() );
-            } catch ( InvalidLicenseStringException e ) {
+            } catch ( InvalidLicenseStringException e ) 
+            {
                 this.getLog().error( "Invalid declared license: "+e.getMessage() );
                 throw( new MojoExecutionException( "Invalid declared license: "+e.getMessage() ) );
             }
         }
         SPDXLicenseInfo concludedLicense = null;
-        if ( this.licenseConcluded == null ) {
+        if ( this.licenseConcluded == null ) 
+        {
             concludedLicense = declaredLicense;
-        } else {
-            try {
+        } else 
+        {
+            try 
+            {
                 concludedLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( this.licenseConcluded.trim() );
-            } catch ( InvalidLicenseStringException e ) {
+            } catch ( InvalidLicenseStringException e ) 
+            {
                 this.getLog().error( "Invalid concluded license: "+e.getMessage() );
                 throw( new MojoExecutionException( "Invalid concluded license: "+e.getMessage() ) );
             }
         }
         retval.setConcludedLicense( concludedLicense );
         retval.setCreatorComment( this.creatorComment );
-        if ( this.creators == null ) {
+        if ( this.creators == null ) 
+        {
             this.creators = new String[0];
         }
         String[] allCreators = (String[]) Arrays.copyOf( creators, creators.length + 1 );
@@ -574,15 +607,18 @@ public class CreateSpdxMojo
         retval.setCopyrightText( this.copyrightText );
         retval.setDeclaredLicense( declaredLicense );
         String projectName = mavenProject.getName();
-        if ( projectName == null || projectName.isEmpty() ) {
+        if ( projectName == null || projectName.isEmpty() ) 
+        {
             projectName = getDefaultProjectName();
         }
         retval.setName( projectName );
         retval.setDescription( mavenProject.getDescription() );
         String downloadUrl = "NOASSERTION";
         DistributionManagement distributionManager = mavenProject.getDistributionManagement();
-        if ( distributionManager != null ) {
-            if ( distributionManager.getDownloadUrl() != null && !distributionManager.getDownloadUrl().isEmpty() ) {
+        if ( distributionManager != null ) 
+        {
+            if ( distributionManager.getDownloadUrl() != null && !distributionManager.getDownloadUrl().isEmpty() ) 
+            {
                 downloadUrl = distributionManager.getDownloadUrl();
             }
         }
@@ -602,7 +638,8 @@ public class CreateSpdxMojo
         File packageFile = null;
         //TODO Create the archive file for SPDX redistribution
         String sha1 = null;
-        if ( packageFile != null ) {
+        if ( packageFile != null ) 
+        {
             try
             {
                 sha1 = SpdxFileCollector.generateSha1( packageFile );
@@ -614,9 +651,11 @@ public class CreateSpdxMojo
         }
         retval.setSha1( sha1 );
         retval.setShortDescription( mavenProject.getDescription() );
-        if ( mavenProject.getOrganization() != null ) {
+        if ( mavenProject.getOrganization() != null ) 
+        {
             String supplier = mavenProject.getOrganization().getName();
-            if ( supplier != null && !supplier.isEmpty() ) {
+            if ( supplier != null && !supplier.isEmpty() ) 
+            {
                 supplier = "Organization: "+supplier;
                 retval.setSupplier( supplier );
             }        
@@ -635,24 +674,46 @@ public class CreateSpdxMojo
         return this.mavenProject.getArtifactId();
     }
 
-    private File[] getIncludedDirectoriesFromParameters() {
-        return this.includedDirectories;
-        //TODO: See if this can be extracted from other parameters
-    }
-
-    private Pattern[] getPatternFromParameters() throws MojoExecutionException {
-        if ( this.excludedFilePatterns == null ) {
-            return new Pattern[0];
-        }
-        Pattern[] retval = new Pattern[this.excludedFilePatterns.length];
-        for ( int i = 0; i < retval.length; i++ ) {
-            try {
-                retval[i] = Pattern.compile( excludedFilePatterns[i] );
-            } catch ( Exception e ) {
-                this.getLog().error( "Error in excluded file pattern "+excludedFilePatterns[i], e );
-                throw( new MojoExecutionException( "Error in excluded file pattern "+excludedFilePatterns[i]+": "+e.getMessage() ) );
+    /**
+     * Combine all inputs for files which are to be included in the SPDX analysis.
+     * FileSets are all normalized to include the full (absolute) path and use filtering.
+     * @return included files from the project source roots, resources, and includedDirectories parameter
+     */
+    private FileSet[] getIncludedDirectoriesFromParameters() 
+    {
+        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        @SuppressWarnings( "unchecked" )
+        List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
+        if ( sourceRoots != null ) 
+        {
+            Iterator<String> sourceRootIter = sourceRoots.iterator();
+            while ( sourceRootIter.hasNext() ) {
+                FileSet srcFileSet = new FileSet();
+                File sourceDir = new File( sourceRootIter.next() );
+                srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
+                srcFileSet.addInclude( INCLUDE_ALL );
+                result.add( srcFileSet );
+                this.getLog().debug( "Adding sourceRoot directory "+srcFileSet.getDirectory() );
             }
         }
-        return retval;
+        @SuppressWarnings( "unchecked" )
+        List<Resource> resourceList = this.mavenProject.getResources();
+        if ( resourceList != null ) 
+        {
+            Iterator<Resource> resourceIter = resourceList.iterator();
+            while ( resourceIter.hasNext() ) 
+            {
+                Resource resource = resourceIter.next();
+                FileSet resourceFileSet = new FileSet();
+                File resourceDir = new File( resource.getDirectory() );
+                resourceFileSet.setDirectory( resourceDir.getAbsolutePath() );
+                resourceFileSet.setExcludes( resource.getExcludes() );
+                resourceFileSet.setIncludes( resource.getIncludes() );
+                result.add( resourceFileSet );
+                this.getLog().debug( "Adding resource directory "+resource.getDirectory() );
+            }
+        }
+        this.getLog().debug( "Number of filesets: "+String.valueOf( result.size() ) );
+        return result.toArray( new FileSet[result.size()] );
     }
 }

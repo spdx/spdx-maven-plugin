@@ -26,9 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SPDXCreatorInformation;
 import org.spdx.rdfparser.SPDXDocument;
@@ -75,49 +75,62 @@ public class SpdxDocumentBuilder
         if ( !spdxFile.exists() )
         {
             File parentDir = spdxFile.getParentFile();
-            if ( parentDir != null && !parentDir.exists() ) {
-                if ( !parentDir.mkdirs() ) {
+            if ( parentDir != null && !parentDir.exists() ) 
+            {
+                if ( !parentDir.mkdirs() ) 
+                {
                     this.getLog().error( "Unable to create directory containing the SPDX file: "+parentDir.getPath() );
                     throw( new SpdxBuilderException( "Unable to create directories for SPDX file" ) );
                 }
             }
 
-            try {
-                if ( !spdxFile.createNewFile() ) {
-                       this.getLog().error( "Unable to create the SPDX file: "+spdxFile.getPath() );
+            try 
+            {
+                if ( !spdxFile.createNewFile() ) 
+                {
+                    this.getLog().error( "Unable to create the SPDX file: "+spdxFile.getPath() );
                     throw( new SpdxBuilderException( "Unable to create the SPDX file" ) );
                 }
-            } catch ( IOException e ) {
-                   this.getLog().error( "IO error creating the SPDX file "+spdxFile.getPath() + ":"+e.getMessage(),e );
+            } catch ( IOException e ) 
+            {
+                this.getLog().error( "IO error creating the SPDX file "+spdxFile.getPath() + ":"+e.getMessage(),e );
                 throw( new SpdxBuilderException( "IO error creating the SPDX file" ) );
             }
         }
-        if ( !spdxFile.canWrite() ) {
+        if ( !spdxFile.canWrite() ) 
+        {
             this.getLog().error( "Can not write to SPDX file "+spdxFile.getPath() );
             throw( new SpdxBuilderException( "Unable to write to SPDX file - check permissions: "+spdxFile.getPath() ) ) ;
         }
         
         // create the SPDX document
         Model model = ModelFactory.createDefaultModel();
-        try {
+        try 
+        {
             spdxDoc = new SPDXDocument( model );
-        } catch ( InvalidSPDXAnalysisException e ) {
+        } catch ( InvalidSPDXAnalysisException e ) 
+        {
             this.getLog().error( "Error creating SPDX document", e );
             throw( new SpdxBuilderException( "Error creating SPDX document: "+e.getMessage() ) );
         }
-        if ( spdxDocumentUrl == null ) {
+        if ( spdxDocumentUrl == null ) 
+        {
             this.getLog().error( "spdxDocumentUrl must be specified as a configuration parameter" );
             throw( new SpdxBuilderException( "Missing spdxDocumentUrl" ) );
         }
-        try {
+        try 
+        {
             spdxDoc.createSpdxAnalysis( spdxDocumentUrl.toString() );
-        } catch ( InvalidSPDXAnalysisException e ) {
+        } catch ( InvalidSPDXAnalysisException e ) 
+        {
             this.getLog().error( "Error creating SPDX analysis", e );
             throw( new SpdxBuilderException( "Error creating SPDX analysis: "+e.getMessage() ) );
         }
-        try {
+        try 
+        {
             spdxDoc.createSpdxPackage();
-        } catch ( InvalidSPDXAnalysisException e ) {
+        } catch ( InvalidSPDXAnalysisException e ) 
+        {
             this.getLog().error( "Error creating SPDX package", e );
             throw( new SpdxBuilderException( "Error creating SPDX package: "+e.getMessage() ) );
         }
@@ -131,9 +144,12 @@ public class SpdxDocumentBuilder
      * @param spdxDoc
      * @throws SpdxBuilderException 
      */
-    public void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses ) throws SpdxBuilderException {
-        if ( nonStandardLicenses != null ) {
-            for ( int i = 0; i < nonStandardLicenses.length; i++ ) {
+    public void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses ) throws SpdxBuilderException 
+    {
+        if ( nonStandardLicenses != null ) 
+        {
+            for ( int i = 0; i < nonStandardLicenses.length; i++ ) 
+            {
                 try
                 {
                     licenseManager.addNonStandardLicense( nonStandardLicenses[i] );
@@ -163,37 +179,42 @@ public class SpdxDocumentBuilder
 
     /**
      * Build the SPDX document from the files and save the information to the SPDX file
-     * @param excludedFilePatterns File patterns to exclude - any files or directories matching any of the patterns will be skipped
      * @param includedDirectories Directories to be included in the document
      * @param projectInformation Project level SPDX information
      * @param defaultFileInformation Default SPDX file information
      * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @throws SpdxBuilderException
      */
-    public void buildDocumentFromFiles( Pattern[] excludedFilePatterns, File[] includedDirectories,
+    public void buildDocumentFromFiles( FileSet[] includedDirectories,
                                         SpdxProjectInformation projectInformation,
                                         SpdxDefaultFileInformation defaultFileInformation,
                                         Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxBuilderException
     {
         FileOutputStream spdxOut = null;
-        try {
+        try 
+        {
             spdxOut = new FileOutputStream ( spdxFile );
             fillSpdxDocumentInformation( projectInformation );
-            collectSpdxFileInformation( excludedFilePatterns, includedDirectories,
+            collectSpdxFileInformation( includedDirectories,
                     defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ),
                     pathSpecificInformation );
             spdxDoc.getModel().write( spdxOut );
-        } catch ( FileNotFoundException e ) {
+        } catch ( FileNotFoundException e ) 
+        {
             this.getLog().error( "Error saving SPDX data to file", e );
             throw( new SpdxBuilderException( "Error saving SPDX data to file: "+e.getMessage() ) ) ;
-        } catch ( InvalidSPDXAnalysisException e ) {
+        } catch ( InvalidSPDXAnalysisException e ) 
+        {
             this.getLog().error( "Error collecting SPDX file data", e );
             throw( new SpdxBuilderException( "Error collecting SPDX file data: "+e.getMessage() ) );
-        } finally {
-            if ( spdxOut != null ) {
+        } finally 
+        {
+            if ( spdxOut != null ) 
+            {
                 try {
                     spdxOut.close();
-                } catch ( IOException e ) {
+                } catch ( IOException e ) 
+                {
                     this.getLog().warn( "Error closing SPDX output file", e );
                 }
             }
@@ -206,7 +227,8 @@ public class SpdxDocumentBuilder
      * @param projectInformation project information to be used
      * @throws SpdxBuilderException
      */
-    private void fillSpdxDocumentInformation( SpdxProjectInformation projectInformation ) throws SpdxBuilderException {
+    private void fillSpdxDocumentInformation( SpdxProjectInformation projectInformation ) throws SpdxBuilderException 
+    {
       try {
           // creator
           fillCreatorInfo( projectInformation );
@@ -215,7 +237,8 @@ public class SpdxDocumentBuilder
           spdxDoc.setDataLicense( dataLicense );
           // reviewers - not implemented
           // packageName
-          if ( projectInformation.getName() != null ) {
+          if ( projectInformation.getName() != null ) 
+          {
               spdxDoc.getSpdxPackage().setDeclaredName( projectInformation.getName() );
           }
           // concluded license
@@ -223,57 +246,71 @@ public class SpdxDocumentBuilder
           // declared license
           spdxDoc.getSpdxPackage().setDeclaredLicense( projectInformation.getDeclaredLicense() );
           // description
-          if ( projectInformation.getDescription() != null ) {
+          if ( projectInformation.getDescription() != null ) 
+          {
               spdxDoc.getSpdxPackage().setDescription( projectInformation.getDescription() );
           }
           // download url
-          if ( projectInformation.getDownloadUrl() != null ) {
+          if ( projectInformation.getDownloadUrl() != null ) 
+          {
               spdxDoc.getSpdxPackage().setDownloadUrl( projectInformation.getDownloadUrl() );
           }
           // archive file name
-          if ( projectInformation.getPackageArchiveFileName() != null ) {
+          if ( projectInformation.getPackageArchiveFileName() != null ) 
+          {
               spdxDoc.getSpdxPackage().setFileName( projectInformation.getPackageArchiveFileName() );
           }
           // home page
-          if ( projectInformation.getHomePage() != null ) {
+          if ( projectInformation.getHomePage() != null ) 
+          {
               spdxDoc.getSpdxPackage().setHomePage( projectInformation.getHomePage() );
           }
           // source information
-          if ( projectInformation.getSourceInfo() != null ) {
+          if ( projectInformation.getSourceInfo() != null ) 
+          {
               spdxDoc.getSpdxPackage().setSourceInfo( projectInformation.getSourceInfo() );
           }
           // license comment
-          if ( projectInformation.getLicenseComment() != null ) {
+          if ( projectInformation.getLicenseComment() != null ) 
+          {
               spdxDoc.getSpdxPackage().setLicenseComment( projectInformation.getLicenseComment() );
           }
           // originator
-          if ( projectInformation.getOriginator() != null ) {
+          if ( projectInformation.getOriginator() != null ) 
+          {
               spdxDoc.getSpdxPackage().setOriginator( projectInformation.getOriginator() );
           }
           // sha1 checksum
-          if ( projectInformation.getSha1() != null ) {
+          if ( projectInformation.getSha1() != null ) 
+          {
               spdxDoc.getSpdxPackage().setSha1( projectInformation.getSha1() );
           }
           // copyright text
-          if ( projectInformation.getCopyrightText() != null ) {
+          if ( projectInformation.getCopyrightText() != null ) 
+          {
               spdxDoc.getSpdxPackage().setDeclaredCopyright( projectInformation.getCopyrightText() );
           }
           // short description
-          if ( projectInformation.getShortDescription() != null ) {
+          if ( projectInformation.getShortDescription() != null ) 
+          {
               spdxDoc.getSpdxPackage().setShortDescription( projectInformation.getShortDescription() );
           }
           // supplier
-          if ( projectInformation.getSupplier() != null ) {
+          if ( projectInformation.getSupplier() != null ) 
+          {
               spdxDoc.getSpdxPackage().setSupplier( projectInformation.getSupplier() );
           }
           // version info        
-          if ( projectInformation.getVersionInfo() != null ) {
+          if ( projectInformation.getVersionInfo() != null ) 
+          {
               spdxDoc.getSpdxPackage().setVersionInfo( projectInformation.getVersionInfo() );
           }
-      } catch ( InvalidSPDXAnalysisException e ) {
+      } catch ( InvalidSPDXAnalysisException e ) 
+      {
           this.getLog().error( "SPDX error filling SPDX information", e );
           throw( new SpdxBuilderException( "Error adding package information to SPDX document: "+e.getMessage(), e ) );
-      } catch ( InvalidLicenseStringException e ) {
+      } catch ( InvalidLicenseStringException e ) 
+      {
           this.getLog().error( "SPDX error creating license", e );
           throw( new SpdxBuilderException( "Error adding package information to SPDX document: "+e.getMessage(), e ) );
       }
@@ -284,14 +321,18 @@ public class SpdxDocumentBuilder
  * @param projectInformation project level information including the creators
  * @throws InvalidSPDXAnalysisException
  */
-private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws InvalidSPDXAnalysisException {
+private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws InvalidSPDXAnalysisException 
+{
       ArrayList<String> creators = new ArrayList<String>();
       String[] parameterCreators = projectInformation.getCreators();
-      for ( int i = 0; i < parameterCreators.length; i++ ) {
+      for ( int i = 0; i < parameterCreators.length; i++ ) 
+      {
           String verify = SpdxVerificationHelper.verifyCreator( parameterCreators[i] );
-          if ( verify == null ) {
+          if ( verify == null ) 
+          {
               creators.add( parameterCreators[i] );
-          } else {
+          } else 
+          {
               this.getLog().warn( "Invalid creator string ( "+verify+" ), "+
                           parameterCreators[i]+" will be skipped." );
           }
@@ -305,7 +346,6 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
 
   /**
    * Collect information at the file level, fill in the SPDX document
-   * @param excludedFilePatterns File patterns to exclude - any files or directories matching any of the patterns will be skipped
    * @param includedDirectories Directories to be included in the document
    * @param projectInformation Project level SPDX information
    * @param spdxFileName SPDX file name - will be used for the skipped file names in the verification code
@@ -313,29 +353,31 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
    * @throws InvalidSPDXAnalysisException
    * @throws SpdxBuilderException
  */
-private void collectSpdxFileInformation( Pattern[] excludedFilePatterns, File[] includedDirectories,
+private void collectSpdxFileInformation( FileSet[] includedDirectories,
           SpdxDefaultFileInformation defaultFileInformation,
           String spdxFileName, 
-          Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException {
-      
-      SpdxFileCollector fileCollector = new SpdxFileCollector( excludedFilePatterns );
-
-      for ( int i = 0; i < includedDirectories.length; i++ ) {
-          try {
-              fileCollector.collectFilesInDirectory( includedDirectories[i], defaultFileInformation, pathSpecificInformation );
-          } catch ( SpdxCollectionException e ) {
-              this.getLog().error( "SPDX error collecting file information", e );
-              throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );
-          }
+          Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException 
+  {      
+      SpdxFileCollector fileCollector = new SpdxFileCollector();
+      fileCollector.setLog( getLog() );
+      try {
+          fileCollector.collectFiles( includedDirectories, 
+                                                 defaultFileInformation, pathSpecificInformation );
+      } catch ( SpdxCollectionException e ) {
+          this.getLog().error( "SPDX error collecting file information", e );
+          throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );
       }
       spdxDoc.getSpdxPackage().setFiles( fileCollector.getFiles() );
       spdxDoc.getSpdxPackage().setLicenseInfoFromFiles( fileCollector.getLicenseInfoFromFiles() );
-      try {
+      try 
+      {
           spdxDoc.getSpdxPackage().setVerificationCode( fileCollector.getVerificationCode( spdxFileName ) );
-      } catch ( NoSuchAlgorithmException e )  {
+      } catch ( NoSuchAlgorithmException e )  
+      {
           this.getLog().error( "Error calculating verification code", e );
           throw( new SpdxBuilderException( "Unable to calculate verification code" ) );
-      } catch ( InvalidSPDXAnalysisException e ) {
+      } catch ( InvalidSPDXAnalysisException e ) 
+      {
           this.getLog().error( "SPDX Error updating verification code", e );
           throw( new SpdxBuilderException( "Unable to update verification code" ) );
       }
