@@ -120,6 +120,13 @@ public class CreateSpdxMojo
      */
     @Parameter( defaultValue = "false")
     private boolean matchLicensedOnCrossReferenceUrls;
+    
+    /**
+     * An optional field for creators of the SPDX file content to provide comments to 
+     * the consumers of the SPDX document.
+     */
+    @Parameter
+    private String documentComment;
 
     /**
      * optional default SPDX file comment field.  
@@ -137,7 +144,6 @@ public class CreateSpdxMojo
      */
     @Parameter
     private String[] defaultFileContributors;
-    //TODO: Take this from developers project parameter
 
     /**
      * Default file copyright text.
@@ -383,7 +389,7 @@ public class CreateSpdxMojo
         while ( iter.hasNext() ) 
         {
             Entry<String, SpdxDefaultFileInformation> entry = iter.next();
-            this.getLog().info( "File Specific Information for "+entry.getKey() );
+            this.getLog().debug( "File Specific Information for "+entry.getKey() );
             entry.getValue().logInfo( this.getLog() );
         }
     }
@@ -555,6 +561,10 @@ public class CreateSpdxMojo
     private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager ) throws MojoExecutionException 
     {
         SpdxProjectInformation retval = new SpdxProjectInformation();
+        if ( this.documentComment != null ) 
+        {
+            retval.setDocumentComment( this.documentComment );
+        }
         SPDXLicenseInfo declaredLicense = null;
         if ( this.licenseDeclared == null ) 
         {

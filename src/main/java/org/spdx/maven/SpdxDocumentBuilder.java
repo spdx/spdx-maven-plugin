@@ -50,7 +50,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 public class SpdxDocumentBuilder
 {
     //TODO: Use a previous SPDX to document file specific information and update
-    //TODO: Create actual SPDX distribution package
+    //TODO: Map the SPDX document to the Maven build artifacts
     static DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
 
     private Log log;
@@ -230,6 +230,11 @@ public class SpdxDocumentBuilder
     private void fillSpdxDocumentInformation( SpdxProjectInformation projectInformation ) throws SpdxBuilderException 
     {
       try {
+          // document comment
+          if ( projectInformation.getDocumentComment() != null && !projectInformation.getDocumentComment().isEmpty() )
+          {
+              spdxDoc.setDocumentComment( projectInformation.getDocumentComment() );
+          }
           // creator
           fillCreatorInfo( projectInformation );
           // data license

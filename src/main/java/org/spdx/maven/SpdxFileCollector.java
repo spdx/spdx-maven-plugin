@@ -29,11 +29,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.DOAPProject;
 import org.spdx.rdfparser.SPDXFile;
 import org.spdx.rdfparser.SPDXLicenseInfo;
@@ -54,56 +58,18 @@ import org.spdx.rdfparser.SpdxRdfConstants;
  */
 public class SpdxFileCollector 
 {
-
+    static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
     // constants for mapping extensions to types.
-    //TODO: These static hashsets should be converted to using properties rather than constants
-    static HashSet<String> SOURCE_EXTENSION = new HashSet<String>();
-    
-    static 
-    {
-        SOURCE_EXTENSION.add( "C" ); SOURCE_EXTENSION.add( "H" );
-        SOURCE_EXTENSION.add( "JAVA" ); SOURCE_EXTENSION.add( "CS" );
-        SOURCE_EXTENSION.add( "JS" ); SOURCE_EXTENSION.add( "HH" );
-        SOURCE_EXTENSION.add( "CC" ); SOURCE_EXTENSION.add( "CPP" );
-        SOURCE_EXTENSION.add( "CXX" ); SOURCE_EXTENSION.add( "HPP" );
-        SOURCE_EXTENSION.add( "ASP" ); SOURCE_EXTENSION.add( "BAS" );
-        SOURCE_EXTENSION.add( "BAT" ); SOURCE_EXTENSION.add( "HTM" );
-        SOURCE_EXTENSION.add( "HTML" ); SOURCE_EXTENSION.add( "LSP" );
-        SOURCE_EXTENSION.add( "PAS" ); SOURCE_EXTENSION.add( "XML" );
-        SOURCE_EXTENSION.add( "PAS" ); SOURCE_EXTENSION.add( "ADA" );
-        SOURCE_EXTENSION.add( "VB" ); SOURCE_EXTENSION.add( "ASM" );
-        SOURCE_EXTENSION.add( "CBL" ); SOURCE_EXTENSION.add( "COB" );
-        SOURCE_EXTENSION.add( "F77" ); SOURCE_EXTENSION.add( "M3" );
-        SOURCE_EXTENSION.add( "MK" ); SOURCE_EXTENSION.add( "MKE" );
-        SOURCE_EXTENSION.add( "RMK" ); SOURCE_EXTENSION.add( "MOD" );
-        SOURCE_EXTENSION.add( "PL" ); SOURCE_EXTENSION.add( "PM" );
-        SOURCE_EXTENSION.add( "PRO" ); SOURCE_EXTENSION.add( "REX" );
-        SOURCE_EXTENSION.add( "SM" ); SOURCE_EXTENSION.add( "ST" );
-        SOURCE_EXTENSION.add( "SNO" ); SOURCE_EXTENSION.add( "PY" );
-        SOURCE_EXTENSION.add( "PHP" ); SOURCE_EXTENSION.add( "CSS" );
-        SOURCE_EXTENSION.add( "XSL" ); SOURCE_EXTENSION.add( "XSLT" );
-        SOURCE_EXTENSION.add( "SH" ); SOURCE_EXTENSION.add( "XSD" );
-        SOURCE_EXTENSION.add( "RB" ); SOURCE_EXTENSION.add( "RBX" );        
-        SOURCE_EXTENSION.add( "RHTML" ); SOURCE_EXTENSION.add( "RUBY" );
-    }
- 
-    //TODO: These static hashsets should be converted to using properties rather than constants
+    static HashSet<String> SOURCE_EXTENSIONS = new HashSet<String>();
     static HashSet<String> BINARY_EXTENSIONS = new HashSet<String>();
-    static 
-    {
-        BINARY_EXTENSIONS.add( "EXE" );    BINARY_EXTENSIONS.add( "DLL" );
-        BINARY_EXTENSIONS.add( "JAR" );    BINARY_EXTENSIONS.add( "CLASS" );
-        BINARY_EXTENSIONS.add( "SO" );    BINARY_EXTENSIONS.add( "A" );
-    }
-    
-    //TODO: These static hashsets should be converted to using properties rather than constants
     static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<String>();
+    static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "org/spdx/maven/SpdxFileTypeConstants.prop";
+    static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
+    static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
+    static final String SPDX_PROP_FILETYPE_ARCHIVE = "SpdxArchiveExtensions";
     static 
     {
-        ARCHIVE_EXTENSIONS.add( "ZIP" ); ARCHIVE_EXTENSIONS.add( "EAR" );
-        ARCHIVE_EXTENSIONS.add( "TAR" ); ARCHIVE_EXTENSIONS.add( "GZ" );
-        ARCHIVE_EXTENSIONS.add( "TGZ" ); ARCHIVE_EXTENSIONS.add( "BZ2" );
-        ARCHIVE_EXTENSIONS.add( "RPM" ); 
+        loadFileExtensionConstants();
     }
     
     static final String SHA1_ALGORITHM = "SHA-1";
@@ -115,6 +81,7 @@ public class SpdxFileCollector
         {
             digest = MessageDigest.getInstance( SHA1_ALGORITHM );
         } catch ( NoSuchAlgorithmException e ) {
+            logger.error( "No such algorithm error initializing the SPDX file collector - SHA1", e );
             digest = null;
         };
     }
@@ -137,6 +104,54 @@ public class SpdxFileCollector
         
     }
  
+    /**
+     * Load file type constants from the properties file
+     */
+    private static void loadFileExtensionConstants()
+    {
+        InputStream is = null;
+        Properties prop = new Properties();
+        try {
+            is = SpdxFileCollector.class.getClassLoader().getResourceAsStream(SPDX_FILE_TYPE_CONSTANTS_PROP_PATH);
+            if ( is == null ) {
+                logger.error( "Unable to load properties file "+SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
+            }
+            prop.load(is);
+            String sourceExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_SOURCE );
+            loadSetUpcase( SOURCE_EXTENSIONS, sourceExtensionStr );
+            String binaryExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_BINARY );
+            loadSetUpcase( BINARY_EXTENSIONS, binaryExtensionStr );
+            String archiveExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_ARCHIVE );
+            loadSetUpcase( ARCHIVE_EXTENSIONS, archiveExtensionStr );
+        }
+        catch ( IOException e )
+        {
+            logger.warn("WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other.");
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (Throwable e) {
+                logger.warn("WARNING: Error closing SpdxFileTypeConstants properties file");
+            }
+        }
+    }
+
+    /**
+     * Load a set from a comma delimited string of values trimming and upcasing all values
+     * @param set
+     * @param str
+     */
+    private static void loadSetUpcase( Set<String> set, String str )
+    {
+        String[] values = str.split( "," );
+        for ( int i = 0; i < values.length; i++ )
+        {
+            set.add( values[i].toUpperCase().trim() );
+        }
+    }
+
     /**
      * Collect file information in the directory (including subdirectories).  
      * @param fileSets FileSets containing the description of the directory to be scanned
@@ -215,6 +230,10 @@ public class SpdxFileCollector
         if ( this.getLog() != null ) 
         {
             this.getLog().debug( msg );
+        } 
+        else 
+        {
+            logger.debug( msg );
         }
     }
 
@@ -301,7 +320,7 @@ public class SpdxFileCollector
             return SpdxRdfConstants.FILE_TYPE_OTHER;
         }
         String upperExtension = fileExtension.toUpperCase();
-        if ( SOURCE_EXTENSION.contains( upperExtension ) ) 
+        if ( SOURCE_EXTENSIONS.contains( upperExtension ) ) 
         {
             return SpdxRdfConstants.FILE_TYPE_SOURCE;
         } else if ( BINARY_EXTENSIONS.contains( upperExtension ) ) 

@@ -105,11 +105,13 @@ public class NonStandardLicense {
      * @return the crossReference
      */
     public String[] getCrossReference() {
-        if ( this.crossReference == null ) {
+        if ( this.crossReference == null ) 
+        {
             return new String[0];
         }
         String[] retval = new String[this.crossReference.length];
-        for ( int i = 0; i < retval.length; i++ ) {
+        for ( int i = 0; i < retval.length; i++ ) 
+        {
             retval[i] = this.crossReference[i].toString();
         }
         return retval;

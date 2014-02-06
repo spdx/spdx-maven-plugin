@@ -42,6 +42,21 @@ class SpdxProjectInformation {
     String name;
     private String sourceInfo;
     private String copyrightText;
+    private String documentComment;
+    /**
+     * @return the documentComment
+     */
+    public String getDocumentComment()
+    {
+        return documentComment;
+    }
+    /**
+     * @param documentComment the documentComment to set
+     */
+    public void setDocumentComment( String documentComment )
+    {
+        this.documentComment = documentComment;
+    }
     /**
      * @return the sha1
      */
@@ -223,25 +238,26 @@ class SpdxProjectInformation {
      * @param log
      */
     public void logInfo( Log log ) {
-        log.info( "SPDX Project Name: "+this.getName() );
-        log.info( "SPDX Creator comment: "+this.getCreatorComment() );
-        log.info( "SPDX Description: "+this.getDescription() );
-        log.info( "SPDX License comment: "+this.getLicenseComment() );
-        log.info( "SPDX Originator: "+this.getOriginator() );
-        log.info( "SPDX PackageArchiveFileName: "+this.getPackageArchiveFileName() );
-        log.info( "SPDX SHA1: "+this.getSha1() );
-        log.info( "SPDX Short description: "+this.getShortDescription() );
-        log.info( "SPDX Supplier: "+this.getSupplier() );
-        log.info( "SPDX Source Info:  "+this.getSourceInfo() );
-        log.info( "SPDX Version info: "+this.getVersionInfo() );
-        log.info( "SPDX Concluded license: "+this.getConcludedLicense().toString() );
-        log.info( "SPDX Declared license: "+this.getDeclaredLicense().toString() );
-        log.info( "SPDX Download URL: "+this.getDownloadUrl() );
-        log.info( "SPDX Home page: "+this.getHomePage() );
+        log.debug( "SPDX Project Name: "+this.getName() );
+        log.debug( "SPDX Document comment: "+this.getDocumentComment() );
+        log.debug( "SPDX Creator comment: "+this.getCreatorComment() );
+        log.debug( "SPDX Description: "+this.getDescription() );
+        log.debug( "SPDX License comment: "+this.getLicenseComment() );
+        log.debug( "SPDX Originator: "+this.getOriginator() );
+        log.debug( "SPDX PackageArchiveFileName: "+this.getPackageArchiveFileName() );
+        log.debug( "SPDX SHA1: "+this.getSha1() );
+        log.debug( "SPDX Short description: "+this.getShortDescription() );
+        log.debug( "SPDX Supplier: "+this.getSupplier() );
+        log.debug( "SPDX Source Info:  "+this.getSourceInfo() );
+        log.debug( "SPDX Version info: "+this.getVersionInfo() );
+        log.debug( "SPDX Concluded license: "+this.getConcludedLicense().toString() );
+        log.debug( "SPDX Declared license: "+this.getDeclaredLicense().toString() );
+        log.debug( "SPDX Download URL: "+this.getDownloadUrl() );
+        log.debug( "SPDX Home page: "+this.getHomePage() );
         String[] creators = this.getCreators();
         if ( creators != null ) {
             for ( int i = 0; i < creators.length; i++ ) {
-                log.info( "SPDX Creator: "+creators[i] );
+                log.debug( "SPDX Creator: "+creators[i] );
             }
         }
     }

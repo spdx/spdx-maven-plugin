@@ -130,53 +130,69 @@ public class PathSpecificSpdxInfo
      */
     public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults ) throws InvalidLicenseStringException {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
-        if ( this.fileArtifactOfs != null ) {
+        if ( this.fileArtifactOfs != null ) 
+        {
             DOAPProject artifactOfs[] = new DOAPProject[this.fileArtifactOfs.length];
-            for ( int i = 0; i < artifactOfs.length; i++ ) {
+            for ( int i = 0; i < artifactOfs.length; i++ ) 
+            {
                 artifactOfs[i] = new DOAPProject( this.fileArtifactOfs[i].getName(), 
                                                   this.fileArtifactOfs[i].getHomePage().toString() );
             }
             retval.setArtifactOf( artifactOfs );
-        } else {
+        } else 
+        {
             retval.setArtifactOf( defaults.getArtifactOf() );
         }
         if ( this.fileComment != null ) {
             retval.setComment( fileComment );
-        } else {
+        } else 
+        {
             retval.setComment( defaults.getComment() );
         }
-        if ( this.fileConcludedLicense != null ) {
+        if ( this.fileConcludedLicense != null ) 
+        {
             SPDXLicenseInfo concludedLicense = null;
             concludedLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim() );
             retval.setConcludedLicense( concludedLicense );
-        } else {
+        } else 
+        {
             retval.setConcludedLicense( defaults.getConcludedLicense() );
         }
-        if ( this.fileContributors != null ) {
+        if ( this.fileContributors != null ) 
+        {
             retval.setContributors( this.fileContributors );
-        } else {
+        } else 
+        {
             retval.setContributors( defaults.getContributors() );
         }
-        if ( this.fileCopyright != null ) {
+        if ( this.fileCopyright != null ) 
+        {
             retval.setCopyright( fileCopyright );
-        } else {
+        } else 
+        {
             retval.setCopyright( defaults.getCopyright() );
         }
-        if ( this.fileLicenseComment != null ) {
+        if ( this.fileLicenseComment != null ) 
+        {
             retval.setLicenseComment( this.fileLicenseComment );
-        } else {
+        } else 
+        {
             retval.setLicenseComment( defaults.getLicenseComment() );
         }
-        if ( this.fileNotice != null ) {
+        if ( this.fileNotice != null ) 
+        {
             retval.setNotice( this.fileNotice );
-        } else {
+        } else 
+        {
             retval.setNotice( defaults.getNotice() );
         }
-        if ( this.licenseInformationInFile != null ) {
+        if ( this.licenseInformationInFile != null ) 
+        {
             SPDXLicenseInfo declaredLicense = null;
             declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim() );
             retval.setDeclaredLicense( declaredLicense );
-        } else {
+        } else 
+        {
             retval.setDeclaredLicense( defaults.getDeclaredLicense() );
         }
         return retval;
