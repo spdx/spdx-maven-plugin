@@ -63,7 +63,7 @@ public class SpdxFileCollector
     static HashSet<String> SOURCE_EXTENSIONS = new HashSet<String>();
     static HashSet<String> BINARY_EXTENSIONS = new HashSet<String>();
     static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<String>();
-    static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "org/spdx/maven/SpdxFileTypeConstants.prop";
+    static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
     static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
     static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
     static final String SPDX_PROP_FILETYPE_ARCHIVE = "SpdxArchiveExtensions";
