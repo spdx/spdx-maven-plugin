@@ -27,16 +27,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.SPDXConjunctiveLicenseSet;
-import org.spdx.rdfparser.SPDXDocument;
-import org.spdx.rdfparser.SPDXLicenseInfo;
-import org.spdx.rdfparser.SPDXLicenseInfoFactory;
-import org.spdx.rdfparser.SPDXNonStandardLicense;
-import org.spdx.rdfparser.SPDXStandardLicense;
+import org.spdx.rdfparser.SpdxDocumentContainer;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
+import org.spdx.rdfparser.license.ExtractedLicenseInfo;
+import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.license.SpdxListedLicense;
+import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.logging.Log;
@@ -49,14 +48,14 @@ import org.apache.maven.plugin.logging.Log;
 public class TestLicenseManager
 {
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
-    static final String APACHE_CROSS_REF_URL = "http://www.apache.org/licenses/LICENSE-2.0";
+    static final String APACHE_CROSS_REF_URL = "http://www.opensource.org/licenses/Apache-2.0";
     static final String APACHE_LICENSE_ID = "Apache-2.0";
     static final String APACHE_LICENSE_NAME = "Apache License 2.0";
     static final String APSL_CROSS_REF_URL = "http://www.opensource.apple.com/source/IOSerialFamily/IOSerialFamily-7/APPLE_LICENSE";
     static final String APSL_LICENSE_ID = "APSL-1.1";
     
-    Model model = null;
-    SPDXDocument spdxDoc = null;
+    SpdxDocumentContainer container = null;
+    SpdxDocument spdxDoc = null;
     Log log = null;
 
 
@@ -85,10 +84,8 @@ public class TestLicenseManager
     public void setUp()
         throws Exception
     {
-        model = ModelFactory.createDefaultModel();
-        spdxDoc = new SPDXDocument(model);
-        spdxDoc.createSpdxAnalysis( TEST_SPDX_DOCUMENT_URL );
-        spdxDoc.createSpdxPackage();
+        container = new SpdxDocumentContainer( TEST_SPDX_DOCUMENT_URL );
+        spdxDoc = container.getSpdxDocument();
     }
 
     /**
@@ -99,11 +96,11 @@ public class TestLicenseManager
         throws Exception
     {
         spdxDoc = null;
-        model = null;
+        container = null;
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#LicenseManager(org.spdx.rdfparser.SPDXDocument, org.apache.maven.plugin.logging.Log)}.
+     * Test method for {@link org.spdx.maven.LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument, org.apache.maven.plugin.logging.Log)}.
      */
     @Test
     public void testLicenseManager()
@@ -137,13 +134,13 @@ public class TestLicenseManager
         
         licenseManager.addNonStandardLicense( lic );
         
-        SPDXNonStandardLicense[] result = spdxDoc.getExtractedLicenseInfos();
+        ExtractedLicenseInfo[] result = spdxDoc.getExtractedLicenseInfos();
         assertEquals( 1, result.length );
         assertEquals( COMMENT, result[0].getComment() );
-        assertArraysEqual( CROSS_REF_STR, result[0].getSourceUrls() );
-        assertEquals( EXTRACTED_TEXT, result[0].getText() );
-        assertEquals( LICENSE_ID, result[0].getId() );
-        assertEquals( LICENSE_NAME, result[0].getLicenseName() );
+        assertArraysEqual( CROSS_REF_STR, result[0].getSeeAlso() );
+        assertEquals( EXTRACTED_TEXT, result[0].getExtractedText() );
+        assertEquals( LICENSE_ID, result[0].getLicenseId() );
+        assertEquals( LICENSE_NAME, result[0].getName() );
         
         NonStandardLicense lic2 = new NonStandardLicense();
         final String LICENSE_ID2 = "LicenseRef-licenseId2";
@@ -155,12 +152,12 @@ public class TestLicenseManager
         
         result = spdxDoc.getExtractedLicenseInfos();
         assertEquals( 2, result.length );
-        SPDXNonStandardLicense licResult = result[1];
-        if ( !licResult.getId().equals( LICENSE_ID2 ) ) {
+        ExtractedLicenseInfo licResult = result[1];
+        if ( !licResult.getLicenseId().equals( LICENSE_ID2 ) ) {
             licResult = result[0];
         }
-        assertEquals( EXTRACTED_TEXT2, licResult.getText() );
-        assertEquals( LICENSE_ID2, licResult.getId() );
+        assertEquals( EXTRACTED_TEXT2, licResult.getExtractedText() );
+        assertEquals( LICENSE_ID2, licResult.getLicenseId() );
 
     }
 
@@ -212,19 +209,19 @@ public class TestLicenseManager
         
         LicenseManager licenseManager = new LicenseManager( spdxDoc, log, true );
         
-        SPDXLicenseInfo result = licenseManager.mavenLicenseListToSpdxLicense( licenseList );
-        assertTrue( result instanceof SPDXConjunctiveLicenseSet );
-        SPDXLicenseInfo[] resultLicenses = ((SPDXConjunctiveLicenseSet)result).getSPDXLicenseInfos();
+        AnyLicenseInfo result = licenseManager.mavenLicenseListToSpdxLicense( licenseList );
+        assertTrue( result instanceof ConjunctiveLicenseSet );
+        AnyLicenseInfo[] resultLicenses = ((ConjunctiveLicenseSet)result).getMembers();
         assertEquals( 2, resultLicenses.length );
-        assertTrue( resultLicenses[0] instanceof SPDXStandardLicense );
-        if ( !((SPDXStandardLicense)resultLicenses[0]).getId().equals( APACHE_LICENSE_ID ) &&
-                        !((SPDXStandardLicense)resultLicenses[0]).getId().equals( APSL_LICENSE_ID )) {
-            fail( "Unrecognized first license "+((SPDXStandardLicense)resultLicenses[0]).getId());
+        assertTrue( resultLicenses[0] instanceof SpdxListedLicense );
+        if ( !((SpdxListedLicense)resultLicenses[0]).getLicenseId().equals( APACHE_LICENSE_ID ) &&
+                        !((SpdxListedLicense)resultLicenses[0]).getLicenseId().equals( APSL_LICENSE_ID )) {
+            fail( "Unrecognized first license "+((SpdxListedLicense)resultLicenses[0]).getLicenseId());
         }
-        assertTrue( resultLicenses[1] instanceof SPDXStandardLicense );
-        if ( !((SPDXStandardLicense)resultLicenses[1]).getId().equals( APACHE_LICENSE_ID ) &&
-                        !((SPDXStandardLicense)resultLicenses[1]).getId().equals( APSL_LICENSE_ID )) {
-            fail( "Unrecognized second license "+((SPDXStandardLicense)resultLicenses[1]).getId());
+        assertTrue( resultLicenses[1] instanceof SpdxListedLicense );
+        if ( !((SpdxListedLicense)resultLicenses[1]).getLicenseId().equals( APACHE_LICENSE_ID ) &&
+                        !((SpdxListedLicense)resultLicenses[1]).getLicenseId().equals( APSL_LICENSE_ID )) {
+            fail( "Unrecognized second license "+((SpdxListedLicense)resultLicenses[1]).getLicenseId());
         }
     }
 
@@ -244,9 +241,9 @@ public class TestLicenseManager
         apache.setUrl( APACHE_CROSS_REF_URL );
         LicenseManager licenseManager = new LicenseManager( spdxDoc, log, true );
         
-        SPDXLicenseInfo result = licenseManager.mavenLicenseToSpdxLicense( apache );
-        assertTrue( result instanceof SPDXStandardLicense );
-        assertEquals( APACHE_LICENSE_ID, ((SPDXStandardLicense)result).getId() );
+        AnyLicenseInfo result = licenseManager.mavenLicenseToSpdxLicense( apache );
+        assertTrue( result instanceof SpdxListedLicense );
+        assertEquals( APACHE_LICENSE_ID, ((SpdxListedLicense)result).getLicenseId() );
         
         // nonstandard license
         NonStandardLicense lic = new NonStandardLicense();
@@ -268,17 +265,17 @@ public class TestLicenseManager
         nonStd.setUrl( CROSS_REF_STR[0] );
         result = licenseManager.mavenLicenseToSpdxLicense( nonStd );
         
-        assertTrue( result instanceof SPDXNonStandardLicense );
-        SPDXNonStandardLicense nonStdResult = (SPDXNonStandardLicense)result;
+        assertTrue( result instanceof ExtractedLicenseInfo );
+        ExtractedLicenseInfo nonStdResult = (ExtractedLicenseInfo)result;
         assertEquals( COMMENT, nonStdResult.getComment() );
-        assertArraysEqual( CROSS_REF_STR, nonStdResult.getSourceUrls() );
-        assertEquals( EXTRACTED_TEXT, nonStdResult.getText() );
-        assertEquals( LICENSE_ID, nonStdResult.getId() );
-        assertEquals( LICENSE_NAME, nonStdResult.getLicenseName() );
+        assertArraysEqual( CROSS_REF_STR, nonStdResult.getSeeAlso() );
+        assertEquals( EXTRACTED_TEXT, nonStdResult.getExtractedText() );
+        assertEquals( LICENSE_ID, nonStdResult.getLicenseId() );
+        assertEquals( LICENSE_NAME, nonStdResult.getName() );
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.SPDXLicenseInfo)}.
+     * Test method for {@link org.spdx.maven.LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.AnyLicenseInfo)}.
      * @throws InvalidLicenseStringException 
      * @throws LicenseManagerException 
      */
@@ -287,10 +284,10 @@ public class TestLicenseManager
     {
         LicenseManager licenseManager = new LicenseManager( spdxDoc, log, false );
         // standard license
-        SPDXLicenseInfo licenseInfo = SPDXLicenseInfoFactory.parseSPDXLicenseString( APACHE_LICENSE_ID );
+        AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseString( APACHE_LICENSE_ID );
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );
-        assertEquals( result.getName(), ((SPDXStandardLicense)licenseInfo).getName() );
-        assertEquals( result.getUrl(), APACHE_CROSS_REF_URL );
+        assertEquals( result.getName(), ((SpdxListedLicense)licenseInfo).getName() );
+        assertEquals( APACHE_CROSS_REF_URL, result.getUrl()  );
         
         // non standard license
         final String LICENSE_ID = "LicenseRef-nonStd1";
@@ -298,7 +295,7 @@ public class TestLicenseManager
         final String[] CROSS_REF_URLS = new String[] {"http://nonStd.url"};
         final String LICENSE_NAME = "License Name";
         final String LICENSE_COMMENT = "License Comment";
-        SPDXLicenseInfo nonStd = new SPDXNonStandardLicense( LICENSE_ID, LICENSE_TEXT, 
+        AnyLicenseInfo nonStd = new ExtractedLicenseInfo( LICENSE_ID, LICENSE_TEXT, 
                                                              LICENSE_NAME, CROSS_REF_URLS, LICENSE_COMMENT );
         result = licenseManager.spdxLicenseToMavenLicense( nonStd );
         assertEquals( LICENSE_NAME, result.getName() );
@@ -307,7 +304,7 @@ public class TestLicenseManager
         // non standard without name
         final String LICENSE_ID2 = "LicenseRef-second";
         final String LICENSE_TEXT2 = "second text";
-        SPDXLicenseInfo noName = new SPDXNonStandardLicense( LICENSE_ID2, LICENSE_TEXT2 );
+        AnyLicenseInfo noName = new ExtractedLicenseInfo( LICENSE_ID2, LICENSE_TEXT2 );
         result = licenseManager.spdxLicenseToMavenLicense( noName );
         assertEquals( LICENSE_ID2, result.getName() );
     }

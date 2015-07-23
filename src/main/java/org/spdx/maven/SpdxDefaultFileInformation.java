@@ -16,9 +16,9 @@
 package org.spdx.maven;
 
 import org.apache.maven.plugin.logging.Log;
-import org.spdx.rdfparser.DOAPProject;
-import org.spdx.rdfparser.SPDXLicenseInfo;
-import org.spdx.rdfparser.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.DoapProject;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 
 /**
  * Simple structure to hold information obout default file information
@@ -28,21 +28,21 @@ import org.spdx.rdfparser.SpdxNoAssertionLicense;
 public class SpdxDefaultFileInformation 
 {
 
-    private SPDXLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
+    private AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
     private String copyright = "NOASSERTION";
     private String notice = "";
     private String comment = "";
     private String[] contributors = new String[0];
-    private DOAPProject[] artifactOf = new DOAPProject[0];
-    private SPDXLicenseInfo concludedLicense = new SpdxNoAssertionLicense();;
+    private DoapProject[] artifactOf = new DoapProject[0];
+    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();;
     private String licenseComment = "";
 
-    public SPDXLicenseInfo getDeclaredLicense() 
+    public AnyLicenseInfo getDeclaredLicense() 
     {
         return this.declaredLicense;
     }
     
-    public void setDeclaredLicense( SPDXLicenseInfo license ) 
+    public void setDeclaredLicense( AnyLicenseInfo license ) 
     {
         this.declaredLicense = license;
     }
@@ -87,22 +87,22 @@ public class SpdxDefaultFileInformation
         this.contributors = contributors;
     }
 
-    public DOAPProject[] getArtifactOf() 
+    public DoapProject[] getArtifactOf() 
     {
         return this.artifactOf;
     }
     
-    public void setArtifactOf( DOAPProject[] projects ) 
+    public void setArtifactOf( DoapProject[] projects ) 
     {
         this.artifactOf = projects;
     }
 
-    public SPDXLicenseInfo getConcludedLicense() 
+    public AnyLicenseInfo getConcludedLicense() 
     {
         return this.concludedLicense;
     }
     
-    public void setConcludedLicense( SPDXLicenseInfo license ) 
+    public void setConcludedLicense( AnyLicenseInfo license ) 
     {
         this.concludedLicense = license;
     }
@@ -129,7 +129,7 @@ public class SpdxDefaultFileInformation
         log.debug( "Default File Notice: "+getNotice() );
         log.debug( "Default File Concluded License: "+getConcludedLicense().toString() );
         log.debug( "Default File Declared License: "+getDeclaredLicense().toString() );
-        DOAPProject[] artifactOfs = getArtifactOf();
+        DoapProject[] artifactOfs = getArtifactOf();
         if ( artifactOfs != null ) 
         {
             for ( int i = 0; i < artifactOfs.length; i++ ) 

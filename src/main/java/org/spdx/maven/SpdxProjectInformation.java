@@ -16,8 +16,8 @@
 package org.spdx.maven;
 
 import org.apache.maven.plugin.logging.Log;
-import org.spdx.rdfparser.SPDXLicenseInfo;
-import org.spdx.rdfparser.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 
 /**
  * Simple structure to hold information about SPDX project
@@ -27,8 +27,8 @@ import org.spdx.rdfparser.SpdxNoAssertionLicense;
 class SpdxProjectInformation {
     String[] creators = new String[0];
     String creatorComment = "";
-    SPDXLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
-    SPDXLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
+    AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
+    AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
     String description;
     String downloadUrl;
     String homePage;
@@ -72,25 +72,25 @@ class SpdxProjectInformation {
     /**
      * @return the concludedLicense
      */
-    public SPDXLicenseInfo getConcludedLicense() {
+    public AnyLicenseInfo getConcludedLicense() {
         return concludedLicense;
     }
     /**
      * @param concludedLicense the concludedLicense to set
      */
-    public void setConcludedLicense( SPDXLicenseInfo concludedLicense ) {
+    public void setConcludedLicense( AnyLicenseInfo concludedLicense ) {
         this.concludedLicense = concludedLicense;
     }
     /**
      * @return the declaredLicense
      */
-    public SPDXLicenseInfo getDeclaredLicense() {
+    public AnyLicenseInfo getDeclaredLicense() {
         return declaredLicense;
     }
     /**
      * @param declaredLicense the declaredLicense to set
      */
-    public void setDeclaredLicense( SPDXLicenseInfo declaredLicense ) {
+    public void setDeclaredLicense( AnyLicenseInfo declaredLicense ) {
         this.declaredLicense = declaredLicense;
     }
     /**

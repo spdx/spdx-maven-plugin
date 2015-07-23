@@ -31,15 +31,21 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SPDXCreatorInformation;
-import org.spdx.rdfparser.SPDXDocument;
-import org.spdx.rdfparser.SPDXLicenseInfoFactory;
-import org.spdx.rdfparser.SPDXStandardLicense;
+import org.spdx.rdfparser.SpdxDocumentContainer;
+import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.SpdxRdfConstants;
 import org.spdx.rdfparser.SpdxVerificationHelper;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.license.ListedLicenses;
+import org.spdx.rdfparser.license.SpdxListedLicense;
+import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.Checksum;
+import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
+import org.spdx.rdfparser.model.SpdxDocument;
+import org.spdx.rdfparser.model.SpdxFile;
+import org.spdx.rdfparser.model.SpdxPackage;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * Builds SPDX documents for a given set of source files.
@@ -49,12 +55,19 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  */
 public class SpdxDocumentBuilder
 {
+    private static final String UNSPECIFIED = "UNSPECIFIED";
+
+    private static final String NULL_SHA1 = "cf23df2207d99a74fbe169e3eba035e633b65d94";
+
     //TODO: Use a previous SPDX to document file specific information and update
     //TODO: Map the SPDX document to the Maven build artifacts
     static DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
 
     private Log log;
-    private SPDXDocument spdxDoc;
+    private SpdxDocument spdxDoc;
+    private SpdxPackage projectPackage;
+    private SpdxDocumentContainer container;
+    private SpdxPackage packageDescribedByPom;
     private LicenseManager licenseManager;
     private File spdxFile;
 
@@ -70,6 +83,12 @@ public class SpdxDocumentBuilder
     {
         this.log = log;
         this.spdxFile = spdxFile;
+        
+        if ( spdxDocumentUrl == null ) 
+        {
+            this.getLog().error( "spdxDocumentUrl must be specified as a configuration parameter" );
+            throw( new SpdxBuilderException( "Missing spdxDocumentUrl" ) );
+        }
         
         // Handle the SPDX file
         if ( !spdxFile.exists() )
@@ -104,31 +123,21 @@ public class SpdxDocumentBuilder
         }
         
         // create the SPDX document
-        Model model = ModelFactory.createDefaultModel();
         try 
         {
-            spdxDoc = new SPDXDocument( model );
+            container = new SpdxDocumentContainer( spdxDocumentUrl.toString() );
+            spdxDoc = container.getSpdxDocument();
         } catch ( InvalidSPDXAnalysisException e ) 
         {
             this.getLog().error( "Error creating SPDX document", e );
             throw( new SpdxBuilderException( "Error creating SPDX document: "+e.getMessage() ) );
         }
-        if ( spdxDocumentUrl == null ) 
-        {
-            this.getLog().error( "spdxDocumentUrl must be specified as a configuration parameter" );
-            throw( new SpdxBuilderException( "Missing spdxDocumentUrl" ) );
-        }
         try 
         {
-            spdxDoc.createSpdxAnalysis( spdxDocumentUrl.toString() );
-        } catch ( InvalidSPDXAnalysisException e ) 
-        {
-            this.getLog().error( "Error creating SPDX analysis", e );
-            throw( new SpdxBuilderException( "Error creating SPDX analysis: "+e.getMessage() ) );
-        }
-        try 
-        {
-            spdxDoc.createSpdxPackage();
+            packageDescribedByPom = new SpdxPackage("NameToBeReplaced", new SpdxNoAssertionLicense(), new AnyLicenseInfo[0], 
+                                                    "", new SpdxNoAssertionLicense(), "", new SpdxFile[0], 
+                                                    new SpdxPackageVerificationCode("", new String[0]));
+            container.addElement( packageDescribedByPom );
         } catch ( InvalidSPDXAnalysisException e ) 
         {
             this.getLog().error( "Error creating SPDX package", e );
@@ -172,7 +181,7 @@ public class SpdxDocumentBuilder
         this.log = log;
     }
 
-    public SPDXDocument getSpdxDoc()
+    public SpdxDocument getSpdxDoc()
     {
         return this.spdxDoc;
     }
@@ -198,7 +207,7 @@ public class SpdxDocumentBuilder
             collectSpdxFileInformation( includedDirectories,
                     defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ),
                     pathSpecificInformation );
-            spdxDoc.getModel().write( spdxOut );
+            container.getModel().write( spdxOut );
         } catch ( FileNotFoundException e ) 
         {
             this.getLog().error( "Error saving SPDX data to file", e );
@@ -233,83 +242,20 @@ public class SpdxDocumentBuilder
           // document comment
           if ( projectInformation.getDocumentComment() != null && !projectInformation.getDocumentComment().isEmpty() )
           {
-              spdxDoc.setDocumentComment( projectInformation.getDocumentComment() );
+              spdxDoc.setComment( projectInformation.getDocumentComment() );
           }
           // creator
           fillCreatorInfo( projectInformation );
           // data license
-          SPDXStandardLicense dataLicense = (SPDXStandardLicense)(SPDXLicenseInfoFactory.parseSPDXLicenseString( SPDXDocument.SPDX_DATA_LICENSE_ID ) );
-          spdxDoc.setDataLicense( dataLicense );
-          // reviewers - not implemented
-          // packageName
-          if ( projectInformation.getName() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setDeclaredName( projectInformation.getName() );
-          }
-          // concluded license
-          spdxDoc.getSpdxPackage().setConcludedLicenses( projectInformation.getConcludedLicense() );
-          // declared license
-          spdxDoc.getSpdxPackage().setDeclaredLicense( projectInformation.getDeclaredLicense() );
-          // description
-          if ( projectInformation.getDescription() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setDescription( projectInformation.getDescription() );
-          }
-          // download url
-          if ( projectInformation.getDownloadUrl() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setDownloadUrl( projectInformation.getDownloadUrl() );
-          }
-          // archive file name
-          if ( projectInformation.getPackageArchiveFileName() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setFileName( projectInformation.getPackageArchiveFileName() );
-          }
-          // home page
-          if ( projectInformation.getHomePage() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setHomePage( projectInformation.getHomePage() );
-          }
-          // source information
-          if ( projectInformation.getSourceInfo() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setSourceInfo( projectInformation.getSourceInfo() );
-          }
-          // license comment
-          if ( projectInformation.getLicenseComment() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setLicenseComment( projectInformation.getLicenseComment() );
-          }
-          // originator
-          if ( projectInformation.getOriginator() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setOriginator( projectInformation.getOriginator() );
-          }
-          // sha1 checksum
-          if ( projectInformation.getSha1() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setSha1( projectInformation.getSha1() );
-          }
-          // copyright text
-          if ( projectInformation.getCopyrightText() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setDeclaredCopyright( projectInformation.getCopyrightText() );
-          }
-          // short description
-          if ( projectInformation.getShortDescription() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setShortDescription( projectInformation.getShortDescription() );
-          }
-          // supplier
-          if ( projectInformation.getSupplier() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setSupplier( projectInformation.getSupplier() );
-          }
-          // version info        
-          if ( projectInformation.getVersionInfo() != null ) 
-          {
-              spdxDoc.getSpdxPackage().setVersionInfo( projectInformation.getVersionInfo() );
-          }
+          SpdxListedLicense dataLicense = (SpdxListedLicense)(LicenseInfoFactory.parseSPDXLicenseString( SpdxDocumentContainer.SPDX_DATA_LICENSE_ID ) );
+          spdxDoc.setDataLicense( dataLicense );         
+          // annotations
+          //TODO: Implement document annotations        
+          //TODO: Add document level relationships
+          //TODO: Add document name - REQUIRED!
+          // Package level information
+          projectPackage = createSpdxPackage( projectInformation );
+          spdxDoc.getDocumentContainer().addElement( projectPackage );
       } catch ( InvalidSPDXAnalysisException e ) 
       {
           this.getLog().error( "SPDX error filling SPDX information", e );
@@ -321,7 +267,96 @@ public class SpdxDocumentBuilder
       }
   }
 
-  /**
+  private SpdxPackage createSpdxPackage( SpdxProjectInformation projectInformation ) throws SpdxBuilderException
+    {
+      //TODO: Add annotations
+      //TODO: Add relationships
+      //TODO: Add comment
+      String copyrightText = projectInformation.getCopyrightText();
+      if ( copyrightText == null ) {
+          copyrightText = UNSPECIFIED;
+      }
+      String downloadUrl = projectInformation.getDownloadUrl();
+      if ( downloadUrl == null ) {
+          downloadUrl = UNSPECIFIED;
+      }
+      SpdxPackageVerificationCode nullPackageVerificationCode = new SpdxPackageVerificationCode(NULL_SHA1, new String[0]);
+      SpdxPackage pkg = new SpdxPackage(projectInformation.getName(),
+                                                   projectInformation.getConcludedLicense(),
+                                                   new AnyLicenseInfo[0],
+                                                   copyrightText, 
+                                                   projectInformation.getDeclaredLicense(),
+                                                   downloadUrl, new SpdxFile[0],
+                                                   nullPackageVerificationCode);
+      // description
+      if ( projectInformation.getDescription() != null ) 
+      {
+          pkg.setDescription( projectInformation.getDescription() );
+      }
+      // download url
+      if ( projectInformation.getDownloadUrl() != null ) 
+      {
+          pkg.setDownloadLocation( projectInformation.getDownloadUrl() );
+      }
+      // archive file name
+      if ( projectInformation.getPackageArchiveFileName() != null ) 
+      {
+          pkg.setPackageFileName( projectInformation.getPackageArchiveFileName() );
+      }
+      // home page
+      if ( projectInformation.getHomePage() != null ) 
+      {
+          pkg.setHomepage( projectInformation.getHomePage() );
+      }
+      // source information
+      if ( projectInformation.getSourceInfo() != null ) 
+      {
+          pkg.setSourceInfo( projectInformation.getSourceInfo() );
+      }
+      // license comment
+      if ( projectInformation.getLicenseComment() != null ) 
+      {
+          pkg.setLicenseComments( projectInformation.getLicenseComment() );
+      }
+      // originator
+      if ( projectInformation.getOriginator() != null ) 
+      {
+          pkg.setOriginator( projectInformation.getOriginator() );
+      }
+      // sha1 checksum
+      if ( projectInformation.getSha1() != null ) 
+      {
+          //TODO: Add options for additional checksums
+          Checksum checksum = new Checksum( ChecksumAlgorithm.checksumAlgorithm_sha1, projectInformation.getSha1() );
+          try
+        {
+            pkg.setChecksums( new Checksum[] { checksum } );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            this.getLog().error( "Invalid checksum value for package", e );
+            throw( new SpdxBuilderException( "Error adding package information to SPDX document - Invalid checksum provided: "+e.getMessage(), e ) );
+        }
+      }
+      // short description
+      if ( projectInformation.getShortDescription() != null ) 
+      {
+          pkg.setSummary( projectInformation.getShortDescription() );
+      }
+      // supplier
+      if ( projectInformation.getSupplier() != null ) 
+      {
+          pkg.setSupplier( projectInformation.getSupplier() );
+      }
+      // version info        
+      if ( projectInformation.getVersionInfo() != null ) 
+      {
+          pkg.setVersionInfo( projectInformation.getVersionInfo() );
+      }
+      return pkg;
+    }
+
+/**
    * Fill in the creator information to the SPDX document
  * @param projectInformation project level information including the creators
  * @throws InvalidSPDXAnalysisException
@@ -345,7 +380,7 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
       SPDXCreatorInformation spdxCreator = new SPDXCreatorInformation(
               creators.toArray( new String[creators.size()] ), format.format( new Date() ),
               projectInformation.getCreatorComment(), 
-              SPDXLicenseInfoFactory.DEFAULT_LICENSE_LIST_VERSION );
+              ListedLicenses.DEFAULT_LICENSE_LIST_VERSION );
       spdxDoc.setCreationInfo( spdxCreator );        
   }
 
@@ -372,11 +407,11 @@ private void collectSpdxFileInformation( FileSet[] includedDirectories,
           this.getLog().error( "SPDX error collecting file information", e );
           throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );
       }
-      spdxDoc.getSpdxPackage().setFiles( fileCollector.getFiles() );
-      spdxDoc.getSpdxPackage().setLicenseInfoFromFiles( fileCollector.getLicenseInfoFromFiles() );
+      projectPackage.setFiles( fileCollector.getFiles() );
+      projectPackage.setLicenseInfosFromFiles( fileCollector.getLicenseInfoFromFiles() );
       try 
       {
-          spdxDoc.getSpdxPackage().setVerificationCode( fileCollector.getVerificationCode( spdxFileName ) );
+          projectPackage.setPackageVerificationCode( fileCollector.getVerificationCode( spdxFileName ) );
       } catch ( NoSuchAlgorithmException e )  
       {
           this.getLog().error( "Error calculating verification code", e );

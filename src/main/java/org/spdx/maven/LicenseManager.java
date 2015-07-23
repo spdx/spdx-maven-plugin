@@ -19,17 +19,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.logging.Log;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.SPDXConjunctiveLicenseSet;
-import org.spdx.rdfparser.SPDXDocument;
-import org.spdx.rdfparser.SPDXLicenseInfo;
-import org.spdx.rdfparser.SPDXLicenseInfoFactory;
-import org.spdx.rdfparser.SPDXNonStandardLicense;
-import org.spdx.rdfparser.SPDXStandardLicense;
-import org.spdx.rdfparser.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
+import org.spdx.rdfparser.license.ExtractedLicenseInfo;
+import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.license.SpdxListedLicense;
+import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
@@ -49,18 +50,18 @@ public class LicenseManager
      * SPDX document containing the license information collected.  All
      * non-standard licenses are added to the SPDX document
      */
-    SPDXDocument spdxDoc = null;
+    SpdxDocument spdxDoc = null;
     
     /**
      * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX standard
      * license or a non-standard license.
      */
-    HashMap<String, String> urlStringToSpdxLicenseId = null;
+    Map<String, String> urlStringToSpdxLicenseId = null;
     
     /**
      * Map of non-standard license ID's to the SPDX license
      */
-    HashMap<String, SPDXNonStandardLicense> nonStandardLicenses = new HashMap<String, SPDXNonStandardLicense>();
+    Map<String, ExtractedLicenseInfo> nonStandardLicenses = new HashMap<String, ExtractedLicenseInfo>();
 
     Log log;
 
@@ -72,7 +73,7 @@ public class LicenseManager
      * @param useStdLicenseSourceUrls if true, map any SPDX standard license source URL to license ID.  Note: significant performance degredation
      * @param Log plugin logger
      */
-    public LicenseManager( SPDXDocument spdxDoc, Log log, boolean useStdLicenseSourceUrls )
+    public LicenseManager( SpdxDocument spdxDoc, Log log, boolean useStdLicenseSourceUrls )
     {
         this.spdxDoc = spdxDoc;
         this.log = log;
@@ -90,15 +91,15 @@ public class LicenseManager
     {
         //TODO: This is rather slow.  Consider going to a hardcoded map
         urlStringToSpdxLicenseId = new HashMap<String, String>();
-        String[] standardLicenseIds = SPDXLicenseInfoFactory.getStandardLicenseIds();
+        String[] standardLicenseIds = LicenseInfoFactory.getSpdxListedLicenseIds();
         for ( int i = 0; i < standardLicenseIds.length; i++ ) {
             this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX + standardLicenseIds[i], standardLicenseIds[i] );
             if (useSourceUrls) {
                 try
                 {
-                    SPDXStandardLicense stdLicense = 
-                                    SPDXLicenseInfoFactory.getStandardLicenseById( standardLicenseIds[i] );
-                    String[] urls = stdLicense.getSourceUrl();
+                    SpdxListedLicense stdLicense = 
+                                    LicenseInfoFactory.getListedLicenseById( standardLicenseIds[i] );
+                    String[] urls = stdLicense.getSeeAlso();
                     if ( urls != null ) {
                         for ( int j = 0; j < urls.length; j++ ) {
                             if (this.urlStringToSpdxLicenseId.containsKey( urls[j] )) {
@@ -129,11 +130,11 @@ public class LicenseManager
      */
     public void addNonStandardLicense( NonStandardLicense license ) throws LicenseManagerException
     {
-         SPDXNonStandardLicense spdxLicense = new SPDXNonStandardLicense(
+         ExtractedLicenseInfo spdxLicense = new ExtractedLicenseInfo(
                 license.getLicenseId(), license.getExtractedText(), license.getName(),
                 license.getCrossReference(), license.getComment() );
         try {
-            spdxDoc.addNewExtractedLicenseInfo( spdxLicense );
+            spdxDoc.addExtractedLicenseInfos( spdxLicense );
         } catch ( InvalidSPDXAnalysisException e ) {
             String licenseId = license.getLicenseId();
             if ( licenseId == null ) {
@@ -151,11 +152,11 @@ public class LicenseManager
                                         oldLicenseId + " with " + license.getLicenseId() +
                                         " for " + urls[i]);
                 }
-                this.urlStringToSpdxLicenseId.put( urls[i], spdxLicense.getId() );
+                this.urlStringToSpdxLicenseId.put( urls[i], spdxLicense.getLicenseId() );
             }
         }
         // add to nonstandard license cache
-        nonStandardLicenses.put( spdxLicense.getId(), spdxLicense );
+        nonStandardLicenses.put( spdxLicense.getLicenseId(), spdxLicense );
     }
     
     /**
@@ -167,11 +168,11 @@ public class LicenseManager
      * @return
      * @throws LicenseManagerException 
      */
-    public SPDXLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList ) throws LicenseManagerException {
+    public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList ) throws LicenseManagerException {
         if ( licenseList == null ) {
             return new SpdxNoAssertionLicense();
         }
-        ArrayList<SPDXLicenseInfo> spdxLicenses = new ArrayList<SPDXLicenseInfo>();
+        List<AnyLicenseInfo> spdxLicenses = new ArrayList<AnyLicenseInfo>();
         Iterator<License> iter = licenseList.iterator();
         while( iter.hasNext() ) {
             License license = iter.next();
@@ -182,8 +183,8 @@ public class LicenseManager
         } else if ( spdxLicenses.size() == 1 ) {
             return spdxLicenses.get( 0 );
         } else {
-            SPDXLicenseInfo[] licensesInSet = spdxLicenses.toArray( new SPDXLicenseInfo[spdxLicenses.size()] );
-            SPDXLicenseInfo conjunctiveLicense = new SPDXConjunctiveLicenseSet( licensesInSet );
+            AnyLicenseInfo[] licensesInSet = spdxLicenses.toArray( new AnyLicenseInfo[spdxLicenses.size()] );
+            AnyLicenseInfo conjunctiveLicense = new ConjunctiveLicenseSet( licensesInSet );
             return conjunctiveLicense;
         }
     }
@@ -194,7 +195,7 @@ public class LicenseManager
      * @return SPDX license
      * @throws LicenseManagerException thrown if no SPDX standard or non standard license exists with the same URL
      */
-    public SPDXLicenseInfo mavenLicenseToSpdxLicense( License mavenLicense ) throws LicenseManagerException
+    public AnyLicenseInfo mavenLicenseToSpdxLicense( License mavenLicense ) throws LicenseManagerException
     {
         if ( mavenLicense.getUrl() == null ) {
             throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
@@ -205,11 +206,11 @@ public class LicenseManager
             throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
                                                 "No standard or non-standard license matches the URL " + mavenLicense.getUrl() ) );
         }
-        SPDXLicenseInfo retval = nonStandardLicenses.get( licenseId );
+        AnyLicenseInfo retval = nonStandardLicenses.get( licenseId );
         if (retval == null) {
             try
             {
-                retval = SPDXLicenseInfoFactory.parseSPDXLicenseString( licenseId );
+                retval = LicenseInfoFactory.parseSPDXLicenseString( licenseId );
             }
             catch ( InvalidLicenseStringException e )
             {
@@ -226,36 +227,36 @@ public class LicenseManager
      * @return
      * @throws LicenseManagerException 
      */
-    public License spdxLicenseToMavenLicense( SPDXLicenseInfo spdxLicense ) throws LicenseManagerException {
-        if ( spdxLicense instanceof SPDXNonStandardLicense ) {
-            return spdxNonStdLicenseToMavenLicense( (SPDXNonStandardLicense)spdxLicense );
-        } else if ( spdxLicense instanceof SPDXStandardLicense ) {
-            return spdxStdLicenseToMavenLicense( (SPDXStandardLicense)spdxLicense );
+    public License spdxLicenseToMavenLicense( AnyLicenseInfo spdxLicense ) throws LicenseManagerException {
+        if ( spdxLicense instanceof ExtractedLicenseInfo ) {
+            return spdxNonStdLicenseToMavenLicense( (ExtractedLicenseInfo)spdxLicense );
+        } else if ( spdxLicense instanceof SpdxListedLicense ) {
+            return spdxStdLicenseToMavenLicense( (SpdxListedLicense)spdxLicense );
         } else {
             throw( new LicenseManagerException( "Can not create a Maven license from this SPDX license type.  " +
-                            "Must be an SPDXNonStandardLicense or an SPDXStandardLicense "));
+                            "Must be an ExtractedLicenseInfo or an SpdxListedLicense "));
         }
     }
 
-    private License spdxStdLicenseToMavenLicense( SPDXStandardLicense spdxLicense )
+    private License spdxStdLicenseToMavenLicense( SpdxListedLicense spdxLicense )
     {
         License retval = new License();
         // name
         if ( spdxLicense.getName() != null && !spdxLicense.getName().isEmpty() ) {
             retval.setName( spdxLicense.getName() );
         } else {
-            retval.setName( spdxLicense.getId() );
+            retval.setName( spdxLicense.getLicenseId() );
         }
         // comment
         if ( spdxLicense.getComment() != null && !spdxLicense.getComment().isEmpty() ) {
             retval.setComments( spdxLicense.getComment() );
         }
         // url
-        if ( spdxLicense.getSourceUrl() != null && spdxLicense.getSourceUrl().length > 0 ) {
-            retval.setUrl( spdxLicense.getSourceUrl()[0] );
-            if ( spdxLicense.getSourceUrl().length > 1 ) {
+        if ( spdxLicense.getSeeAlso() != null && spdxLicense.getSeeAlso().length > 0 ) {
+            retval.setUrl( spdxLicense.getSeeAlso()[0] );
+            if ( spdxLicense.getSeeAlso().length > 1 ) {
                 if ( getLog() != null ) {
-                    getLog().warn( "SPDX license "+spdxLicense.getId() +
+                    getLog().warn( "SPDX license "+spdxLicense.getLicenseId() +
                                     " contains multiple URLs.  Only the first URL will be preserved in the Maven license created." );
                 }
             }
@@ -263,24 +264,24 @@ public class LicenseManager
         return retval;
     }
 
-    private License spdxNonStdLicenseToMavenLicense( SPDXNonStandardLicense spdxLicense )
+    private License spdxNonStdLicenseToMavenLicense( ExtractedLicenseInfo spdxLicense )
     {
         License retval = new License();
         // name
-        if ( spdxLicense.getLicenseName() != null && !spdxLicense.getLicenseName().isEmpty() ) {
-            retval.setName( spdxLicense.getLicenseName() );
+        if ( spdxLicense.getName() != null && !spdxLicense.getName().isEmpty() ) {
+            retval.setName( spdxLicense.getName() );
         } else {
-            retval.setName( spdxLicense.getId() );
+            retval.setName( spdxLicense.getLicenseId() );
         }
         // comment
         if ( spdxLicense.getComment() != null && !spdxLicense.getComment().isEmpty() ) {
             retval.setComments( spdxLicense.getComment() );
         }
         // url
-        if ( spdxLicense.getSourceUrls() != null && spdxLicense.getSourceUrls().length > 0 ) {
-            retval.setUrl( spdxLicense.getSourceUrls()[0] );
-            if ( spdxLicense.getSourceUrls().length > 1 ) {
-                getLog().warn( "SPDX license "+spdxLicense.getId() +
+        if ( spdxLicense.getSeeAlso() != null && spdxLicense.getSeeAlso().length > 0 ) {
+            retval.setUrl( spdxLicense.getSeeAlso()[0] );
+            if ( spdxLicense.getSeeAlso().length > 1 ) {
+                getLog().warn( "SPDX license "+spdxLicense.getLicenseId() +
                                " contains multiple URLs.  Only the first URL will be preserved in the Maven license created." );
             }
         }

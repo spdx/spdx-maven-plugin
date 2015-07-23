@@ -18,9 +18,9 @@ package org.spdx.maven;
 import java.io.File;
 
 import org.apache.maven.plugins.annotations.Parameter;
-import org.spdx.rdfparser.DOAPProject;
-import org.spdx.rdfparser.SPDXLicenseInfo;
-import org.spdx.rdfparser.SPDXLicenseInfoFactory;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
@@ -132,10 +132,10 @@ public class PathSpecificSpdxInfo
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         if ( this.fileArtifactOfs != null ) 
         {
-            DOAPProject artifactOfs[] = new DOAPProject[this.fileArtifactOfs.length];
+            DoapProject artifactOfs[] = new DoapProject[this.fileArtifactOfs.length];
             for ( int i = 0; i < artifactOfs.length; i++ ) 
             {
-                artifactOfs[i] = new DOAPProject( this.fileArtifactOfs[i].getName(), 
+                artifactOfs[i] = new DoapProject( this.fileArtifactOfs[i].getName(), 
                                                   this.fileArtifactOfs[i].getHomePage().toString() );
             }
             retval.setArtifactOf( artifactOfs );
@@ -151,8 +151,8 @@ public class PathSpecificSpdxInfo
         }
         if ( this.fileConcludedLicense != null ) 
         {
-            SPDXLicenseInfo concludedLicense = null;
-            concludedLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim() );
+            AnyLicenseInfo concludedLicense = null;
+            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim() );
             retval.setConcludedLicense( concludedLicense );
         } else 
         {
@@ -188,8 +188,8 @@ public class PathSpecificSpdxInfo
         }
         if ( this.licenseInformationInFile != null ) 
         {
-            SPDXLicenseInfo declaredLicense = null;
-            declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim() );
+            AnyLicenseInfo declaredLicense = null;
+            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim() );
             retval.setDeclaredLicense( declaredLicense );
         } else 
         {

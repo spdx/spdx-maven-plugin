@@ -28,10 +28,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
-import org.spdx.rdfparser.DOAPProject;
-import org.spdx.rdfparser.SPDXLicenseInfo;
-import org.spdx.rdfparser.SPDXLicenseInfoFactory;
-import org.spdx.rdfparser.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -368,7 +368,7 @@ public class CreateSpdxMojo
             this.getLog().error( "Error building SPDX document from project files: "+e.getMessage(), e );
             throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
         }
-        ArrayList<String> spdxErrors = builder.getSpdxDoc().verify();
+        List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) 
         {
             // report error
@@ -501,10 +501,10 @@ public class CreateSpdxMojo
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         retval.setArtifactOf( getDefaultFileProjects() );
         retval.setComment( defaultFileComment );
-        SPDXLicenseInfo concludedLicense = null;
+        AnyLicenseInfo concludedLicense = null;
         try 
         {
-            concludedLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( defaultFileConcludedLicense.trim() );
+            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultFileConcludedLicense.trim() );
         } catch ( InvalidLicenseStringException e ) 
         {
             this.getLog().error( "Invalid default file concluded license: "+e.getMessage() );
@@ -513,10 +513,10 @@ public class CreateSpdxMojo
         retval.setConcludedLicense( concludedLicense );
         retval.setContributors( defaultFileContributors );
         retval.setCopyright( defaultFileCopyright );
-        SPDXLicenseInfo declaredLicense = null;
+        AnyLicenseInfo declaredLicense = null;
         try 
         {
-            declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( defaultLicenseInformationInFile.trim() );
+            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultLicenseInformationInFile.trim() );
         } catch ( InvalidLicenseStringException e ) 
         {
             this.getLog().error( "Invalid default file declared license: "+e.getMessage() );
@@ -528,16 +528,16 @@ public class CreateSpdxMojo
         return retval;
     }
 
-    private DOAPProject[] getDefaultFileProjects() 
+    private DoapProject[] getDefaultFileProjects() 
     {
         if ( this.defaultFileArtifactOfs == null ) 
         {
-            return new DOAPProject[0];
+            return new DoapProject[0];
         }
-        DOAPProject[] retval = new DOAPProject[this.defaultFileArtifactOfs.length];
+        DoapProject[] retval = new DoapProject[this.defaultFileArtifactOfs.length];
         for ( int i = 0; i < retval.length; i++ ) 
         {
-            retval[i] = new DOAPProject( defaultFileArtifactOfs[i].getName(), 
+            retval[i] = new DoapProject( defaultFileArtifactOfs[i].getName(), 
                     defaultFileArtifactOfs[i].getHomePage().toString() );
         }
         return retval;
@@ -565,7 +565,7 @@ public class CreateSpdxMojo
         {
             retval.setDocumentComment( this.documentComment );
         }
-        SPDXLicenseInfo declaredLicense = null;
+        AnyLicenseInfo declaredLicense = null;
         if ( this.licenseDeclared == null ) 
         {
             @SuppressWarnings( "unchecked" )
@@ -583,14 +583,14 @@ public class CreateSpdxMojo
         {
             try 
             {
-                declaredLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( this.licenseDeclared.trim() );
+                declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( this.licenseDeclared.trim() );
             } catch ( InvalidLicenseStringException e ) 
             {
                 this.getLog().error( "Invalid declared license: "+e.getMessage() );
                 throw( new MojoExecutionException( "Invalid declared license: "+e.getMessage() ) );
             }
         }
-        SPDXLicenseInfo concludedLicense = null;
+        AnyLicenseInfo concludedLicense = null;
         if ( this.licenseConcluded == null ) 
         {
             concludedLicense = declaredLicense;
@@ -598,7 +598,7 @@ public class CreateSpdxMojo
         {
             try 
             {
-                concludedLicense = SPDXLicenseInfoFactory.parseSPDXLicenseString( this.licenseConcluded.trim() );
+                concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( this.licenseConcluded.trim() );
             } catch ( InvalidLicenseStringException e ) 
             {
                 this.getLog().error( "Invalid concluded license: "+e.getMessage() );
