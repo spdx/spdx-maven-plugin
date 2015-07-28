@@ -16,6 +16,8 @@ package org.spdx.maven;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Resource;
@@ -27,6 +29,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
@@ -43,6 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * NOTE: Currently this is a prototype plugin for supporting SPDX in a Maven build.
@@ -81,6 +85,8 @@ public class CreateSpdxMojo
     static final String INCLUDE_ALL = "**/*";
 
     private static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
+
+    private static final String SPDX_ARTIFACT_TYPE = "spdx";
     
     /**
      * @parameter default-value="${project}"
@@ -89,7 +95,36 @@ public class CreateSpdxMojo
      */
     @Parameter ( defaultValue ="${project}" )
     MavenProject mavenProject;
+    /**
+     * Helper class to assist in attaching artifacts to the project instance.
+     * project-helper instance, used to make addition of resources simpler.
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
     
+    /**
+     * @requiresDependencyResolution test
+     */
+    /**
+     * @requiresDependencyResolution compile
+     */
+    /**
+     * @requiresDependencyResolution runtime
+     */
+    /**
+     * The set of dependencies required by the project
+     * @parameter default-value="${project.dependencies}"
+     * @required
+     * @readonly
+     */
+    private Set dependencies;
+    
+//    /**
+//     * @parameter default-value="${session}"
+//     * @readonly
+//     */
+//    private MavenSession session;
+//    
     // Parameters for the plugin
     /**
      * Location of the SPDX file.
@@ -98,10 +133,10 @@ public class CreateSpdxMojo
     private File spdxFile;
     
     /**
-     * Document URL - must be unique for the artifact and SPDX file
+     * Document namespace - must be unique for the artifact and SPDX file
      */
     @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.name}-${project.version}", property = "spdxDocumentUrl", required = true )
-    private URL spdxDocumentUrl;
+    private URL spdxDocumentNamespace;
     
     /**
      * Non standard licenses referenced within the Maven SPDX plugin configuration.
@@ -118,7 +153,7 @@ public class CreateSpdxMojo
      * Note: Several SPDX standard licenses contain the same cross-reference license
      * URL.  In this case, the SPDX standard license used in indeterminate.
      */
-    @Parameter( defaultValue = "false")
+    @Parameter( defaultValue = "false" )
     private boolean matchLicensedOnCrossReferenceUrls;
     
     /**
@@ -127,6 +162,21 @@ public class CreateSpdxMojo
      */
     @Parameter
     private String documentComment;
+    
+    /**
+     * Optional annotations for the SPDX document
+     */
+    @Parameter
+    private Annotation[] documentAnnotations;
+    
+    @Parameter
+    private String testParameter;
+    
+    /**
+     * Optional annotations for the package
+     */
+    @Parameter
+    private Annotation[] packageAnnotations;
 
     /**
      * optional default SPDX file comment field.  
@@ -307,10 +357,23 @@ public class CreateSpdxMojo
      */
     @Parameter( required = false )
     private List<PathSpecificSpdxInfo> pathsWithSpecificSpdxInfo;
+    
+    /**
+     * Additional files to be added to the SPDX document which are not in the source list or resources file
+     */
+    @Parameter( required = false )
+    private FileSet additionalFiles;
+    
+    /**
+     * File patterns to exclude from the calculation of the package verification code
+     */
+    @Parameter( required = false )
+    private String[] excludedFilePatterns;
 
     public void execute()
         throws MojoExecutionException
     {
+        
         if ( this.getLog() == null ) 
         {
             throw( new MojoExecutionException( "Null log for Mojo" ) );
@@ -325,7 +388,7 @@ public class CreateSpdxMojo
         SpdxDocumentBuilder builder;
         try
         {
-            builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, spdxDocumentUrl,
+            builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, spdxDocumentNamespace,
                                                this.matchLicensedOnCrossReferenceUrls );
         }
         catch ( SpdxBuilderException e )
@@ -350,7 +413,12 @@ public class CreateSpdxMojo
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation );
+        SpdxDependencyInformation dependencyInformation = new SpdxDependencyInformation();
+  //      @SuppressWarnings( "unchecked" )
+  //      SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( this.dependencies );
+        //TODO: Should we use the dependency graph
         // The following is for debugging purposes
+        this.getLog().debug( "Test parameter: "+this.testParameter );
         logIncludedDirectories( includedDirectories );
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
@@ -361,13 +429,14 @@ public class CreateSpdxMojo
         {
             builder.buildDocumentFromFiles( includedDirectories, 
                                             projectInformation, defaultFileInformation,
-                                            pathSpecificInformation );
+                                            pathSpecificInformation, dependencyInformation );
         }
         catch ( SpdxBuilderException e )
         {
             this.getLog().error( "Error building SPDX document from project files: "+e.getMessage(), e );
             throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
         }
+ //       projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) 
         {
@@ -381,6 +450,21 @@ public class CreateSpdxMojo
             }
             this.getLog().warn( sb.toString() );
         }
+    }
+
+    /**
+     * Collect dependency information from Maven dependencies
+     * @param dependencies Maven dependencies
+     * @param session2 
+     * @return information collected from Maven dependencies
+     */
+    private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies )
+    {
+        SpdxDependencyInformation retval = new SpdxDependencyInformation(  );
+        for (Artifact dependency:dependencies) {
+            retval.addMavenDependency( dependency );
+        }
+        return retval;
     }
 
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
@@ -672,6 +756,8 @@ public class CreateSpdxMojo
         }
         retval.setSourceInfo( this.sourceInfo );
         retval.setVersionInfo( mavenProject.getVersion() );
+        retval.setDocumentAnnotations( this.documentAnnotations );
+        retval.setPackageAnnotations( this.packageAnnotations );
         return retval;
     }
 
@@ -723,6 +809,7 @@ public class CreateSpdxMojo
                 this.getLog().debug( "Adding resource directory "+resource.getDirectory() );
             }
         }
+        // TODO add additional file sets
         this.getLog().debug( "Number of filesets: "+String.valueOf( result.size() ) );
         return result.toArray( new FileSet[result.size()] );
     }

@@ -25,6 +25,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
@@ -40,8 +41,11 @@ import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.license.ListedLicenses;
 import org.spdx.rdfparser.license.SpdxListedLicense;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.Annotation;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
+import org.spdx.rdfparser.model.Relationship;
+import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
@@ -74,20 +78,20 @@ public class SpdxDocumentBuilder
     /**
      * @param log Log for logging information and errors
      * @param spdxFile File to store the SPDX document results
-     * @param spdxDocumentUrl URI for SPDX document - must be unique
+     * @param spdxDocumentNamespace URI for SPDX document - must be unique
      * @param useStdLicenseSourceUrls if true, map any SPDX standard license source URL to license ID.  Note: significant performance degredation
      * @throws SpdxBuilderException
      */
-    public SpdxDocumentBuilder( Log log, File spdxFile, URL spdxDocumentUrl,
+    public SpdxDocumentBuilder( Log log, File spdxFile, URL spdxDocumentNamespace,
                                 boolean useStdLicenseSourceUrls) throws SpdxBuilderException
     {
         this.log = log;
         this.spdxFile = spdxFile;
         
-        if ( spdxDocumentUrl == null ) 
+        if ( spdxDocumentNamespace == null ) 
         {
-            this.getLog().error( "spdxDocumentUrl must be specified as a configuration parameter" );
-            throw( new SpdxBuilderException( "Missing spdxDocumentUrl" ) );
+            this.getLog().error( "spdxDocumentNamespace must be specified as a configuration parameter" );
+            throw( new SpdxBuilderException( "Missing spdxDocumentNamespace" ) );
         }
         
         // Handle the SPDX file
@@ -125,7 +129,7 @@ public class SpdxDocumentBuilder
         // create the SPDX document
         try 
         {
-            container = new SpdxDocumentContainer( spdxDocumentUrl.toString() );
+            container = new SpdxDocumentContainer( spdxDocumentNamespace.toString() );
             spdxDoc = container.getSpdxDocument();
         } catch ( InvalidSPDXAnalysisException e ) 
         {
@@ -192,22 +196,27 @@ public class SpdxDocumentBuilder
      * @param projectInformation Project level SPDX information
      * @param defaultFileInformation Default SPDX file information
      * @param pathSpecificInformation Map of path to file information used to override the default file information
+     * @param dependencyInformation Dependencies to add to the SPDX file (typically based on project dependencies in the POM file)
      * @throws SpdxBuilderException
      */
     public void buildDocumentFromFiles( FileSet[] includedDirectories,
                                         SpdxProjectInformation projectInformation,
                                         SpdxDefaultFileInformation defaultFileInformation,
-                                        Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxBuilderException
+                                        Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
+                                        SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
     {
         FileOutputStream spdxOut = null;
         try 
         {
+            this.log.debug(  "Starting buid document from files" );
             spdxOut = new FileOutputStream ( spdxFile );
             fillSpdxDocumentInformation( projectInformation );
             collectSpdxFileInformation( includedDirectories,
                     defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ),
                     pathSpecificInformation );
+ //           addDependencyInformation( dependencyInformation );
             container.getModel().write( spdxOut );
+            this.log.debug( "Completed build document from files" );
         } catch ( FileNotFoundException e ) 
         {
             this.getLog().error( "Error saving SPDX data to file", e );
@@ -232,6 +241,42 @@ public class SpdxDocumentBuilder
     
     
     /**
+     * Add dependency information to the SPDX file
+     * @param dependencyInformation dependency information collected from the project POM file
+     */
+    private void addDependencyInformation( SpdxDependencyInformation dependencyInformation )
+    {
+        List<Relationship> packageRelationships = dependencyInformation.getPackageRelationships();
+        if ( packageRelationships != null ) {
+            for ( Relationship relationship:packageRelationships ) {
+                try
+                {
+                    this.projectPackage.addRelationship( relationship );
+                }
+                catch ( InvalidSPDXAnalysisException e )
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        List<Relationship> documentRelationships = dependencyInformation.getDocumentRelationships();
+        if ( documentRelationships != null ) {
+            for ( Relationship relationship:documentRelationships ) {
+                try
+                {
+                    this.spdxDoc.addRelationship( relationship );
+                }
+                catch ( InvalidSPDXAnalysisException e )
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
      * Fill in the document level information for SPDX
      * @param projectInformation project information to be used
      * @throws SpdxBuilderException
@@ -250,12 +295,17 @@ public class SpdxDocumentBuilder
           SpdxListedLicense dataLicense = (SpdxListedLicense)(LicenseInfoFactory.parseSPDXLicenseString( SpdxDocumentContainer.SPDX_DATA_LICENSE_ID ) );
           spdxDoc.setDataLicense( dataLicense );         
           // annotations
+          if ( projectInformation.getDocumentAnnotations() != null && projectInformation.getDocumentAnnotations().length > 0 ) {
+              spdxDoc.setAnnotations( toSpdxAnnotations( projectInformation.getDocumentAnnotations() ) );
+          }
           //TODO: Implement document annotations        
           //TODO: Add document level relationships
-          //TODO: Add document name - REQUIRED!
+          spdxDoc.setName( projectInformation.getName() );  // Same as package name
           // Package level information
           projectPackage = createSpdxPackage( projectInformation );
+          Relationship documentContainsRelationship = new Relationship( projectPackage, RelationshipType.relationshipType_describes, "" );
           spdxDoc.getDocumentContainer().addElement( projectPackage );
+          spdxDoc.addRelationship( documentContainsRelationship );
       } catch ( InvalidSPDXAnalysisException e ) 
       {
           this.getLog().error( "SPDX error filling SPDX information", e );
@@ -267,7 +317,16 @@ public class SpdxDocumentBuilder
       }
   }
 
-  private SpdxPackage createSpdxPackage( SpdxProjectInformation projectInformation ) throws SpdxBuilderException
+  private Annotation[] toSpdxAnnotations( org.spdx.maven.Annotation[] annotations )
+    {
+        Annotation[] retval = new Annotation[annotations.length];
+        for ( int i = 0; i < annotations.length; i++ ) {
+            retval[i] = annotations[i].toSpdxAnnotation();
+        }
+        return retval;
+    }
+
+private SpdxPackage createSpdxPackage( SpdxProjectInformation projectInformation ) throws SpdxBuilderException
     {
       //TODO: Add annotations
       //TODO: Add relationships
@@ -288,6 +347,18 @@ public class SpdxDocumentBuilder
                                                    projectInformation.getDeclaredLicense(),
                                                    downloadUrl, new SpdxFile[0],
                                                    nullPackageVerificationCode);
+      // Annotations
+      if ( projectInformation.getPackageAnnotations() != null && projectInformation.getPackageAnnotations().length > 0 ) {
+          try
+        {
+            pkg.setAnnotations( toSpdxAnnotations( projectInformation.getPackageAnnotations() ) );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            this.getLog().error( "Invalid package annotation", e );
+            throw( new SpdxBuilderException( "Error adding package annotations to SPDX document: "+e.getMessage(), e ) );
+        }
+      }
       // description
       if ( projectInformation.getDescription() != null ) 
       {

@@ -43,6 +43,8 @@ class SpdxProjectInformation {
     private String sourceInfo;
     private String copyrightText;
     private String documentComment;
+    private Annotation[] packageAnnotations;
+    private Annotation[] documentAnnotations;
     /**
      * @return the documentComment
      */
@@ -254,6 +256,18 @@ class SpdxProjectInformation {
         log.debug( "SPDX Declared license: "+this.getDeclaredLicense().toString() );
         log.debug( "SPDX Download URL: "+this.getDownloadUrl() );
         log.debug( "SPDX Home page: "+this.getHomePage() );
+        if ( this.documentAnnotations != null && this.documentAnnotations.length > 0 ) {
+            log.debug( "Document annotations: " );
+            for ( Annotation annotation:documentAnnotations ) {
+                annotation.logInfo( log );
+            }
+        }
+        if ( this.packageAnnotations != null && this.packageAnnotations.length > 0 ) {
+            log.debug( "Package annotations: " );
+            for ( Annotation annotation:packageAnnotations ) {
+                annotation.logInfo( log );
+            }
+        }
         String[] creators = this.getCreators();
         if ( creators != null ) {
             for ( int i = 0; i < creators.length; i++ ) {
@@ -276,5 +290,20 @@ class SpdxProjectInformation {
     public String getCopyrightText()
     {
         return this.copyrightText;
+    }
+    public void setPackageAnnotations( Annotation[] packageAnnotations )
+    {
+        this.packageAnnotations = packageAnnotations;
+        
+    }
+    public Annotation[] getPackageAnnotations() {
+        return this.packageAnnotations;
+    }
+    public void setDocumentAnnotations( Annotation[] documentAnnotations )
+    {
+        this.documentAnnotations = documentAnnotations;
+    }
+    public Annotation[] getDocumentAnnotations() {
+        return this.documentAnnotations;
     }
 }

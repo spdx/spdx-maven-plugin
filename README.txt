@@ -28,3 +28,4 @@ Add optional checksums for file - SpdxFileCollector
 Add new file types for 2.0 - SpdxFileCollector
 Add file level specific information (override defaults) - SpdxFileCollector
 Add dependencies as relationships
+Support aggregation (multi-module)

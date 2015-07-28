@@ -83,7 +83,6 @@
             <plugin>
                 <groupId>org.spdx</groupId>
                 <artifactId>spdx-maven-plugin</artifactId>
-                <version>0.2.1-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>build-spdx</id>
@@ -94,8 +93,10 @@
                     </execution>
                 </executions>
                 <configuration>
+                                        <!-- The defined stubs -->
+                    <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
                     <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx</spdxFile>
-                    <spdxDocumentUrl>http://spdx.org/documents/test-maven-plugin</spdxDocumentUrl>
+                    <spdxDocumentNamespace>http://spdx.org/documents/spdx-toolsv2.0-rc1</spdxDocumentNamespace>
                     <nonStandardLicenses>
                         <param>
                             <licenseId>LicenseRef-testLicense</licenseId>
@@ -118,12 +119,10 @@
                         </param>
                     </nonStandardLicenses>
                     <additionalFiles>
-                        <fileSet>
                             <directory>src/test/resources/unit/spdx-maven-plugin-test/src</directory>
                             <includes>
                                 <include>**/*.html</include>
                             </includes>
-                        </fileSet>
                     </additionalFiles>
                     <defaultFileCopyright>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</defaultFileCopyright>
                     <defaultFileComment>Default file comment</defaultFileComment>
