@@ -148,8 +148,8 @@
                     <licenseConcluded>BSD-3-Clause</licenseConcluded>
                     <creatorComment>Creator comment</creatorComment>
                     <creators>
-                        <param>PERSON: Creator1</param>
-                        <param>PERSON: Creator2</param>
+                        <param>Person: Creator1</param>
+                        <param>Person: Creator2</param>
                     </creators>
                     <licenseComments>License comments</licenseComments>
                     <originator>Organization: Originating org.</originator>

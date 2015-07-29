@@ -1,4 +1,5 @@
 /*
+
  * Copyright 2014 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License" );
@@ -49,10 +50,8 @@ import org.spdx.rdfparser.model.SpdxFile.FileType;
 /**
  * Collects SPDX file information from directories.
  * 
- * The method <code>collectFilesInDirectory(File directory)</code> will scan and
- * create SPDX File information for all files in the directory.
- * 
- * File patterns can be passed to the constructor file files which should be ignored.
+ * The method <code>collectFilesInDirectory(FileSet[] filesets)</code> will scan and
+ * create SPDX File information for all files in the filesets.
  * 
  * @author Gary O'Neall
  *
@@ -199,11 +198,10 @@ public class SpdxFileCollector
     private SpdxDefaultFileInformation findDefaultFileInformation( String filePath,
                                                                    Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
     {
-        debug( "Mapping file info for "+filePath );
         SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
         if ( retval != null ) 
         {
-            debug( "Found file path.  File comment: "+retval.getComment() );
+            debug( "Found file path for path specific information.  File comment: "+retval.getComment() );
             return retval;
         }
         // see if any of the parent directories contain default information which should be used
@@ -214,14 +212,13 @@ public class SpdxFileCollector
             parentPathIndex = parentPath.lastIndexOf( File.separator );
             if ( parentPathIndex > 0 ) 
             {
-                debug( "Mapping file info for "+parentPath );
                 parentPath = parentPath.substring( 0, parentPathIndex );
                 retval = pathSpecificInformation.get( parentPath );
             }
         } while ( retval == null && parentPathIndex > 0 );
         if ( retval != null )
         {
-            debug( "Found file path.  File comment: "+retval.getComment() );
+            debug( "Found file path for path specific information.  File comment: "+retval.getComment() );
         }
         return retval;
     }

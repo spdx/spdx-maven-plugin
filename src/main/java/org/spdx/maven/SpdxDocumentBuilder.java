@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.Annotation;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
+import org.spdx.rdfparser.model.ExternalDocumentRef;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxDocument;
@@ -61,7 +63,7 @@ public class SpdxDocumentBuilder
 {
     private static final String UNSPECIFIED = "UNSPECIFIED";
 
-    private static final String NULL_SHA1 = "cf23df2207d99a74fbe169e3eba035e633b65d94";
+    public static final String NULL_SHA1 = "cf23df2207d99a74fbe169e3eba035e633b65d94";
 
     //TODO: Use a previous SPDX to document file specific information and update
     //TODO: Map the SPDX document to the Maven build artifacts
@@ -214,7 +216,7 @@ public class SpdxDocumentBuilder
             collectSpdxFileInformation( includedDirectories,
                     defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ),
                     pathSpecificInformation );
- //           addDependencyInformation( dependencyInformation );
+            addDependencyInformation( dependencyInformation );
             container.getModel().write( spdxOut );
             this.log.debug( "Completed build document from files" );
         } catch ( FileNotFoundException e ) 
@@ -243,8 +245,9 @@ public class SpdxDocumentBuilder
     /**
      * Add dependency information to the SPDX file
      * @param dependencyInformation dependency information collected from the project POM file
+     * @throws SpdxBuilderException 
      */
-    private void addDependencyInformation( SpdxDependencyInformation dependencyInformation )
+    private void addDependencyInformation( SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
     {
         List<Relationship> packageRelationships = dependencyInformation.getPackageRelationships();
         if ( packageRelationships != null ) {
@@ -255,23 +258,22 @@ public class SpdxDocumentBuilder
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    log.error( "Unable to set package dependencies: "+e.getMessage() );
+                    throw new SpdxBuilderException("Unable to set package dependencies", e );
                 }
             }
         }
-        List<Relationship> documentRelationships = dependencyInformation.getDocumentRelationships();
-        if ( documentRelationships != null ) {
-            for ( Relationship relationship:documentRelationships ) {
-                try
-                {
-                    this.spdxDoc.addRelationship( relationship );
-                }
-                catch ( InvalidSPDXAnalysisException e )
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+        Collection<ExternalDocumentRef> externalDocRefs = dependencyInformation.getDocumentExternalReferences();
+
+        if ( externalDocRefs != null && !externalDocRefs.isEmpty() ) {
+            try
+            {
+                this.spdxDoc.setExternalDocumentRefs( externalDocRefs.toArray( new ExternalDocumentRef[externalDocRefs.size()] ) );
+            }
+            catch ( InvalidSPDXAnalysisException e )
+            {
+                log.error( "Unable to set external document references: "+e.getMessage() );
+                throw new SpdxBuilderException("Unable to set external document references", e );
             }
         }
     }

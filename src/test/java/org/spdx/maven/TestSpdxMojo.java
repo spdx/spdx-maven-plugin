@@ -40,8 +40,8 @@ public class TestSpdxMojo
                         "src/test/resources/unit/spdx-maven-plugin-test/pom.xml" );
                
         CreateSpdxMojo myMojo = new CreateSpdxMojo();
-        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
-   
+//        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
+        CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
         assertNotNull( mojo );
         mojo.execute();
     }

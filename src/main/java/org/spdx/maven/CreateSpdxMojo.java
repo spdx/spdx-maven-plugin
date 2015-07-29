@@ -17,7 +17,6 @@ package org.spdx.maven;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Resource;
@@ -97,7 +96,6 @@ public class CreateSpdxMojo
     MavenProject mavenProject;
     /**
      * Helper class to assist in attaching artifacts to the project instance.
-     * project-helper instance, used to make addition of resources simpler.
      * @component
      */
     private MavenProjectHelper projectHelper;
@@ -111,13 +109,7 @@ public class CreateSpdxMojo
     /**
      * @requiresDependencyResolution runtime
      */
-    /**
-     * The set of dependencies required by the project
-     * @parameter default-value="${project.dependencies}"
-     * @required
-     * @readonly
-     */
-    private Set dependencies;
+    private Set<Artifact> dependencies;
     
 //    /**
 //     * @parameter default-value="${session}"
@@ -363,17 +355,12 @@ public class CreateSpdxMojo
      */
     @Parameter( required = false )
     private FileSet additionalFiles;
-    
-    /**
-     * File patterns to exclude from the calculation of the package verification code
-     */
-    @Parameter( required = false )
-    private String[] excludedFilePatterns;
 
+    @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException
     {
-        
+        this.dependencies = mavenProject.getDependencyArtifacts();
         if ( this.getLog() == null ) 
         {
             throw( new MojoExecutionException( "Null log for Mojo" ) );
@@ -413,10 +400,8 @@ public class CreateSpdxMojo
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation );
-        SpdxDependencyInformation dependencyInformation = new SpdxDependencyInformation();
-  //      @SuppressWarnings( "unchecked" )
-  //      SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( this.dependencies );
-        //TODO: Should we use the dependency graph
+//        SpdxDependencyInformation dependencyInformation = new SpdxDependencyInformation();
+        SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( this.dependencies );
         // The following is for debugging purposes
         this.getLog().debug( "Test parameter: "+this.testParameter );
         logIncludedDirectories( includedDirectories );
@@ -424,7 +409,7 @@ public class CreateSpdxMojo
         projectInformation.logInfo( this.getLog() );
         defaultFileInformation.logInfo( this.getLog() );
         logFileSpecificInfo( pathSpecificInformation );
-        
+        logDependencies( this.dependencies );
         try
         {
             builder.buildDocumentFromFiles( includedDirectories, 
@@ -436,7 +421,8 @@ public class CreateSpdxMojo
             this.getLog().error( "Error building SPDX document from project files: "+e.getMessage(), e );
             throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
         }
- //       projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
+        getLog().debug( "Project Helper: "+projectHelper );
+        projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) 
         {
@@ -460,11 +446,28 @@ public class CreateSpdxMojo
      */
     private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies )
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation(  );
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog() );
         for (Artifact dependency:dependencies) {
             retval.addMavenDependency( dependency );
         }
         return retval;
+    }
+    
+    private void logDependencies( Set<Artifact> dependencies ) {
+        this.getLog().debug( "Dependencies:" );
+        if ( dependencies == null ) {
+            this.getLog().debug( "\tNull dependencies" );
+            return;
+        }
+        if ( dependencies.isEmpty() ) {
+            this.getLog().debug( "\tZero dependencies" );
+            return;
+        }
+        for ( Artifact dependency:dependencies ) {
+            this.getLog().debug( "ArtifactId: "+dependency.getArtifactId() + 
+                                 ", file path: "+dependency.getFile().getAbsolutePath() +
+                                 ", Scope: "+dependency.getScope() );
+        }
     }
 
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
