@@ -23,10 +23,12 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.DefaultMavenProjectHelper;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -94,10 +96,8 @@ public class CreateSpdxMojo
      */
     @Parameter ( defaultValue ="${project}" )
     MavenProject mavenProject;
-    /**
-     * Helper class to assist in attaching artifacts to the project instance.
-     * @component
-     */
+    
+    @Component
     private MavenProjectHelper projectHelper;
     
     /**
@@ -119,9 +119,9 @@ public class CreateSpdxMojo
 //    
     // Parameters for the plugin
     /**
-     * Location of the SPDX file.
+     * SPDX File name
      */
-    @Parameter( defaultValue = "${project.build.directory}/${project.name}-${project.version}-SPDX.rdf", property = "spdxFileName", required = true )
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.name}-${project.version}.spdx", property = "spdxFileName", required = true )
     private File spdxFile;
     
     /**
@@ -370,6 +370,10 @@ public class CreateSpdxMojo
             throw( new MojoExecutionException( "No SPDX file referenced.  " +
             		"Specify a configuration paramaeter spdxFile to resolve." ) );
         }
+        File outputDir = this.spdxFile.getParentFile();
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
         this.getLog().info( "Creating SPDX File "+spdxFile.getPath() );
         
         SpdxDocumentBuilder builder;
@@ -422,6 +426,9 @@ public class CreateSpdxMojo
             throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
         }
         getLog().debug( "Project Helper: "+projectHelper );
+        if (projectHelper == null) {
+            projectHelper = new DefaultMavenProjectHelper();
+        }
         projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) 
