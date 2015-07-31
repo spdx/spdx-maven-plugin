@@ -80,8 +80,9 @@ public class SpdxDependencyInformation
     /**
      * Add information about a Maven dependency to the list of SPDX Dependencies
      * @param dependency
+     * @throws LicenseMapperException 
      */
-    public void addMavenDependency( Artifact dependency )
+    public void addMavenDependency( Artifact dependency ) throws LicenseMapperException
     {
         String scope = dependency.getScope();
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
@@ -118,8 +119,9 @@ public class SpdxDependencyInformation
      * Create an SPDX Document from a POM file stored in the Maven repository
      * @param artifact Maven dependency artifact
      * @return
+     * @throws LicenseMapperException 
      */
-    private SpdxElement createSpdxPackage( Artifact artifact )
+    private SpdxElement createSpdxPackage( Artifact artifact ) throws LicenseMapperException
     {
         File spdxFile = artifactFileToSpdxFile( artifact.getFile() );
         if ( spdxFile != null && spdxFile.exists() ) {
@@ -256,8 +258,9 @@ public class SpdxDependencyInformation
      * @throws IOException 
      * @throws SpdxCollectionException 
      * @throws NoSuchAlgorithmException 
+     * @throws LicenseMapperException 
      */
-    private SpdxPackage createSpdxPackage( File pomFile ) throws IOException, XmlPullParserException, SpdxCollectionException, NoSuchAlgorithmException
+    private SpdxPackage createSpdxPackage( File pomFile ) throws IOException, XmlPullParserException, SpdxCollectionException, NoSuchAlgorithmException, LicenseMapperException
     {
         MavenXpp3Reader pomReader = new MavenXpp3Reader();
         Model model;
@@ -316,14 +319,13 @@ public class SpdxDependencyInformation
     
     /**
      * Convert a list of Maven licenses to an SPDX License
-     * @param mavenLicenses
+     * @param mavenLicenses List of maven licenses to map
      * @return
+     * @throws LicenseMapperException 
      */
-    private AnyLicenseInfo mavenLicensesToSpdxLicense( List<License> mavenLicenses )
+    private AnyLicenseInfo mavenLicensesToSpdxLicense( List<License> mavenLicenses ) throws LicenseMapperException
     {
-        //TODO: Implement - need to refactor LicenseManager to pull out the mapper
-        //It also needs to be much faster than it currently is
-        return new SpdxNoAssertionLicense();
+        return MavenToSpdxLicenseMapper.getInstance( this.log ).mapMavenLicenses( mavenLicenses );
     }
     /**
      * Get filsets of files included in the project from the Maven model

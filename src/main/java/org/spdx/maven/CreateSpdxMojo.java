@@ -387,6 +387,12 @@ public class CreateSpdxMojo
             this.getLog().error( "Error creating SPDX Document Builder: "+e.getMessage(), e );
             throw( new MojoExecutionException( "Error creating SPDX Document Builder: "+e.getMessage(), e ) );
         }
+        catch ( LicenseMapperException e )
+        {
+            this.getLog().error( "License mapping error creating SPDX Document Builder: "+e.getMessage(), e );
+            throw( new MojoExecutionException( "License mapping error creating SPDX Document Builder: "+e.getMessage(), e ) );
+
+        }
         if ( nonStandardLicenses != null ) 
         {
             try
@@ -404,8 +410,16 @@ public class CreateSpdxMojo
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation );
-//        SpdxDependencyInformation dependencyInformation = new SpdxDependencyInformation();
-        SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( this.dependencies );
+        SpdxDependencyInformation dependencyInformation = null;
+        try
+        {
+            dependencyInformation = getSpdxDependencyInformation( this.dependencies );
+        }
+        catch ( LicenseMapperException e1 )
+        {
+            this.getLog().error( "Error mapping licenses for dependencies: "+e1.getMessage(), e1 );
+            throw( new MojoExecutionException( "Error mapping licenses for dependencies: "+e1.getMessage(), e1 ) );
+        }
         // The following is for debugging purposes
         this.getLog().debug( "Test parameter: "+this.testParameter );
         logIncludedDirectories( includedDirectories );
@@ -450,8 +464,9 @@ public class CreateSpdxMojo
      * @param dependencies Maven dependencies
      * @param session2 
      * @return information collected from Maven dependencies
+     * @throws LicenseMapperException 
      */
-    private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies )
+    private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies ) throws LicenseMapperException
     {
         SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog() );
         for (Artifact dependency:dependencies) {

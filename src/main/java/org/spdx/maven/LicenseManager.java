@@ -35,7 +35,7 @@ import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
  * Manages the SPDX licenses for the Spdx plugin.
- * Keeps track of any non standard licenses (added as configuration
+ * Keeps track of any extracted licenses (added as configuration
  * parameters to the plugin).  Maps Maven licenses to SPDX licenses.
  * Creates a Maven license from an SPDX license.
  * 
@@ -44,91 +44,64 @@ import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
  */
 public class LicenseManager
 {
-    private static final String SPDX_LICENSE_URL_PREFIX = "http://spdx.org/licenses/";
 
     /**
      * SPDX document containing the license information collected.  All
-     * non-standard licenses are added to the SPDX document
+     * extracted licenses are added to the SPDX document
      */
     SpdxDocument spdxDoc = null;
     
     /**
-     * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX standard
-     * license or a non-standard license.
+     * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX listed
+     * license or a extracted license.
      */
-    Map<String, String> urlStringToSpdxLicenseId = null;
+    Map<String, String> urlStringToSpdxLicenseId = new HashMap<String, String>();
     
     /**
-     * Map of non-standard license ID's to the SPDX license
+     * Map of extracted license ID's to the SPDX license
      */
-    Map<String, ExtractedLicenseInfo> nonStandardLicenses = new HashMap<String, ExtractedLicenseInfo>();
+    Map<String, ExtractedLicenseInfo> extractedLicenses = new HashMap<String, ExtractedLicenseInfo>();
 
     Log log;
 
     /**
-     * License manager will track any non-standard SPDX licenses and map
+     * License manager will track any extracted SPDX licenses and map
      * between SPDX licenses and Maven licenses.  The mapping uses the
      * license URL to uniquely identify the licenses.
-     * @param spdxDoc SPDX document to add any non-standard licenses
-     * @param useStdLicenseSourceUrls if true, map any SPDX standard license source URL to license ID.  Note: significant performance degredation
+     * @param spdxDoc SPDX document to add any extracted licenses
+     * @param useStdLicenseSourceUrls if true, map any SPDX listed license source URL to license ID.  Note: significant performance degredation
      * @param Log plugin logger
+     * @throws LicenseMapperException 
      */
-    public LicenseManager( SpdxDocument spdxDoc, Log log, boolean useStdLicenseSourceUrls )
+    public LicenseManager( SpdxDocument spdxDoc, Log log, boolean useStdLicenseSourceUrls ) throws LicenseMapperException
     {
         this.spdxDoc = spdxDoc;
         this.log = log;
-        initializeUrlMap(useStdLicenseSourceUrls);
+        initializeUrlMap();
     }
     
+    /**
+     * Initialize the URL map from the SPDX listed licenses
+     * @throws LicenseMapperException 
+     */
+    private void initializeUrlMap() throws LicenseMapperException
+    {
+        this.urlStringToSpdxLicenseId.putAll( MavenToSpdxLicenseMapper.getInstance( log ).getMap() );
+    }
+
     protected Log getLog() {
         return this.log;
     }
 
-    /**
-     * Initialize the urlSTringToSpdxLicense map with the SPDX standard licenses
-     */
-    private void initializeUrlMap(boolean useSourceUrls)
-    {
-        //TODO: This is rather slow.  Consider going to a hardcoded map
-        urlStringToSpdxLicenseId = new HashMap<String, String>();
-        String[] standardLicenseIds = LicenseInfoFactory.getSpdxListedLicenseIds();
-        for ( int i = 0; i < standardLicenseIds.length; i++ ) {
-            this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX + standardLicenseIds[i], standardLicenseIds[i] );
-            if (useSourceUrls) {
-                try
-                {
-                    SpdxListedLicense stdLicense = 
-                                    LicenseInfoFactory.getListedLicenseById( standardLicenseIds[i] );
-                    String[] urls = stdLicense.getSeeAlso();
-                    if ( urls != null ) {
-                        for ( int j = 0; j < urls.length; j++ ) {
-                            if (this.urlStringToSpdxLicenseId.containsKey( urls[j] )) {
-                                String oldLicenseId = (urlStringToSpdxLicenseId.get( urls[j] ));
-                                if (getLog() != null) {
-                                    getLog().warn( "Duplicate URL for SPDX standard license.  Replacing " +
-                                                        oldLicenseId + " with " + standardLicenseIds[i] +
-                                                        " for " + urls[j]);
-                                }
-                            }
-                            this.urlStringToSpdxLicenseId.put( urls[j], standardLicenseIds[i] );
-                        }
-                    }
-                }
-                catch ( InvalidSPDXAnalysisException e )
-                {
-                    getLog().warn( "Unable to get standard license ID for mapping.  LicenseID="+standardLicenseIds[i], e);               
-                }
-            }
-        }
-    }
+
 
     /**
-     * Add a non-standard license to the SPDX document.  Once added, the non-standard
+     * Add a non-listed license to the SPDX document.  Once added, the non-listed
      * license can be referenced by the license ID
      * @param license
      * @throws LicenseManagerException
      */
-    public void addNonStandardLicense( NonStandardLicense license ) throws LicenseManagerException
+    public void addExtractedLicense( NonStandardLicense license ) throws LicenseManagerException
     {
          ExtractedLicenseInfo spdxLicense = new ExtractedLicenseInfo(
                 license.getLicenseId(), license.getExtractedText(), license.getName(),
@@ -140,7 +113,7 @@ public class LicenseManager
             if ( licenseId == null ) {
                 licenseId = "[NullLicenseId]";
             }
-            throw( new LicenseManagerException( "Unable to add non standard license "+licenseId+": "+e.getMessage(),e ) );
+            throw( new LicenseManagerException( "Unable to add non listed license "+licenseId+": "+e.getMessage(),e ) );
         }
         // add to URL mapping
         String[] urls = license.getCrossReference();
@@ -148,15 +121,15 @@ public class LicenseManager
             for ( int i = 0; i < urls.length; i++ ) {
                 if (this.urlStringToSpdxLicenseId.containsKey( urls[i] )) {
                     String oldLicenseId = urlStringToSpdxLicenseId.get( urls[i] );
-                    getLog().warn( "Duplicate URL for SPDX non standard license.  Replacing " +
+                    getLog().warn( "Duplicate URL for SPDX extracted license.  Replacing " +
                                         oldLicenseId + " with " + license.getLicenseId() +
                                         " for " + urls[i]);
                 }
                 this.urlStringToSpdxLicenseId.put( urls[i], spdxLicense.getLicenseId() );
             }
         }
-        // add to nonstandard license cache
-        nonStandardLicenses.put( spdxLicense.getLicenseId(), spdxLicense );
+        // add to extracted license cache
+        extractedLicenses.put( spdxLicense.getLicenseId(), spdxLicense );
     }
     
     /**
@@ -191,9 +164,9 @@ public class LicenseManager
 
     /**
      * Map a Maven license to an SPDX license based on the URL
-     * @param mavenLicense license to map to a standard SPDX license
+     * @param mavenLicense license to map to a listed SPDX license
      * @return SPDX license
-     * @throws LicenseManagerException thrown if no SPDX standard or non standard license exists with the same URL
+     * @throws LicenseManagerException thrown if no SPDX listed or extracted license exists with the same URL
      */
     public AnyLicenseInfo mavenLicenseToSpdxLicense( License mavenLicense ) throws LicenseManagerException
     {
@@ -204,9 +177,9 @@ public class LicenseManager
         String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl() );
         if ( licenseId == null ) {
             throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
-                                                "No standard or non-standard license matches the URL " + mavenLicense.getUrl() ) );
+                                                "No listed or extracted license matches the URL " + mavenLicense.getUrl() ) );
         }
-        AnyLicenseInfo retval = nonStandardLicenses.get( licenseId );
+        AnyLicenseInfo retval = extractedLicenses.get( licenseId );
         if (retval == null) {
             try
             {
@@ -215,7 +188,7 @@ public class LicenseManager
             catch ( InvalidLicenseStringException e )
             {
                 throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
-                                                    "Invalid standard or non-standard license id matching the URL " + mavenLicense.getUrl() ) );
+                                                    "Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() ) );
             }
         }
         return retval;

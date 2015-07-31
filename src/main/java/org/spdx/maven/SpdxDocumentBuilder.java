@@ -83,9 +83,10 @@ public class SpdxDocumentBuilder
      * @param spdxDocumentNamespace URI for SPDX document - must be unique
      * @param useStdLicenseSourceUrls if true, map any SPDX standard license source URL to license ID.  Note: significant performance degredation
      * @throws SpdxBuilderException
+     * @throws LicenseMapperException 
      */
     public SpdxDocumentBuilder( Log log, File spdxFile, URL spdxDocumentNamespace,
-                                boolean useStdLicenseSourceUrls) throws SpdxBuilderException
+                                boolean useStdLicenseSourceUrls) throws SpdxBuilderException, LicenseMapperException
     {
         this.log = log;
         this.spdxFile = spdxFile;
@@ -167,7 +168,7 @@ public class SpdxDocumentBuilder
             {
                 try
                 {
-                    licenseManager.addNonStandardLicense( nonStandardLicenses[i] );
+                    licenseManager.addExtractedLicense( nonStandardLicenses[i] );
                 }
                 catch ( LicenseManagerException e )
                 {
