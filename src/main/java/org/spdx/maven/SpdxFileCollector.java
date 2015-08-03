@@ -155,13 +155,14 @@ public class SpdxFileCollector
     /**
      * Collect file information in the directory (including subdirectories).  
      * @param fileSets FileSets containing the description of the directory to be scanned
+     * @param baseDir project base directory used to construct the relative paths for the SPDX files 
      * @param pathPrefix Path string which should be removed when creating the SPDX file name
      * @param defaultFileInformation Information on default SPDX field data for the files
      * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @throws SpdxCollectionException 
      */
     public void collectFiles( FileSet[] fileSets,
-                              SpdxDefaultFileInformation defaultFileInformation,
+                              String baseDir, SpdxDefaultFileInformation defaultFileInformation,
                               Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxCollectionException 
     {
        for ( int i = 0; i < fileSets.length; i++ ) 
@@ -182,7 +183,7 @@ public class SpdxFileCollector
                    outputFileName = fileSets[i].getOutputDirectory() + File.separator + includedFiles[j];
                } else 
                {
-                   outputFileName = includedFiles[j];
+                   outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                }
                collectFile( file, outputFileName, fileInfo );
            }

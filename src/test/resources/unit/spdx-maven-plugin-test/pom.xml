@@ -95,8 +95,32 @@
                 <configuration>
                                         <!-- The defined stubs -->
                     <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
+                    <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
                     <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx</spdxFile>
                     <spdxDocumentNamespace>http://spdx.org/documents/spdx-toolsv2.0-rc1</spdxDocumentNamespace>
+                    <documentComment>Document Comment</documentComment>
+                    <documentAnnotations>
+                        <param>
+                            <annotationComment>Annotation1</annotationComment>
+                            <annotationType>REVIEW</annotationType>
+                            <annotationDate>2010-01-29T18:30:22Z</annotationDate>
+                            <annotator>Person:Test Person</annotator>
+                        </param>
+                        <param>
+                            <annotationComment>Annotation2</annotationComment>
+                            <annotationType>OTHER</annotationType>
+                            <annotationDate>2012-11-29T18:30:22Z</annotationDate>
+                            <annotator>Organization:Test Organization</annotator>
+                        </param>
+                    </documentAnnotations>
+                    <packageAnnotations>
+                        <param>
+                            <annotationComment>PackageAnnotation</annotationComment>
+                            <annotationType>REVIEW</annotationType>
+                            <annotationDate>2015-01-29T18:30:22Z</annotationDate>
+                            <annotator>Person:Test Package Person</annotator>
+                        </param>
+                    </packageAnnotations>
                     <nonStandardLicenses>
                         <param>
                             <licenseId>LicenseRef-testLicense</licenseId>
@@ -118,12 +142,6 @@
                             <comment>Second Test license comment</comment>
                         </param>
                     </nonStandardLicenses>
-                    <additionalFiles>
-                            <directory>src/test/resources/unit/spdx-maven-plugin-test/src</directory>
-                            <includes>
-                                <include>**/*.html</include>
-                            </includes>
-                    </additionalFiles>
                     <defaultFileCopyright>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</defaultFileCopyright>
                     <defaultFileComment>Default file comment</defaultFileComment>
                     <defaultFileContributors>
@@ -153,10 +171,8 @@
                     </creators>
                     <licenseComments>License comments</licenseComments>
                     <originator>Organization: Originating org.</originator>
-                    <excludedFilePatterns>
-                        <param>pattern.*</param>
-                        <param>pattern2.*</param>
-                    </excludedFilePatterns>
+                    <sourceInfo>Source info</sourceInfo>
+                    <copyrightText>Copyright Text for Package</copyrightText>
                 </configuration>
                 </plugin>
         </plugins>

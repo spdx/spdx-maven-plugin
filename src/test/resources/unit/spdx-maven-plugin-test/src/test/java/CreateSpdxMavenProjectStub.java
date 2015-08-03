@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -61,6 +62,10 @@ public class CreateSpdxMavenProjectStub
         build.setTestSourceDirectory( getBasedir() + "/src/test/java" );
         build.setTestOutputDirectory( getBasedir() + "/target/test-classes" );
         setBuild( build );
+        
+        Reporting reporting = new Reporting();
+        reporting.setOutputDirectory( getBaseDir() + "/target/site" );
+        setReporting( reporting );
 
         List<String> compileSourceRoots = new ArrayList<String>();
         compileSourceRoots.add( getBasedir() + "/src/main/java" );

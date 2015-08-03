@@ -40,6 +40,7 @@ import org.spdx.rdfparser.SPDXDocumentFactory;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.SpdxRdfConstants;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.ExtractedLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
@@ -266,7 +267,6 @@ public class SpdxDependencyInformation
         Model model;
 
         model = pomReader.read( ReaderFactory.newXmlReader( pomFile ) );
-        FileSet[] includedFileSets = getIncludedDirectoriesFromModel( model );
         SpdxDefaultFileInformation fileInfo = new SpdxDefaultFileInformation();
         
         // initialize the SPDX information from the POM file
@@ -293,14 +293,12 @@ public class SpdxDependencyInformation
         fileInfo.setDeclaredLicense( declaredLicense );
         fileInfo.setLicenseComment( "" );
         fileInfo.setNotice( notice );
-        SpdxFileCollector collector = new SpdxFileCollector();
-        collector.collectFiles( includedFileSets, fileInfo, 
-                                new HashMap<String, SpdxDefaultFileInformation>() );
         
         SpdxPackage retval = new SpdxPackage(packageName, new SpdxNoAssertionLicense(), 
-                                             collector.getLicenseInfoFromFiles(),
+                                             new ExtractedLicenseInfo[0],
                                              copyright, declaredLicense, downloadLocation,
-                                             collector.getFiles(), collector.getVerificationCode( null ));
+                                             new SpdxFile[0], 
+                                             new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
         if ( model.getVersion() != null ) {
             retval.setVersionInfo( model.getVersion() );
         }
@@ -325,7 +323,7 @@ public class SpdxDependencyInformation
      */
     private AnyLicenseInfo mavenLicensesToSpdxLicense( List<License> mavenLicenses ) throws LicenseMapperException
     {
-        return MavenToSpdxLicenseMapper.getInstance( this.log ).mapMavenLicenses( mavenLicenses );
+        return MavenToSpdxLicenseMapper.getInstance( this.log ).mavenLicenseListToSpdxLicense( mavenLicenses );
     }
     /**
      * Get filsets of files included in the project from the Maven model

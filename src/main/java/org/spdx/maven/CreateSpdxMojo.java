@@ -28,7 +28,6 @@ import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.DefaultMavenProjectHelper;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -131,7 +130,7 @@ public class CreateSpdxMojo
     private URL spdxDocumentNamespace;
     
     /**
-     * Non standard licenses referenced within the Maven SPDX plugin configuration.
+     * Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration.
      * All non standard licenses must be configured containing the required license ID
      * and license text.
      */
@@ -141,12 +140,12 @@ public class CreateSpdxMojo
     /**
      * Optional parameter if set to true will match a Maven license to an SPDX
      * standard license if the Maven license URL matches any of the cross-reference
-     * license URLs for a standard license.  Default value is false.
+     * license URLs for a standard license.  Default value is true.
      * Note: Several SPDX standard licenses contain the same cross-reference license
      * URL.  In this case, the SPDX standard license used in indeterminate.
      */
-    @Parameter( defaultValue = "false" )
-    private boolean matchLicensedOnCrossReferenceUrls;
+    @Parameter( defaultValue = "true" )
+    private boolean matchLicensesOnCrossReferenceUrls;
     
     /**
      * An optional field for creators of the SPDX file content to provide comments to 
@@ -160,9 +159,6 @@ public class CreateSpdxMojo
      */
     @Parameter
     private Annotation[] documentAnnotations;
-    
-    @Parameter
-    private String testParameter;
     
     /**
      * Optional annotations for the package
@@ -349,12 +345,6 @@ public class CreateSpdxMojo
      */
     @Parameter( required = false )
     private List<PathSpecificSpdxInfo> pathsWithSpecificSpdxInfo;
-    
-    /**
-     * Additional files to be added to the SPDX document which are not in the source list or resources file
-     */
-    @Parameter( required = false )
-    private FileSet additionalFiles;
 
     @SuppressWarnings( "unchecked" )
     public void execute()
@@ -371,6 +361,10 @@ public class CreateSpdxMojo
             		"Specify a configuration paramaeter spdxFile to resolve." ) );
         }
         File outputDir = this.spdxFile.getParentFile();
+        if (outputDir == null) {
+            throw( new MojoExecutionException( "Invalid path for SPDX output file.  " +
+                            "Specify a configuration parameter spdxFile with a valid directory path to resolve." ) );
+        }
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
@@ -380,7 +374,7 @@ public class CreateSpdxMojo
         try
         {
             builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, spdxDocumentNamespace,
-                                               this.matchLicensedOnCrossReferenceUrls );
+                                               this.matchLicensesOnCrossReferenceUrls );
         }
         catch ( SpdxBuilderException e )
         {
@@ -421,7 +415,6 @@ public class CreateSpdxMojo
             throw( new MojoExecutionException( "Error mapping licenses for dependencies: "+e1.getMessage(), e1 ) );
         }
         // The following is for debugging purposes
-        this.getLog().debug( "Test parameter: "+this.testParameter );
         logIncludedDirectories( includedDirectories );
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
@@ -431,6 +424,7 @@ public class CreateSpdxMojo
         try
         {
             builder.buildDocumentFromFiles( includedDirectories, 
+                                            mavenProject.getBasedir().getAbsolutePath(),
                                             projectInformation, defaultFileInformation,
                                             pathSpecificInformation, dependencyInformation );
         }
@@ -440,10 +434,12 @@ public class CreateSpdxMojo
             throw( new MojoExecutionException( "Error building SPDX document from project files: "+e.getMessage(), e ) );
         }
         getLog().debug( "Project Helper: "+projectHelper );
-        if (projectHelper == null) {
-            projectHelper = new DefaultMavenProjectHelper();
+        if (projectHelper != null) {
+            projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
+        } else {
+            this.getLog().warn( "Unable to attach SPDX artifact file - no ProjectHelper exists" );
         }
-        projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
+        
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 ) 
         {
@@ -469,8 +465,10 @@ public class CreateSpdxMojo
     private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies ) throws LicenseMapperException
     {
         SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog() );
-        for (Artifact dependency:dependencies) {
-            retval.addMavenDependency( dependency );
+        if (dependencies != null) {
+            for (Artifact dependency:dependencies) {
+                retval.addMavenDependency( dependency );
+            }
         }
         return retval;
     }

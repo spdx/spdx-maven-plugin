@@ -164,7 +164,7 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( this.fileSets, this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>() );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
@@ -184,7 +184,7 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( new FileSet[] {skipBin},  this.defaultFileInformation,
+        collector.collectFiles( new FileSet[] {skipBin},  "", this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>() );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length - 2, SpdxFiles.length );
@@ -222,7 +222,7 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( this.fileSets, this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>() );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
@@ -302,7 +302,7 @@ public class TestSpdxFileCollector {
             fileSpecificInfo.put( subdir1Path, file3Info );
             
             //TODO: Test directory patterns
-	        collector.collectFiles( this.fileSets, this.defaultFileInformation,
+	        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
 	                                           fileSpecificInfo );
 	        SpdxFiles = collector.getFiles();
 	        assertEquals( filePaths.length, SpdxFiles.length );
@@ -374,7 +374,7 @@ public class TestSpdxFileCollector {
         AnyLicenseInfo[] result = collector.getLicenseInfoFromFiles();
         assertEquals( 0, result.length );
         
-        collector.collectFiles( this.fileSets, this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>() );
         result = collector.getLicenseInfoFromFiles();
         assertEquals( 1, result.length );
@@ -394,7 +394,7 @@ public class TestSpdxFileCollector {
             FileSet fileSet2 = new FileSet();
             fileSet2.setDirectory( tempDir2.getPath() );
             
-            collector.collectFiles( new FileSet[] { fileSet2 }, info2,
+            collector.collectFiles( new FileSet[] { fileSet2 }, "", info2,
                                                new HashMap<String, SpdxDefaultFileInformation>() );
             result = collector.getLicenseInfoFromFiles();
             assertEquals( 2, result.length );
@@ -415,7 +415,7 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( this.fileSets, this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>() );
         File SpdxFile = new File( filePaths[0] );
         SpdxPackageVerificationCode result = collector.getVerificationCode( SpdxFile.getPath() );
