@@ -41,7 +41,6 @@ import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.license.ListedLicenses;
 import org.spdx.rdfparser.license.SpdxListedLicense;
-import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.Annotation;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
@@ -73,7 +72,6 @@ public class SpdxDocumentBuilder
     private SpdxDocument spdxDoc;
     private SpdxPackage projectPackage;
     private SpdxDocumentContainer container;
-    private SpdxPackage packageDescribedByPom;
     private LicenseManager licenseManager;
     private File spdxFile;
 
@@ -138,17 +136,6 @@ public class SpdxDocumentBuilder
         {
             this.getLog().error( "Error creating SPDX document", e );
             throw( new SpdxBuilderException( "Error creating SPDX document: "+e.getMessage() ) );
-        }
-        try 
-        {
-            packageDescribedByPom = new SpdxPackage("NameToBeReplaced", new SpdxNoAssertionLicense(), new AnyLicenseInfo[0], 
-                                                    "", new SpdxNoAssertionLicense(), "", new SpdxFile[0], 
-                                                    new SpdxPackageVerificationCode("", new String[0]));
-            container.addElement( packageDescribedByPom );
-        } catch ( InvalidSPDXAnalysisException e ) 
-        {
-            this.getLog().error( "Error creating SPDX package", e );
-            throw( new SpdxBuilderException( "Error creating SPDX package: "+e.getMessage() ) );
         }
         
         // process the licenses

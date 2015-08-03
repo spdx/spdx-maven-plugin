@@ -77,8 +77,8 @@ import java.util.Set;
  *  
  * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
-@Mojo( name = "createSPDX", defaultPhase = LifecyclePhase.PREPARE_PACKAGE )
-@Execute ( goal = "createSPDX", phase = LifecyclePhase.PREPARE_PACKAGE )
+@Mojo( name = "createSPDX", defaultPhase = LifecyclePhase.VERIFY )
+@Execute ( goal = "createSPDX", phase = LifecyclePhase.VERIFY )
 public class CreateSpdxMojo
     extends AbstractMojo
 {    
@@ -303,11 +303,12 @@ public class CreateSpdxMojo
      * The name and, optionally, contact information of the person or organization that originally created the package.
      * Note that the supplier field of SPDX is filled in by the Organization in the POM.  However, the originator may
      * be different than the supplier (e.g. a Maven POM was build by organization X containing code originating from organization Y).
+     * 
+     * The default for this is the Maven organization
      */
     @Parameter
     private String originator;
-    //TODO: Determine if the POM organization should be the originator or the supplier or both
-
+ 
     /**
      * This field provides a place for the SPDX file creator to record any relevant 
      * background information or additional comments about the origin of the package.
@@ -664,7 +665,6 @@ public class CreateSpdxMojo
      * @return
      * @throws MojoExecutionException 
      */
-    @SuppressWarnings( "unused" )
     private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager ) throws MojoExecutionException 
     {
         SpdxProjectInformation retval = new SpdxProjectInformation();
@@ -742,20 +742,27 @@ public class CreateSpdxMojo
         retval.setDownloadUrl( downloadUrl );
         retval.setHomePage( mavenProject.getUrl() );
         retval.setLicenseComment( this.licenseComments );
+        if ( this.originator == null ) {
+            // use the POM organization as the default
+            if (this.mavenProject.getOrganization() != null && this.mavenProject.getOrganization().getName() != null &&
+                            !this.mavenProject.getOrganization().getName().isEmpty()) {
+                this.originator = "Organization:"+this.mavenProject.getOrganization().getName();
+            }
+        }
         retval.setOriginator( this.originator );
-//        String packageFileName;
-//        File packageFile = mavenProject.getArtifact().getFile();
-//        if ( packageFile != null ) {
-//            packageFileName = packageFile.getName();
-//        } else {
-//            packageFileName = "NOASSERTION";
-//        }
-//        retval.setPackageArchiveFileName( packageFileName );
-        retval.setPackageArchiveFileName( "NOASSERTION" );
+        String packageFileName = null;
         File packageFile = null;
-        //TODO Create the archive file for SPDX redistribution
+        Artifact mainArtifact = mavenProject.getArtifact();
+        
+        if (mainArtifact != null && mainArtifact.getFile() != null) {
+            packageFileName = mainArtifact.getArtifactId() + "." + mainArtifact.getType();
+            packageFile = mainArtifact.getFile();
+        } else {
+            packageFileName = "NOASSERTION";
+        }
+        retval.setPackageArchiveFileName( packageFileName );
         String sha1 = null;
-        if ( packageFile != null ) 
+        if ( packageFile != null && packageFile.exists() ) 
         {
             try
             {
@@ -832,7 +839,6 @@ public class CreateSpdxMojo
                 this.getLog().debug( "Adding resource directory "+resource.getDirectory() );
             }
         }
-        // TODO add additional file sets
         this.getLog().debug( "Number of filesets: "+String.valueOf( result.size() ) );
         return result.toArray( new FileSet[result.size()] );
     }

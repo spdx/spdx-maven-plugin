@@ -168,8 +168,25 @@ public class MavenToSpdxLicenseMapper
         for (String redundantUrl:urlsWithMultipleIds) {
             this.urlStringToSpdxLicenseId.remove( redundantUrl );
         }
+        addManualMappings();
     }
     
+    /**
+     * This is a bit of an override on the official SPDX license list
+     * Add some specific URL mappings that are commonly used in SPDX files
+     */
+    private void addManualMappings()
+    {
+        // TODO: Request these be added to the SPDX license list and remove once they
+        // have been added
+        this.urlStringToSpdxLicenseId.put( "http://www.apache.org/licenses/LICENSE-2.0.txt", "Apache-2.0" );
+        this.urlStringToSpdxLicenseId.put( "http://www.opensource.org/licenses/cpl1.0.txt", "CPL-1.0" );
+        this.urlStringToSpdxLicenseId.put( "http://www.opensource.org/licenses/mit-license.php", "MIT" );
+        // The following is in the listed licenses, but is duplicated in multiple SPDX license ID's
+        // adding it back for the license it was originally targeted for
+        this.urlStringToSpdxLicenseId.put( "http://www.mozilla.org/MPL/MPL-1.0.txt", "MPL-1.0" );
+    }
+
     /**
      * Map a list of Maven licenses to an SPDX license.  If no licenses
      * are supplied, SpdxNoAssertion license is returned.  if a single

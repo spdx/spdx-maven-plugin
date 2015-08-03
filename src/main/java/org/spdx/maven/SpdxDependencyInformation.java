@@ -125,9 +125,11 @@ public class SpdxDependencyInformation
     private SpdxElement createSpdxPackage( Artifact artifact ) throws LicenseMapperException
     {
         File spdxFile = artifactFileToSpdxFile( artifact.getFile() );
+        log.debug( "Dependency "+artifact.getArtifactId()+"Looking for SPDX file "+spdxFile.getAbsolutePath() );
         if ( spdxFile != null && spdxFile.exists() ) {
             try
             {
+                log.debug( "Dependency "+artifact.getArtifactId()+"Dependency information collected from SPDX file "+spdxFile.getAbsolutePath() );
                 SpdxDocument spdxDoc = SPDXDocumentFactory.createSpdxDocument( spdxFile.getPath() );
                 return createExternalSpdxPackageReference( spdxDoc, spdxFile, SpdxRdfConstants.EXTERNAL_DOC_REF_PRENUM + artifact.getArtifactId() );
             }
@@ -148,9 +150,11 @@ public class SpdxDependencyInformation
             }
         }
         File pomFile = artifactFileToPomFile( artifact.getFile() );
+        log.debug( "Dependency "+artifact.getArtifactId()+"Looking for POM file "+pomFile.getAbsolutePath() );
         if ( pomFile != null && pomFile.exists() ) {
             try
             {
+                log.debug( "Dependency "+artifact.getArtifactId()+"Collecting information from POM file "+pomFile.getAbsolutePath() );
                 return createSpdxPackage( pomFile );
             }
             catch ( IOException e )
@@ -178,6 +182,7 @@ public class SpdxDependencyInformation
         }
         // Create a minimal SPDX package from dependency
         // Name will be the artifact ID
+        log.debug( "Dependency "+artifact.getArtifactId()+"Using only artifact information to create dependent package" );
         SpdxPackage pkg = new SpdxPackage(artifact.getArtifactId(), 
                                           new SpdxNoAssertionLicense(), 
                                           new AnyLicenseInfo[0], "UNSPECIFIED",
@@ -378,12 +383,12 @@ public class SpdxDependencyInformation
      */
     private File getFileWithDifferentType( File file, String type )
     {
-        String filePath = file.getPath();
-        int indexOfDot = filePath.indexOf( '.' );
+        String filePath = file.getAbsolutePath();
+        int indexOfDot = filePath.lastIndexOf( '.' );
         if (indexOfDot > 0) {
-            filePath = filePath.substring( 0, indexOfDot-1 );
+            filePath = filePath.substring( 0, indexOfDot+1 );
         }
-        filePath = filePath + "." + type;
+        filePath = filePath + type;
         File retval = new File(filePath);
         return retval;
     }

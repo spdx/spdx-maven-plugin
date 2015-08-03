@@ -17,15 +17,9 @@ a unique license ID and the verbatim license text.
 This project is licensed under the Apache 2.0 License
 
 Remaining implementation work for 2.0:
-Add document annotations - SpdxDocumentBuilder.java
-Add document name - SpdxDocumentBuilder.java
-Add package annotation - SpdxDocumentBuilder.java
-Add document relationships - contains SpdxDocumentBuilder.java
 add optional checksum types for package - SpdxDocumentBuilder.java
-Add package relationships, annotations, others - dependencies SpdxDocumentBuilder.java
 Add file annotation, relationships - SpdxFileCollector
 Add optional checksums for file - SpdxFileCollector
 Add new file types for 2.0 - SpdxFileCollector
-Add file level specific information (override defaults) - SpdxFileCollector
-Add dependencies as relationships
+Test file level specific information (override defaults) - SpdxFileCollector
 Support aggregation (multi-module)
