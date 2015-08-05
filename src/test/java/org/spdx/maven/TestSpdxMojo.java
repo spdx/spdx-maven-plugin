@@ -169,6 +169,13 @@ public class TestSpdxMojo
         File sourceDir = new File( getBasedir(),
                         UNIT_TEST_RESOURCE_DIR + "/src/main" );
         addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, sourceDir, filePaths );
+        File testDir = new File( getBasedir(),
+                                   UNIT_TEST_RESOURCE_DIR + "/src/test" );
+        addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, testDir, filePaths );
+        File resourceDir = new File( getBasedir(),
+                                 UNIT_TEST_RESOURCE_DIR + "/src/resources" );
+//TODO: Add resource to project stub and uncomment the line below
+//        addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, resourceDir, filePaths );
         SpdxFile[] pkgFiles = pkg.getFiles();
         assertEquals( filePaths.size(), pkgFiles.length );
         for (SpdxFile sFile:pkgFiles) {

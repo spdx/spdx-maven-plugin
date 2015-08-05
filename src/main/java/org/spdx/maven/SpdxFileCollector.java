@@ -43,8 +43,11 @@ import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.model.DoapProject;
+import org.spdx.rdfparser.model.Relationship;
+import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
+import org.spdx.rdfparser.model.SpdxPackage;
 
 
 /**
@@ -159,11 +162,13 @@ public class SpdxFileCollector
      * @param pathPrefix Path string which should be removed when creating the SPDX file name
      * @param defaultFileInformation Information on default SPDX field data for the files
      * @param pathSpecificInformation Map of path to file information used to override the default file information
+     * @param relationshipType Type of relationship to the project package 
+     * @param projectPackage Package to which the files belong
      * @throws SpdxCollectionException 
      */
     public void collectFiles( FileSet[] fileSets,
                               String baseDir, SpdxDefaultFileInformation defaultFileInformation,
-                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws SpdxCollectionException 
+                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType ) throws SpdxCollectionException 
     {
        for ( int i = 0; i < fileSets.length; i++ ) 
        {
@@ -185,7 +190,7 @@ public class SpdxFileCollector
                {
                    outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                }
-               collectFile( file, outputFileName, fileInfo );
+               collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage );
            }
        }
     }
@@ -240,17 +245,27 @@ public class SpdxFileCollector
      * Collect SPDX information for a specific file
      * @param file
      * @param outputFileName Path to the output file name relative to the root of the output archive file
-     * @param defaultFileInformation Information on default SPDX field data for the files
-     * @param fileSpecificInformation Map of file path to file information used to override the default file information
+     * @param relationshipType Type of relationship to the project package 
+     * @param projectPackage Package to which the files belong
      * @throws SpdxCollectionException
      */
-    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo ) throws SpdxCollectionException
+    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() )) 
         {
             return; // already added from a previous scan
         }
         SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo );
+        Relationship relationship = new Relationship(projectPackage, relationshipType, "");
+        try
+        {
+            spdxFile.addRelationship( relationship );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            log.error( "Spdx exception creating file relationship: "+e.getMessage(), e );
+            throw new SpdxCollectionException("Error creating SPDX file relationship: "+e.getMessage());
+        }
         spdxFiles.put( file.getPath(), spdxFile );
         AnyLicenseInfo[] licenseInfoFromFiles = spdxFile.getLicenseInfoFromFiles();
         for ( int j = 0; j < licenseInfoFromFiles.length; j++ ) 
@@ -283,7 +298,6 @@ public class SpdxFileCollector
         String licenseComment = defaultFileInformation.getLicenseComment();
         SpdxFile retval = null;
         //TODO: Add annotation
-        //TODO: Add relationship
         //TODO: Add optional checksums
         try
         {
@@ -296,7 +310,7 @@ public class SpdxFileCollector
         catch ( InvalidSPDXAnalysisException e )
         {
             log.error( "Spdx exception creating file: "+e.getMessage(), e );
-            throw new SpdxCollectionException("Error creating SPDX File: "+e.getMessage());
+            throw new SpdxCollectionException("Error creating SPDX file: "+e.getMessage());
         }
 
         return retval;

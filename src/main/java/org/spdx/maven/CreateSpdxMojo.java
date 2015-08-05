@@ -400,7 +400,9 @@ public class CreateSpdxMojo
                 throw( new MojoExecutionException( "Error adding non standard licenses: "+e.getMessage(), e ) );
             }
         }
-        FileSet[] includedDirectories = getIncludedDirectoriesFromParameters();
+        FileSet[] includedSourceDirectories = getSourceDirectories();
+        FileSet[] includedResourceDirectories = getResourceDirectories();
+        FileSet[] includedTestDirectories = getTestDirectories();
 
         SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
@@ -408,7 +410,7 @@ public class CreateSpdxMojo
         SpdxDependencyInformation dependencyInformation = null;
         try
         {
-            dependencyInformation = getSpdxDependencyInformation( this.dependencies );
+            dependencyInformation = getSpdxDependencyInformation( this.dependencies, builder.getLicenseManager() );
         }
         catch ( LicenseMapperException e1 )
         {
@@ -416,7 +418,9 @@ public class CreateSpdxMojo
             throw( new MojoExecutionException( "Error mapping licenses for dependencies: "+e1.getMessage(), e1 ) );
         }
         // The following is for debugging purposes
-        logIncludedDirectories( includedDirectories );
+        logIncludedDirectories( includedSourceDirectories );
+        logIncludedDirectories( includedTestDirectories );
+        logIncludedDirectories( includedResourceDirectories );
         logNonStandardLicenses( this.nonStandardLicenses );
         projectInformation.logInfo( this.getLog() );
         defaultFileInformation.logInfo( this.getLog() );
@@ -424,7 +428,8 @@ public class CreateSpdxMojo
         logDependencies( this.dependencies );
         try
         {
-            builder.buildDocumentFromFiles( includedDirectories, 
+            builder.buildDocumentFromFiles( includedSourceDirectories, includedTestDirectories,
+                                            includedResourceDirectories,
                                             mavenProject.getBasedir().getAbsolutePath(),
                                             projectInformation, defaultFileInformation,
                                             pathSpecificInformation, dependencyInformation );
@@ -463,9 +468,9 @@ public class CreateSpdxMojo
      * @return information collected from Maven dependencies
      * @throws LicenseMapperException 
      */
-    private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies ) throws LicenseMapperException
+    private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies, LicenseManager licenseManager ) throws LicenseMapperException
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog() );
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog(), licenseManager );
         if (dependencies != null) {
             for (Artifact dependency:dependencies) {
                 retval.addMavenDependency( dependency );
@@ -801,11 +806,36 @@ public class CreateSpdxMojo
     }
 
     /**
-     * Combine all inputs for files which are to be included in the SPDX analysis.
+     * Combine all inputs for source files which are to be included in the SPDX analysis.
      * FileSets are all normalized to include the full (absolute) path and use filtering.
      * @return included files from the project source roots, resources, and includedDirectories parameter
      */
-    private FileSet[] getIncludedDirectoriesFromParameters() 
+    private FileSet[] getSourceDirectories() 
+    {
+        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        @SuppressWarnings( "unchecked" )
+        List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
+        if ( sourceRoots != null ) 
+        {
+            Iterator<String> sourceRootIter = sourceRoots.iterator();
+            while ( sourceRootIter.hasNext() ) {
+                FileSet srcFileSet = new FileSet();
+                File sourceDir = new File( sourceRootIter.next() );
+                srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
+                srcFileSet.addInclude( INCLUDE_ALL );
+                result.add( srcFileSet );
+                this.getLog().debug( "Adding sourceRoot directory "+srcFileSet.getDirectory() );
+            }
+        }
+        return result.toArray( new FileSet[result.size()] );
+    }
+    
+    /**
+     * Combine all inputs for resource files which are to be included in the SPDX analysis.
+     * FileSets are all normalized to include the full (absolute) path and use filtering.
+     * @return included files from the project source roots, resources, and includedDirectories parameter
+     */
+    private FileSet[] getResourceDirectories() 
     {
         ArrayList<FileSet> result = new ArrayList<FileSet>();
         @SuppressWarnings( "unchecked" )
@@ -840,6 +870,31 @@ public class CreateSpdxMojo
             }
         }
         this.getLog().debug( "Number of filesets: "+String.valueOf( result.size() ) );
+        return result.toArray( new FileSet[result.size()] );
+    }
+    
+    /**
+     * Combine all inputs for test files which are to be included in the SPDX analysis.
+     * FileSets are all normalized to include the full (absolute) path and use filtering.
+     * @return included files from the project source roots, resources, and includedDirectories parameter
+     */
+    private FileSet[] getTestDirectories() 
+    {
+        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        @SuppressWarnings( "unchecked" )
+        List<String> sourceRoots = this.mavenProject.getTestCompileSourceRoots();
+        if ( sourceRoots != null ) 
+        {
+            Iterator<String> sourceRootIter = sourceRoots.iterator();
+            while ( sourceRootIter.hasNext() ) {
+                FileSet srcFileSet = new FileSet();
+                File sourceDir = new File( sourceRootIter.next() );
+                srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
+                srcFileSet.addInclude( INCLUDE_ALL );
+                result.add( srcFileSet );
+                this.getLog().debug( "Adding TestSourceRoot directory "+srcFileSet.getDirectory() );
+            }
+        }
         return result.toArray( new FileSet[result.size()] );
     }
 }

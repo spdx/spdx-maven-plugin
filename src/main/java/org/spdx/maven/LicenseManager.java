@@ -125,6 +125,9 @@ public class LicenseManager
                                         oldLicenseId + " with " + license.getLicenseId() +
                                         " for " + urls[i]);
                 }
+                if (getLog() != null) {
+                    getLog().debug( "Adding URL mapping for non-standard license "+spdxLicense.getLicenseId() );
+                }
                 this.urlStringToSpdxLicenseId.put( urls[i], spdxLicense.getLicenseId() );
             }
         }
@@ -172,12 +175,12 @@ public class LicenseManager
     {
         if ( mavenLicense.getUrl() == null ) {
             throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
-                                                "No URL exists to provide a mapping" ) );
+                                                "  No URL exists to provide a mapping" ) );
         }
         String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl() );
         if ( licenseId == null ) {
             throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
-                                                "No listed or extracted license matches the URL " + mavenLicense.getUrl() ) );
+                                                "  No listed or extracted license matches the URL " + mavenLicense.getUrl() ) );
         }
         AnyLicenseInfo retval = extractedLicenses.get( licenseId );
         if (retval == null) {
@@ -188,7 +191,7 @@ public class LicenseManager
             catch ( InvalidLicenseStringException e )
             {
                 throw( new LicenseManagerException( "Can not map maven license " + mavenLicense.getName() +
-                                                    "Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() ) );
+                                                    "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() ) );
             }
         }
         return retval;

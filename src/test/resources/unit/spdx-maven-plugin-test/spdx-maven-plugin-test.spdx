@@ -4,6 +4,102 @@
     xmlns:doap="http://usefulinc.com/ns/doap#"
     xmlns:spdx="http://spdx.org/rdf/terms#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+  <rdf:Description rdf:nodeID="A0">
+    <doap:homepage>http://home.page.one.html</doap:homepage>
+    <doap:name>Artifact1 Name</doap:name>
+    <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A1">
+    <spdx:checksumValue>9290a43e876164af4f977aa2c363c2525e91f97d</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A2">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense">
+    <spdx:extractedText>Test license text</spdx:extractedText>
+    <rdfs:seeAlso>http://www.test.url/testLicense.html</rdfs:seeAlso>
+    <rdfs:comment>Test license comment</rdfs:comment>
+    <spdx:name>Test License</spdx:name>
+    <spdx:licenseId>LicenseRef-testLicense</spdx:licenseId>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-5">
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:relationship rdf:nodeID="A2"/>
+    <spdx:checksum rdf:nodeID="A3"/>
+    <spdx:artifactOf rdf:nodeID="A0"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:fileName>./src/test/java/TestSpdxFileCollector.java</spdx:fileName>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A5">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_describes"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A6">
+    <spdx:annotationDate>2015-01-29T18:30:22Z</spdx:annotationDate>
+    <rdfs:comment>PackageAnnotation</rdfs:comment>
+    <spdx:annotator>Person:Test Package Person</spdx:annotator>
+    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3">
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:relationship rdf:nodeID="A7"/>
+    <spdx:checksum rdf:nodeID="A8"/>
+    <spdx:fileName>./src/main/java/CommonCode.java</spdx:fileName>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:artifactOf rdf:nodeID="A0"/>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <rdfs:comment>Default file comment</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A9">
+    <spdx:annotationDate>2010-01-29T18:30:22Z</spdx:annotationDate>
+    <rdfs:comment>Annotation1</rdfs:comment>
+    <spdx:annotator>Person:Test Person</spdx:annotator>
+    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A10">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A7">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A11">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense2">
     <spdx:extractedText>Second est license text</spdx:extractedText>
     <rdfs:seeAlso>http://www.test.url/testLicense2-alt.html</rdfs:seeAlso>
@@ -14,23 +110,31 @@
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1">
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-5"/>
     <doap:homepage>http://spdx.org/tools</doap:homepage>
     <spdx:licenseInfoFromFiles rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
     <spdx:versionInfo>1.0-SNAPSHOT</spdx:versionInfo>
-    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3"/>
+    <spdx:packageVerificationCode rdf:nodeID="A12"/>
     <spdx:copyrightText>Copyright Text for Package</spdx:copyrightText>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3"/>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#Package"/>
-    <spdx:annotation rdf:nodeID="A0"/>
     <spdx:name>Test SPDX Plugin</spdx:name>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6"/>
     <spdx:originator>Organization: Originating org.</spdx:originator>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4"/>
     <spdx:licenseComments>License comments</spdx:licenseComments>
     <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/BSD-3-Clause"/>
     <spdx:licenseDeclared rdf:resource="http://spdx.org/licenses/BSD-2-Clause"/>
-    <spdx:packageVerificationCode rdf:nodeID="A1"/>
     <spdx:sourceInfo>Source info</spdx:sourceInfo>
     <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
     <spdx:downloadLocation rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
+    <spdx:annotation rdf:nodeID="A6"/>
     <spdx:packageFileName rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A4">
+    <doap:homepage>http://home.page.two.html</doap:homepage>
+    <doap:name>Artifact2 Name</doap:name>
+    <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/licenses/CC0-1.0">
     <spdx:standardLicenseHeader>
@@ -64,27 +168,24 @@ For these and/or other purposes and motivations, and without any expectation of 
     <spdx:licenseId>CC0-1.0</spdx:licenseId>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A2">
-    <spdx:checksumValue>9290a43e876164af4f977aa2c363c2525e91f97d</spdx:checksumValue>
-    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
-  </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-DOCUMENT">
-    <spdx:annotation rdf:nodeID="A3"/>
-    <spdx:creationInfo rdf:nodeID="A4"/>
-    <spdx:relationship rdf:nodeID="A5"/>
+    <spdx:annotation rdf:nodeID="A13"/>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#SpdxDocument"/>
     <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense"/>
     <rdfs:comment>Document Comment</rdfs:comment>
     <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense2"/>
-    <spdx:annotation rdf:nodeID="A6"/>
+    <spdx:annotation rdf:nodeID="A9"/>
+    <spdx:creationInfo rdf:nodeID="A14"/>
     <spdx:dataLicense rdf:resource="http://spdx.org/licenses/CC0-1.0"/>
     <spdx:name>Test SPDX Plugin</spdx:name>
     <spdx:specVersion>SPDX-2.0</spdx:specVersion>
+    <spdx:relationship rdf:nodeID="A5"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A1">
-    <spdx:packageVerificationCodeValue>df19c46a358bf076bce002494f55ebf6d39e0c86</spdx:packageVerificationCodeValue>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
+  <rdf:Description rdf:nodeID="A15">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/licenses/BSD-2-Clause">
     <spdx:isOsiApproved>true</spdx:isOsiApproved>
@@ -102,77 +203,71 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <spdx:licenseId>BSD-2-Clause</spdx:licenseId>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A5">
-    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_describes"/>
-    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
-    <rdfs:comment></rdfs:comment>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  <rdf:Description rdf:nodeID="A12">
+    <spdx:packageVerificationCodeValue>362c6c616fab4e2f6663a53b84c1d65ce40b0207</spdx:packageVerificationCodeValue>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
   </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense">
-    <spdx:extractedText>Test license text</spdx:extractedText>
-    <rdfs:seeAlso>http://www.test.url/testLicense.html</rdfs:seeAlso>
-    <rdfs:comment>Test license comment</rdfs:comment>
-    <spdx:name>Test License</spdx:name>
-    <spdx:licenseId>LicenseRef-testLicense</spdx:licenseId>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6">
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:artifactOf rdf:nodeID="A0"/>
+    <spdx:fileName>./src/main/java/SpdxTagValueConstants.properties</spdx:fileName>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:relationship rdf:nodeID="A15"/>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:checksum rdf:nodeID="A1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_other"/>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A7">
-    <spdx:checksumValue>901a2d1e2c26cb3583c99abae9e62870f310a0d6</spdx:checksumValue>
+  <rdf:Description rdf:nodeID="A3">
+    <spdx:checksumValue>271f8a00acfc50134178ea119d6965b1958ca1f1</spdx:checksumValue>
     <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A0">
-    <spdx:annotationDate>2015-01-29T18:30:22Z</spdx:annotationDate>
-    <rdfs:comment>PackageAnnotation</rdfs:comment>
-    <spdx:annotator>Person:Test Package Person</spdx:annotator>
-    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A8">
+  <rdf:Description rdf:nodeID="A16">
     <spdx:packageVerificationCodeValue>cf23df2207d99a74fbe169e3eba035e633b65d94</spdx:packageVerificationCodeValue>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A6">
-    <spdx:annotationDate>2012-11-29T18:30:22Z</spdx:annotationDate>
-    <rdfs:comment>Annotation2</rdfs:comment>
-    <spdx:annotator>Organization:Test Organization</spdx:annotator>
-    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_other"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
+  <rdf:Description rdf:nodeID="A17">
+    <spdx:checksumValue>3dbbebf26f1e6b707b9ccd36ac6c447cc7de5253</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A9">
-    <doap:homepage>http://home.page.one.html</doap:homepage>
-    <doap:name>Artifact1 Name</doap:name>
-    <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3">
-    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:fileContributor>First contributor</spdx:fileContributor>
-    <spdx:checksum rdf:nodeID="A2"/>
-    <spdx:licenseComments>Default file comment</spdx:licenseComments>
-    <spdx:artifactOf rdf:nodeID="A10"/>
-    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:fileName>./src/main/java/SpdxTagValueConstants.properties</spdx:fileName>
-    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_other"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
-    <spdx:noticeText>Default file notice</spdx:noticeText>
-    <rdfs:comment>Default file comment</rdfs:comment>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A4">
+  <rdf:Description rdf:nodeID="A14">
     <spdx:licenseListVersion>2.0</spdx:licenseListVersion>
-    <spdx:created>2015-08-03T14:19:16Z</spdx:created>
+    <spdx:created>2015-08-03T21:36:44Z</spdx:created>
     <rdfs:comment>Creator comment</rdfs:comment>
     <spdx:creator>Tool: spdx-maven-plugin</spdx:creator>
     <spdx:creator>Person: Creator2</spdx:creator>
     <spdx:creator>Person: Creator1</spdx:creator>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#CreationInfo"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A10">
-    <doap:homepage>http://home.page.two.html</doap:homepage>
-    <doap:name>Artifact2 Name</doap:name>
-    <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4">
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <spdx:relationship rdf:nodeID="A11"/>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:checksum rdf:nodeID="A18"/>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:artifactOf rdf:nodeID="A0"/>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:fileName>./src/test/java/CreateSpdxMavenProjectStub.java</spdx:fileName>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A18">
+    <spdx:checksumValue>c3276671012ba00662a2d23d944c6a3e99af6851</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/licenses/BSD-3-Clause">
     <spdx:isOsiApproved>true</spdx:isOsiApproved>
@@ -192,27 +287,33 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2">
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:fileName>./src/main/java/CommonCode.java</spdx:fileName>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:artifactOf rdf:nodeID="A4"/>
     <spdx:noticeText>Default file notice</spdx:noticeText>
     <spdx:licenseComments>Default file comment</spdx:licenseComments>
-    <spdx:artifactOf rdf:nodeID="A10"/>
+    <spdx:fileName>./src/test/java/TestLicenseManager.java</spdx:fileName>
     <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:relationship rdf:nodeID="A10"/>
     <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:checksum rdf:nodeID="A7"/>
     <spdx:fileContributor>First contributor</spdx:fileContributor>
     <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:checksum rdf:nodeID="A17"/>
     <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:artifactOf rdf:nodeID="A0"/>
     <spdx:fileContributor>Second contributor</spdx:fileContributor>
     <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A3">
-    <spdx:annotationDate>2010-01-29T18:30:22Z</spdx:annotationDate>
-    <rdfs:comment>Annotation1</rdfs:comment>
-    <spdx:annotator>Person:Test Person</spdx:annotator>
-    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
+  <rdf:Description rdf:nodeID="A13">
+    <spdx:annotationDate>2012-11-29T18:30:22Z</spdx:annotationDate>
+    <rdfs:comment>Annotation2</rdfs:comment>
+    <spdx:annotator>Organization:Test Organization</spdx:annotator>
+    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_other"/>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A8">
+    <spdx:checksumValue>901a2d1e2c26cb3583c99abae9e62870f310a0d6</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/licenses/Apache-2.0">
     <spdx:isOsiApproved>true</spdx:isOsiApproved>

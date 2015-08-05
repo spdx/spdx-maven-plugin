@@ -182,7 +182,9 @@ public class SpdxDocumentBuilder
 
     /**
      * Build the SPDX document from the files and save the information to the SPDX file
-     * @param includedDirectories Directories to be included in the document
+   * @param includedSourceDirectories Source directories to be included in the document
+   * @param includedResourceDirectories Test directories to be included in the document
+   * @param includedTestDirectories Resource directories to be included in the document
      * @param baseDir Base directory used to create the relative file paths for the SPDX file names
      * @param projectInformation Project level SPDX information
      * @param defaultFileInformation Default SPDX file information
@@ -190,8 +192,8 @@ public class SpdxDocumentBuilder
      * @param dependencyInformation Dependencies to add to the SPDX file (typically based on project dependencies in the POM file)
      * @throws SpdxBuilderException
      */
-    public void buildDocumentFromFiles( FileSet[] includedDirectories,
-                                        String baseDir, SpdxProjectInformation projectInformation,
+    public void buildDocumentFromFiles( FileSet[] includedSourceDirectories,
+                                        FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, String baseDir, SpdxProjectInformation projectInformation,
                                         SpdxDefaultFileInformation defaultFileInformation,
                                         Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                                         SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
@@ -202,7 +204,8 @@ public class SpdxDocumentBuilder
             this.log.debug(  "Starting buid document from files" );
             spdxOut = new FileOutputStream ( spdxFile );
             fillSpdxDocumentInformation( projectInformation );
-            collectSpdxFileInformation( includedDirectories, baseDir,
+            collectSpdxFileInformation( includedSourceDirectories, includedTestDirectories,
+                                        includedResourceDirectories, baseDir,
                     defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ),
                     pathSpecificInformation );
             addDependencyInformation( dependencyInformation );
@@ -448,25 +451,33 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
 
   /**
    * Collect information at the file level, fill in the SPDX document
-   * @param includedDirectories Directories to be included in the document
- * @param baseDir 
-   * @param projectInformation Project level SPDX information
+   * @param includedSourceDirectories Source directories to be included in the document
+   * @param includedResourceDirectories Test directories to be included in the document
+   * @param includedTestDirectories Resource directories to be included in the document
    * @param baseDir project base directory used to construct the relative paths for the SPDX files
+   * @param projectInformation Project level SPDX information
    * @param spdxFileName SPDX file name - will be used for the skipped file names in the verification code
    * @param pathSpecificInformation Map of path to file information used to override the default file information
    * @throws InvalidSPDXAnalysisException
    * @throws SpdxBuilderException
  */
-private void collectSpdxFileInformation( FileSet[] includedDirectories,
-          String baseDir, SpdxDefaultFileInformation defaultFileInformation,
+private void collectSpdxFileInformation( FileSet[] includedSourceDirectories,
+          FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, String baseDir, SpdxDefaultFileInformation defaultFileInformation,
           String spdxFileName, 
           Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException 
   {      
       SpdxFileCollector fileCollector = new SpdxFileCollector();
       fileCollector.setLog( getLog() );
       try {
-          fileCollector.collectFiles( includedDirectories, baseDir,
-                                                 defaultFileInformation, pathSpecificInformation );
+          fileCollector.collectFiles( includedSourceDirectories, baseDir,
+                                                 defaultFileInformation, pathSpecificInformation,
+                                                 projectPackage, RelationshipType.relationshipType_generates );
+          fileCollector.collectFiles( includedTestDirectories, baseDir,
+                                      defaultFileInformation, pathSpecificInformation,
+                                      projectPackage, RelationshipType.relationshipType_testcaseOf );
+          fileCollector.collectFiles( includedResourceDirectories, baseDir,
+                                      defaultFileInformation, pathSpecificInformation,
+                                      projectPackage, RelationshipType.relationshipType_containedBy );
       } catch ( SpdxCollectionException e ) {
           this.getLog().error( "SPDX error collecting file information", e );
           throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );

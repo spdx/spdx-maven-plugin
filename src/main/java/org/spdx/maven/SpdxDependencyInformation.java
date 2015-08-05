@@ -71,12 +71,14 @@ public class SpdxDependencyInformation
     private List<Relationship> relationships = new ArrayList<Relationship>();
     private Map<String, ExternalDocumentRef> externalDocuments = 
                     new HashMap<String, ExternalDocumentRef>();
+    private LicenseManager licenseManager;
     
     /**
      * @param log Logger for Maven
      */
-    public SpdxDependencyInformation( Log log ) {
+    public SpdxDependencyInformation( Log log, LicenseManager licenseManager ) {
         this.log = log;
+        this.licenseManager = licenseManager;
     }
     /**
      * Add information about a Maven dependency to the list of SPDX Dependencies
@@ -325,10 +327,20 @@ public class SpdxDependencyInformation
      * @param mavenLicenses List of maven licenses to map
      * @return
      * @throws LicenseMapperException 
+     * @throws LicenseManagerException 
      */
     private AnyLicenseInfo mavenLicensesToSpdxLicense( List<License> mavenLicenses ) throws LicenseMapperException
     {
-        return MavenToSpdxLicenseMapper.getInstance( this.log ).mavenLicenseListToSpdxLicense( mavenLicenses );
+        try {
+            // The call below will map non standard licenses as well as standard licenses
+            // but will throw an exception if no mapping is found - we'll try this first
+            // and if there is an error, try just the standard license mapper which will
+            // return an UNSPECIFIED license type if there is no mapping
+            return this.licenseManager.mavenLicenseListToSpdxLicense( mavenLicenses );
+        } catch (LicenseManagerException ex) {
+            return MavenToSpdxLicenseMapper.getInstance( log ).mavenLicenseListToSpdxLicense( mavenLicenses );
+        }
+        
     }
     /**
      * Get filsets of files included in the project from the Maven model
