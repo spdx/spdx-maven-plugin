@@ -40,7 +40,6 @@ import org.spdx.rdfparser.SPDXDocumentFactory;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.SpdxRdfConstants;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.ExtractedLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
@@ -187,9 +186,10 @@ public class SpdxDependencyInformation
         log.debug( "Dependency "+artifact.getArtifactId()+"Using only artifact information to create dependent package" );
         SpdxPackage pkg = new SpdxPackage(artifact.getArtifactId(), 
                                           new SpdxNoAssertionLicense(), 
-                                          new AnyLicenseInfo[0], "UNSPECIFIED",
+                                          new AnyLicenseInfo[] {new SpdxNoAssertionLicense()},
+                                          "UNSPECIFIED",
                                           new SpdxNoAssertionLicense(), 
-                                          "UNSPECIFIED", new SpdxFile[0], new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
+                                          "NOASSERTION", new SpdxFile[0], new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
         pkg.setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." );
         pkg.setVersionInfo( artifact.getBaseVersion() );
         return pkg;
@@ -290,7 +290,7 @@ public class SpdxDependencyInformation
         }
         String copyright = "UNSPECIFIED";
         String notice = "UNSPECIFIED";
-        String downloadLocation = "UNSPECIFIED";
+        String downloadLocation = "NOASSERTION";
         AnyLicenseInfo declaredLicense = mavenLicensesToSpdxLicense( model.getLicenses() );
         fileInfo.setArtifactOf( new DoapProject[0] );
         fileInfo.setComment( "" );
@@ -302,7 +302,7 @@ public class SpdxDependencyInformation
         fileInfo.setNotice( notice );
         
         SpdxPackage retval = new SpdxPackage(packageName, new SpdxNoAssertionLicense(), 
-                                             new ExtractedLicenseInfo[0],
+                                             new AnyLicenseInfo[] {new SpdxNoAssertionLicense()},
                                              copyright, declaredLicense, downloadLocation,
                                              new SpdxFile[0], 
                                              new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
@@ -314,7 +314,7 @@ public class SpdxDependencyInformation
             retval.setSummary( model.getDescription() );
         }
         if (model.getOrganization() != null) {
-            retval.setOriginator( model.getOrganization().getName() );
+            retval.setOriginator( SpdxRdfConstants.CREATOR_PREFIX_ORGANIZATION +  model.getOrganization().getName() );
         }
         if (model.getUrl() != null) {
             retval.setHomepage( model.getUrl() );
