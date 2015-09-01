@@ -66,7 +66,7 @@ public class SpdxDocumentBuilder
 
     //TODO: Use a previous SPDX to document file specific information and update
     //TODO: Map the SPDX document to the Maven build artifacts
-    static DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
+    DateFormat format = new SimpleDateFormat( SpdxRdfConstants.SPDX_DATE_FORMAT );
 
     private Log log;
     private SpdxDocument spdxDoc;

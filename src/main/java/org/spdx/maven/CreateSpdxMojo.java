@@ -490,9 +490,21 @@ public class CreateSpdxMojo
             return;
         }
         for ( Artifact dependency:dependencies ) {
+            String filePath;
+            if ( dependency.getFile() != null ) {
+                filePath = dependency.getFile().getAbsolutePath();
+            } else {
+                filePath = "[NONE]";
+            }
+            String scope;
+            if ( dependency.getScope() != null ) {
+                scope = dependency.getScope();
+            }else {
+                scope = "[NONE]";
+            }
             this.getLog().debug( "ArtifactId: "+dependency.getArtifactId() + 
-                                 ", file path: "+dependency.getFile().getAbsolutePath() +
-                                 ", Scope: "+dependency.getScope() );
+                                 ", file path: "+filePath +
+                                 ", Scope: "+scope );
         }
     }
 

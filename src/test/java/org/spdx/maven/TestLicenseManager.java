@@ -48,7 +48,8 @@ import org.apache.maven.plugin.logging.Log;
 public class TestLicenseManager
 {
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
-    static final String APACHE_CROSS_REF_URL = "http://www.opensource.org/licenses/Apache-2.0";
+    static final String APACHE_CROSS_REF_URL1 = "http://www.opensource.org/licenses/Apache-2.0";
+    static final String APACHE_CROSS_REF_URL2 = "http://www.apache.org/licenses/LICENSE-2.0";
     static final String APACHE_LICENSE_ID = "Apache-2.0";
     static final String APACHE_LICENSE_NAME = "Apache License 2.0";
     static final String APSL_CROSS_REF_URL = "http://www.opensource.apple.com/source/IOSerialFamily/IOSerialFamily-7/APPLE_LICENSE";
@@ -201,7 +202,7 @@ public class TestLicenseManager
         
         License apache = new License();
         apache.setName( LICENSE1_NAME );
-        apache.setUrl( APACHE_CROSS_REF_URL );
+        apache.setUrl( APACHE_CROSS_REF_URL1 );
         License apsl = new License();
         apsl.setName( LICENSE2_NAME );
         apsl.setUrl( APSL_CROSS_REF_URL );
@@ -242,7 +243,7 @@ public class TestLicenseManager
         final String LICENSE1_NAME = "Apachelicense1";
         License apache = new License();
         apache.setName( LICENSE1_NAME );
-        apache.setUrl( APACHE_CROSS_REF_URL );
+        apache.setUrl( APACHE_CROSS_REF_URL1 );
         LicenseManager licenseManager = new LicenseManager( spdxDoc, log, true );
         
         AnyLicenseInfo result = licenseManager.mavenLicenseToSpdxLicense( apache );
@@ -292,7 +293,7 @@ public class TestLicenseManager
         AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseString( APACHE_LICENSE_ID );
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );
         assertEquals( result.getName(), ((SpdxListedLicense)licenseInfo).getName() );
-        assertEquals( APACHE_CROSS_REF_URL, result.getUrl()  );
+        assertTrue( APACHE_CROSS_REF_URL1.equals(result.getUrl()) || APACHE_CROSS_REF_URL2.equals(result.getUrl()) );
         
         // non standard license
         final String LICENSE_ID = "LicenseRef-nonStd1";

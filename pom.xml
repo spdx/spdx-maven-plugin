@@ -4,7 +4,7 @@
 
   <groupId>org.spdx</groupId>
   <artifactId>spdx-maven-plugin</artifactId>
-  <version>0.2.3-SNAPSHOT</version>
+  <version>0.2.5</version>
   <packaging>maven-plugin</packaging>
 
   <name>spdx-maven-plugin Maven Plugin</name>
@@ -14,7 +14,22 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
+  <licenses>
+      <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <distribution>repo</distribution>
+      </license>
+  </licenses>
+  <developers>
+     <developer>
+       <id>goneall</id>
+       <name>Gary O'Neall</name>
+       <email>gary@sourceauditor.com</email>
+       <organization>SPDX</organization>
+       <organizationUrl>http://spdx.org</organizationUrl>
+     </developer>
+   </developers>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -36,7 +51,7 @@
     <dependency>
     	<groupId>org.spdx</groupId>
     	<artifactId>spdx-tools</artifactId>
-    	<version>2.0.2</version>
+    	<version>2.0.3</version>
     </dependency>
     <dependency>
     	<groupId>org.apache.maven</groupId>
@@ -116,6 +131,20 @@
           </execution>
         </executions>
       </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2.1</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+               <phase>verify</phase>
+               <goals>
+                 <goal>jar-no-fork</goal>
+               </goals>
+             </execution>
+           </executions>
+        </plugin>
     </plugins>
   </build>
   <profiles>
@@ -158,6 +187,14 @@
       </build>
     </profile>
   </profiles>
-  <description> NOTE: Currently this is a prototype plugin for supporting SPDX in a Maven build.
- Goal which creates a new SPDX file for the package being built.  </description>
+  <description>Plugin for supporting SPDX in a Maven build.  See README.md</description>
+  <organization>
+  	<name>SPDX</name>
+  	<url>http://spdx.org</url>
+  </organization>
+  <scm>
+  	<url>https://github.com/goneall/spdx-maven-plugin.git</url>
+  	<connection>https</connection>
+  	<developerConnection>Gary O'Neall</developerConnection>
+  </scm>
 </project>

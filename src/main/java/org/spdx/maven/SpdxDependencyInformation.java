@@ -125,9 +125,18 @@ public class SpdxDependencyInformation
      */
     private SpdxElement createSpdxPackage( Artifact artifact ) throws LicenseMapperException
     {
-        File spdxFile = artifactFileToSpdxFile( artifact.getFile() );
-        log.debug( "Dependency "+artifact.getArtifactId()+"Looking for SPDX file "+spdxFile.getAbsolutePath() );
+        log.debug( "Creating SPDX package for artifact "+artifact.getArtifactId() );
+        if ( artifact.getFile() == null ) {
+            log.debug( "Artifact file is null" );
+        } else {
+            log.debug( "Artifact file name = "+artifact.getFile().getName() );
+        }
+        File spdxFile = null;
+        if ( artifact.getFile() != null ) {
+            spdxFile = artifactFileToSpdxFile( artifact.getFile() );
+        }
         if ( spdxFile != null && spdxFile.exists() ) {
+            log.debug( "Dependency "+artifact.getArtifactId()+"Looking for SPDX file "+spdxFile.getAbsolutePath() );
             try
             {
                 log.debug( "Dependency "+artifact.getArtifactId()+"Dependency information collected from SPDX file "+spdxFile.getAbsolutePath() );
@@ -150,9 +159,12 @@ public class SpdxDependencyInformation
                            ":"+e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
         }
-        File pomFile = artifactFileToPomFile( artifact.getFile() );
-        log.debug( "Dependency "+artifact.getArtifactId()+"Looking for POM file "+pomFile.getAbsolutePath() );
-        if ( pomFile != null && pomFile.exists() ) {
+        File pomFile = null;
+        if ( artifact.getFile() != null ) {
+            pomFile = artifactFileToPomFile( artifact.getFile() );
+        }    
+         if ( pomFile != null && pomFile.exists() ) {
+            log.debug( "Dependency "+artifact.getArtifactId()+"Looking for POM file "+pomFile.getAbsolutePath() );
             try
             {
                 log.debug( "Dependency "+artifact.getArtifactId()+"Collecting information from POM file "+pomFile.getAbsolutePath() );
