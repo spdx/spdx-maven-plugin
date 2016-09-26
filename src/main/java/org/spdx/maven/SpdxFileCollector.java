@@ -293,7 +293,7 @@ public class SpdxFileCollector
         String notice = defaultFileInformation.getNotice();
         String comment = defaultFileInformation.getComment();
         String[] contributors = defaultFileInformation.getContributors();
-        DoapProject[] artifactOf = defaultFileInformation.getArtifactOf();
+        DoapProject[] artifactOf = new DoapProject[0];
         AnyLicenseInfo concludedLicense = defaultFileInformation.getConcludedLicense();
         String licenseComment = defaultFileInformation.getLicenseComment();
         SpdxFile retval = null;

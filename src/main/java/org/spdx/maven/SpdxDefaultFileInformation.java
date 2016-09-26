@@ -16,7 +16,6 @@
 package org.spdx.maven;
 
 import org.apache.maven.plugin.logging.Log;
-import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 
@@ -33,7 +32,6 @@ public class SpdxDefaultFileInformation
     private String notice = "";
     private String comment = "";
     private String[] contributors = new String[0];
-    private DoapProject[] artifactOf = new DoapProject[0];
     private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();;
     private String licenseComment = "";
 
@@ -87,16 +85,6 @@ public class SpdxDefaultFileInformation
         this.contributors = contributors;
     }
 
-    public DoapProject[] getArtifactOf() 
-    {
-        return this.artifactOf;
-    }
-    
-    public void setArtifactOf( DoapProject[] projects ) 
-    {
-        this.artifactOf = projects;
-    }
-
     public AnyLicenseInfo getConcludedLicense() 
     {
         return this.concludedLicense;
@@ -129,15 +117,6 @@ public class SpdxDefaultFileInformation
         log.debug( "Default File Notice: "+getNotice() );
         log.debug( "Default File Concluded License: "+getConcludedLicense().toString() );
         log.debug( "Default File Declared License: "+getDeclaredLicense().toString() );
-        DoapProject[] artifactOfs = getArtifactOf();
-        if ( artifactOfs != null ) 
-        {
-            for ( int i = 0; i < artifactOfs.length; i++ ) 
-            {
-                log.debug( "Default ArtifactOf Project Name: "+artifactOfs[i].getName() );
-                log.debug( "Default ArtifactOf Project HomePage: "+artifactOfs[i].getHomePage() );
-            }
-        }
         String[] contributors = getContributors();
         if ( contributors != null ) 
         {

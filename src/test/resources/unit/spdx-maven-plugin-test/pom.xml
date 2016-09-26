@@ -152,16 +152,6 @@
                     <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
                     <defaultFileLicenseComment>Default file comment</defaultFileLicenseComment>
                     <defaultFileNotice>Default file notice</defaultFileNotice>
-                    <defaultFileArtifactOfs>
-                        <param>
-                            <name>Artifact1 Name</name>
-                            <homePage>http://home.page.one.html</homePage>
-                        </param>
-                        <param>
-                            <name>Artifact2 Name</name>
-                            <homePage>http://home.page.two.html</homePage>
-                        </param>
-                    </defaultFileArtifactOfs>
                     <licenseDeclared>BSD-2-Clause</licenseDeclared>
                     <licenseConcluded>BSD-3-Clause</licenseConcluded>
                     <creatorComment>Creator comment</creatorComment>
@@ -173,6 +163,36 @@
                     <originator>Organization: Originating org.</originator>
                     <sourceInfo>Source info</sourceInfo>
                     <copyrightText>Copyright Text for Package</copyrightText>
+                    <externalReferences>
+                        <ExternalReference>
+                            <category>
+                                SECURITY
+                            </category>
+                            <type>
+                                cpe22Type
+                            </type>
+                            <locator>
+                                example-locator-CPE22Type
+                            </locator>
+                            <comment>
+                                extref comment1
+                            </comment>
+                        </ExternalReference>
+                        <ExternalReference>
+                            <category>
+                                PACKAGE-MANAGER
+                            </category>
+                            <type>
+                                maven-central
+                            </type>
+                            <locator>
+                                org.apache.tomcat:tomcat:9.0.0.M4
+                            </locator>
+                            <comment>
+                                extref comment2
+                            </comment>
+                        </ExternalReference>
+                    </externalReferences>
                 </configuration>
                 </plugin>
         </plugins>

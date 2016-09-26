@@ -43,7 +43,6 @@ import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
-import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.model.ExternalDocumentRef;
 import org.spdx.rdfparser.model.ExternalSpdxElement;
 import org.spdx.rdfparser.model.Relationship;
@@ -304,7 +303,6 @@ public class SpdxDependencyInformation
         String notice = "UNSPECIFIED";
         String downloadLocation = "NOASSERTION";
         AnyLicenseInfo declaredLicense = mavenLicensesToSpdxLicense( model.getLicenses() );
-        fileInfo.setArtifactOf( new DoapProject[0] );
         fileInfo.setComment( "" );
         fileInfo.setConcludedLicense( new SpdxNoAssertionLicense() );
         fileInfo.setContributors( fileContributorList.toArray(new String[fileContributorList.size()]) );
@@ -359,6 +357,7 @@ public class SpdxDependencyInformation
      * @param model Maven model
      * @return Source file set and resource filesets
      */
+    @SuppressWarnings( "unused" )
     private FileSet[] getIncludedDirectoriesFromModel( Model model ) 
     {
         //TODO: This can be refactored to common code from the CreateSpdxMojo

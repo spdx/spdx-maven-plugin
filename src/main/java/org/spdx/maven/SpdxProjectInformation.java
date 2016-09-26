@@ -15,9 +15,15 @@
  */
 package org.spdx.maven;
 
+import java.util.List;
+
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.ExternalRef;
+import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 
 /**
  * Simple structure to hold information about SPDX project
@@ -45,6 +51,7 @@ class SpdxProjectInformation {
     private String documentComment;
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
+    private List<ExternalReference> externalRefs;
     /**
      * @return the documentComment
      */
@@ -274,6 +281,34 @@ class SpdxProjectInformation {
                 log.debug( "SPDX Creator: "+creators[i] );
             }
         }
+        if (this.externalRefs != null) {
+            for ( ExternalReference externalReference:externalRefs ) {
+                ExternalRef externalRef;
+                try
+                {
+                    externalRef = externalReference.getExternalRef();
+                    StringBuilder externalRefString = new StringBuilder();
+                    externalRefString.append( externalRef.getReferenceCategory().getTag() );
+                    externalRefString.append( ' ' );
+                    try
+                    {
+                        externalRefString.append( ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName( externalRef.getReferenceType().getReferenceTypeUri()));
+                    }
+                    catch ( InvalidSPDXAnalysisException e )
+                    {
+                        externalRefString.append( "Invalid Reference Type" );
+                    }
+                    externalRefString.append( ' ' );
+                    externalRefString.append( externalRef.getReferenceLocator() );
+                    log.debug( "External Ref: "+externalRefString.toString() );
+                }
+                catch ( MojoExecutionException e1 )
+                {
+                    log.error( "Invalid external reference", e1 );
+                }
+                
+            }
+        }
     }
     public String getSourceInfo()
     {
@@ -305,5 +340,12 @@ class SpdxProjectInformation {
     }
     public Annotation[] getDocumentAnnotations() {
         return this.documentAnnotations;
+    }
+    public void setExternalRefs( List<ExternalReference> externalReferences )
+    {
+        this.externalRefs = externalReferences;
+    }
+    public List<ExternalReference> getExternalRefs() {
+        return this.externalRefs;
     }
 }

@@ -15,9 +15,12 @@ import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ExtractedLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.model.Annotation.AnnotationType;
+import org.spdx.rdfparser.model.ExternalRef;
+import org.spdx.rdfparser.model.ExternalRef.ReferenceCategory;
 import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
+import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 
 public class TestSpdxMojo
     extends AbstractMojoTestCase
@@ -164,6 +167,26 @@ public class TestSpdxMojo
         assertEquals( "Source info", pkg.getSourceInfo() );
         //copyrightText
         assertEquals( "Copyright Text for Package", pkg.getCopyrightText() );
+        //external Refs
+        ExternalRef[] externalRefs = pkg.getExternalRefs();
+        assertEquals(2, externalRefs.length);
+        if (externalRefs[0].getReferenceCategory().equals( ReferenceCategory.referenceCategory_security )) {
+            assertEquals("extref comment1", externalRefs[0].getComment());
+            assertEquals("example-locator-CPE22Type", externalRefs[0].getReferenceLocator());
+            assertEquals("cpe22Type", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName( externalRefs[0].getReferenceType().getReferenceTypeUri() ) );
+            assertEquals("extref comment2", externalRefs[1].getComment());
+            assertEquals("org.apache.tomcat:tomcat:9.0.0.M4", externalRefs[1].getReferenceLocator());
+            assertEquals("maven-central", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName( externalRefs[1].getReferenceType().getReferenceTypeUri() ) );
+        } else if (externalRefs[0].getReferenceCategory().equals( ReferenceCategory.referenceCategory_packageManager )) {
+            assertEquals("extref comment1", externalRefs[1].getComment());
+            assertEquals("example-locator-CPE22Type", externalRefs[1].getReferenceLocator());
+            assertEquals("cpe22Type", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName( externalRefs[1].getReferenceType().getReferenceTypeUri() ) );
+            assertEquals("extref comment2", externalRefs[0].getComment());
+            assertEquals("org.apache.tomcat:tomcat:9.0.0.M4", externalRefs[0].getReferenceLocator());
+            assertEquals("maven-central", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName( externalRefs[0].getReferenceType().getReferenceTypeUri() ) );          
+        } else {
+            fail("Unexpected reference category");
+        }
         // Test all files are included
         List<String> filePaths = new ArrayList<String>();
         File sourceDir = new File( getBasedir(),

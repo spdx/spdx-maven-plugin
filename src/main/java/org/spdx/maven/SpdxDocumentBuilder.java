@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -45,6 +46,7 @@ import org.spdx.rdfparser.model.Annotation;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
 import org.spdx.rdfparser.model.ExternalDocumentRef;
+import org.spdx.rdfparser.model.ExternalRef;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxDocument;
@@ -417,6 +419,31 @@ private SpdxPackage createSpdxPackage( SpdxProjectInformation projectInformation
       if ( projectInformation.getVersionInfo() != null ) 
       {
           pkg.setVersionInfo( projectInformation.getVersionInfo() );
+      }
+      // external references
+      List<ExternalReference> externalRefs = projectInformation.getExternalRefs();
+      if ( externalRefs != null && externalRefs.size() > 0 ) {
+          ExternalRef[] externalRefAr = new ExternalRef[ externalRefs.size() ];
+          for ( int i = 0; i < externalRefAr.length; i++ ) {
+              try
+            {
+                externalRefAr[i] = externalRefs.get( i ).getExternalRef();
+            }
+            catch ( MojoExecutionException e )
+            {
+                this.getLog().error( "Invalid external refs", e );
+                throw( new SpdxBuilderException( "Error adding package information to SPDX document - Invalid external refs provided: "+e.getMessage(), e ) );
+            }
+          }
+          try
+        {
+            pkg.setExternalRefs( externalRefAr );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            this.getLog().error( "Invalid external refs", e );
+            throw( new SpdxBuilderException( "Error adding package information to SPDX document - Invalid external refs provided: "+e.getMessage(), e ) );
+        }
       }
       return pkg;
     }

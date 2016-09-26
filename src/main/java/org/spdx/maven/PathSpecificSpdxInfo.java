@@ -20,7 +20,6 @@ import java.io.File;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
@@ -106,13 +105,6 @@ public class PathSpecificSpdxInfo
      */
     @Parameter
     private String licenseInformationInFile;
-    
-    /**
-     * File artifactOf.
-     * ArtifactOf indicates the origin for a given file if it originates from a separate project.
-     */
-    @Parameter
-    private ArtifactOf[] fileArtifactOfs;
 
     /**
      * Default constructor
@@ -130,19 +122,6 @@ public class PathSpecificSpdxInfo
      */
     public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults ) throws InvalidLicenseStringException {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
-        if ( this.fileArtifactOfs != null ) 
-        {
-            DoapProject artifactOfs[] = new DoapProject[this.fileArtifactOfs.length];
-            for ( int i = 0; i < artifactOfs.length; i++ ) 
-            {
-                artifactOfs[i] = new DoapProject( this.fileArtifactOfs[i].getName(), 
-                                                  this.fileArtifactOfs[i].getHomePage().toString() );
-            }
-            retval.setArtifactOf( artifactOfs );
-        } else 
-        {
-            retval.setArtifactOf( defaults.getArtifactOf() );
-        }
         if ( this.fileComment != null ) {
             retval.setComment( fileComment );
         } else 

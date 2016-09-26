@@ -34,7 +34,6 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
-import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -236,13 +235,6 @@ public class CreateSpdxMojo
      */
     @Parameter( defaultValue ="NOASSERTION" )
     private String defaultLicenseInformationInFile;
-    
-    /**
-     * Optional default file artifactOf.
-     * ArtifactOf indicates the origin for a given file if it originates from a separate project.
-     */
-    @Parameter
-    private ArtifactOf[] defaultFileArtifactOfs;
 
     // the following parameters are for the SPDX project
     
@@ -346,6 +338,9 @@ public class CreateSpdxMojo
      */
     @Parameter( required = false )
     private List<PathSpecificSpdxInfo> pathsWithSpecificSpdxInfo;
+    
+    @Parameter( required = false )
+    private List<ExternalReference> externalReferences;
 
     @SuppressWarnings( "unchecked" )
     public void execute()
@@ -624,7 +619,6 @@ public class CreateSpdxMojo
     private SpdxDefaultFileInformation getDefaultFileInfoFromParameters() throws MojoExecutionException 
     {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
-        retval.setArtifactOf( getDefaultFileProjects() );
         retval.setComment( defaultFileComment );
         AnyLicenseInfo concludedLicense = null;
         try 
@@ -650,21 +644,6 @@ public class CreateSpdxMojo
         retval.setDeclaredLicense( declaredLicense );
         retval.setLicenseComment( defaultFileLicenseComment );
         retval.setNotice( defaultFileNotice );
-        return retval;
-    }
-
-    private DoapProject[] getDefaultFileProjects() 
-    {
-        if ( this.defaultFileArtifactOfs == null ) 
-        {
-            return new DoapProject[0];
-        }
-        DoapProject[] retval = new DoapProject[this.defaultFileArtifactOfs.length];
-        for ( int i = 0; i < retval.length; i++ ) 
-        {
-            retval[i] = new DoapProject( defaultFileArtifactOfs[i].getName(), 
-                    defaultFileArtifactOfs[i].getHomePage().toString() );
-        }
         return retval;
     }
 
@@ -805,6 +784,7 @@ public class CreateSpdxMojo
         retval.setVersionInfo( mavenProject.getVersion() );
         retval.setDocumentAnnotations( this.documentAnnotations );
         retval.setPackageAnnotations( this.packageAnnotations );
+        retval.setExternalRefs( this.externalReferences );
         return retval;
     }
 

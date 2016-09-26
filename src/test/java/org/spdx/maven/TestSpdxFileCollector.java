@@ -47,8 +47,6 @@ public class TestSpdxFileCollector {
 	static final String[] SUB_DIRS = new String[] {"dirA", "folderB"};
 	static final String[][] SUBDIR_FILES = new String[][] { new String[] {"subfile1.c", "subfile2.bin"},
 	    new String[] {"sub2files.php"} };
-	static final String[] ARTIFACT_OF_NAMES = new String[] {"projectA", "projectB"};
-	static final String[] ARTIFACT_OF_HOME_PAGES = new String[] {"http://www.projecta", "http://www.projectb"};
     private static final String DEFAULT_COMMENT = "Default comment";
     private static final String DEFAULT_CONCLUDED_LICENSE = "Apache-2.0";
     private static final String[] DEFAULT_CONTRIBUTORS = new String[] {"Contrib1", "Contrib2"};
@@ -67,11 +65,6 @@ public class TestSpdxFileCollector {
 	@Before
 	public void setUp() throws Exception {
 	    this.defaultFileInformation = new SpdxDefaultFileInformation();
-	    DoapProject[] projects = new DoapProject[ARTIFACT_OF_NAMES.length];
-	    for ( int i = 0; i < projects.length; i++ ) {
-	        projects[i] = new DoapProject( ARTIFACT_OF_NAMES[i], ARTIFACT_OF_HOME_PAGES[i] );
-	    }
-	    this.defaultFileInformation.setArtifactOf( projects );
 	    this.defaultFileInformation.setComment( DEFAULT_COMMENT );
 	    AnyLicenseInfo concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( DEFAULT_CONCLUDED_LICENSE );
 	    this.defaultFileInformation.setConcludedLicense( concludedLicense );
@@ -244,19 +237,6 @@ public class TestSpdxFileCollector {
         Arrays.sort(  SpdxFiles );
         for ( int i = 0; i < SpdxFiles.length; i++ ) {
             assertEquals( SpdxFileNames[i], SpdxFiles[i].getName() );
-            DoapProject[] artifactOfs = SpdxFiles[i].getArtifactOf();
-            assertEquals( ARTIFACT_OF_NAMES.length, artifactOfs.length );
-            if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[0] )) {
-                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[0].getHomePage() );
-                assertEquals( ARTIFACT_OF_NAMES[1], artifactOfs[1].getName());
-                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[1].getHomePage() );
-            } else if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[1] )) {
-                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[0].getHomePage() );
-                assertEquals( ARTIFACT_OF_NAMES[0], artifactOfs[1].getName());
-                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[1].getHomePage() );
-            } else {
-                fail( "ArtifactOf not found" );
-            }
             assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment() );
             assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString());
             assertEquals( DEFAULT_CONTRIBUTORS.length, SpdxFiles[i].getFileContributors().length );
@@ -276,9 +256,6 @@ public class TestSpdxFileCollector {
 	        HashMap<String, SpdxDefaultFileInformation> fileSpecificInfo = 
 	                        new HashMap<String, SpdxDefaultFileInformation>();
 	        SpdxDefaultFileInformation file2Info = new SpdxDefaultFileInformation();
-	        DoapProject file2DoapProject = new DoapProject( "file2project", "http://file2homepage.net");
-	        DoapProject[] file2ArtifactOf = new DoapProject[] { file2DoapProject };
-	        file2Info.setArtifactOf( file2ArtifactOf );
 	        String file2Comment = "File 2 comment";
             file2Info.setComment( file2Comment  );
             AnyLicenseInfo file2License = defaultFileInformation.getDeclaredLicense();
@@ -296,9 +273,6 @@ public class TestSpdxFileCollector {
             fileSpecificInfo.put( filePaths[1], file2Info );
             
             SpdxDefaultFileInformation file3Info = new SpdxDefaultFileInformation();
-            DoapProject file3DoapProject = new DoapProject( "prj3file", "http://file3homepage.net");
-            DoapProject[] file3ArtifactOf = new DoapProject[] { file3DoapProject };
-            file3Info.setArtifactOf( file3ArtifactOf );
             String file3Comment = "File 3 comment";
             file3Info.setComment( file3Comment  );
             AnyLicenseInfo file3License = defaultFileInformation.getDeclaredLicense();
@@ -330,10 +304,6 @@ public class TestSpdxFileCollector {
                 assertEquals( SpdxFileNames[i], SpdxFiles[i].getName() );
                 if ( SpdxFiles[i].getName().equals( SpdxFileNames[1] ))
                 {
-                    artifactOfs = SpdxFiles[1].getArtifactOf();
-                    assertEquals( file2ArtifactOf.length, artifactOfs.length );
-                    assertEquals( file2ArtifactOf[0].getName(), artifactOfs[0].getName() );
-                    assertEquals( file2ArtifactOf[0].getHomePage(), artifactOfs[0].getHomePage() );
                     assertEquals( file2Comment, SpdxFiles[1].getComment() );
                     assertEquals( file2License.toString(), SpdxFiles[1].getLicenseConcluded().toString());
                     assertEquals( file2Contributors.length, SpdxFiles[1].getFileContributors().length );
@@ -345,10 +315,6 @@ public class TestSpdxFileCollector {
                 }
                 else if ( SpdxFiles[i].getName().startsWith( subDirAPrefix )) 
 	            {
-                    artifactOfs = SpdxFiles[i].getArtifactOf();
-                    assertEquals( file3ArtifactOf.length, artifactOfs.length );
-                    assertEquals( file3ArtifactOf[0].getName(), artifactOfs[0].getName() );
-                    assertEquals( file3ArtifactOf[0].getHomePage(), artifactOfs[0].getHomePage() );
                     assertEquals( file3Comment, SpdxFiles[i].getComment() );
                     assertEquals( file3License.toString(), SpdxFiles[i].getLicenseConcluded().toString());
                     assertEquals( file3Contributors.length, SpdxFiles[i].getFileContributors().length );
@@ -359,19 +325,6 @@ public class TestSpdxFileCollector {
                     assertEquals( file3Notice, SpdxFiles[i].getNoticeText() );
 	            } else 
 	            {
-    	            artifactOfs = SpdxFiles[i].getArtifactOf();
-    	            assertEquals( ARTIFACT_OF_NAMES.length, artifactOfs.length );
-    	            if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[0] )) {
-    	                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[0].getHomePage() );
-    	                assertEquals( ARTIFACT_OF_NAMES[1], artifactOfs[1].getName());
-    	                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[1].getHomePage() );
-    	            } else if ( artifactOfs[0].getName().equals( ARTIFACT_OF_NAMES[1] )) {
-    	                assertEquals( ARTIFACT_OF_HOME_PAGES[1], artifactOfs[0].getHomePage() );
-    	                assertEquals( ARTIFACT_OF_NAMES[0], artifactOfs[1].getName());
-    	                assertEquals( ARTIFACT_OF_HOME_PAGES[0], artifactOfs[1].getHomePage() );
-    	            } else {
-    	                fail( "ArtifactOf not found" );
-    	            }
     	            assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment() );
     	            assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString());
     	            assertEquals( DEFAULT_CONTRIBUTORS.length, SpdxFiles[i].getFileContributors().length );
