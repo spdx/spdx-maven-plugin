@@ -4,10 +4,12 @@ See http://spdx.org for information on SPDX.
 createSPDX creates an SPDX document for artifacts defined in the POM file.  Will replace any exsiting SPDX documents.
 
 # Usage
-In the plugins section add a the plugin with a goal of createSPDX:
+In the build plugins section add the plugin with a goal of createSPDX:
+```xml
                 <plugin>
                     <groupId>org.spdx</groupId>
                     <artifactId>spdx-maven-plugin</artifactId>
+                    <version>0.2.3-SNAPSHOT</version>
                     <executions>
                         <execution>
                             <id>build-spdx</id>
@@ -17,9 +19,17 @@ In the plugins section add a the plugin with a goal of createSPDX:
                         </execution>
                     </executions>
                     <configuration>
-                    ...
+                      <excludedFilePatterns>
+                        <param>*.spdx</param>
+                      </excludedFilePatterns>
+                      <!-- See documentation below for additional configuration -->
                     </configuration>
                 </plugin>
+```
+
+Then invoke with *mvn spdx:createSPDX* and your spdx file will be generated in *target/site/{artifactId}-{version}.spdx*.
+
+# Additional Configuration
 
 All SPDX document and SPDX package properties are supported.  Some of the properties
 are taken from existing POM properties while others are specified in the configuration
@@ -38,7 +48,9 @@ The treatment of licenses for Maven is somewhat involved.  Where possible,
 SPDX standard licenses ID's should be used.  If no SPDX standard license
 is available, a nonStandardLicense must be declared as a parameter including 
 a unique license ID and the verbatim license text.
+
 # Example
 See the file SpdxTools-POM-FIle-Example.xml for an example project using the spdx-maven-plugin.
+
 # License
 This project is licensed under the Apache 2.0 License
