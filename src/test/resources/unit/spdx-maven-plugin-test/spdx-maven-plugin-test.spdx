@@ -1,102 +1,83 @@
 <rdf:RDF
-    xmlns="http://spdx.org/documents/spdx-toolsv2.0-rc1#"
+    xmlns:spdx="http://spdx.org/rdf/terms#"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:doap="http://usefulinc.com/ns/doap#"
-    xmlns:spdx="http://spdx.org/rdf/terms#"
-    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns="http://spdx.org/documents/spdx-toolsv2.0-rc1#" > 
   <rdf:Description rdf:nodeID="A0">
-    <spdx:annotationDate>2010-01-29T18:30:22Z</spdx:annotationDate>
-    <rdfs:comment>Annotation1</rdfs:comment>
-    <spdx:annotator>Person:Test Person</spdx:annotator>
-    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense">
-    <spdx:extractedText>Test license text</spdx:extractedText>
-    <rdfs:seeAlso>http://www.test.url/testLicense.html</rdfs:seeAlso>
-    <spdx:name>Test License</spdx:name>
-    <rdfs:comment>Test license comment</rdfs:comment>
-    <spdx:licenseId>LicenseRef-testLicense</spdx:licenseId>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
+    <spdx:packageVerificationCodeValue>cf23df2207d99a74fbe169e3eba035e633b65d94</spdx:packageVerificationCodeValue>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A1">
-    <spdx:checksumValue>c3276671012ba00662a2d23d944c6a3e99af6851</spdx:checksumValue>
-    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+    <spdx:annotationDate>2012-11-29T18:30:22Z</spdx:annotationDate>
+    <rdfs:comment>Annotation2</rdfs:comment>
+    <spdx:annotator>Organization:Test Organization</spdx:annotator>
+    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_other"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A2">
-    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
-    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
-    <rdfs:comment></rdfs:comment>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+    <spdx:packageVerificationCodeValue>362c6c616fab4e2f6663a53b84c1d65ce40b0207</spdx:packageVerificationCodeValue>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A3">
-    <spdx:licenseListVersion>2.1</spdx:licenseListVersion>
-    <spdx:created>2015-08-31T16:08:33Z</spdx:created>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#CreationInfo"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A4">
     <doap:homepage>http://home.page.one.html</doap:homepage>
     <doap:name>Artifact1 Name</doap:name>
     <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A5">
-    <spdx:checksumValue>901a2d1e2c26cb3583c99abae9e62870f310a0d6</spdx:checksumValue>
-    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3">
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:relationship rdf:nodeID="A5"/>
+    <spdx:checksum rdf:nodeID="A6"/>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:artifactOf rdf:nodeID="A3"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:fileName>./src/test/java/TestSpdxFileCollector.java</spdx:fileName>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <rdfs:comment>Default file comment</rdfs:comment>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A6">
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-5">
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:fileName>./src/main/java/SpdxTagValueConstants.properties</spdx:fileName>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:checksum rdf:nodeID="A7"/>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:artifactOf rdf:nodeID="A3"/>
+    <spdx:relationship rdf:nodeID="A8"/>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_other"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A9">
     <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
     <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
     <rdfs:comment></rdfs:comment>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
   </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-5">
-    <spdx:artifactOf rdf:nodeID="A4"/>
-    <spdx:checksum rdf:nodeID="A7"/>
-    <spdx:relationship rdf:nodeID="A8"/>
-    <spdx:fileContributor>First contributor</spdx:fileContributor>
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:licenseComments>Default file comment</spdx:licenseComments>
-    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
-    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
-    <spdx:noticeText>Default file notice</spdx:noticeText>
-    <rdfs:comment>Default file comment</rdfs:comment>
-    <spdx:fileName>./src/test/java/TestSpdxFileCollector.java</spdx:fileName>
-    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A7">
-    <spdx:checksumValue>271f8a00acfc50134178ea119d6965b1958ca1f1</spdx:checksumValue>
-    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
-  </rdf:Description>
   <rdf:Description rdf:nodeID="A10">
-    <spdx:packageVerificationCodeValue>cf23df2207d99a74fbe169e3eba035e633b65d94</spdx:packageVerificationCodeValue>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
+    <spdx:licenseListVersion>2.0</spdx:licenseListVersion>
+    <spdx:created>2016-09-26T11:36:56Z</spdx:created>
+    <rdfs:comment>Creator comment</rdfs:comment>
+    <spdx:creator>Tool: spdx-maven-plugin</spdx:creator>
+    <spdx:creator>Person: Creator2</spdx:creator>
+    <spdx:creator>Person: Creator1</spdx:creator>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#CreationInfo"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A11">
-    <spdx:packageVerificationCodeValue>362c6c616fab4e2f6663a53b84c1d65ce40b0207</spdx:packageVerificationCodeValue>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#PackageVerificationCode"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3">
-    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
-    <spdx:artifactOf rdf:nodeID="A4"/>
-    <spdx:fileName>./src/main/java/CommonCode.java</spdx:fileName>
-    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:relationship rdf:nodeID="A2"/>
-    <spdx:fileContributor>First contributor</spdx:fileContributor>
-    <spdx:checksum rdf:nodeID="A5"/>
-    <spdx:licenseComments>Default file comment</spdx:licenseComments>
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
-    <spdx:noticeText>Default file notice</spdx:noticeText>
-    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A12">
     <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
@@ -104,230 +85,22 @@
     <rdfs:comment></rdfs:comment>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="A13">
-    <spdx:licenseListVersion>2.0</spdx:licenseListVersion>
-    <spdx:created>2015-08-31T16:08:33Z</spdx:created>
-    <rdfs:comment>Creator comment</rdfs:comment>
-    <spdx:creator>Tool: spdx-maven-plugin</spdx:creator>
-    <spdx:creator>Person: Creator2</spdx:creator>
-    <spdx:creator>Person: Creator1</spdx:creator>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#CreationInfo"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense2">
-    <spdx:extractedText>Second est license text</spdx:extractedText>
-    <rdfs:seeAlso>http://www.test.url/testLicense2-alt.html</rdfs:seeAlso>
-    <rdfs:seeAlso>http://www.test.url/testLicense2.html</rdfs:seeAlso>
-    <spdx:name>Second Test License</spdx:name>
-    <rdfs:comment>Second Test license comment</rdfs:comment>
-    <spdx:licenseId>LicenseRef-testLicense2</spdx:licenseId>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1">
-    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-5"/>
-    <doap:homepage>http://spdx.org/tools</doap:homepage>
-    <spdx:licenseInfoFromFiles rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:versionInfo>1.0-SNAPSHOT</spdx:versionInfo>
-    <spdx:copyrightText>Copyright Text for Package</spdx:copyrightText>
-    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Package"/>
-    <spdx:name>Test SPDX Plugin</spdx:name>
-    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6"/>
-    <spdx:annotation rdf:nodeID="A14"/>
-    <spdx:originator>Organization: Originating org.</spdx:originator>
-    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4"/>
-    <spdx:licenseComments>License comments</spdx:licenseComments>
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/BSD-3-Clause"/>
-    <spdx:licenseDeclared rdf:resource="http://spdx.org/licenses/BSD-2-Clause"/>
-    <spdx:packageVerificationCode rdf:nodeID="A11"/>
-    <spdx:sourceInfo>Source info</spdx:sourceInfo>
-    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
-    <spdx:downloadLocation rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
-    <spdx:packageFileName rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/licenses/CC0-1.0">
-    <spdx:standardLicenseHeader>
-  &lt;p xmlns="http://www.w3.org/1999/xhtml" style="font-style: italic"&gt;There is no standard license header for the license&lt;/p&gt;
-  
-^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
-    <spdx:licenseText>Creative Commons CC0 1.0 Universal 
- CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER. 
- 
-Statement of Purpose 
-The laws of most jurisdictions throughout the world automatically confer exclusive Copyright and Related Rights (defined below) upon the creator and subsequent owner(s) (each and all, an "owner") of an original work of authorship and/or a database (each, a "Work"). 
-Certain owners wish to permanently relinquish those rights to a Work for the purpose of contributing to a commons of creative, cultural and scientific works ("Commons") that the public can reliably and without fear of later claims of infringement build upon, modify, incorporate in other works, reuse and redistribute as freely as possible in any form whatsoever and for any purposes, including without limitation commercial purposes. These owners may contribute to the Commons to promote the ideal of a free culture and the further production of creative, cultural and scientific works, or to gain reputation or greater distribution for their Work in part through the use and efforts of others. 
-For these and/or other purposes and motivations, and without any expectation of additional consideration or compensation, the person associating CC0 with a Work (the "Affirmer"), to the extent that he or she is an owner of Copyright and Related Rights in the Work, voluntarily elects to apply CC0 to the Work and publicly distribute the Work under its terms, with knowledge of his or her Copyright and Related Rights in the Work and the meaning and intended legal effect of CC0 on those rights. 
-1. Copyright and Related Rights. A Work made available under CC0 may be protected by copyright and related or neighboring rights ("Copyright and Related Rights"). Copyright and Related Rights include, but are not limited to, the following: 
- i. the right to reproduce, adapt, distribute, perform, display, communicate, and translate a Work; 
- ii. moral rights retained by the original author(s) and/or performer(s); 
- iii. publicity and privacy rights pertaining to a person's image or likeness depicted in a Work; 
- iv. rights protecting against unfair competition in regards to a Work, subject to the limitations in paragraph 4(a), below; 
- v. rights protecting the extraction, dissemination, use and reuse of data in a Work; 
- vi. database rights (such as those arising under Directive 96/9/EC of the European Parliament and of the Council of 11 March 1996 on the legal protection of databases, and under any national implementation thereof, including any amended or successor version of such directive); and 
- vii. other similar, equivalent or corresponding rights throughout the world based on applicable law or treaty, and any national implementations thereof. 
-2. Waiver. To the greatest extent permitted by, but not in contravention of, applicable law, Affirmer hereby overtly, fully, permanently, irrevocably and unconditionally waives, abandons, and surrenders all of Affirmer's Copyright and Related Rights and associated claims and causes of action, whether now known or unknown (including existing as well as future claims and causes of action), in the Work (i) in all territories worldwide, (ii) for the maximum duration provided by applicable law or treaty (including future time extensions), (iii) in any current or future medium and for any number of copies, and (iv) for any purpose whatsoever, including without limitation commercial, advertising or promotional purposes (the "Waiver"). Affirmer makes the Waiver for the benefit of each member of the public at large and to the detriment of Affirmer's heirs and successors, fully intending that such Waiver shall not be subject to revocation, rescission, cancellation, termination, or any other legal or equitable action to disrupt the quiet enjoyment of the Work by the public as contemplated by Affirmer's express Statement of Purpose. 
-3. Public License Fallback. Should any part of the Waiver for any reason be judged legally invalid or ineffective under applicable law, then the Waiver shall be preserved to the maximum extent permitted taking into account Affirmer's express Statement of Purpose. In addition, to the extent the Waiver is so judged Affirmer hereby grants to each affected person a royalty-free, non transferable, non sublicensable, non exclusive, irrevocable and unconditional license to exercise Affirmer's Copyright and Related Rights in the Work (i) in all territories worldwide, (ii) for the maximum duration provided by applicable law or treaty (including future time extensions), (iii) in any current or future medium and for any number of copies, and (iv) for any purpose whatsoever, including without limitation commercial, advertising or promotional purposes (the "License"). The License shall be deemed effective as of the date CC0 was applied by Affirmer to the Work. Should any part of the License for any reason be judged legally invalid or ineffective under applicable law, such partial invalidity or ineffectiveness shall not invalidate the remainder of the License, and in such case Affirmer hereby affirms that he or she will not (i) exercise any of his or her remaining Copyright and Related Rights in the Work or (ii) assert any associated claims and causes of action with respect to the Work, in either case contrary to Affirmer's express Statement of Purpose. 
-4. Limitations and Disclaimers. 
- a. No trademark or patent rights held by Affirmer are waived, abandoned, surrendered, licensed or otherwise affected by this document. 
- b. Affirmer offers the Work as-is and makes no representations or warranties of any kind concerning the Work, express, implied, statutory or otherwise, including without limitation warranties of title, merchantability, fitness for a particular purpose, non infringement, or the absence of latent or other defects, accuracy, or the present or absence of errors, whether or not discoverable, all to the greatest extent permissible under applicable law. 
- c. Affirmer disclaims responsibility for clearing rights of other persons that may apply to the Work or any use thereof, including without limitation any person's Copyright and Related Rights in the Work. Further, Affirmer disclaims responsibility for obtaining any necessary consents, permissions or other rights required for any use of the Work. 
- d. Affirmer understands and acknowledges that Creative Commons is not a party to this document and has no duty or obligation with respect to this CC0 or use of the Work.</spdx:licenseText>
-    <rdfs:seeAlso>http://creativecommons.org/publicdomain/zero/1.0/legalcode</rdfs:seeAlso>
-    <spdx:name>Creative Commons Zero v1.0 Universal</spdx:name>
-    <spdx:licenseId>CC0-1.0</spdx:licenseId>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-DOCUMENT">
-    <spdx:annotation rdf:nodeID="A0"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#SpdxDocument"/>
-    <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense"/>
-    <rdfs:comment>Document Comment</rdfs:comment>
-    <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense2"/>
-    <spdx:creationInfo rdf:nodeID="A13"/>
-    <spdx:annotation rdf:nodeID="A15"/>
-    <spdx:relationship rdf:nodeID="A16"/>
-    <spdx:dataLicense rdf:resource="http://spdx.org/licenses/CC0-1.0"/>
-    <spdx:name>Test SPDX Plugin</spdx:name>
-    <spdx:specVersion>SPDX-2.0</spdx:specVersion>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A15">
-    <spdx:annotationDate>2012-11-29T18:30:22Z</spdx:annotationDate>
-    <rdfs:comment>Annotation2</rdfs:comment>
-    <spdx:annotator>Organization:Test Organization</spdx:annotator>
-    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_other"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/licenses/BSD-2-Clause">
-    <spdx:standardLicenseHeader>
-  &lt;p xmlns="http://www.w3.org/1999/xhtml" style="font-style: italic"&gt;There is no standard license header for the license&lt;/p&gt;
-  
-^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
-    <spdx:isOsiApproved>true</spdx:isOsiApproved>
-    <spdx:licenseText>Copyright (c) &lt;year&gt; &lt;owner&gt; All rights reserved. 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</spdx:licenseText>
-    <rdfs:seeAlso>http://www.opensource.org/licenses/BSD-2-Clause</rdfs:seeAlso>
-    <spdx:name>BSD 2-clause "Simplified" License</spdx:name>
-    <spdx:licenseId>BSD-2-Clause</spdx:licenseId>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6">
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:artifactOf rdf:nodeID="A4"/>
-    <spdx:fileName>./src/main/java/SpdxTagValueConstants.properties</spdx:fileName>
-    <spdx:fileContributor>First contributor</spdx:fileContributor>
-    <rdfs:comment>Default file comment</rdfs:comment>
-    <spdx:relationship rdf:nodeID="A6"/>
-    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:noticeText>Default file notice</spdx:noticeText>
-    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_other"/>
-    <spdx:checksum rdf:nodeID="A17"/>
-    <spdx:licenseComments>Default file comment</spdx:licenseComments>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A8">
+  <rdf:Description rdf:nodeID="A5">
     <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
     <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
     <rdfs:comment></rdfs:comment>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A9">
-    <doap:homepage>http://home.page.two.html</doap:homepage>
-    <doap:name>Artifact2 Name</doap:name>
-    <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A18">
-    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
-    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
-    <rdfs:comment></rdfs:comment>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A14">
-    <spdx:annotationDate>2015-01-29T18:30:22Z</spdx:annotationDate>
-    <rdfs:comment>PackageAnnotation</rdfs:comment>
-    <spdx:annotator>Person:Test Package Person</spdx:annotator>
-    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A16">
-    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_describes"/>
-    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
-    <rdfs:comment></rdfs:comment>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A19">
-    <spdx:checksumValue>3dbbebf26f1e6b707b9ccd36ac6c447cc7de5253</spdx:checksumValue>
-    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4">
-    <spdx:noticeText>Default file notice</spdx:noticeText>
-    <spdx:licenseComments>Default file comment</spdx:licenseComments>
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:artifactOf rdf:nodeID="A4"/>
-    <spdx:checksum rdf:nodeID="A1"/>
-    <spdx:fileContributor>First contributor</spdx:fileContributor>
-    <spdx:relationship rdf:nodeID="A18"/>
-    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-    <rdfs:comment>Default file comment</rdfs:comment>
-    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
-    <spdx:fileName>./src/test/java/CreateSpdxMavenProjectStub.java</spdx:fileName>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="A17">
-    <spdx:checksumValue>9290a43e876164af4f977aa2c363c2525e91f97d</spdx:checksumValue>
-    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/licenses/BSD-3-Clause">
-    <spdx:standardLicenseHeader>
-  &lt;p xmlns="http://www.w3.org/1999/xhtml" style="font-style: italic"&gt;There is no standard license header for the license&lt;/p&gt;
-  
-^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
-    <spdx:isOsiApproved>true</spdx:isOsiApproved>
-    <spdx:licenseText>Copyright (c) &lt;year&gt; &lt;owner&gt; . All rights reserved. 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</spdx:licenseText>
-    <rdfs:seeAlso>http://www.opensource.org/licenses/BSD-3-Clause</rdfs:seeAlso>
-    <spdx:name>BSD 3-clause "New" or "Revised" License</spdx:name>
-    <spdx:licenseId>BSD-3-Clause</spdx:licenseId>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2">
-    <spdx:relationship rdf:nodeID="A12"/>
-    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
-    <spdx:noticeText>Default file notice</spdx:noticeText>
-    <spdx:checksum rdf:nodeID="A19"/>
-    <spdx:artifactOf rdf:nodeID="A4"/>
-    <spdx:licenseComments>Default file comment</spdx:licenseComments>
-    <spdx:fileName>./src/test/java/TestLicenseManager.java</spdx:fileName>
-    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
-    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-    <spdx:fileContributor>First contributor</spdx:fileContributor>
-    <rdfs:comment>Default file comment</rdfs:comment>
-    <spdx:artifactOf rdf:nodeID="A9"/>
-    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
-    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://spdx.org/licenses/Apache-2.0">
     <spdx:standardLicenseHeader>
-  
-  Copyright [yyyy] [name of copyright owner]
-&lt;p&gt;Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at&lt;/p&gt;
-&lt;p style="margin-left: 20px;"&gt;     http://www.apache.org/licenses/LICENSE-2.0&lt;/p&gt;
-&lt;p&gt;Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.&lt;/p&gt;
-</spdx:standardLicenseHeader>
+        
+        Copyright 
+&lt;span xmlns="http://www.w3.org/1999/xhtml" class="replacable-license-text" id="copyright"&gt;[yyyy] [name of copyright owner]&lt;/span&gt;
+
+&lt;p xmlns="http://www.w3.org/1999/xhtml"&gt;Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at&lt;/p&gt;
+&lt;p xmlns="http://www.w3.org/1999/xhtml" style="margin-left: 20px;"&gt;     http://www.apache.org/licenses/LICENSE-2.0&lt;/p&gt;
+&lt;p xmlns="http://www.w3.org/1999/xhtml"&gt;Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.&lt;/p&gt;
+      ^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
     <spdx:isOsiApproved>true</spdx:isOsiApproved>
     <spdx:licenseText>Apache License 
  Version 2.0, January 2004 
@@ -375,5 +148,235 @@ Unless required by applicable law or agreed to in writing, software
     <spdx:name>Apache License 2.0</spdx:name>
     <spdx:licenseId>Apache-2.0</spdx:licenseId>
     <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A8">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense">
+    <spdx:extractedText>Test license text</spdx:extractedText>
+    <rdfs:seeAlso>http://www.test.url/testLicense.html</rdfs:seeAlso>
+    <spdx:name>Test License</spdx:name>
+    <rdfs:comment>Test license comment</rdfs:comment>
+    <spdx:licenseId>LicenseRef-testLicense</spdx:licenseId>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/licenses/BSD-2-Clause">
+    <spdx:standardLicenseHeader>
+        &lt;p xmlns="http://www.w3.org/1999/xhtml" style="font-style: italic"&gt;There is no standard license header for the license&lt;/p&gt;
+        
+      ^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
+    <spdx:isOsiApproved>true</spdx:isOsiApproved>
+    <spdx:licenseText>Copyright (c) &lt;year&gt; &lt;owner&gt; All rights reserved. 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</spdx:licenseText>
+    <rdfs:seeAlso>http://www.opensource.org/licenses/BSD-2-Clause</rdfs:seeAlso>
+    <spdx:name>BSD 2-clause "Simplified" License</spdx:name>
+    <spdx:licenseId>BSD-2-Clause</spdx:licenseId>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A4">
+    <doap:homepage>http://home.page.two.html</doap:homepage>
+    <doap:name>Artifact2 Name</doap:name>
+    <rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-DOCUMENT">
+    <spdx:creationInfo rdf:nodeID="A10"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#SpdxDocument"/>
+    <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense"/>
+    <rdfs:comment>Document Comment</rdfs:comment>
+    <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense2"/>
+    <spdx:specVersion>SPDX-2.1</spdx:specVersion>
+    <spdx:annotation rdf:nodeID="A1"/>
+    <spdx:dataLicense rdf:resource="http://spdx.org/licenses/CC0-1.0"/>
+    <spdx:name>Test SPDX Plugin</spdx:name>
+    <spdx:relationship rdf:nodeID="A13"/>
+    <spdx:annotation rdf:nodeID="A14"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6">
+    <spdx:artifactOf rdf:nodeID="A3"/>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileName>./src/test/java/TestLicenseManager.java</spdx:fileName>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:checksum rdf:nodeID="A15"/>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:relationship rdf:nodeID="A11"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A16">
+    <spdx:annotationDate>2015-01-29T18:30:22Z</spdx:annotationDate>
+    <rdfs:comment>PackageAnnotation</rdfs:comment>
+    <spdx:annotator>Person:Test Package Person</spdx:annotator>
+    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A14">
+    <spdx:annotationDate>2010-01-29T18:30:22Z</spdx:annotationDate>
+    <rdfs:comment>Annotation1</rdfs:comment>
+    <spdx:annotator>Person:Test Person</spdx:annotator>
+    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Annotation"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A17">
+    <spdx:checksumValue>901a2d1e2c26cb3583c99abae9e62870f310a0d6</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2">
+    <spdx:fileName>./src/main/java/CommonCode.java</spdx:fileName>
+    <spdx:artifactOf rdf:nodeID="A3"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <spdx:checksum rdf:nodeID="A17"/>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:relationship rdf:nodeID="A9"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4">
+    <spdx:noticeText>Default file notice</spdx:noticeText>
+    <spdx:licenseComments>Default file comment</spdx:licenseComments>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileContributor>First contributor</spdx:fileContributor>
+    <spdx:checksum rdf:nodeID="A18"/>
+    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
+    <spdx:artifactOf rdf:nodeID="A4"/>
+    <spdx:relationship rdf:nodeID="A12"/>
+    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+    <rdfs:comment>Default file comment</rdfs:comment>
+    <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
+    <spdx:fileName>./src/test/java/CreateSpdxMavenProjectStub.java</spdx:fileName>
+    <spdx:artifactOf rdf:nodeID="A3"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#File"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/licenses/BSD-3-Clause">
+    <spdx:standardLicenseHeader>
+        &lt;p xmlns="http://www.w3.org/1999/xhtml" style="font-style: italic"&gt;There is no standard license header for the license&lt;/p&gt;
+        
+      ^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
+    <spdx:isOsiApproved>true</spdx:isOsiApproved>
+    <spdx:licenseText>Copyright (c) &lt;year&gt; &lt;owner&gt; . All rights reserved. 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</spdx:licenseText>
+    <rdfs:seeAlso>http://www.opensource.org/licenses/BSD-3-Clause</rdfs:seeAlso>
+    <spdx:name>BSD 3-clause "New" or "Revised" License</spdx:name>
+    <spdx:licenseId>BSD-3-Clause</spdx:licenseId>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A13">
+    <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_describes"/>
+    <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+    <rdfs:comment></rdfs:comment>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Relationship"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1">
+    <spdx:packageVerificationCode rdf:nodeID="A2"/>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-5"/>
+    <doap:homepage>http://spdx.org/tools</doap:homepage>
+    <spdx:licenseInfoFromFiles rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+    <spdx:versionInfo>1.0-SNAPSHOT</spdx:versionInfo>
+    <spdx:copyrightText>Copyright Text for Package</spdx:copyrightText>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Package"/>
+    <spdx:name>Test SPDX Plugin</spdx:name>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6"/>
+    <spdx:originator>Organization: Originating org.</spdx:originator>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4"/>
+    <spdx:licenseComments>License comments</spdx:licenseComments>
+    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/BSD-3-Clause"/>
+    <spdx:licenseDeclared rdf:resource="http://spdx.org/licenses/BSD-2-Clause"/>
+    <spdx:filesAnalyzed>true</spdx:filesAnalyzed>
+    <spdx:sourceInfo>Source info</spdx:sourceInfo>
+    <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
+    <spdx:annotation rdf:nodeID="A16"/>
+    <spdx:downloadLocation rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
+    <spdx:packageFileName rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A15">
+    <spdx:checksumValue>3dbbebf26f1e6b707b9ccd36ac6c447cc7de5253</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/licenses/CC0-1.0">
+    <spdx:standardLicenseHeader>
+        &lt;p xmlns="http://www.w3.org/1999/xhtml" style="font-style: italic"&gt;There is no standard license header for the license&lt;/p&gt;
+        
+      ^^http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral</spdx:standardLicenseHeader>
+    <spdx:licenseText>Creative Commons CC0 1.0 Universal 
+ CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER. 
+ 
+Statement of Purpose 
+The laws of most jurisdictions throughout the world automatically confer exclusive Copyright and Related Rights (defined below) upon the creator and subsequent owner(s) (each and all, an "owner") of an original work of authorship and/or a database (each, a "Work"). 
+Certain owners wish to permanently relinquish those rights to a Work for the purpose of contributing to a commons of creative, cultural and scientific works ("Commons") that the public can reliably and without fear of later claims of infringement build upon, modify, incorporate in other works, reuse and redistribute as freely as possible in any form whatsoever and for any purposes, including without limitation commercial purposes. These owners may contribute to the Commons to promote the ideal of a free culture and the further production of creative, cultural and scientific works, or to gain reputation or greater distribution for their Work in part through the use and efforts of others. 
+For these and/or other purposes and motivations, and without any expectation of additional consideration or compensation, the person associating CC0 with a Work (the "Affirmer"), to the extent that he or she is an owner of Copyright and Related Rights in the Work, voluntarily elects to apply CC0 to the Work and publicly distribute the Work under its terms, with knowledge of his or her Copyright and Related Rights in the Work and the meaning and intended legal effect of CC0 on those rights. 
+1. Copyright and Related Rights. A Work made available under CC0 may be protected by copyright and related or neighboring rights ("Copyright and Related Rights"). Copyright and Related Rights include, but are not limited to, the following: 
+ i. the right to reproduce, adapt, distribute, perform, display, communicate, and translate a Work; 
+ ii. moral rights retained by the original author(s) and/or performer(s); 
+ iii. publicity and privacy rights pertaining to a person's image or likeness depicted in a Work; 
+ iv. rights protecting against unfair competition in regards to a Work, subject to the limitations in paragraph 4(a), below; 
+ v. rights protecting the extraction, dissemination, use and reuse of data in a Work; 
+ vi. database rights (such as those arising under Directive 96/9/EC of the European Parliament and of the Council of 11 March 1996 on the legal protection of databases, and under any national implementation thereof, including any amended or successor version of such directive); and 
+ vii. other similar, equivalent or corresponding rights throughout the world based on applicable law or treaty, and any national implementations thereof. 
+2. Waiver. To the greatest extent permitted by, but not in contravention of, applicable law, Affirmer hereby overtly, fully, permanently, irrevocably and unconditionally waives, abandons, and surrenders all of Affirmer's Copyright and Related Rights and associated claims and causes of action, whether now known or unknown (including existing as well as future claims and causes of action), in the Work (i) in all territories worldwide, (ii) for the maximum duration provided by applicable law or treaty (including future time extensions), (iii) in any current or future medium and for any number of copies, and (iv) for any purpose whatsoever, including without limitation commercial, advertising or promotional purposes (the "Waiver"). Affirmer makes the Waiver for the benefit of each member of the public at large and to the detriment of Affirmer's heirs and successors, fully intending that such Waiver shall not be subject to revocation, rescission, cancellation, termination, or any other legal or equitable action to disrupt the quiet enjoyment of the Work by the public as contemplated by Affirmer's express Statement of Purpose. 
+3. Public License Fallback. Should any part of the Waiver for any reason be judged legally invalid or ineffective under applicable law, then the Waiver shall be preserved to the maximum extent permitted taking into account Affirmer's express Statement of Purpose. In addition, to the extent the Waiver is so judged Affirmer hereby grants to each affected person a royalty-free, non transferable, non sublicensable, non exclusive, irrevocable and unconditional license to exercise Affirmer's Copyright and Related Rights in the Work (i) in all territories worldwide, (ii) for the maximum duration provided by applicable law or treaty (including future time extensions), (iii) in any current or future medium and for any number of copies, and (iv) for any purpose whatsoever, including without limitation commercial, advertising or promotional purposes (the "License"). The License shall be deemed effective as of the date CC0 was applied by Affirmer to the Work. Should any part of the License for any reason be judged legally invalid or ineffective under applicable law, such partial invalidity or ineffectiveness shall not invalidate the remainder of the License, and in such case Affirmer hereby affirms that he or she will not (i) exercise any of his or her remaining Copyright and Related Rights in the Work or (ii) assert any associated claims and causes of action with respect to the Work, in either case contrary to Affirmer's express Statement of Purpose. 
+4. Limitations and Disclaimers. 
+ a. No trademark or patent rights held by Affirmer are waived, abandoned, surrendered, licensed or otherwise affected by this document. 
+ b. Affirmer offers the Work as-is and makes no representations or warranties of any kind concerning the Work, express, implied, statutory or otherwise, including without limitation warranties of title, merchantability, fitness for a particular purpose, non infringement, or the absence of latent or other defects, accuracy, or the present or absence of errors, whether or not discoverable, all to the greatest extent permissible under applicable law. 
+ c. Affirmer disclaims responsibility for clearing rights of other persons that may apply to the Work or any use thereof, including without limitation any person's Copyright and Related Rights in the Work. Further, Affirmer disclaims responsibility for obtaining any necessary consents, permissions or other rights required for any use of the Work. 
+ d. Affirmer understands and acknowledges that Creative Commons is not a party to this document and has no duty or obligation with respect to this CC0 or use of the Work.</spdx:licenseText>
+    <rdfs:seeAlso>http://creativecommons.org/publicdomain/zero/1.0/legalcode</rdfs:seeAlso>
+    <spdx:name>Creative Commons Zero v1.0 Universal</spdx:name>
+    <spdx:licenseId>CC0-1.0</spdx:licenseId>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#License"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense2">
+    <spdx:extractedText>Second est license text</spdx:extractedText>
+    <rdfs:seeAlso>http://www.test.url/testLicense2-alt.html</rdfs:seeAlso>
+    <rdfs:seeAlso>http://www.test.url/testLicense2.html</rdfs:seeAlso>
+    <spdx:name>Second Test License</spdx:name>
+    <rdfs:comment>Second Test license comment</rdfs:comment>
+    <spdx:licenseId>LicenseRef-testLicense2</spdx:licenseId>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#ExtractedLicensingInfo"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A6">
+    <spdx:checksumValue>271f8a00acfc50134178ea119d6965b1958ca1f1</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A19">
+    <spdx:licenseListVersion>2.5</spdx:licenseListVersion>
+    <spdx:created>2016-09-26T11:36:56Z</spdx:created>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#CreationInfo"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A7">
+    <spdx:checksumValue>9290a43e876164af4f977aa2c363c2525e91f97d</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="A18">
+    <spdx:checksumValue>c3276671012ba00662a2d23d944c6a3e99af6851</spdx:checksumValue>
+    <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+    <rdf:type rdf:resource="http://spdx.org/rdf/terms#Checksum"/>
   </rdf:Description>
 </rdf:RDF>

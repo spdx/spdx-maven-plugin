@@ -88,7 +88,7 @@ public class SpdxDependencyInformation
     {
         String scope = dependency.getScope();
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
-        if ( relType == RelationshipType.relationshipType_other ) {
+        if ( relType == RelationshipType.OTHER ) {
             log.warn( "Could not determine the SPDX relationship type for dependency artifact ID "+dependency.getArtifactId()+" scope " + scope );
         }
         SpdxElement dependencyPackage = createSpdxPackage( dependency );
@@ -105,15 +105,15 @@ public class SpdxDependencyInformation
     private RelationshipType scopeToRelationshipType( String scope, boolean optional )
     {
         if ( scope == null ) {
-            return RelationshipType.relationshipType_other;
+            return RelationshipType.OTHER;
         } else if ( optional ) {
-            return RelationshipType.relationshipType_optionalComponentOf;
+            return RelationshipType.OPTIONAL_COMPONENT_OF;
         } else if ( scope.equals( "compile" ) || scope.equals( "runtime" )) {
-            return RelationshipType.relationshipType_dynamicLink;
+            return RelationshipType.DYNAMIC_LINK;
         } else if (scope.equals( "test" )) {
-            return RelationshipType.relationshipType_testcaseOf;
+            return RelationshipType.TEST_CASE_OF;
         } else {
-            return RelationshipType.relationshipType_other;
+            return RelationshipType.OTHER;
         }
     }
 

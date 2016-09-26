@@ -297,7 +297,7 @@ public class SpdxDocumentBuilder
           spdxDoc.setName( projectInformation.getName() );  // Same as package name
           // Package level information
           projectPackage = createSpdxPackage( projectInformation );
-          Relationship documentContainsRelationship = new Relationship( projectPackage, RelationshipType.relationshipType_describes, "" );
+          Relationship documentContainsRelationship = new Relationship( projectPackage, RelationshipType.DESCRIBES, "" );
           spdxDoc.getDocumentContainer().addElement( projectPackage );
           spdxDoc.addRelationship( documentContainsRelationship );
       } catch ( InvalidSPDXAnalysisException e ) 
@@ -471,13 +471,13 @@ private void collectSpdxFileInformation( FileSet[] includedSourceDirectories,
       try {
           fileCollector.collectFiles( includedSourceDirectories, baseDir,
                                                  defaultFileInformation, pathSpecificInformation,
-                                                 projectPackage, RelationshipType.relationshipType_generates );
+                                                 projectPackage, RelationshipType.GENERATES );
           fileCollector.collectFiles( includedTestDirectories, baseDir,
                                       defaultFileInformation, pathSpecificInformation,
-                                      projectPackage, RelationshipType.relationshipType_testcaseOf );
+                                      projectPackage, RelationshipType.TEST_CASE_OF );
           fileCollector.collectFiles( includedResourceDirectories, baseDir,
                                       defaultFileInformation, pathSpecificInformation,
-                                      projectPackage, RelationshipType.relationshipType_containedBy );
+                                      projectPackage, RelationshipType.CONTAINED_BY );
       } catch ( SpdxCollectionException e ) {
           this.getLog().error( "SPDX error collecting file information", e );
           throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );
