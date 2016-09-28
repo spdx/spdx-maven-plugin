@@ -148,9 +148,9 @@
                         <param>First contributor</param>
                         <param>Second contributor</param>
                     </defaultFileContributors>
-                    <defaultLicenseInformationInFile>Apache-2.0</defaultLicenseInformationInFile>
+                    <defaultLicenseInformationInFile>Apache-1.1</defaultLicenseInformationInFile>
                     <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
-                    <defaultFileLicenseComment>Default file comment</defaultFileLicenseComment>
+                    <defaultFileLicenseComment>Default file license comment</defaultFileLicenseComment>
                     <defaultFileNotice>Default file notice</defaultFileNotice>
                     <licenseDeclared>BSD-2-Clause</licenseDeclared>
                     <licenseConcluded>BSD-3-Clause</licenseConcluded>
@@ -193,6 +193,42 @@
                             </comment>
                         </ExternalReference>
                     </externalReferences>
+                    <pathsWithSpecificSpdxInfo>
+                        <PathSpecificSpdxInfo>
+                            <directoryOrFile>src/main/java/CommonCode.java</directoryOrFile>
+                            <fileComment>Comment for CommonCode</fileComment>
+                            <fileContributors>
+                                <param>Contributor to CommonCode</param>
+                            </fileContributors>
+                            <fileCopyright>Common Code Copyright</fileCopyright>
+                            <fileLicenseComment>License Comment for Common Code</fileLicenseComment>
+                            <fileNotice>Notice for Commmon Code</fileNotice>
+                            <fileConcludedLicense>EPL-1.0</fileConcludedLicense>
+                            <licenseInformationInFile>ISC</licenseInformationInFile>
+                            <snippets>
+                                <SnippetInfo>
+                                    <name>SnippetName</name>
+                                    <comment>Snippet Comment</comment>
+                                    <concludedLicense>BSD-2-Clause</concludedLicense>
+                                    <lineRange>44:55</lineRange>
+                                    <byteRange>1231:3442</byteRange>
+                                    <licenseComment>Snippet License Comment</licenseComment>
+                                    <copyrightText>Snippet Copyright Text</copyrightText>
+                                    <licenseInfoInSnippet>BSD-2-Clause-FreeBSD</licenseInfoInSnippet>
+                                </SnippetInfo>
+                                <SnippetInfo>
+                                    <name>SnippetName2</name>
+                                    <comment>Snippet Comment2</comment>
+                                    <concludedLicense>MITNFA</concludedLicense>
+                                    <lineRange>444:554</lineRange>
+                                    <byteRange>31231:33442</byteRange>
+                                    <licenseComment>Snippet2 License Comment</licenseComment>
+                                    <copyrightText>Snippet2 Copyright Text</copyrightText>
+                                    <licenseInfoInSnippet>LicenseRef-testLicense</licenseInfoInSnippet>
+                                </SnippetInfo>
+                            </snippets>
+                        </PathSpecificSpdxInfo>
+                    </pathsWithSpecificSpdxInfo>
                 </configuration>
                 </plugin>
         </plugins>

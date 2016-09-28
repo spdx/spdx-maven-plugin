@@ -31,6 +31,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
@@ -387,6 +388,7 @@ public class CreateSpdxMojo
         {
             try
             {
+                // the following will add the license to the document container
                 builder.addNonStandardLicenses( nonStandardLicenses );
             }
             catch ( SpdxBuilderException e )
@@ -395,13 +397,14 @@ public class CreateSpdxMojo
                 throw( new MojoExecutionException( "Error adding non standard licenses: "+e.getMessage(), e ) );
             }
         }
+        SpdxDocumentContainer container = builder.getSpdxDoc().getDocumentContainer();
         FileSet[] includedSourceDirectories = getSourceDirectories();
         FileSet[] includedResourceDirectories = getResourceDirectories();
         FileSet[] includedTestDirectories = getTestDirectories();
 
-        SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager() );
-        SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters();
-        HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation );
+        SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager(), container );
+        SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters( container );
+        HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation, container );
         SpdxDependencyInformation dependencyInformation = null;
         try
         {
@@ -514,8 +517,16 @@ public class CreateSpdxMojo
         }
     }
 
+    /**
+     * Get the patch specific information
+     * @param projectDefault
+     * @param container Container for any extracted license infos
+     * @return
+     * @throws MojoExecutionException
+     */
     private HashMap<String, SpdxDefaultFileInformation> getPathSpecificInfoFromParameters(
-                                                  SpdxDefaultFileInformation projectDefault ) throws MojoExecutionException
+                                                  SpdxDefaultFileInformation projectDefault,
+                                                  SpdxDocumentContainer container) throws MojoExecutionException
     {
         HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<String, SpdxDefaultFileInformation>();
         if ( this.pathsWithSpecificSpdxInfo != null ) 
@@ -527,7 +538,7 @@ public class CreateSpdxMojo
                 SpdxDefaultFileInformation value = null;
                 try
                 {
-                    value = spdxInfo.getDefaultFileInformation( projectDefault );
+                    value = spdxInfo.getDefaultFileInformation( projectDefault, container );
                 }
                 catch ( InvalidLicenseStringException e )
                 {
@@ -613,17 +624,18 @@ public class CreateSpdxMojo
     }
 
     /**
+     * @param container Container for any extracted license infos
      * @return default file information from the plugin parameters
      * @throws MojoExecutionException 
      */
-    private SpdxDefaultFileInformation getDefaultFileInfoFromParameters() throws MojoExecutionException 
+    private SpdxDefaultFileInformation getDefaultFileInfoFromParameters( SpdxDocumentContainer container ) throws MojoExecutionException 
     {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         retval.setComment( defaultFileComment );
         AnyLicenseInfo concludedLicense = null;
         try 
         {
-            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultFileConcludedLicense.trim() );
+            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultFileConcludedLicense.trim(), container );
         } catch ( InvalidLicenseStringException e ) 
         {
             this.getLog().error( "Invalid default file concluded license: "+e.getMessage() );
@@ -635,7 +647,7 @@ public class CreateSpdxMojo
         AnyLicenseInfo declaredLicense = null;
         try 
         {
-            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultLicenseInformationInFile.trim() );
+            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultLicenseInformationInFile.trim(), container );
         } catch ( InvalidLicenseStringException e ) 
         {
             this.getLog().error( "Invalid default file declared license: "+e.getMessage() );
@@ -658,10 +670,12 @@ public class CreateSpdxMojo
      *     could be determined, a 'NOASSERTION' value is used [currently not implemented] 
      *   description, summary - The project description is used for the SPDX package description and SPDX package summary
      *   supplier - the project organization is used for the supplier.  "ORGANIZATION: " is prepended
+     * @param licenseManager maps the Maven licenses to SPDX licenses
+     * @param container Container for any extracted license infos
      * @return
      * @throws MojoExecutionException 
      */
-    private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager ) throws MojoExecutionException 
+    private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager, SpdxDocumentContainer container ) throws MojoExecutionException 
     {
         SpdxProjectInformation retval = new SpdxProjectInformation();
         if ( this.documentComment != null ) 
@@ -682,11 +696,12 @@ public class CreateSpdxMojo
                this.getLog().warn( "Unable to map maven licenses to a declared license.  Using NOASSERTION" );
                declaredLicense = new SpdxNoAssertionLicense();
             }
-        } else 
+        } 
+        else 
         {
             try 
             {
-                declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( this.licenseDeclared.trim() );
+                declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( this.licenseDeclared.trim(), container );
             } catch ( InvalidLicenseStringException e ) 
             {
                 this.getLog().error( "Invalid declared license: "+e.getMessage() );
@@ -701,7 +716,7 @@ public class CreateSpdxMojo
         {
             try 
             {
-                concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( this.licenseConcluded.trim() );
+                concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( this.licenseConcluded.trim(), container );
             } catch ( InvalidLicenseStringException e ) 
             {
                 this.getLog().error( "Invalid concluded license: "+e.getMessage() );

@@ -20,7 +20,10 @@ import org.spdx.rdfparser.model.ExternalRef.ReferenceCategory;
 import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
+import org.spdx.rdfparser.model.SpdxSnippet;
 import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 public class TestSpdxMojo
     extends AbstractMojoTestCase
@@ -201,10 +204,51 @@ public class TestSpdxMojo
 //        addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, resourceDir, filePaths );
         SpdxFile[] pkgFiles = pkg.getFiles();
         assertEquals( filePaths.size(), pkgFiles.length );
-        for (SpdxFile sFile:pkgFiles) {
+        String fileWithSnippet = null;
+        for ( SpdxFile sFile:pkgFiles ) {
+            if ( sFile.getName().equals( "./src/main/java/CommonCode.java" ) ) {
+                fileWithSnippet = sFile.getId();
+                assertEquals( "Comment for CommonCode", sFile.getComment() );
+                assertEquals( "Common Code Copyright", sFile.getCopyrightText() );
+                assertEquals( "License Comment for Common Code", sFile.getLicenseComments() );
+                assertEquals( "Notice for Commmon Code", sFile.getNoticeText() );
+                assertEquals( "EPL-1.0", sFile.getLicenseConcluded().toString() );
+                assertEquals( "Contributor to CommonCode", sFile.getFileContributors()[0] );
+                assertEquals( "ISC", sFile.getLicenseInfoFromFiles()[0].toString() );
+            } else {
+                assertEquals( "Default file comment", sFile.getComment() );
+                assertEquals( "Copyright (c) 2012, 2013, 2014 Source Auditor Inc.", sFile.getCopyrightText() );
+                assertEquals( "Default file license comment", sFile.getLicenseComments() );
+                assertEquals( "Default file notice", sFile.getNoticeText() );
+                assertEquals( "Apache-2.0", sFile.getLicenseConcluded().toString() );
+                assertEquals( 2, sFile.getFileContributors().length );
+                assertEquals( "Apache-1.1", sFile.getLicenseInfoFromFiles()[0].toString() );
+            }
             filePaths.remove( sFile.getName() );
         }
         assertEquals( 0, filePaths.size() );
+        List<SpdxSnippet> snippets = result.getDocumentContainer().findAllSnippets();
+        assertEquals( 2, snippets.size() );
+        Collections.sort( snippets );
+        assertEquals( "Snippet Comment", snippets.get( 0 ).getComment() );
+        assertEquals( "Snippet Copyright Text", snippets.get( 0 ).getCopyrightText() );
+        assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments() );
+        assertEquals( "SnippetName", snippets.get( 0 ).getName() );
+        assertEquals( "1231:3442", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
+        assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
+        assertEquals( "BSD-2-Clause-FreeBSD", snippets.get( 0 ).getLicenseInfoFromFiles()[0].toString() );
+        assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange() ) );
+        assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
+        
+        assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment() );
+        assertEquals( "Snippet2 Copyright Text", snippets.get( 1 ).getCopyrightText() );
+        assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments() );
+        assertEquals( "SnippetName2", snippets.get( 1 ).getName() );
+        assertEquals( "31231:33442", TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
+        assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );
+        assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles()[0].toString() );
+        assertEquals( "444:554", TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange() ) );
+        assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         // file parameters
         // defaultFileComment
         // defaultFileContributors

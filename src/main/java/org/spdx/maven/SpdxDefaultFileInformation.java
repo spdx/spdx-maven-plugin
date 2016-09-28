@@ -15,6 +15,9 @@
  */
 package org.spdx.maven;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.plugin.logging.Log;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
@@ -34,6 +37,7 @@ public class SpdxDefaultFileInformation
     private String[] contributors = new String[0];
     private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();;
     private String licenseComment = "";
+    private List<SnippetInfo> snippets = new ArrayList<SnippetInfo>();
 
     public AnyLicenseInfo getDeclaredLicense() 
     {
@@ -104,6 +108,24 @@ public class SpdxDefaultFileInformation
     {
         this.licenseComment = licenseComment;
     }
+    
+    
+
+    /**
+     * @return the snippets
+     */
+    public List<SnippetInfo> getSnippets()
+    {
+        return snippets;
+    }
+
+    /**
+     * @param snippets the snippets to set
+     */
+    public void setSnippets( List<SnippetInfo> snippets )
+    {
+        this.snippets = snippets;
+    }
 
     /**
      * Primarily for debugging purposes.  Dump all the field information to the log Info
@@ -123,6 +145,11 @@ public class SpdxDefaultFileInformation
             for ( int i = 0; i < contributors.length; i++ ) 
             {
                 log.debug( "Default File Contributors: "+contributors[i] );
+            }
+        }
+        if (this.snippets != null) {
+            for ( SnippetInfo snippet:snippets ) {
+                snippet.logInfo( log );
             }
         }
     }

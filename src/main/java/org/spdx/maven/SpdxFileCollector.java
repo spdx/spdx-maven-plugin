@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -40,6 +41,7 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.model.DoapProject;
@@ -48,6 +50,8 @@ import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
+import org.spdx.rdfparser.model.SpdxSnippet;
+import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 
 /**
@@ -95,6 +99,7 @@ public class SpdxFileCollector
      * Map of fileName, SPDXFile for all files in the SPDX document
      */
     Map<String, SpdxFile> spdxFiles = new HashMap<String, SpdxFile>();
+    List<SpdxSnippet> spdxSnippets = new ArrayList<SpdxSnippet>();
     
     FileSetManager fileSetManager = new FileSetManager();
     private Log log;
@@ -164,11 +169,14 @@ public class SpdxFileCollector
      * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @param relationshipType Type of relationship to the project package 
      * @param projectPackage Package to which the files belong
+     * @param container contains the extracted license infos that may be needed for license parsing
      * @throws SpdxCollectionException 
      */
     public void collectFiles( FileSet[] fileSets,
                               String baseDir, SpdxDefaultFileInformation defaultFileInformation,
-                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType ) throws SpdxCollectionException 
+                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
+                              SpdxPackage projectPackage, RelationshipType relationshipType,
+                              SpdxDocumentContainer container) throws SpdxCollectionException 
     {
        for ( int i = 0; i < fileSets.length; i++ ) 
        {
@@ -176,12 +184,14 @@ public class SpdxFileCollector
            for ( int j = 0; j < includedFiles.length; j++ )
            {
                String filePath = fileSets[i].getDirectory() + File.separator + includedFiles[j];
-               SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( filePath, pathSpecificInformation );
+               File file = new File( filePath );
+               String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 );
+               SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath, pathSpecificInformation );
                if ( fileInfo == null ) 
                {
                    fileInfo = defaultFileInformation;
                }
-               File file = new File( filePath );
+               
                String outputFileName;
                if ( fileSets[i].getOutputDirectory() != null ) 
                {
@@ -190,7 +200,7 @@ public class SpdxFileCollector
                {
                    outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                }
-               collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage );
+               collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container );
            }
        }
     }
@@ -207,7 +217,6 @@ public class SpdxFileCollector
         SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
         if ( retval != null ) 
         {
-            debug( "Found file path for path specific information.  File comment: "+retval.getComment() );
             return retval;
         }
         // see if any of the parent directories contain default information which should be used
@@ -249,7 +258,9 @@ public class SpdxFileCollector
      * @param projectPackage Package to which the files belong
      * @throws SpdxCollectionException
      */
-    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage ) throws SpdxCollectionException
+    private void collectFile( File file, String outputFileName, 
+                              SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, 
+                              SpdxPackage projectPackage, SpdxDocumentContainer container ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() )) 
         {
@@ -266,12 +277,49 @@ public class SpdxFileCollector
             log.error( "Spdx exception creating file relationship: "+e.getMessage(), e );
             throw new SpdxCollectionException("Error creating SPDX file relationship: "+e.getMessage());
         }
+        if ( fileInfo.getSnippets() != null ) {
+            for ( SnippetInfo snippet:fileInfo.getSnippets() ) {
+                SpdxSnippet spdxSnippet;
+                try
+                {
+                    spdxSnippet = convertToSpdxSnippet( snippet, spdxFile, container  );
+                }
+                catch ( InvalidLicenseStringException e )
+                {
+                    logger.error( "Invalid license string creating snippet", e );
+                    throw new SpdxCollectionException( "Error processing SPDX snippet information.  Invalid license string specified in snippet.",e );
+                }
+                catch ( SpdxBuilderException e )
+                {
+                    logger.error( "Error creating SPDX snippet", e );
+                    throw new SpdxCollectionException( "Error creating SPDX snippet information.",e );
+                }
+                spdxSnippets.add( spdxSnippet );
+            }
+        }
         spdxFiles.put( file.getPath(), spdxFile );
         AnyLicenseInfo[] licenseInfoFromFiles = spdxFile.getLicenseInfoFromFiles();
         for ( int j = 0; j < licenseInfoFromFiles.length; j++ ) 
         {
             licensesFromFiles.add( licenseInfoFromFiles[j] );
         }
+    }
+
+    private SpdxSnippet convertToSpdxSnippet( SnippetInfo snippet, SpdxFile spdxFile, SpdxDocumentContainer container ) throws InvalidLicenseStringException, SpdxBuilderException
+    {
+        //TODO: Add annotations to snippet
+        SpdxSnippet retval = new SpdxSnippet(snippet.getName(), 
+                                             snippet.getComment(), 
+                                             new org.spdx.rdfparser.model.Annotation[0], 
+                                             new Relationship[0], 
+                                             snippet.getLicenseConcluded( container ), 
+                                             snippet.getLicenseInfoInSnippet( container ),
+                                             snippet.getCopyrightText(),
+                                             snippet.getLicensComment(), 
+                                             spdxFile, 
+                                             snippet.getByteRange(),
+                                             snippet.getLineRange());
+        return retval;
     }
 
     /**
@@ -371,6 +419,14 @@ public class SpdxFileCollector
     public SpdxFile[] getFiles() 
     {
         return spdxFiles.values().toArray( new SpdxFile[spdxFiles.size()] );
+    }
+    
+    /**
+     * @return SPDX Snippets collected through the collectFilesInDirectory method
+     */
+    public List<SpdxSnippet> getSnippets() 
+    {
+        return this.spdxSnippets;
     }
 
     /**

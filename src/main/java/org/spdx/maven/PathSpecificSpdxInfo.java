@@ -16,8 +16,10 @@
 package org.spdx.maven;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
@@ -105,6 +107,9 @@ public class PathSpecificSpdxInfo
      */
     @Parameter
     private String licenseInformationInFile;
+    
+    @Parameter( required = false )
+    private List<SnippetInfo> snippets;
 
     /**
      * Default constructor
@@ -117,10 +122,12 @@ public class PathSpecificSpdxInfo
     /**
      * Get the default file information to be used with this file path
      * @param defaults Default file information to use if the parameter was not specified for this file path
+     * @param container Container containing any extracted license infos that may be needed for concluded or declared licenses
      * @return default file information to be used with this file path
      * @throws InvalidLicenseStringException
      */
-    public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults ) throws InvalidLicenseStringException {
+    public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults,
+                                                                 SpdxDocumentContainer container) throws InvalidLicenseStringException {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         if ( this.fileComment != null ) {
             retval.setComment( fileComment );
@@ -131,7 +138,7 @@ public class PathSpecificSpdxInfo
         if ( this.fileConcludedLicense != null ) 
         {
             AnyLicenseInfo concludedLicense = null;
-            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim() );
+            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim(), container );
             retval.setConcludedLicense( concludedLicense );
         } else 
         {
@@ -168,11 +175,14 @@ public class PathSpecificSpdxInfo
         if ( this.licenseInformationInFile != null ) 
         {
             AnyLicenseInfo declaredLicense = null;
-            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim() );
+            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim(), container );
             retval.setDeclaredLicense( declaredLicense );
         } else 
         {
             retval.setDeclaredLicense( defaults.getDeclaredLicense() );
+        }
+        if ( this.snippets != null ) {
+            retval.setSnippets( snippets );
         }
         return retval;
     }

@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.junit.After;
@@ -19,16 +21,23 @@ import org.junit.Test;
 import org.spdx.maven.SpdxDefaultFileInformation;
 import org.spdx.maven.SpdxFileCollector;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
+import org.spdx.rdfparser.model.SpdxSnippet;
+import org.spdx.rdfparser.model.pointer.ByteOffsetPointer;
+import org.spdx.rdfparser.model.pointer.LineCharPointer;
+import org.spdx.rdfparser.model.pointer.SinglePointer;
+import org.spdx.rdfparser.model.pointer.StartEndPointer;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 import com.google.common.io.Files;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 
 public class TestSpdxFileCollector {
@@ -44,6 +53,7 @@ public class TestSpdxFileCollector {
 	}
 	
 	static final String[] FILE_NAMES = new String[] {"file1.bin", "file2.c", "file3.php", "file4.zip"};
+	static final String SNIPPET_NAMES = "Snippet Name";
 	static final String[] SUB_DIRS = new String[] {"dirA", "folderB"};
 	static final String[][] SUBDIR_FILES = new String[][] { new String[] {"subfile1.c", "subfile2.bin"},
 	    new String[] {"sub2files.php"} };
@@ -54,6 +64,13 @@ public class TestSpdxFileCollector {
     private static final String DEFAULT_DECLARED_LICENSE = "APSL-1.1";
     private static final String DEFAULT_LICENSE_COMMENT = "Default license comment";
     private static final String DEFAULT_NOTICE = "Default notice";
+    private static final String DEFAULT_SNIPPET_BYTE_RANGE = "12:5234";
+    private static final String DEFAULT_SNIPPET_LINE_RANGE = "88:99";
+    private static final String DEFAULT_SNIPPET_COMMENT = "Snippet comment";
+    private static final String DEFAULT_SNIPPET_CONCLUDED_LICENSE = "CC-BY-3.0";
+    private static final String DEFAULT_SNIPPET_DECLARED_LICENSE = "LGPL-2.0";
+    private static final String DEFAULT_SNIPPET_LICENSE_COMMENT = "Snippet License Comment";
+    private static final String DEFAULT_SNIPPET_COPYRIGHT = "Snippet Copyright";
 	
     private SpdxDefaultFileInformation defaultFileInformation;
     private File directory;
@@ -61,19 +78,33 @@ public class TestSpdxFileCollector {
     private String[] SpdxFileNames;
     private FileSet[] fileSets;
     private SpdxPackage spdxPackage;
+    private SpdxDocumentContainer container;
 
 	@Before
 	public void setUp() throws Exception {
+	    this.container = new SpdxDocumentContainer("http://unique/spdx/string");
 	    this.defaultFileInformation = new SpdxDefaultFileInformation();
 	    this.defaultFileInformation.setComment( DEFAULT_COMMENT );
-	    AnyLicenseInfo concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( DEFAULT_CONCLUDED_LICENSE );
+	    AnyLicenseInfo concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( DEFAULT_CONCLUDED_LICENSE, container );
 	    this.defaultFileInformation.setConcludedLicense( concludedLicense );
 	    this.defaultFileInformation.setContributors( DEFAULT_CONTRIBUTORS );
 	    this.defaultFileInformation.setCopyright( DEFAULT_COPYRIGHT );
-	    AnyLicenseInfo declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( DEFAULT_DECLARED_LICENSE );
+	    AnyLicenseInfo declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( DEFAULT_DECLARED_LICENSE, container );
 	    this.defaultFileInformation.setDeclaredLicense( declaredLicense );
 	    this.defaultFileInformation.setLicenseComment( DEFAULT_LICENSE_COMMENT );
-	    this.defaultFileInformation.setNotice( DEFAULT_NOTICE );	
+	    this.defaultFileInformation.setNotice( DEFAULT_NOTICE );
+	    SnippetInfo si = new SnippetInfo();
+	    si.setByteRange( DEFAULT_SNIPPET_BYTE_RANGE );
+	    si.setComment( DEFAULT_SNIPPET_COMMENT );
+	    si.setConcludedLicense( DEFAULT_SNIPPET_CONCLUDED_LICENSE );
+	    si.setLicenseInfoInSnippet( DEFAULT_SNIPPET_DECLARED_LICENSE );
+	    si.setLicenseComment( DEFAULT_SNIPPET_LICENSE_COMMENT );
+	    si.setCopyrightText( DEFAULT_SNIPPET_COPYRIGHT );
+	    si.setLineRange( DEFAULT_SNIPPET_LINE_RANGE );
+	    si.setName( SNIPPET_NAMES );
+	    ArrayList<SnippetInfo> snippets = new ArrayList<SnippetInfo>();
+	    snippets.add( si );
+	    this.defaultFileInformation.setSnippets( snippets );
 	    
 	    this.directory = Files.createTempDir();
 	    int numFiles = FILE_NAMES.length;
@@ -139,15 +170,17 @@ public class TestSpdxFileCollector {
             }
         } else if ( dir.isDirectory() ) {
             File[] children = dir.listFiles();
-            for ( int i = 0; i < children.length; i++ ) {
-                if ( children[i].isFile() ) {
-                    if (!children[i].delete()) {
-                        System.console().writer().println("Unable to delete "+children[i].getPath() );
+            if ( children != null ) {
+                for ( int i = 0; i < children.length; i++ ) {
+                    if ( children[i].isFile() ) {
+                        if (!children[i].delete()) {
+                            System.console().writer().println("Unable to delete "+children[i].getPath() );
+                        }
+                    } else if ( children[i].isDirectory() ) {
+                        deleteDirectory( children[i] );
                     }
-                } else if ( children[i].isDirectory() ) {
-                    deleteDirectory( children[i] );
                 }
-            }
+            }           
         }
     }
 
@@ -164,9 +197,9 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>(),
-                                           spdxPackage, RelationshipType.GENERATES );
+                                           spdxPackage, RelationshipType.GENERATES, container );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort(  SpdxFiles );
@@ -190,9 +223,9 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( new FileSet[] {skipBin},  "", this.defaultFileInformation,
+        collector.collectFiles( new FileSet[] {skipBin},  this.directory.getAbsolutePath(), this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>(),
-                                           spdxPackage, RelationshipType.GENERATES );
+                                           spdxPackage, RelationshipType.GENERATES, container );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length - 2, SpdxFiles.length );
         Arrays.sort(  SpdxFiles );
@@ -229,16 +262,16 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>(),
-                                           spdxPackage, RelationshipType.GENERATES );
+                                           spdxPackage, RelationshipType.GENERATES, container );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort(  SpdxFiles );
         for ( int i = 0; i < SpdxFiles.length; i++ ) {
             assertEquals( SpdxFileNames[i], SpdxFiles[i].getName() );
             assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment() );
-            assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString());
+            assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString() );
             assertEquals( DEFAULT_CONTRIBUTORS.length, SpdxFiles[i].getFileContributors().length );
             TestLicenseManager.assertArraysEqual( DEFAULT_CONTRIBUTORS, SpdxFiles[i].getFileContributors() );
             assertEquals( DEFAULT_COPYRIGHT, SpdxFiles[i].getCopyrightText() );
@@ -249,6 +282,48 @@ public class TestSpdxFileCollector {
 	}
 	
 	   @Test
+	    public void testGetSnippets() throws SpdxCollectionException, InvalidSPDXAnalysisException {
+	        SpdxFileCollector collector = new SpdxFileCollector();
+	        List<SpdxSnippet> snippets = collector.getSnippets();
+	        assertEquals( 0, snippets.size() );
+	        
+	        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
+	                                           new HashMap<String, SpdxDefaultFileInformation>(),
+	                                           spdxPackage, RelationshipType.GENERATES, container );
+	        snippets = collector.getSnippets();
+	        assertEquals( filePaths.length, snippets.size() );
+	        Collections.sort( snippets );
+	        for ( int i = 0; i < snippets.size(); i++ ) {
+	            assertEquals( SNIPPET_NAMES, snippets.get( i ).getName() );
+	            assertEquals( DEFAULT_SNIPPET_COMMENT, snippets.get( i ).getComment() );
+	            assertEquals( DEFAULT_SNIPPET_CONCLUDED_LICENSE, snippets.get( i ).getLicenseConcluded().toString() );
+	            assertEquals( DEFAULT_SNIPPET_COPYRIGHT, snippets.get( i ).getCopyrightText() );
+	            assertEquals( DEFAULT_SNIPPET_DECLARED_LICENSE, snippets.get( i ).getLicenseInfoFromFiles()[0].toString() );
+	            assertEquals( DEFAULT_SNIPPET_LICENSE_COMMENT, snippets.get( i ).getLicenseComments() );
+	            assertEquals( DEFAULT_SNIPPET_BYTE_RANGE, startEndPointerToString( snippets.get( i ).getByteRange() ) );
+	            assertEquals( DEFAULT_SNIPPET_LINE_RANGE, startEndPointerToString( snippets.get( i ).getLineRange() ) );
+	        }
+	    }
+	   
+	
+	public static String startEndPointerToString( StartEndPointer range ) throws InvalidSPDXAnalysisException
+    {
+        return singlePointerToString( range.getStartPointer() ) + ":" + 
+                        singlePointerToString( range.getEndPointer() );
+    }
+
+    private static String singlePointerToString( SinglePointer pointer )
+    {
+        if ( pointer instanceof ByteOffsetPointer ) {
+            return String.valueOf( ( (ByteOffsetPointer)pointer).getOffset() );
+        } else if ( pointer instanceof LineCharPointer ) {
+            return String.valueOf( ( (LineCharPointer)pointer).getLineNumber() );
+        } else {
+            return "Unknown type - can't convert pointer";
+        }
+    }
+
+    @Test
 	    public void testCollectFilesWithPattern() throws SpdxCollectionException {
 	        SpdxFileCollector collector = new SpdxFileCollector();
 	        SpdxFile[] SpdxFiles = collector.getFiles();
@@ -270,7 +345,7 @@ public class TestSpdxFileCollector {
             file2Info.setLicenseComment( file2LicenseComment  );
             String file2Notice = "file 2 notice";
             file2Info.setNotice( file2Notice  );
-            fileSpecificInfo.put( filePaths[1], file2Info );
+            fileSpecificInfo.put( filePaths[1].substring( this.directory.getAbsolutePath().length() + 1 ), file2Info );
             
             SpdxDefaultFileInformation file3Info = new SpdxDefaultFileInformation();
             String file3Comment = "File 3 comment";
@@ -287,17 +362,15 @@ public class TestSpdxFileCollector {
             file3Info.setLicenseComment( file3LicenseComment  );
             String file3Notice = "file 3 notice";
             file3Info.setNotice( file3Notice  );
-            String subdir1Path = this.directory.getPath() + File.separator + SUB_DIRS[0];
-            fileSpecificInfo.put( subdir1Path, file3Info );
+           fileSpecificInfo.put( SUB_DIRS[0], file3Info );
             
             //TODO: Test directory patterns
-	        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
+	        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
 	                                           fileSpecificInfo,
-	                                           spdxPackage, RelationshipType.GENERATES );
+	                                           spdxPackage, RelationshipType.GENERATES, container );
 	        SpdxFiles = collector.getFiles();
 	        assertEquals( filePaths.length, SpdxFiles.length );
 	        Arrays.sort(  SpdxFiles );
-	        DoapProject[] artifactOfs;
             String subDirAPrefix = "./" + directory.getName() + "/" + SUB_DIRS[0];
             
 	        for ( int i = 0; i < SpdxFiles.length; i++ ) {
@@ -343,9 +416,9 @@ public class TestSpdxFileCollector {
         AnyLicenseInfo[] result = collector.getLicenseInfoFromFiles();
         assertEquals( 0, result.length );
         
-        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>(),
-                                           spdxPackage, RelationshipType.GENERATES );
+                                           spdxPackage, RelationshipType.GENERATES, container );
         result = collector.getLicenseInfoFromFiles();
         assertEquals( 1, result.length );
         assertEquals( DEFAULT_DECLARED_LICENSE, result[0].toString() );
@@ -364,9 +437,9 @@ public class TestSpdxFileCollector {
             FileSet fileSet2 = new FileSet();
             fileSet2.setDirectory( tempDir2.getPath() );
             
-            collector.collectFiles( new FileSet[] { fileSet2 }, "", info2,
+            collector.collectFiles( new FileSet[] { fileSet2 }, this.directory.getAbsolutePath(), info2,
                                                new HashMap<String, SpdxDefaultFileInformation>(),
-                                               spdxPackage, RelationshipType.GENERATES );
+                                               spdxPackage, RelationshipType.GENERATES, container );
             result = collector.getLicenseInfoFromFiles();
             assertEquals( 2, result.length );
             if ( result[0].toString().equals( DEFAULT_DECLARED_LICENSE )) {
@@ -386,9 +459,9 @@ public class TestSpdxFileCollector {
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
-        collector.collectFiles( this.fileSets, "", this.defaultFileInformation,
+        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
                                            new HashMap<String, SpdxDefaultFileInformation>(),
-                                           spdxPackage, RelationshipType.GENERATES );
+                                           spdxPackage, RelationshipType.GENERATES, container );
         File SpdxFile = new File( filePaths[0] );
         SpdxPackageVerificationCode result = collector.getVerificationCode( SpdxFile.getPath() );
         assertTrue( !result.getValue().isEmpty() );

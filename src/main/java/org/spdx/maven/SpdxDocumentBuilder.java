@@ -52,6 +52,7 @@ import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
+import org.spdx.rdfparser.model.SpdxSnippet;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
@@ -157,6 +158,7 @@ public class SpdxDocumentBuilder
             {
                 try
                 {
+                    // the following will add the non standard license to the document container
                     licenseManager.addExtractedLicense( nonStandardLicenses[i] );
                 }
                 catch ( LicenseManagerException e )
@@ -498,18 +500,26 @@ private void collectSpdxFileInformation( FileSet[] includedSourceDirectories,
       try {
           fileCollector.collectFiles( includedSourceDirectories, baseDir,
                                                  defaultFileInformation, pathSpecificInformation,
-                                                 projectPackage, RelationshipType.GENERATES );
+                                                 projectPackage, RelationshipType.GENERATES, container );
           fileCollector.collectFiles( includedTestDirectories, baseDir,
                                       defaultFileInformation, pathSpecificInformation,
-                                      projectPackage, RelationshipType.TEST_CASE_OF );
+                                      projectPackage, RelationshipType.TEST_CASE_OF, container );
           fileCollector.collectFiles( includedResourceDirectories, baseDir,
                                       defaultFileInformation, pathSpecificInformation,
-                                      projectPackage, RelationshipType.CONTAINED_BY );
+                                      projectPackage, RelationshipType.CONTAINED_BY, container );
       } catch ( SpdxCollectionException e ) {
           this.getLog().error( "SPDX error collecting file information", e );
           throw( new SpdxBuilderException( "Error collecting SPDX file information: "+e.getMessage() ) );
       }
       projectPackage.setFiles( fileCollector.getFiles() );
+      List<SpdxSnippet> snippets = fileCollector.getSnippets();
+      if ( snippets != null ) 
+      {
+          for ( SpdxSnippet snippet:snippets ) 
+          {
+              spdxDoc.getDocumentContainer().addElement( snippet ); 
+          }         
+      }
       projectPackage.setLicenseInfosFromFiles( fileCollector.getLicenseInfoFromFiles() );
       try 
       {
