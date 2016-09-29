@@ -495,7 +495,7 @@ private void collectSpdxFileInformation( FileSet[] includedSourceDirectories,
           String spdxFileName, 
           Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException 
   {      
-      SpdxFileCollector fileCollector = new SpdxFileCollector();
+      SpdxFileCollector fileCollector = new SpdxFileCollector( getLog() );
       fileCollector.setLog( getLog() );
       try {
           fileCollector.collectFiles( includedSourceDirectories, baseDir,

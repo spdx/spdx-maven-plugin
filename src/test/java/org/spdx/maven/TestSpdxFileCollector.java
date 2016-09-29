@@ -186,14 +186,14 @@ public class TestSpdxFileCollector {
 
     @Test
 	public void testSpdxFileCollector() throws InvalidSPDXAnalysisException {
-        SpdxFileCollector collector = new SpdxFileCollector();
+        SpdxFileCollector collector = new SpdxFileCollector( null );
         SpdxFile[] files = collector.getFiles();
         assertEquals( 0, files.length );
 	}
 
 	@Test
 	public void testCollectFilesInDirectory() throws InvalidSPDXAnalysisException, SpdxCollectionException {
-        SpdxFileCollector collector = new SpdxFileCollector();
+        SpdxFileCollector collector = new SpdxFileCollector( null );
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
@@ -219,7 +219,7 @@ public class TestSpdxFileCollector {
 	    skipBin.setDirectory( this.fileSets[0].getDirectory() );
 	    skipBin.addExclude( "**/*.bin" );
 	    skipBin.setOutputDirectory( this.fileSets[0].getOutputDirectory() );
-	    SpdxFileCollector collector = new SpdxFileCollector();
+	    SpdxFileCollector collector = new SpdxFileCollector( null );
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
@@ -240,7 +240,7 @@ public class TestSpdxFileCollector {
 
 	@Test
 	public void testGetExtension() throws InvalidSPDXAnalysisException {
-		SpdxFileCollector collector = new SpdxFileCollector();
+		SpdxFileCollector collector = new SpdxFileCollector( null );
 		File noExtension = new File( "noextension" );
 		String result = collector.getExtension( noExtension );
 		assertTrue( result.isEmpty() );
@@ -258,7 +258,7 @@ public class TestSpdxFileCollector {
 
 	@Test
 	public void testGetFiles() throws SpdxCollectionException {
-        SpdxFileCollector collector = new SpdxFileCollector();
+        SpdxFileCollector collector = new SpdxFileCollector( null );
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
@@ -283,7 +283,7 @@ public class TestSpdxFileCollector {
 	
 	   @Test
 	    public void testGetSnippets() throws SpdxCollectionException, InvalidSPDXAnalysisException {
-	        SpdxFileCollector collector = new SpdxFileCollector();
+	        SpdxFileCollector collector = new SpdxFileCollector( null );
 	        List<SpdxSnippet> snippets = collector.getSnippets();
 	        assertEquals( 0, snippets.size() );
 	        
@@ -325,7 +325,7 @@ public class TestSpdxFileCollector {
 
     @Test
 	    public void testCollectFilesWithPattern() throws SpdxCollectionException {
-	        SpdxFileCollector collector = new SpdxFileCollector();
+	        SpdxFileCollector collector = new SpdxFileCollector( null );
 	        SpdxFile[] SpdxFiles = collector.getFiles();
 	        assertEquals( 0, SpdxFiles.length );
 	        HashMap<String, SpdxDefaultFileInformation> fileSpecificInfo = 
@@ -345,7 +345,7 @@ public class TestSpdxFileCollector {
             file2Info.setLicenseComment( file2LicenseComment  );
             String file2Notice = "file 2 notice";
             file2Info.setNotice( file2Notice  );
-            fileSpecificInfo.put( filePaths[1].substring( this.directory.getAbsolutePath().length() + 1 ), file2Info );
+            fileSpecificInfo.put( filePaths[1].substring( this.directory.getAbsolutePath().length() + 1 ).replace( '\\', '/' ), file2Info );
             
             SpdxDefaultFileInformation file3Info = new SpdxDefaultFileInformation();
             String file3Comment = "File 3 comment";
@@ -362,7 +362,7 @@ public class TestSpdxFileCollector {
             file3Info.setLicenseComment( file3LicenseComment  );
             String file3Notice = "file 3 notice";
             file3Info.setNotice( file3Notice  );
-           fileSpecificInfo.put( SUB_DIRS[0], file3Info );
+            fileSpecificInfo.put( SUB_DIRS[0], file3Info );
             
             //TODO: Test directory patterns
 	        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
@@ -412,7 +412,7 @@ public class TestSpdxFileCollector {
 
 	@Test
 	public void testGetLicenseInfoFromFiles() throws SpdxCollectionException, IOException, InvalidLicenseStringException {
-        SpdxFileCollector collector = new SpdxFileCollector();
+        SpdxFileCollector collector = new SpdxFileCollector( null );
         AnyLicenseInfo[] result = collector.getLicenseInfoFromFiles();
         assertEquals( 0, result.length );
         
@@ -455,7 +455,7 @@ public class TestSpdxFileCollector {
 
 	@Test
 	public void testGetVerificationCode() throws SpdxCollectionException, NoSuchAlgorithmException {
-        SpdxFileCollector collector = new SpdxFileCollector();
+        SpdxFileCollector collector = new SpdxFileCollector( null );
         SpdxFile[] SpdxFiles = collector.getFiles();
         assertEquals( 0, SpdxFiles.length );
         
@@ -483,7 +483,7 @@ public class TestSpdxFileCollector {
 	public void testConvertFilePathToSpdxFileName() {
 	    String dosFilePath = "subdir\\subdir2\\file.c";
 	    String dosSpdxFile = "./subdir/subdir2/file.c";
-	    SpdxFileCollector collector = new SpdxFileCollector();
+	    SpdxFileCollector collector = new SpdxFileCollector( null );
 	    String result = collector.convertFilePathToSpdxFileName( dosFilePath );
 	    assertEquals( dosSpdxFile, result );
 	    

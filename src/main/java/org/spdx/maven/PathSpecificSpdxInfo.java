@@ -15,7 +15,6 @@
  */
 package org.spdx.maven;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
@@ -36,7 +35,7 @@ public class PathSpecificSpdxInfo
      * File or directory for which the specific file information is referred to
      */
     @Parameter( required = true )
-    File directoryOrFile;
+    String directoryOrFile;
     /**
      * SPDX file comment field.  
      * The file comment field provides a place for the SPDX file creator to 
@@ -192,7 +191,7 @@ public class PathSpecificSpdxInfo
      */
     public String getPath()
     {
-        return this.directoryOrFile.getPath();
+        return this.directoryOrFile;
     }
 
 }

@@ -9,7 +9,7 @@ In the build plugins section add the plugin with a goal of createSPDX:
                 <plugin>
                     <groupId>org.spdx</groupId>
                     <artifactId>spdx-maven-plugin</artifactId>
-                    <version>0.2.3-SNAPSHOT</version>
+                    <version>0.3.1-SNAPSHOT</version>
                     <executions>
                         <execution>
                             <id>build-spdx</id>
@@ -50,7 +50,7 @@ is available, a nonStandardLicense must be declared as a parameter including
 a unique license ID and the verbatim license text.
 
 # Example
-See the file SpdxTools-POM-FIle-Example.xml for an example project using the spdx-maven-plugin.
+See the file SpdxTools-POM-File-Example.xml for an example project using the spdx-maven-plugin.
 
 # License
 This project is licensed under the Apache 2.0 License
