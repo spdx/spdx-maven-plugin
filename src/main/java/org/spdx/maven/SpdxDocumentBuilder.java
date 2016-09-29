@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Apache Software Foundation.
+ * Copyright 2014 Source Auditor Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -495,7 +495,7 @@ private void collectSpdxFileInformation( FileSet[] includedSourceDirectories,
           String spdxFileName, 
           Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException 
   {      
-      SpdxFileCollector fileCollector = new SpdxFileCollector();
+      SpdxFileCollector fileCollector = new SpdxFileCollector( getLog() );
       fileCollector.setLog( getLog() );
       try {
           fileCollector.collectFiles( includedSourceDirectories, baseDir,

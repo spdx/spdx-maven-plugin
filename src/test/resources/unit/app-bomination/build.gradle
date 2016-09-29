@@ -1,0 +1,21 @@
+/*
+ * The AppBOMination build file.
+ * SPDX­License­Identifier: LGPL-2.0+ OR WTFPL
+ */
+
+apply plugin: 'java'
+
+repositories {
+
+    jcenter()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+	// The production code uses the SLF4J logging API at compile time
+	compile 'org.slf4j:slf4j-api:1.7.21'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+
+	testCompile 'junit:junit:4.12'
+}
+

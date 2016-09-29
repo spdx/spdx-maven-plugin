@@ -1,6 +1,6 @@
 /*
 
- * Copyright 2014 The Apache Software Foundation.
+ * Copyright 2014 Source Auditor Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License" );
  * you may not use this file except in compliance with the License.
@@ -107,9 +107,9 @@ public class SpdxFileCollector
     /**
      * SpdxFileCollector collects SPDX file information for files
      */
-    public SpdxFileCollector() 
+    public SpdxFileCollector( Log log ) 
     {
-        
+        this.log = log;
     }
  
     /**
@@ -185,7 +185,7 @@ public class SpdxFileCollector
            {
                String filePath = fileSets[i].getDirectory() + File.separator + includedFiles[j];
                File file = new File( filePath );
-               String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 );
+               String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 ).replace( '\\', '/' );;
                SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath, pathSpecificInformation );
                if ( fileInfo == null ) 
                {
@@ -214,9 +214,15 @@ public class SpdxFileCollector
     private SpdxDefaultFileInformation findDefaultFileInformation( String filePath,
                                                                    Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
     {
+        if ( log != null ) {
+            log.debug( "Checking for file path "+filePath );
+        }      
         SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
         if ( retval != null ) 
         {
+            if ( log != null ) {
+                log.debug( "Found filepath" );
+            }
             return retval;
         }
         // see if any of the parent directories contain default information which should be used
@@ -224,7 +230,7 @@ public class SpdxFileCollector
         int parentPathIndex = 0;
         do
         {
-            parentPathIndex = parentPath.lastIndexOf( File.separator );
+            parentPathIndex = parentPath.lastIndexOf( "/" );
             if ( parentPathIndex > 0 ) 
             {
                 parentPath = parentPath.substring( 0, parentPathIndex );
@@ -233,7 +239,7 @@ public class SpdxFileCollector
         } while ( retval == null && parentPathIndex > 0 );
         if ( retval != null )
         {
-            debug( "Found file path for path specific information.  File comment: "+retval.getComment() );
+            debug( "Found directory containing file path for path specific information.  File path: "+parentPath );
         }
         return retval;
     }
@@ -274,7 +280,9 @@ public class SpdxFileCollector
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            log.error( "Spdx exception creating file relationship: "+e.getMessage(), e );
+            if ( log != null ) {
+                log.error( "Spdx exception creating file relationship: "+e.getMessage(), e );   
+            }
             throw new SpdxCollectionException("Error creating SPDX file relationship: "+e.getMessage());
         }
         if ( fileInfo.getSnippets() != null ) {
@@ -357,7 +365,9 @@ public class SpdxFileCollector
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            log.error( "Spdx exception creating file: "+e.getMessage(), e );
+            if ( log != null ) {
+                log.error( "Spdx exception creating file: "+e.getMessage(), e );
+            }
             throw new SpdxCollectionException("Error creating SPDX file: "+e.getMessage());
         }
 

@@ -1,0 +1,176 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.spdx</groupId>
+  <artifactId>spdx-maven-plugin-test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>Test SPDX Plugin</name>
+  <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+  </licenses>
+  <distributionManagement>
+     <downloadUrl>https://github.com/yevster/App-BOM-ination/archive/f562cb755f4456bacbed2e2fa7f4e0dce5f10533.zip</downloadUrl>
+  </distributionManagement>
+  <build>
+    <resources>
+	    <resource>
+	      <targetPath>META-INF</targetPath>
+	      <filtering>false</filtering>
+	      <directory>.</directory>
+	      <includes>
+	         <include>LICENSE</include>
+	      </includes>
+	    </resource>
+	</resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+              <encoding>${project.build.sourceEncoding}</encoding>
+          </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2.1</version>
+          <executions>
+              <execution>
+                  <id>attach-sources</id>
+                  <phase>verify</phase>
+                  <goals>
+                      <goal>jar-no-fork</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>    
+      <plugin>
+          <groupId>org.spdx</groupId>
+          <artifactId>spdx-maven-plugin</artifactId>
+          
+                                        <!-- The defined stubs -->
+                    <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
+                    <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
+ 
+          <executions>
+              <execution>
+                  <id>build-spdx</id>
+                  <phase>prepare-package</phase>
+                  <goals>
+                      <goal>createSPDX</goal>
+                  </goals>
+              </execution>
+          </executions>
+          <configuration>
+              <spdxDocumentNamespace>http://spdx.org/documents/APP-BOM-Ination-3d81ad36-2ee1-45be-85b6-83eba529424c</spdxDocumentNamespace>
+              <documentComment>This document is an example of an SPDX 2.1 file created by the SPDX Maven plugin</documentComment>
+              <nonStandardLicenses>
+                  <param>
+                      <licenseId>LicenseRef-FaustProprietary</licenseId>
+                      <extractedText>FAUST, INC. PROPRIETARY LICENSE:
+
+FAUST, INC. grants you a non-exclusive right to use, modify, and distribute
+the file provided that (a) you distribute all copies and/or modifications of
+this file, whether in source or binary form, under the same license, and (b)
+you hereby irrevocably transfer and assign the ownership of your soul to Faust, 
+Inc. In the event the fair market value of your soul is less than $100 US, you
+agree to compensate Faust, Inc. for the difference. 
+
+Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.
+                      </extractedText>
+                      <name>Faust (really) Proprietary License</name>
+                      <comment>This license was extracted from the file InsufficientKarmaException</comment>
+                  </param>
+              </nonStandardLicenses>
+              <defaultFileCopyright>NOASSERTION</defaultFileCopyright>
+              <defaultFileContributors>
+                  <param>yevster</param>
+              </defaultFileContributors>
+              <defaultLicenseInformationInFile>Apache-2.0</defaultLicenseInformationInFile>
+              <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
+              <defaultFileNotice>This file is licensed under the Apache 2.0 License (except where otherwise indicated).</defaultFileNotice>
+              <licenseDeclared>Apache-2.0</licenseDeclared>
+              <licenseConcluded>Apache-2.0 AND LicenseRef-FaustProprietary</licenseConcluded>
+              <creatorComment>Created for the SPDX 2.1 BakeOff - wish I could be there in Berlin!</creatorComment>
+              <creators>
+                  <param>Person: Gary O'Neall</param>
+                  <param>Organization: Source Auditor Inc.</param>
+              </creators>
+              <copyrightText>Copyright (c) 2016 Faust, Inc.,</copyrightText>
+              <pathsWithSpecificSpdxInfo>
+                  <PathSpecificSpdxInfo>
+                      <directoryOrFile>InsufficientKarmaException.java</directoryOrFile>
+                      <fileCopyright>Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.</fileCopyright>
+                      <fileNotice>NThis file is licensed under the following license.
+ 
+FAUST, INC. PROPRIETARY LICENSE:
+
+FAUST, INC. grants you a non-exclusive right to use, modify, and distribute
+the file provided that (a) you distribute all copies and/or modifications of
+this file, whether in source or binary form, under the same license, and (b)
+you hereby irrevocably transfer and assign the ownership of your soul to Faust, 
+Inc. In the event the fair market value of your soul is less than $100 US, you
+agree to compensate Faust, Inc. for the difference. 
+
+Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.</fileNotice>
+                      <fileConcludedLicense>LicenseRef-FaustProprietary</fileConcludedLicense>
+                      <licenseInformationInFile>LicenseRef-FaustProprietary</licenseInformationInFile>
+                  </PathSpecificSpdxInfo>
+                  <PathSpecificSpdxInfo>
+                  <directoryOrFile>Main.java</directoryOrFile>
+                      <fileCopyright>NONE</fileCopyright>
+                      <fileNotice>This file is licensed under the Apache 2.0 License (except where otherwise indicated).</fileNotice>
+                      <fileConcludedLicense>Apache-2.0</fileConcludedLicense>
+                      <licenseInformationInFile>Apache-2.0</licenseInformationInFile>
+    
+                      <snippets>
+                          <SnippetInfo>
+                              <name>Apache Commons Math v. 3.6.1</name>
+                              <comment>This snippet should have a related package with an external referenced, however, the maven-plugin only supports external references for the main package</comment>
+                              <concludedLicense>Apache-2.0</concludedLicense>
+                              <lineRange>24:245</lineRange>
+                              <byteRange>889:9002</byteRange>
+                              <licenseComment>Snippet License Comment</licenseComment>
+                              <copyrightText>Snippet Copyright Text</copyrightText>
+                              <licenseInfoInSnippet>BSD-2-Clause-FreeBSD</licenseInfoInSnippet>
+                          </SnippetInfo>
+                      </snippets>
+                  </PathSpecificSpdxInfo>
+              </pathsWithSpecificSpdxInfo>
+          </configuration>
+          </plugin>  
+    </plugins>
+  </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.slf4j</groupId>
+  		<artifactId>slf4j-api</artifactId>
+  		<version>1.7.21</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.apache.commons</groupId>
+  		<artifactId>commons-lang3</artifactId>
+  		<version>3.4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.12</version>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
+</project>

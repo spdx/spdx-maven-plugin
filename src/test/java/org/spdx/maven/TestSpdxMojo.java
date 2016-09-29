@@ -32,6 +32,8 @@ public class TestSpdxMojo
     private static final String UNIT_TEST_RESOURCE_DIR = "src/test/resources/unit/spdx-maven-plugin-test";
     private static final String SPDX_FILE_NAME = UNIT_TEST_RESOURCE_DIR + "/test.spdx";
 
+    private static final String UNIT_TEST_APP_RESOURCE_DIR = "src/test/resources/unit/app-bomination";
+    private static final String APP_SPDX_FILE_NAME = UNIT_TEST_APP_RESOURCE_DIR + "/test.spdx";
     @AfterClass
     public static void tearDownAfterClass()
         throws Exception
@@ -249,23 +251,21 @@ public class TestSpdxMojo
         assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles()[0].toString() );
         assertEquals( "444:554", TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
-        // file parameters
-        // defaultFileComment
-        // defaultFileContributors
-        // defaultFileCopyright
-        // defaultFileLicenseComment
-        // defaultFileNotice
-        // defaultFileConcludedLicense
-        // defaultLicenseInformationInFile
-        // defaultFileArtifactOfs
-        // 
-        // Test derived values 
-        // package name
-        
-        // Path specific information
         //TODO Test dependencies
-        
     }
+    
+/*    @Test
+    public void testExecuteApp() throws Exception
+    {
+        File testPom = new File( getBasedir(),
+                                 UNIT_TEST_APP_RESOURCE_DIR + "/pom.xml" );
+//        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
+        // if the below does not work due to a lookup error, run mvn test goal
+        CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
+        assertNotNull( mojo );
+        mojo.execute();
+    }
+    */
 
     /**
      * Add relative file paths to the filePaths list
