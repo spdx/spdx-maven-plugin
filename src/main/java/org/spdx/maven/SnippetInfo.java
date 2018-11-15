@@ -23,6 +23,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.model.SpdxElement;
 import org.spdx.rdfparser.model.pointer.ByteOffsetPointer;
 import org.spdx.rdfparser.model.pointer.LineCharPointer;
 import org.spdx.rdfparser.model.pointer.StartEndPointer;
@@ -114,7 +115,7 @@ public class SnippetInfo
         return this.licenseComment;
     }
 
-    public StartEndPointer getByteRange() throws SpdxBuilderException
+    public StartEndPointer getByteRange(SpdxElement fileReference) throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher(byteRange.trim());
         if (!matcher.find()) {
@@ -122,20 +123,20 @@ public class SnippetInfo
         }   
         ByteOffsetPointer start = null;
         try {
-            start = new ByteOffsetPointer(null, Integer.parseInt(matcher.group(1)));
+            start = new ByteOffsetPointer(fileReference, Integer.parseInt(matcher.group(1)));
         } catch (Exception ex) {
             throw new SpdxBuilderException("Non integer start to snippet byte offset: "+byteRange);
         }
         ByteOffsetPointer end = null;
         try {
-            end = new ByteOffsetPointer(null, Integer.parseInt(matcher.group(2)));
+            end = new ByteOffsetPointer(fileReference, Integer.parseInt(matcher.group(2)));
         } catch (Exception ex) {
             throw new SpdxBuilderException("Non integer end to snippet byte offset: "+byteRange);
         }
         return new StartEndPointer(start, end);
     }
 
-    public StartEndPointer getLineRange() throws SpdxBuilderException
+    public StartEndPointer getLineRange(SpdxElement fileReference) throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher(lineRange);
         if (!matcher.find()) {
@@ -143,13 +144,13 @@ public class SnippetInfo
         }   
         LineCharPointer start = null;
         try {
-            start = new LineCharPointer(null, Integer.parseInt(matcher.group(1)));
+            start = new LineCharPointer(fileReference, Integer.parseInt(matcher.group(1)));
         } catch (Exception ex) {
             throw new SpdxBuilderException("Non integer start to snippet line offset: "+lineRange);
         }
         LineCharPointer end = null;
         try {
-            end = new LineCharPointer(null, Integer.parseInt(matcher.group(2)));
+            end = new LineCharPointer(fileReference, Integer.parseInt(matcher.group(2)));
         } catch (Exception ex) {
             throw new SpdxBuilderException("Non integer end to snippet line offset: "+lineRange);
         }
