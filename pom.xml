@@ -51,7 +51,7 @@
     <dependency>
     	<groupId>org.spdx</groupId>
     	<artifactId>spdx-tools</artifactId>
-    	<version>2.1.6</version>
+    	<version>2.1.13</version>
     </dependency>
     <dependency>
     	<groupId>org.apache.maven</groupId>
@@ -111,7 +111,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.6.0</version>
         <configuration>
           <goalPrefix>spdx</goalPrefix>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>

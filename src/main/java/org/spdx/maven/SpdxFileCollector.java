@@ -325,8 +325,8 @@ public class SpdxFileCollector
                                              snippet.getCopyrightText(),
                                              snippet.getLicensComment(), 
                                              spdxFile, 
-                                             snippet.getByteRange(),
-                                             snippet.getLineRange());
+                                             snippet.getByteRange(spdxFile),
+                                             snippet.getLineRange(spdxFile));
         return retval;
     }
 
