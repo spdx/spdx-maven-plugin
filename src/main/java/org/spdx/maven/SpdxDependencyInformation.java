@@ -200,7 +200,7 @@ public class SpdxDependencyInformation
                                           new AnyLicenseInfo[] {new SpdxNoAssertionLicense()},
                                           "UNSPECIFIED",
                                           new SpdxNoAssertionLicense(), 
-                                          "NOASSERTION", new SpdxFile[0], new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
+                                          "NOASSERTION", new SpdxFile[0], null);
         pkg.setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." );
         pkg.setVersionInfo( artifact.getBaseVersion() );
         pkg.setFilesAnalyzed( false );
@@ -316,7 +316,7 @@ public class SpdxDependencyInformation
                                              new AnyLicenseInfo[] {new SpdxNoAssertionLicense()},
                                              copyright, declaredLicense, downloadLocation,
                                              new SpdxFile[0], 
-                                             new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
+                                             null);
         if ( model.getVersion() != null ) {
             retval.setVersionInfo( model.getVersion() );
         }
