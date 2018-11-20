@@ -203,6 +203,7 @@ public class SpdxDependencyInformation
                                           "NOASSERTION", new SpdxFile[0], new SpdxPackageVerificationCode(SpdxDocumentBuilder.NULL_SHA1, new String[0]));
         pkg.setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." );
         pkg.setVersionInfo( artifact.getBaseVersion() );
+        pkg.setFilesAnalyzed( false );
         return pkg;
     }
 
@@ -329,6 +330,7 @@ public class SpdxDependencyInformation
         if (model.getUrl() != null) {
             retval.setHomepage( model.getUrl() );
         }
+        retval.setFilesAnalyzed( false );
         return retval;
     }
     
