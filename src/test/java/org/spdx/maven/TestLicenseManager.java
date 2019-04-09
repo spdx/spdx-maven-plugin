@@ -50,6 +50,7 @@ public class TestLicenseManager
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
     static final String APACHE_CROSS_REF_URL1 = "http://www.opensource.org/licenses/Apache-2.0";
     static final String APACHE_CROSS_REF_URL2 = "http://www.apache.org/licenses/LICENSE-2.0";
+    static final String APACHE_CROSS_REF_URL3 = "http://opensource.org/licenses/Apache-2.0";
     static final String APACHE_LICENSE_ID = "Apache-2.0";
     static final String APACHE_LICENSE_NAME = "Apache License 2.0";
     static final String APSL_CROSS_REF_URL = "http://www.opensource.apple.com/source/IOSerialFamily/IOSerialFamily-7/APPLE_LICENSE";
@@ -293,7 +294,8 @@ public class TestLicenseManager
         AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseString( APACHE_LICENSE_ID );
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );
         assertEquals( result.getName(), ((SpdxListedLicense)licenseInfo).getName() );
-        assertTrue( APACHE_CROSS_REF_URL1.equals(result.getUrl()) || APACHE_CROSS_REF_URL2.equals(result.getUrl()) );
+        String resultUrl = result.getUrl().replace("https", "http");
+        assertTrue( APACHE_CROSS_REF_URL1.equals(resultUrl) || APACHE_CROSS_REF_URL2.equals(resultUrl) || APACHE_CROSS_REF_URL3.equals(resultUrl));
         
         // non standard license
         final String LICENSE_ID = "LicenseRef-nonStd1";
