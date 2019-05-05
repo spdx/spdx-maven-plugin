@@ -56,7 +56,7 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
  */
 public class MavenToSpdxLicenseMapper
 {
-    private static final String SPDX_LICENSE_URL_PREFIX = "http://spdx.org/licenses/";
+    private static final String SPDX_LICENSE_URL_PREFIX = "https://spdx.org/licenses/";
     private static final String LISTED_LICENSE_JSON_URL = SPDX_LICENSE_URL_PREFIX + "licenses.json";
     private static final String LISTED_LICENSE_JSON_PATH = "resources/licenses.json";
 
@@ -69,15 +69,18 @@ public class MavenToSpdxLicenseMapper
         try
         {
             URL listedLicenseJsonUrl  = new URL( LISTED_LICENSE_JSON_URL );
-            //TODO: Uncomment the line below once the JSON file has been uploaded to the SPDX listed license website
-            //is = listedLicenseJsonUrl.openStream();
+            is = listedLicenseJsonUrl.openStream();
         }
         catch ( MalformedURLException e )
         {
             if (log != null) {
                 log.warn( "Invalid JSON URL for SPDX listed licenses.  Using cached version" );
             }
-        }
+        } catch (IOException e) {
+            if (log != null) {
+                log.warn( "IO Exception opening web page for JSON for SPDX listed licenses.  Using cached version" );
+            }
+		}
         if (is == null) {
             // use the cached version
             is = LicenseManager.class.getClassLoader().getResourceAsStream(LISTED_LICENSE_JSON_PATH);
@@ -156,6 +159,7 @@ public class MavenToSpdxLicenseMapper
             if ( urls != null ) {
                 for ( int j = 0; j < urls.size(); j++ ) {
                     String url = (String)urls.get( j );
+                    url = url.replaceAll("https", "http");
                     if (this.urlStringToSpdxLicenseId.containsKey( url )) {
                         urlsWithMultipleIds.add( url );
                     } else {
@@ -231,7 +235,7 @@ public class MavenToSpdxLicenseMapper
         if ( license.getUrl() == null || license.getUrl().isEmpty() ) {
             return null;
         }
-        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl() );
+        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll("https", "http") );
         if (spdxId == null) {
             return null;
         }

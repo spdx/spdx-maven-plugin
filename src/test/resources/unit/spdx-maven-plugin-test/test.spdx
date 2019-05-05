@@ -5,9 +5,6 @@
     xmlns:j.0="http://www.w3.org/2009/pointers#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns="http://spdx.org/documents/spdx-toolsv2.0-rc1#">
-  <spdx:PackageVerificationCode>
-    <spdx:packageVerificationCodeValue>cf23df2207d99a74fbe169e3eba035e633b65d94</spdx:packageVerificationCodeValue>
-  </spdx:PackageVerificationCode>
   <spdx:Snippet rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-7">
     <spdx:licenseComments>Snippet License Comment</spdx:licenseComments>
     <spdx:licenseConcluded>
@@ -179,13 +176,6 @@ THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICE
         <spdx:noticeText>Notice for Commmon Code</spdx:noticeText>
         <spdx:fileContributor>Contributor to CommonCode</spdx:fileContributor>
         <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
-        <spdx:checksum>
-          <spdx:Checksum>
-            <spdx:checksumValue>901a2d1e2c26cb3583c99abae9e62870f310a0d6</spdx:checksumValue>
-            <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-          </spdx:Checksum>
-        </spdx:checksum>
-        <spdx:copyrightText>Common Code Copyright</spdx:copyrightText>
         <spdx:relationship>
           <spdx:Relationship>
             <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
@@ -380,13 +370,6 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                       </spdx:License>
                     </spdx:licenseInfoInFile>
                     <spdx:fileName>./src/main/java/SpdxTagValueConstants.properties</spdx:fileName>
-                    <spdx:relationship>
-                      <spdx:Relationship>
-                        <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
-                        <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
-                        <rdfs:comment></rdfs:comment>
-                      </spdx:Relationship>
-                    </spdx:relationship>
                     <spdx:noticeText>Default file notice</spdx:noticeText>
                     <spdx:checksum>
                       <spdx:Checksum>
@@ -394,11 +377,23 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                         <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
                       </spdx:Checksum>
                     </spdx:checksum>
+                    <spdx:relationship>
+                      <spdx:Relationship>
+                        <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_generates"/>
+                        <spdx:relatedSpdxElement rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-1"/>
+                        <rdfs:comment></rdfs:comment>
+                      </spdx:Relationship>
+                    </spdx:relationship>
                     <rdfs:comment>Default file comment</rdfs:comment>
                     <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_other"/>
                   </spdx:File>
                 </spdx:hasFile>
                 <doap:homepage>http://spdx.org/tools</doap:homepage>
+                <spdx:packageVerificationCode>
+                  <spdx:PackageVerificationCode>
+                    <spdx:packageVerificationCodeValue>362c6c616fab4e2f6663a53b84c1d65ce40b0207</spdx:packageVerificationCodeValue>
+                  </spdx:PackageVerificationCode>
+                </spdx:packageVerificationCode>
                 <spdx:versionInfo>1.0-SNAPSHOT</spdx:versionInfo>
                 <spdx:externalRef>
                   <spdx:ExternalRef>
@@ -410,11 +405,6 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                     <spdx:referenceCategory rdf:resource="http://spdx.org/rdf/terms#referenceCategory_packageManager"/>
                   </spdx:ExternalRef>
                 </spdx:externalRef>
-                <spdx:packageVerificationCode>
-                  <spdx:PackageVerificationCode>
-                    <spdx:packageVerificationCodeValue>362c6c616fab4e2f6663a53b84c1d65ce40b0207</spdx:packageVerificationCodeValue>
-                  </spdx:PackageVerificationCode>
-                </spdx:packageVerificationCode>
                 <spdx:copyrightText>Copyright Text for Package</spdx:copyrightText>
                 <spdx:hasFile>
                   <spdx:File rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-3">
@@ -423,6 +413,13 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                     <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
                     <spdx:fileContributor>First contributor</spdx:fileContributor>
                     <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-1.1"/>
+                    <spdx:checksum>
+                      <spdx:Checksum>
+                        <spdx:checksumValue>c3276671012ba00662a2d23d944c6a3e99af6851</spdx:checksumValue>
+                        <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+                      </spdx:Checksum>
+                    </spdx:checksum>
+                    <spdx:licenseComments>Default file license comment</spdx:licenseComments>
                     <spdx:relationship>
                       <spdx:Relationship>
                         <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
@@ -430,15 +427,8 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                         <rdfs:comment></rdfs:comment>
                       </spdx:Relationship>
                     </spdx:relationship>
-                    <spdx:licenseComments>Default file license comment</spdx:licenseComments>
                     <spdx:fileContributor>Second contributor</spdx:fileContributor>
                     <spdx:fileName>./src/test/java/CreateSpdxMavenProjectStub.java</spdx:fileName>
-                    <spdx:checksum>
-                      <spdx:Checksum>
-                        <spdx:checksumValue>c3276671012ba00662a2d23d944c6a3e99af6851</spdx:checksumValue>
-                        <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-                      </spdx:Checksum>
-                    </spdx:checksum>
                     <spdx:noticeText>Default file notice</spdx:noticeText>
                     <rdfs:comment>Default file comment</rdfs:comment>
                   </spdx:File>
@@ -447,18 +437,18 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                 <spdx:hasFile>
                   <spdx:File rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-6">
                     <spdx:fileName>./src/test/java/TestSpdxFileCollector.java</spdx:fileName>
-                    <spdx:checksum>
-                      <spdx:Checksum>
-                        <spdx:checksumValue>271f8a00acfc50134178ea119d6965b1958ca1f1</spdx:checksumValue>
-                        <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
-                      </spdx:Checksum>
-                    </spdx:checksum>
                     <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
                     <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-1.1"/>
                     <spdx:fileContributor>First contributor</spdx:fileContributor>
                     <rdfs:comment>Default file comment</rdfs:comment>
                     <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
                     <spdx:licenseComments>Default file license comment</spdx:licenseComments>
+                    <spdx:checksum>
+                      <spdx:Checksum>
+                        <spdx:checksumValue>271f8a00acfc50134178ea119d6965b1958ca1f1</spdx:checksumValue>
+                        <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+                      </spdx:Checksum>
+                    </spdx:checksum>
                     <spdx:fileContributor>Second contributor</spdx:fileContributor>
                     <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
                     <spdx:noticeText>Default file notice</spdx:noticeText>
@@ -475,6 +465,12 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                 <spdx:hasFile>
                   <spdx:File rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-4">
                     <spdx:noticeText>Default file notice</spdx:noticeText>
+                    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
+                    <spdx:fileName>./src/test/java/TestLicenseManager.java</spdx:fileName>
+                    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-1.1"/>
+                    <spdx:licenseComments>Default file license comment</spdx:licenseComments>
+                    <spdx:fileContributor>First contributor</spdx:fileContributor>
+                    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
                     <spdx:relationship>
                       <spdx:Relationship>
                         <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_testcaseOf"/>
@@ -482,20 +478,14 @@ THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INC
                         <rdfs:comment></rdfs:comment>
                       </spdx:Relationship>
                     </spdx:relationship>
-                    <spdx:licenseConcluded rdf:resource="http://spdx.org/licenses/Apache-2.0"/>
-                    <spdx:fileName>./src/test/java/TestLicenseManager.java</spdx:fileName>
-                    <spdx:licenseInfoInFile rdf:resource="http://spdx.org/licenses/Apache-1.1"/>
-                    <spdx:licenseComments>Default file license comment</spdx:licenseComments>
+                    <spdx:fileContributor>Second contributor</spdx:fileContributor>
+                    <rdfs:comment>Default file comment</rdfs:comment>
                     <spdx:checksum>
                       <spdx:Checksum>
                         <spdx:checksumValue>3dbbebf26f1e6b707b9ccd36ac6c447cc7de5253</spdx:checksumValue>
                         <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
                       </spdx:Checksum>
                     </spdx:checksum>
-                    <spdx:fileContributor>First contributor</spdx:fileContributor>
-                    <spdx:fileType rdf:resource="http://spdx.org/rdf/terms#fileType_source"/>
-                    <spdx:fileContributor>Second contributor</spdx:fileContributor>
-                    <rdfs:comment>Default file comment</rdfs:comment>
                     <spdx:copyrightText>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</spdx:copyrightText>
                   </spdx:File>
                 </spdx:hasFile>
@@ -525,10 +515,17 @@ THIS SOFTWARE IS PROVIDED BY &lt;&lt;var;name="copyrightHolderAsIs";original="TH
                 <spdx:filesAnalyzed>true</spdx:filesAnalyzed>
                 <spdx:licenseInfoFromFiles rdf:resource="http://spdx.org/licenses/ISC"/>
                 <spdx:licenseInfoFromFiles rdf:resource="http://spdx.org/licenses/Apache-1.1"/>
+                <spdx:annotation>
+                  <spdx:Annotation>
+                    <spdx:annotationDate>2015-01-29T18:30:22Z</spdx:annotationDate>
+                    <rdfs:comment>PackageAnnotation</rdfs:comment>
+                    <spdx:annotator>Person:Test Package Person</spdx:annotator>
+                    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
+                  </spdx:Annotation>
+                </spdx:annotation>
                 <spdx:sourceInfo>Source info</spdx:sourceInfo>
                 <spdx:hasFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
                 <spdx:downloadLocation rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
-                <spdx:packageFileName rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
                 <spdx:externalRef>
                   <spdx:ExternalRef>
                     <rdfs:comment>extref comment1</rdfs:comment>
@@ -539,19 +536,19 @@ THIS SOFTWARE IS PROVIDED BY &lt;&lt;var;name="copyrightHolderAsIs";original="TH
                     <spdx:referenceCategory rdf:resource="http://spdx.org/rdf/terms#referenceCategory_security"/>
                   </spdx:ExternalRef>
                 </spdx:externalRef>
-                <spdx:annotation>
-                  <spdx:Annotation>
-                    <spdx:annotationDate>2015-01-29T18:30:22Z</spdx:annotationDate>
-                    <rdfs:comment>PackageAnnotation</rdfs:comment>
-                    <spdx:annotator>Person:Test Package Person</spdx:annotator>
-                    <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_review"/>
-                  </spdx:Annotation>
-                </spdx:annotation>
+                <spdx:packageFileName rdf:resource="http://spdx.org/rdf/terms#noassertion"/>
               </spdx:Package>
             </spdx:relatedSpdxElement>
             <rdfs:comment></rdfs:comment>
           </spdx:Relationship>
         </spdx:relationship>
+        <spdx:checksum>
+          <spdx:Checksum>
+            <spdx:checksumValue>901a2d1e2c26cb3583c99abae9e62870f310a0d6</spdx:checksumValue>
+            <spdx:algorithm rdf:resource="http://spdx.org/rdf/terms#checksumAlgorithm_sha1"/>
+          </spdx:Checksum>
+        </spdx:checksum>
+        <spdx:copyrightText>Common Code Copyright</spdx:copyrightText>
       </spdx:File>
     </spdx:snippetFromFile>
     <spdx:range>
@@ -570,6 +567,7 @@ THIS SOFTWARE IS PROVIDED BY &lt;&lt;var;name="copyrightHolderAsIs";original="TH
         </j.0:startPointer>
       </j.0:StartEndPointer>
     </spdx:range>
+    <spdx:name>SnippetName</spdx:name>
     <spdx:range>
       <j.0:StartEndPointer>
         <j.0:endPointer>
@@ -586,12 +584,7 @@ THIS SOFTWARE IS PROVIDED BY &lt;&lt;var;name="copyrightHolderAsIs";original="TH
         </j.0:startPointer>
       </j.0:StartEndPointer>
     </spdx:range>
-    <spdx:name>SnippetName</spdx:name>
   </spdx:Snippet>
-  <spdx:CreationInfo>
-    <spdx:licenseListVersion>3.5</spdx:licenseListVersion>
-    <spdx:created>2019-04-09T22:37:13Z</spdx:created>
-  </spdx:CreationInfo>
   <spdx:Snippet rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-8">
     <spdx:snippetFromFile rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
     <rdfs:comment>Snippet Comment2</rdfs:comment>
@@ -623,24 +616,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <spdx:range>
       <j.0:StartEndPointer>
         <j.0:endPointer>
-          <j.0:ByteOffsetPointer>
-            <j.0:offset>33442</j.0:offset>
-            <j.0:reference rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
-          </j.0:ByteOffsetPointer>
-        </j.0:endPointer>
-        <j.0:startPointer>
-          <j.0:ByteOffsetPointer>
-            <j.0:offset>31231</j.0:offset>
-            <j.0:reference rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
-          </j.0:ByteOffsetPointer>
-        </j.0:startPointer>
-      </j.0:StartEndPointer>
-    </spdx:range>
-    <spdx:licenseComments>Snippet2 License Comment</spdx:licenseComments>
-    <spdx:copyrightText>Snippet2 Copyright Text</spdx:copyrightText>
-    <spdx:range>
-      <j.0:StartEndPointer>
-        <j.0:endPointer>
           <j.0:LineCharPointer>
             <j.0:lineNumber>554</j.0:lineNumber>
             <j.0:reference rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
@@ -654,7 +629,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </j.0:startPointer>
       </j.0:StartEndPointer>
     </spdx:range>
+    <spdx:licenseComments>Snippet2 License Comment</spdx:licenseComments>
+    <spdx:copyrightText>Snippet2 Copyright Text</spdx:copyrightText>
+    <spdx:range>
+      <j.0:StartEndPointer>
+        <j.0:endPointer>
+          <j.0:ByteOffsetPointer>
+            <j.0:offset>33442</j.0:offset>
+            <j.0:reference rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
+          </j.0:ByteOffsetPointer>
+        </j.0:endPointer>
+        <j.0:startPointer>
+          <j.0:ByteOffsetPointer>
+            <j.0:offset>31231</j.0:offset>
+            <j.0:reference rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-2"/>
+          </j.0:ByteOffsetPointer>
+        </j.0:startPointer>
+      </j.0:StartEndPointer>
+    </spdx:range>
   </spdx:Snippet>
+  <spdx:CreationInfo>
+    <spdx:licenseListVersion>3.5</spdx:licenseListVersion>
+    <spdx:created>2019-05-04T21:04:57Z</spdx:created>
+  </spdx:CreationInfo>
+  <spdx:PackageVerificationCode>
+    <spdx:packageVerificationCodeValue>cf23df2207d99a74fbe169e3eba035e633b65d94</spdx:packageVerificationCodeValue>
+  </spdx:PackageVerificationCode>
   <spdx:SpdxDocument rdf:about="http://spdx.org/documents/spdx-toolsv2.0-rc1#SPDXRef-DOCUMENT">
     <spdx:hasExtractedLicensingInfo rdf:resource="http://spdx.org/documents/spdx-toolsv2.0-rc1#LicenseRef-testLicense"/>
     <rdfs:comment>Document Comment</rdfs:comment>
@@ -676,6 +676,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <spdx:annotationType rdf:resource="http://spdx.org/rdf/terms#annotationType_other"/>
       </spdx:Annotation>
     </spdx:annotation>
+    <spdx:creationInfo>
+      <spdx:CreationInfo>
+        <spdx:licenseListVersion>3.1</spdx:licenseListVersion>
+        <spdx:created>2019-05-04T21:04:59Z</spdx:created>
+        <rdfs:comment>Creator comment</rdfs:comment>
+        <spdx:creator>Tool: spdx-maven-plugin</spdx:creator>
+        <spdx:creator>Person: Creator2</spdx:creator>
+        <spdx:creator>Person: Creator1</spdx:creator>
+      </spdx:CreationInfo>
+    </spdx:creationInfo>
     <spdx:relationship>
       <spdx:Relationship>
         <spdx:relationshipType rdf:resource="http://spdx.org/rdf/terms#relationshipType_describes"/>
@@ -684,16 +694,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </spdx:Relationship>
     </spdx:relationship>
     <spdx:specVersion>SPDX-2.1</spdx:specVersion>
-    <spdx:creationInfo>
-      <spdx:CreationInfo>
-        <spdx:licenseListVersion>3.1</spdx:licenseListVersion>
-        <spdx:created>2019-04-09T22:37:14Z</spdx:created>
-        <rdfs:comment>Creator comment</rdfs:comment>
-        <spdx:creator>Tool: spdx-maven-plugin</spdx:creator>
-        <spdx:creator>Person: Creator2</spdx:creator>
-        <spdx:creator>Person: Creator1</spdx:creator>
-      </spdx:CreationInfo>
-    </spdx:creationInfo>
     <spdx:annotation>
       <spdx:Annotation>
         <spdx:annotationDate>2010-01-29T18:30:22Z</spdx:annotationDate>

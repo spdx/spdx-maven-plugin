@@ -48,7 +48,6 @@ import org.apache.maven.plugin.logging.Log;
 public class TestLicenseManager
 {
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
-    static final String APACHE_CROSS_REF_URL1 = "http://www.opensource.org/licenses/Apache-2.0";
     static final String APACHE_CROSS_REF_URL2 = "http://www.apache.org/licenses/LICENSE-2.0";
     static final String APACHE_CROSS_REF_URL3 = "http://opensource.org/licenses/Apache-2.0";
     static final String APACHE_LICENSE_ID = "Apache-2.0";
@@ -203,7 +202,7 @@ public class TestLicenseManager
         
         License apache = new License();
         apache.setName( LICENSE1_NAME );
-        apache.setUrl( APACHE_CROSS_REF_URL1 );
+        apache.setUrl( APACHE_CROSS_REF_URL2 );
         License apsl = new License();
         apsl.setName( LICENSE2_NAME );
         apsl.setUrl( APSL_CROSS_REF_URL );
@@ -244,7 +243,7 @@ public class TestLicenseManager
         final String LICENSE1_NAME = "Apachelicense1";
         License apache = new License();
         apache.setName( LICENSE1_NAME );
-        apache.setUrl( APACHE_CROSS_REF_URL1 );
+        apache.setUrl( APACHE_CROSS_REF_URL2 );
         LicenseManager licenseManager = new LicenseManager( spdxDoc, log, true );
         
         AnyLicenseInfo result = licenseManager.mavenLicenseToSpdxLicense( apache );
@@ -295,7 +294,7 @@ public class TestLicenseManager
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );
         assertEquals( result.getName(), ((SpdxListedLicense)licenseInfo).getName() );
         String resultUrl = result.getUrl().replace("https", "http");
-        assertTrue( APACHE_CROSS_REF_URL1.equals(resultUrl) || APACHE_CROSS_REF_URL2.equals(resultUrl) || APACHE_CROSS_REF_URL3.equals(resultUrl));
+        assertTrue( APACHE_CROSS_REF_URL2.equals(resultUrl) || APACHE_CROSS_REF_URL3.equals(resultUrl));
         
         // non standard license
         final String LICENSE_ID = "LicenseRef-nonStd1";
