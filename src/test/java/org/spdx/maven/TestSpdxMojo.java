@@ -57,6 +57,7 @@ public class TestSpdxMojo
     @Test
     public void testExecute() throws Exception
     {
+    	try {
         File testPom = new File( getBasedir(),
                                  UNIT_TEST_RESOURCE_DIR + "/pom.xml" );
 //        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
@@ -68,14 +69,14 @@ public class TestSpdxMojo
         File spdxFile = new File ( getBasedir(), SPDX_FILE_NAME );
         assertTrue ( spdxFile.exists() );
         // Test output artifact file is created
-        File artifactFile = new File( getBasedir(), "src/test/resources/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx");
+        File artifactFile = new File( getBasedir(), "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx" );
         assertTrue ( artifactFile.exists() );
         SpdxDocument result = SPDXDocumentFactory.createSpdxDocument( artifactFile.getAbsolutePath() );
         List<String> warnings = result.verify();
         assertEquals( 0, warnings.size() );
         // Test configuration parameters found in the test resources pom.xml file
         // Document namespace
-        assertEquals( "http://spdx.org/documents/spdx-toolsv2.0-rc1", result.getDocumentNamespace() );
+        assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentNamespace() );
         // Non standard licenses
         ExtractedLicenseInfo[] licenseInfos = result.getExtractedLicenseInfos();
         assertEquals(2, licenseInfos.length);
@@ -252,20 +253,21 @@ public class TestSpdxMojo
         assertEquals( "444:554", TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
+    	} finally {
+    		File artifactFile = new File( getBasedir(), "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx" );
+    		if (artifactFile.exists()) {
+    			if (!artifactFile.delete()) {
+    				artifactFile.deleteOnExit();
+    			}
+    		}
+    		File spdxFile = new File ( getBasedir(), SPDX_FILE_NAME );
+    		if (spdxFile.exists()) {
+    			if (!spdxFile.delete()) {
+    				spdxFile.deleteOnExit();
+    			}
+    		}
+    	}
     }
-    
-/*    @Test
-    public void testExecuteApp() throws Exception
-    {
-        File testPom = new File( getBasedir(),
-                                 UNIT_TEST_APP_RESOURCE_DIR + "/pom.xml" );
-//        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
-        // if the below does not work due to a lookup error, run mvn test goal
-        CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
-        assertNotNull( mojo );
-        mojo.execute();
-    }
-    */
 
     /**
      * Add relative file paths to the filePaths list

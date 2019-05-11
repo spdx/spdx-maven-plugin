@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.spdx</groupId>
-  <artifactId>spdx-maven-plugin-test</artifactId>
+  <artifactId>spdx maven plugin test</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Test SPDX Plugin</name>
@@ -97,7 +97,7 @@
                     <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
                     <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
                     <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx</spdxFile>
-                    <spdxDocumentNamespace>http://spdx.org/documents/spdx-toolsv2.0-rc1</spdxDocumentNamespace>
+                    <spdxDocumentNamespace>http://spdx.org/documents/spdx toolsv2.0 rc1</spdxDocumentNamespace>
                     <documentComment>Document Comment</documentComment>
                     <documentAnnotations>
                         <param>

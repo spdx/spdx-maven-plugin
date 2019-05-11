@@ -40,6 +40,9 @@ import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,8 +129,11 @@ public class CreateSpdxMojo
     /**
      * Document namespace - must be unique for the artifact and SPDX file
      */
-    @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.name}-${project.version}", property = "spdxDocumentUrl", required = true )
-    private URL spdxDocumentNamespace;
+    @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.name}-${project.version}", property = "spdxDocumentNamespace", required = true )
+    private String spdxDocumentNamespace;
+    
+    @Parameter ( defaultValue = "${project.basedir}", property="componentName")
+    private String componentName;
     
     /**
      * Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration.
@@ -370,7 +376,11 @@ public class CreateSpdxMojo
         SpdxDocumentBuilder builder;
         try
         {
-            builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, spdxDocumentNamespace,
+        	URL namespaceUrl = new URL( spdxDocumentNamespace );
+        	URI uri = new URI(namespaceUrl.getProtocol(), namespaceUrl.getUserInfo(), namespaceUrl.getHost(), namespaceUrl.getPort(), 
+        			namespaceUrl.getPath(), namespaceUrl.getQuery(), namespaceUrl.getRef());
+        	namespaceUrl = uri.toURL();
+            builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, namespaceUrl,
                                                this.matchLicensesOnCrossReferenceUrls );
         }
         catch ( SpdxBuilderException e )
@@ -383,7 +393,13 @@ public class CreateSpdxMojo
             this.getLog().error( "License mapping error creating SPDX Document Builder: "+e.getMessage(), e );
             throw( new MojoExecutionException( "License mapping error creating SPDX Document Builder: "+e.getMessage(), e ) );
 
-        }
+        } catch (MalformedURLException e) {
+            this.getLog().error( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e );
+            throw( new MojoExecutionException( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e ) );
+		} catch (URISyntaxException e) {
+            this.getLog().error( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e );
+            throw( new MojoExecutionException( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e ) );
+		}
         if ( nonStandardLicenses != null ) 
         {
             try
