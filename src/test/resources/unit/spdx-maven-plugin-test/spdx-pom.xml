@@ -193,7 +193,7 @@
 						</execution>
 					</executions>
 					<configuration>
-						<spdxFile>spdxFile.spdx</spdxFile>
+						<spdxFile>spdxFile.spdx.rdf.xml</spdxFile>
 						<spdxDocumentNamespace>http://spdx.org/documents/spdx-toolsv2.0-rc1</spdxDocumentNamespace>
 						<defaultFileComment>test file comment</defaultFileComment>
 						<testParameter>test parm</testParameter>

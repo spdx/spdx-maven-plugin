@@ -37,7 +37,6 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SPDXDocumentFactory;
-import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.SpdxRdfConstants;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
@@ -398,7 +397,11 @@ public class SpdxDependencyInformation
      */
     private File artifactFileToSpdxFile( File file )
     {
-        return getFileWithDifferentType( file, "spdx" );
+    	File retval = getFileWithDifferentType( file, "spdx.rdf.xml" );
+    	if (retval == null || !retval.exists()) {
+    		retval = getFileWithDifferentType( file, "spdx" );
+    	}
+        return retval;
     }
     /**
      * Convert a file to a different type (e.g. file.txt -> file.rdf with a type rdf parameter)

@@ -123,7 +123,7 @@ public class CreateSpdxMojo
     /**
      * SPDX File name
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.name}-${project.version}.spdx", property = "spdxFileName", required = true )
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.name}-${project.version}.spdx.rdf.xml", property = "spdxFileName", required = true )
     private File spdxFile;
     
     /**

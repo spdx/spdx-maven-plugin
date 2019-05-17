@@ -96,7 +96,7 @@
                                         <!-- The defined stubs -->
                     <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
                     <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
-                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx</spdxFile>
+                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx.rdf.xml</spdxFile>
                     <spdxDocumentNamespace>http://spdx.org/documents/spdx toolsv2.0 rc1</spdxDocumentNamespace>
                     <documentComment>Document Comment</documentComment>
                     <documentAnnotations>
