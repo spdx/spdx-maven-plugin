@@ -30,10 +30,10 @@ public class TestSpdxMojo
 {
 
     private static final String UNIT_TEST_RESOURCE_DIR = "src/test/resources/unit/spdx-maven-plugin-test";
-    private static final String SPDX_FILE_NAME = UNIT_TEST_RESOURCE_DIR + "/test.spdx";
+    private static final String SPDX_FILE_NAME = UNIT_TEST_RESOURCE_DIR + "/test.spdx.rdf.xml";
 
     private static final String UNIT_TEST_APP_RESOURCE_DIR = "src/test/resources/unit/app-bomination";
-    private static final String APP_SPDX_FILE_NAME = UNIT_TEST_APP_RESOURCE_DIR + "/test.spdx";
+    private static final String APP_SPDX_FILE_NAME = UNIT_TEST_APP_RESOURCE_DIR + "/test.spdx.rdf.xml";
     @AfterClass
     public static void tearDownAfterClass()
         throws Exception
