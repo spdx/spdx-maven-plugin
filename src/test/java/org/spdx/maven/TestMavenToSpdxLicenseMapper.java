@@ -21,7 +21,7 @@ public class TestMavenToSpdxLicenseMapper
     private static final String APACHE2_URL = "http://www.apache.org/licenses/LICENSE-2.0";
     private static final String APACHE_SPDX_ID = "Apache-2.0";
     
-    private static final String MIT_URL = "http://www.opensource.org/licenses/MIT";
+    private static final String MIT_URL = "http://opensource.org/licenses/MIT";
     private static final String MIT_SPDX_ID = "MIT";
 
     @Before
