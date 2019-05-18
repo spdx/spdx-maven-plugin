@@ -27,6 +27,7 @@ import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
+import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
 import org.spdx.rdfparser.model.SpdxSnippet;
 import org.spdx.rdfparser.model.pointer.ByteOffsetPointer;
@@ -53,6 +54,10 @@ public class TestSpdxFileCollector {
 	}
 	
 	static final String[] FILE_NAMES = new String[] {"file1.bin", "file2.c", "file3.php", "file4.zip"};
+	static final String FILE_NAME_WITH_ID = "FileWithSpdxIds.java";
+	static final String FILE_WITH_ID_CONTENT = "/**\n  *SPDX-License-Identifier: MIT\n  *\n  *SPDX-License-Identifier: Apache-2.0\n**/";
+	static final String FILE_WITH_IDS_DECLARED_LICENSE = "(MIT AND Apache-2.0)";
+	static final String FILE_WITH_IDS__CONCLUDED_LICENSE = FILE_WITH_IDS_DECLARED_LICENSE;
 	static final String SNIPPET_NAMES = "Snippet Name";
 	static final String[] SUB_DIRS = new String[] {"dirA", "folderB"};
 	static final String[][] SUBDIR_FILES = new String[][] { new String[] {"subfile1.c", "subfile2.bin"},
@@ -112,6 +117,7 @@ public class TestSpdxFileCollector {
 	    {
 	        numFiles = numFiles + SUBDIR_FILES[i].length;
 	    }
+	    numFiles++;	// for the SPDX file with license IDs
 	    this.filePaths = new String[numFiles];
 	    this.SpdxFileNames = new String[numFiles];
 	    int fpi = 0;   // file path index
@@ -134,6 +140,16 @@ public class TestSpdxFileCollector {
 	                            "/" + SUBDIR_FILES[i][j];
 	        }
 	    }
+	    File fileWithIds = new File( this.directory.getPath() + File.separator + FILE_NAME_WITH_ID );
+	    fileWithIds.createNewFile();
+        PrintWriter writer = new PrintWriter( fileWithIds );
+        try {
+            writer.print( FILE_WITH_ID_CONTENT );
+        } finally {
+            writer.close();
+        }
+        this.filePaths[fpi] = fileWithIds.getPath();
+        this.SpdxFileNames[fpi++] = "./" + this.directory.getName() + "/" + FILE_NAME_WITH_ID;
 	    Arrays.sort( this.filePaths );
 	    Arrays.sort( SpdxFileNames );
 	    FileSet dirFileSet = new FileSet();
@@ -271,12 +287,18 @@ public class TestSpdxFileCollector {
         for ( int i = 0; i < SpdxFiles.length; i++ ) {
             assertEquals( SpdxFileNames[i], SpdxFiles[i].getName() );
             assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment() );
-            assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString() );
             assertEquals( DEFAULT_CONTRIBUTORS.length, SpdxFiles[i].getFileContributors().length );
             TestLicenseManager.assertArraysEqual( DEFAULT_CONTRIBUTORS, SpdxFiles[i].getFileContributors() );
             assertEquals( DEFAULT_COPYRIGHT, SpdxFiles[i].getCopyrightText() );
-            assertEquals( DEFAULT_DECLARED_LICENSE, SpdxFiles[i].getLicenseInfoFromFiles()[0].toString() );
-            assertEquals( DEFAULT_LICENSE_COMMENT, SpdxFiles[i].getLicenseComments() );
+        	if ( SpdxFileNames[i].endsWith(FILE_NAME_WITH_ID) ) {
+        		assertEquals( FILE_WITH_IDS_DECLARED_LICENSE, SpdxFiles[i].getLicenseInfoFromFiles()[0].toString() );
+	            assertTrue( SpdxFiles[i].getLicenseComments().contains(FILE_WITH_IDS_DECLARED_LICENSE) );
+	            assertEquals( FILE_WITH_IDS__CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString() );
+        	} else {
+	            assertEquals( DEFAULT_DECLARED_LICENSE, SpdxFiles[i].getLicenseInfoFromFiles()[0].toString() );
+	            assertEquals( DEFAULT_LICENSE_COMMENT, SpdxFiles[i].getLicenseComments() );
+	            assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString() );
+        	}
             assertEquals( DEFAULT_NOTICE, SpdxFiles[i].getNoticeText() );
         }
 	}
@@ -396,7 +418,7 @@ public class TestSpdxFileCollector {
                     assertEquals( file3DeclaredLicense.toString(), SpdxFiles[i].getLicenseInfoFromFiles()[0].toString() );
                     assertEquals( file3LicenseComment, SpdxFiles[i].getLicenseComments() );
                     assertEquals( file3Notice, SpdxFiles[i].getNoticeText() );
-	            } else 
+	            } else if ( !SpdxFiles[i].getName().endsWith( FILE_NAME_WITH_ID ))
 	            {
     	            assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment() );
     	            assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString());
@@ -420,8 +442,13 @@ public class TestSpdxFileCollector {
                                            new HashMap<String, SpdxDefaultFileInformation>(),
                                            spdxPackage, RelationshipType.GENERATES, container );
         result = collector.getLicenseInfoFromFiles();
-        assertEquals( 1, result.length );
-        assertEquals( DEFAULT_DECLARED_LICENSE, result[0].toString() );
+        assertEquals( 2, result.length );
+        if ( DEFAULT_DECLARED_LICENSE.equals(result[0].toString()) ) {
+        	assertEquals( FILE_WITH_IDS_DECLARED_LICENSE, result[1].toString() );
+        } else {
+        	assertEquals( DEFAULT_DECLARED_LICENSE, result[1].toString() );
+        	assertEquals( FILE_WITH_IDS_DECLARED_LICENSE, result[0].toString() );
+        }
         
         File tempDir2 = Files.createTempDir();
         try {
@@ -441,13 +468,24 @@ public class TestSpdxFileCollector {
                                                new HashMap<String, SpdxDefaultFileInformation>(),
                                                spdxPackage, RelationshipType.GENERATES, container );
             result = collector.getLicenseInfoFromFiles();
-            assertEquals( 2, result.length );
-            if ( result[0].toString().equals( DEFAULT_DECLARED_LICENSE )) {
-                assertEquals( newLicenseName, result[1].toString() );
-            } else {
-                assertEquals( newLicenseName, result[0].toString() );
-                assertEquals( DEFAULT_DECLARED_LICENSE, result[1].toString() );
+            assertEquals( 3, result.length );
+            boolean foundDefault = false;
+            boolean foundFileWithIds = false;
+            boolean foundNewLicense = false;
+            for ( AnyLicenseInfo lic:result ) {
+            	if ( lic.toString().equals( DEFAULT_DECLARED_LICENSE )) {
+            		foundDefault = true;
+            	}
+            	if ( lic.toString().equals( FILE_WITH_IDS_DECLARED_LICENSE )) {
+            		foundFileWithIds = true;
+            	}
+            	if ( lic.toString().equals( newLicenseName )) {
+            		foundNewLicense = true;
+            	}
             }
+            assertTrue( foundDefault );
+            assertTrue( foundFileWithIds );
+            assertTrue( foundNewLicense );
         } finally {
             deleteDirectory( tempDir2 );
         }
@@ -491,5 +529,13 @@ public class TestSpdxFileCollector {
 	    String unixSpdxFile = "./unixFolder/subfolder/file.sh";
 	    result = collector.convertFilePathToSpdxFileName( unixFilePath );
 	    assertEquals( unixSpdxFile, result );
+	}
+	
+	@Test
+	public void testIsSourceFile() {
+		SpdxFileCollector collector = new SpdxFileCollector( null );
+		assertTrue( collector.isSourceFile( new FileType[] {FileType.fileType_source} ));
+		assertTrue( collector.isSourceFile( new FileType[] {FileType.fileType_text, FileType.fileType_source} ));
+		assertFalse( collector.isSourceFile( new FileType[] {FileType.fileType_binary, FileType.fileType_image} ));
 	}
 }
