@@ -3,6 +3,16 @@ See http://spdx.org for information on SPDX.
 # Goal Overview
 createSPDX creates an SPDX document for artifacts defined in the POM file.  Will replace any exsiting SPDX documents.
 
+# Code quality badges
+
+| Bugs        | Security Rating           | Maintainability  | Tech debt  |
+| ------------- |:-------------:| -----:|
+|   [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=bugs)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin)    | [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=security_rating)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin) | [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin) | [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=sqale_index)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin) |
+
+
+
+
+
 # Usage
 In the build plugins section add the plugin with a goal of createSPDX:
 ```xml
@@ -39,14 +49,14 @@ File level data supports default parameters which are applied to all files.
 
 File specific parameters can be specified in the configuration parameter pathsWithSpecificSpdxInfo which
 includes a directoryOrFile configuration parameter in addition to the SPDX file level
-parameters. 
+parameters.
 
 A mapping of POM properties and configuration parameters can be found in the spreadsheet
 SPDX-fields-maven-mapping.xlsx.
 
 The treatment of licenses for Maven is somewhat involved.  Where possible,
 SPDX standard licenses ID's should be used.  If no SPDX standard license
-is available, a nonStandardLicense must be declared as a parameter including 
+is available, a nonStandardLicense must be declared as a parameter including
 a unique license ID and the verbatim license text.
 
 # Example
