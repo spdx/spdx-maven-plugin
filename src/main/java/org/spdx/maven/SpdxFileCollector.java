@@ -1,5 +1,4 @@
 /*
-
  * Copyright 2014 Source Auditor Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License" );
@@ -21,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
@@ -44,6 +46,8 @@ import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
+import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
@@ -343,15 +347,45 @@ public class SpdxFileCollector
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
         FileType[] fileTypes =  new FileType[] {extensionToFileType( getExtension( file ) )};
         String sha1 = generateSha1( file );
-        AnyLicenseInfo license;
-        license = defaultFileInformation.getDeclaredLicense();
+        AnyLicenseInfo concludedLicense = null;
+        AnyLicenseInfo license = null;
+        String licenseComment = defaultFileInformation.getLicenseComment();
+        if ( isSourceFile( fileTypes ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH ) {
+        	List<AnyLicenseInfo> fileSpdxLicenses = null;
+        	try {
+        		fileSpdxLicenses = SpdxSourceFileParser.parseFileForSpdxLicenses( file );
+        	} catch ( SpdxSourceParserException ex) {
+    			if ( log != null ) {
+    				log.error( "Error parsing for SPDX license ID's", ex);
+    			}
+        	}
+        	if ( fileSpdxLicenses != null && fileSpdxLicenses.size() > 0) {
+        		// The file has declared licenses of the form SPDX-License-Identifier: licenseId
+        		if ( fileSpdxLicenses.size() == 1 ) {
+        			license = fileSpdxLicenses.get(0);
+        		} else {
+        			license = new ConjunctiveLicenseSet( fileSpdxLicenses.toArray( new AnyLicenseInfo[fileSpdxLicenses.size()] ) );
+        		}
+        		if (licenseComment.length() > 0) {
+        			licenseComment = licenseComment.concat( ";  ");
+        		}
+        		licenseComment = licenseComment.concat( "This file contains SPDX-License-Identifiers for " );
+        		licenseComment = licenseComment.concat( license.toString() );
+        	}
+        }
+        if ( license == null ) {
+        	license = defaultFileInformation.getDeclaredLicense();
+        	concludedLicense = defaultFileInformation.getConcludedLicense();
+        } else {
+        	concludedLicense = license;
+        }
+        
         String copyright = defaultFileInformation.getCopyright();
         String notice = defaultFileInformation.getNotice();
         String comment = defaultFileInformation.getComment();
         String[] contributors = defaultFileInformation.getContributors();
         DoapProject[] artifactOf = new DoapProject[0];
-        AnyLicenseInfo concludedLicense = defaultFileInformation.getConcludedLicense();
-        String licenseComment = defaultFileInformation.getLicenseComment();
+
         SpdxFile retval = null;
         //TODO: Add annotation
         //TODO: Add optional checksums
@@ -374,7 +408,20 @@ public class SpdxFileCollector
         return retval;
     }
 
-    /**
+	/**
+	 * @param fileTypes
+	 * @return true if the fileTypes contain a source file type
+	 */
+	protected boolean isSourceFile( FileType[] fileTypes ) {
+		for ( FileType ft:fileTypes ) {
+			if ( ft == FileType.fileType_source ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
      * Create the SPDX file name from a system specific path name
      * @param filePath system specific file path relative to the top of the archive root
      * to the top of the archive directory where the file is stored.
