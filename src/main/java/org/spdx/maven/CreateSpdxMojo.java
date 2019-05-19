@@ -89,7 +89,7 @@ public class CreateSpdxMojo
 
     private static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
 
-    private static final String SPDX_ARTIFACT_TYPE = "spdx";
+    private static final String SPDX_ARTIFACT_TYPE = "spdx.rdf.xml";
     
     /**
      * @parameter default-value="${project}"

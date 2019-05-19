@@ -69,7 +69,7 @@ public class TestSpdxMojo
         File spdxFile = new File ( getBasedir(), SPDX_FILE_NAME );
         assertTrue ( spdxFile.exists() );
         // Test output artifact file is created
-        File artifactFile = new File( getBasedir(), "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx" );
+        File artifactFile = new File( getBasedir(), "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml" );
         assertTrue ( artifactFile.exists() );
         SpdxDocument result = SPDXDocumentFactory.createSpdxDocument( artifactFile.getAbsolutePath() );
         List<String> warnings = result.verify();
