@@ -622,7 +622,7 @@ public class SpdxFileCollector
                 }
             } catch ( IOException e ) 
             {
-                throw( new SpdxCollectionException( "IO error closing file input stream while calculating the SHA1" ) );
+            	logger.warn( "IO error closing file input stream while calculating the SHA1" );
             }
         }
     }
