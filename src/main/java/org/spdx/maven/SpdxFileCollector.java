@@ -366,7 +366,9 @@ public class SpdxFileCollector
         		} else {
         			license = new ConjunctiveLicenseSet( fileSpdxLicenses.toArray( new AnyLicenseInfo[fileSpdxLicenses.size()] ) );
         		}
-        		if (licenseComment.length() > 0) {
+        		if ( licenseComment == null ) {
+        			licenseComment = "";
+        		} else if (licenseComment.length() > 0) {
         			licenseComment = licenseComment.concat( ";  ");
         		}
         		licenseComment = licenseComment.concat( "This file contains SPDX-License-Identifiers for " );
