@@ -1,0 +1,20 @@
+language: java
+
+dist: trusty
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email: 
+    recipients:
+      - gary@sourceauditor.com
+    on_success: change
+    on_failure: always
+    
+addons:
+  sonarcloud:
+    organization: "spdx-maven-plugin"
+    
+after_success:
+  - sonar-scanner
