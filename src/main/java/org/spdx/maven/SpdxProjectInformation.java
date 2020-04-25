@@ -30,7 +30,7 @@ import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
  * @author Gary O'Neall
  *
  */
-class SpdxProjectInformation {
+public class SpdxProjectInformation {
     String[] creators = new String[0];
     String creatorComment = "";
     AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
