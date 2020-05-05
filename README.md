@@ -5,10 +5,6 @@ createSPDX creates an SPDX document for artifacts defined in the POM file.  Will
 
 # Code quality badges
 
-| Bugs        | Security Rating           | Maintainability  | Tech debt  |
-
-| ------------- |:-------------:| -----:|
-
 |   [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=bugs)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin)    | [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=security_rating)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin) | [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin) | [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=spdx-maven-plugin&metric=sqale_index)](https://sonarcloud.io/dashboard?id=spdx-maven-plugin) |
 
 
