@@ -26,19 +26,20 @@ import com.google.common.io.Files;
 
 /**
  * Testing stub for MavenProjectHelper
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class MavenProjectHelperStub
-    extends DefaultMavenProjectHelper
+public class MavenProjectHelperStub extends DefaultMavenProjectHelper
 {
-    
-    
+
+
     @Override
-    public void attachArtifact(MavenProject project, String artifactType, File file) {
+    public void attachArtifact( MavenProject project, String artifactType, File file )
+    {
         String outputFileName = project.getArtifactId() + "." + artifactType;
-        File outputFile = new File ( getBaseDir(), outputFileName );
-        if (outputFile.exists()) {
+        File outputFile = new File( getBaseDir(), outputFileName );
+        if ( outputFile.exists() )
+        {
             outputFile.delete();
         }
         try
@@ -47,11 +48,12 @@ public class MavenProjectHelperStub
         }
         catch ( IOException e )
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException( e );
         }
     }
-    
-    public File getBaseDir() {
+
+    public File getBaseDir()
+    {
         return new File( PlexusTestCase.getBasedir() + "/src/test/resources/unit/spdx-maven-plugin-test/" );
     }
 

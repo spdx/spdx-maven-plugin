@@ -27,10 +27,11 @@ import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 
 /**
  * Simple structure to hold information about SPDX project
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class SpdxProjectInformation {
+public class SpdxProjectInformation
+{
     String[] creators = new String[0];
     String creatorComment = "";
     AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
@@ -52,6 +53,7 @@ public class SpdxProjectInformation {
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
     private List<ExternalReference> externalRefs;
+
     /**
      * @return the documentComment
      */
@@ -59,6 +61,7 @@ public class SpdxProjectInformation {
     {
         return documentComment;
     }
+
     /**
      * @param documentComment the documentComment to set
      */
@@ -66,223 +69,292 @@ public class SpdxProjectInformation {
     {
         this.documentComment = documentComment;
     }
+
     /**
      * @return the sha1
      */
-    public String getSha1() {
+    public String getSha1()
+    {
         return sha1;
     }
+
     /**
      * @param sha1 the sha1 to set
      */
-    public void setSha1( String sha1 ) {
+    public void setSha1( String sha1 )
+    {
         this.sha1 = sha1;
     }
+
     /**
      * @return the concludedLicense
      */
-    public AnyLicenseInfo getConcludedLicense() {
+    public AnyLicenseInfo getConcludedLicense()
+    {
         return concludedLicense;
     }
+
     /**
      * @param concludedLicense the concludedLicense to set
      */
-    public void setConcludedLicense( AnyLicenseInfo concludedLicense ) {
+    public void setConcludedLicense( AnyLicenseInfo concludedLicense )
+    {
         this.concludedLicense = concludedLicense;
     }
+
     /**
      * @return the declaredLicense
      */
-    public AnyLicenseInfo getDeclaredLicense() {
+    public AnyLicenseInfo getDeclaredLicense()
+    {
         return declaredLicense;
     }
+
     /**
      * @param declaredLicense the declaredLicense to set
      */
-    public void setDeclaredLicense( AnyLicenseInfo declaredLicense ) {
+    public void setDeclaredLicense( AnyLicenseInfo declaredLicense )
+    {
         this.declaredLicense = declaredLicense;
     }
+
     /**
      * @return the description
      */
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
+
     /**
      * @param description the description to set
      */
-    public void setDescription( String description ) {
+    public void setDescription( String description )
+    {
         this.description = description;
     }
+
     /**
      * @return the downloadUrl
      */
-    public String getDownloadUrl() {
+    public String getDownloadUrl()
+    {
         return downloadUrl;
     }
+
     /**
      * @param downloadUrl the downloadUrl to set
      */
-    public void setDownloadUrl( String downloadUrl ) {
+    public void setDownloadUrl( String downloadUrl )
+    {
         this.downloadUrl = downloadUrl;
     }
+
     /**
      * @return the homePage
      */
-    public String getHomePage() {
+    public String getHomePage()
+    {
         return homePage;
     }
+
     /**
      * @param homePage the homePage to set
      */
-    public void setHomePage( String homePage ) {
+    public void setHomePage( String homePage )
+    {
         this.homePage = homePage;
     }
+
     /**
      * @return the shortDescription
      */
-    public String getShortDescription() {
+    public String getShortDescription()
+    {
         return shortDescription;
     }
+
     /**
      * @param shortDescription the shortDescription to set
      */
-    public void setShortDescription( String shortDescription ) {
+    public void setShortDescription( String shortDescription )
+    {
         this.shortDescription = shortDescription;
     }
+
     /**
      * @return the originator
      */
-    public String getOriginator() {
+    public String getOriginator()
+    {
         return originator;
     }
+
     /**
      * @param originator the originator to set
      */
-    public void setOriginator( String originator ) {
+    public void setOriginator( String originator )
+    {
         this.originator = originator;
     }
+
     /**
      * @return the supplier
      */
-    public String getSupplier() {
+    public String getSupplier()
+    {
         return supplier;
     }
+
     /**
      * @param supplier the supplier to set
      */
-    public void setSupplier( String supplier ) {
+    public void setSupplier( String supplier )
+    {
         this.supplier = supplier;
     }
+
     /**
      * @return the packageArchiveFileName
      */
-    public String getPackageArchiveFileName() {
+    public String getPackageArchiveFileName()
+    {
         return packageArchiveFileName;
     }
+
     /**
      * @param packageArchiveFileName the packageArchiveFileName to set
      */
-    public void setPackageArchiveFileName( String packageArchiveFileName ) {
+    public void setPackageArchiveFileName( String packageArchiveFileName )
+    {
         this.packageArchiveFileName = packageArchiveFileName;
     }
+
     /**
      * @return the versionInfo
      */
-    public String getVersionInfo() {
+    public String getVersionInfo()
+    {
         return versionInfo;
     }
+
     /**
      * @param versionInfo the versionInfo to set
      */
-    public void setVersionInfo( String versionInfo ) {
+    public void setVersionInfo( String versionInfo )
+    {
         this.versionInfo = versionInfo;
     }
+
     /**
      * @return the licenseComment
      */
-    public String getLicenseComment() {
+    public String getLicenseComment()
+    {
         return licenseComment;
     }
+
     /**
      * @param licenseComment the licenseComment to set
      */
-    public void setLicenseComment( String licenseComment ) {
+    public void setLicenseComment( String licenseComment )
+    {
         this.licenseComment = licenseComment;
     }
+
     /**
      * @return the creators
      */
-    public String[] getCreators() {
+    public String[] getCreators()
+    {
         return creators;
     }
+
     /**
      * @param creators the creators to set
      */
-    public void setCreators( String[] creators ) {
+    public void setCreators( String[] creators )
+    {
         this.creators = creators;
     }
+
     /**
      * @return the creatorComment
      */
-    public String getCreatorComment() {
+    public String getCreatorComment()
+    {
         return creatorComment;
     }
+
     /**
      * @param creatorComment the creatorComment to set
      */
-    public void setCreatorComment( String creatorComment ) {
+    public void setCreatorComment( String creatorComment )
+    {
         this.creatorComment = creatorComment;
     }
-    public String getName() {
+
+    public String getName()
+    {
         return name;
     }
-    
-    public void setName( String name ) {
+
+    public void setName( String name )
+    {
         this.name = name;
     }
-    
+
     /**
      * Log information on all fields - typically used for debugging
+     *
      * @param log
      */
-    public void logInfo( Log log ) {
-        log.debug( "SPDX Project Name: "+this.getName() );
-        log.debug( "SPDX Document comment: "+this.getDocumentComment() );
-        log.debug( "SPDX Creator comment: "+this.getCreatorComment() );
-        log.debug( "SPDX Description: "+this.getDescription() );
-        log.debug( "SPDX License comment: "+this.getLicenseComment() );
-        log.debug( "SPDX Originator: "+this.getOriginator() );
-        log.debug( "SPDX PackageArchiveFileName: "+this.getPackageArchiveFileName() );
-        log.debug( "SPDX SHA1: "+this.getSha1() );
-        log.debug( "SPDX Short description: "+this.getShortDescription() );
-        log.debug( "SPDX Supplier: "+this.getSupplier() );
-        log.debug( "SPDX Source Info:  "+this.getSourceInfo() );
-        log.debug( "SPDX Version info: "+this.getVersionInfo() );
-        log.debug( "SPDX Concluded license: "+this.getConcludedLicense().toString() );
-        log.debug( "SPDX Declared license: "+this.getDeclaredLicense().toString() );
-        log.debug( "SPDX Download URL: "+this.getDownloadUrl() );
-        log.debug( "SPDX Home page: "+this.getHomePage() );
-        if ( this.documentAnnotations != null && this.documentAnnotations.length > 0 ) {
+    public void logInfo( Log log )
+    {
+        log.debug( "SPDX Project Name: " + this.getName() );
+        log.debug( "SPDX Document comment: " + this.getDocumentComment() );
+        log.debug( "SPDX Creator comment: " + this.getCreatorComment() );
+        log.debug( "SPDX Description: " + this.getDescription() );
+        log.debug( "SPDX License comment: " + this.getLicenseComment() );
+        log.debug( "SPDX Originator: " + this.getOriginator() );
+        log.debug( "SPDX PackageArchiveFileName: " + this.getPackageArchiveFileName() );
+        log.debug( "SPDX SHA1: " + this.getSha1() );
+        log.debug( "SPDX Short description: " + this.getShortDescription() );
+        log.debug( "SPDX Supplier: " + this.getSupplier() );
+        log.debug( "SPDX Source Info:  " + this.getSourceInfo() );
+        log.debug( "SPDX Version info: " + this.getVersionInfo() );
+        log.debug( "SPDX Concluded license: " + this.getConcludedLicense().toString() );
+        log.debug( "SPDX Declared license: " + this.getDeclaredLicense().toString() );
+        log.debug( "SPDX Download URL: " + this.getDownloadUrl() );
+        log.debug( "SPDX Home page: " + this.getHomePage() );
+        if ( this.documentAnnotations != null && this.documentAnnotations.length > 0 )
+        {
             log.debug( "Document annotations: " );
-            for ( Annotation annotation:documentAnnotations ) {
+            for ( Annotation annotation : documentAnnotations )
+            {
                 annotation.logInfo( log );
             }
         }
-        if ( this.packageAnnotations != null && this.packageAnnotations.length > 0 ) {
+        if ( this.packageAnnotations != null && this.packageAnnotations.length > 0 )
+        {
             log.debug( "Package annotations: " );
-            for ( Annotation annotation:packageAnnotations ) {
+            for ( Annotation annotation : packageAnnotations )
+            {
                 annotation.logInfo( log );
             }
         }
         String[] creators = this.getCreators();
-        if ( creators != null ) {
-            for (String creator : creators) {
-                log.debug( "SPDX Creator: "+creator );
+        if ( creators != null )
+        {
+            for ( String creator : creators )
+            {
+                log.debug( "SPDX Creator: " + creator );
             }
         }
-        if (this.externalRefs != null) {
-            for ( ExternalReference externalReference:externalRefs ) {
+        if ( this.externalRefs != null )
+        {
+            for ( ExternalReference externalReference : externalRefs )
+            {
                 ExternalRef externalRef;
                 try
                 {
@@ -292,7 +364,8 @@ public class SpdxProjectInformation {
                     externalRefString.append( ' ' );
                     try
                     {
-                        externalRefString.append( ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName( externalRef.getReferenceType().getReferenceTypeUri()));
+                        externalRefString.append( ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
+                                externalRef.getReferenceType().getReferenceTypeUri() ) );
                     }
                     catch ( InvalidSPDXAnalysisException e )
                     {
@@ -300,52 +373,65 @@ public class SpdxProjectInformation {
                     }
                     externalRefString.append( ' ' );
                     externalRefString.append( externalRef.getReferenceLocator() );
-                    log.debug( "External Ref: "+externalRefString.toString() );
+                    log.debug( "External Ref: " + externalRefString.toString() );
                 }
                 catch ( MojoExecutionException e1 )
                 {
                     log.error( "Invalid external reference", e1 );
                 }
-                
+
             }
         }
     }
+
     public String getSourceInfo()
     {
         return this.sourceInfo;
     }
-    
-    public void setSourceInfo( String sourceInformation ) {
+
+    public void setSourceInfo( String sourceInformation )
+    {
         this.sourceInfo = sourceInformation;
     }
+
     public void setCopyrightText( String copyrightText )
     {
         this.copyrightText = copyrightText;
     }
+
     public String getCopyrightText()
     {
         return this.copyrightText;
     }
+
     public void setPackageAnnotations( Annotation[] packageAnnotations )
     {
         this.packageAnnotations = packageAnnotations;
-        
+
     }
-    public Annotation[] getPackageAnnotations() {
+
+    public Annotation[] getPackageAnnotations()
+    {
         return this.packageAnnotations;
     }
+
     public void setDocumentAnnotations( Annotation[] documentAnnotations )
     {
         this.documentAnnotations = documentAnnotations;
     }
-    public Annotation[] getDocumentAnnotations() {
+
+    public Annotation[] getDocumentAnnotations()
+    {
         return this.documentAnnotations;
     }
+
     public void setExternalRefs( List<ExternalReference> externalReferences )
     {
         this.externalRefs = externalReferences;
     }
-    public List<ExternalReference> getExternalRefs() {
+
+    public List<ExternalReference> getExternalRefs()
+    {
         return this.externalRefs;
     }
 }

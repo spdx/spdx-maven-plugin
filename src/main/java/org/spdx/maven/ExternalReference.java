@@ -24,11 +24,10 @@ import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 import org.spdx.rdfparser.referencetype.ReferenceType;
 
 /**
- *  An External Reference allows a Package to reference an external source of 
- *  additional information, metadata, enumerations, asset identifiers, or 
- *  downloadable content believed to be relevant to the Package.
- * @author Gary O'Neall
+ * An External Reference allows a Package to reference an external source of additional information, metadata,
+ * enumerations, asset identifiers, or downloadable content believed to be relevant to the Package.
  *
+ * @author Gary O'Neall
  */
 public class ExternalReference
 {
@@ -37,30 +36,34 @@ public class ExternalReference
 
     @Parameter( required = true )
     private String type;
-    
+
     @Parameter( required = true )
     private String locator;
-    
+
     @Parameter( required = false )
     private String comment;
-    
-    public ExternalRef getExternalRef() throws MojoExecutionException {
+
+    public ExternalRef getExternalRef() throws MojoExecutionException
+    {
         ReferenceCategory cat = ReferenceCategory.fromTag( category );
-        if (cat == null) {
-            throw( new MojoExecutionException( "External reference category "+category+" is not recognized as a valid, standard category." ) );
+        if ( cat == null )
+        {
+            throw ( new MojoExecutionException(
+                    "External reference category " + category + " is not recognized as a valid, standard category." ) );
         }
         ReferenceType refType = null;
         try
         {
-            refType = ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName(type);
+            refType = ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName( type );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw( new MojoExecutionException( "Error getting listed reference type for "+type, e ) );
+            throw ( new MojoExecutionException( "Error getting listed reference type for " + type, e ) );
         }
-        if (refType == null) {
-            throw( new MojoExecutionException( "Listed reference type not found for "+type) );
+        if ( refType == null )
+        {
+            throw ( new MojoExecutionException( "Listed reference type not found for " + type ) );
         }
-        return new ExternalRef(cat, refType, locator, comment);
+        return new ExternalRef( cat, refType, locator, comment );
     }
 }

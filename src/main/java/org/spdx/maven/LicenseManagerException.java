@@ -16,16 +16,15 @@
 package org.spdx.maven;
 
 /**
- * Exceptions related to the LicenseManager 
- * @author Gary O'Neall
+ * Exceptions related to the LicenseManager
  *
+ * @author Gary O'Neall
  */
-public class LicenseManagerException
-    extends Exception
+public class LicenseManagerException extends Exception
 {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1672757028355331818L;
 
@@ -35,7 +34,7 @@ public class LicenseManagerException
     public LicenseManagerException( String arg0 )
     {
         super( arg0 );
-     }
+    }
 
     /**
      * @param arg0

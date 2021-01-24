@@ -15,8 +15,10 @@ agree to compensate Faust, Inc. for the difference.
 Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.
 
 */
-public class InsufficientKarmaException extends RuntimeException {
-	public InsufficientKarmaException(String message) {
-		super(message);
-	}
+public class InsufficientKarmaException extends RuntimeException
+{
+    public InsufficientKarmaException( String message )
+    {
+        super( message );
+    }
 }

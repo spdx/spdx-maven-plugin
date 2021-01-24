@@ -20,41 +20,44 @@ import java.net.URL;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * Class to contain information on an SPDX doap project using 
- * maven parameters to describe the package
- * @author Gary O'Neall
+ * Class to contain information on an SPDX doap project using maven parameters to describe the package
  *
+ * @author Gary O'Neall
  */
-public class ArtifactOf {
+public class ArtifactOf
+{
 
-	/**
-	 * Required name of a project from which a file was derived
-	 */
-	@Parameter(required = true)
-	String name;
-	
-	/**
-	 * Optional parameter to indicate the location of the project from which the file has been derived
-	 */
-	@Parameter
-	URL homePage;
+    /**
+     * Required name of a project from which a file was derived
+     */
+    @Parameter( required = true )
+    String name;
 
-	public ArtifactOf() {
-		
-	}
+    /**
+     * Optional parameter to indicate the location of the project from which the file has been derived
+     */
+    @Parameter
+    URL homePage;
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+    public ArtifactOf()
+    {
 
-	/**
-	 * @return the homePage
-	 */
-	public URL getHomePage() {
-		return homePage;
-	}
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * @return the homePage
+     */
+    public URL getHomePage()
+    {
+        return homePage;
+    }
 
 }

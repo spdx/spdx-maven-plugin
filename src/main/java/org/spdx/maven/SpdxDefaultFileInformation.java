@@ -24,10 +24,10 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 
 /**
  * Simple structure to hold information obout default file information
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class SpdxDefaultFileInformation 
+public class SpdxDefaultFileInformation
 {
 
     private AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
@@ -39,77 +39,76 @@ public class SpdxDefaultFileInformation
     private String licenseComment = "";
     private List<SnippetInfo> snippets = new ArrayList<>();
 
-    public AnyLicenseInfo getDeclaredLicense() 
+    public AnyLicenseInfo getDeclaredLicense()
     {
         return this.declaredLicense;
     }
-    
-    public void setDeclaredLicense( AnyLicenseInfo license ) 
+
+    public void setDeclaredLicense( AnyLicenseInfo license )
     {
         this.declaredLicense = license;
     }
 
-    public String getCopyright() 
+    public String getCopyright()
     {
-        return this.copyright ;
+        return this.copyright;
     }
-    
-    public void setCopyright( String copyright ) 
+
+    public void setCopyright( String copyright )
     {
         this.copyright = copyright;
     }
 
-    public String getNotice() 
+    public String getNotice()
     {
         return this.notice;
     }
-    
-    public void setNotice( String notice ) 
+
+    public void setNotice( String notice )
     {
         this.notice = notice;
     }
 
-    public String getComment() 
+    public String getComment()
     {
         return this.comment;
     }
-    
-    public void setComment( String comment ) 
+
+    public void setComment( String comment )
     {
         this.comment = comment;
     }
 
-    public String[] getContributors() 
+    public String[] getContributors()
     {
         return this.contributors;
     }
-    
-    public void setContributors( String[] contributors ) 
+
+    public void setContributors( String[] contributors )
     {
         this.contributors = contributors;
     }
 
-    public AnyLicenseInfo getConcludedLicense() 
+    public AnyLicenseInfo getConcludedLicense()
     {
         return this.concludedLicense;
     }
-    
-    public void setConcludedLicense( AnyLicenseInfo license ) 
+
+    public void setConcludedLicense( AnyLicenseInfo license )
     {
         this.concludedLicense = license;
     }
 
-    public String getLicenseComment() 
+    public String getLicenseComment()
     {
         return this.licenseComment;
     }
-    
-    public void setLicenseComment( String licenseComment ) 
+
+    public void setLicenseComment( String licenseComment )
     {
         this.licenseComment = licenseComment;
     }
-    
-    
+
 
     /**
      * @return the snippets
@@ -129,25 +128,29 @@ public class SpdxDefaultFileInformation
 
     /**
      * Primarily for debugging purposes.  Dump all the field information to the log Info
+     *
      * @param log
      */
     public void logInfo( Log log )
     {
-        log.debug( "Default File Comment: "+getComment() );
-        log.debug( "Default File Copyright: "+getCopyright() );
-        log.debug( "Default File License Comment: "+getLicenseComment() );
-        log.debug( "Default File Notice: "+getNotice() );
-        log.debug( "Default File Concluded License: "+getConcludedLicense().toString() );
-        log.debug( "Default File Declared License: "+getDeclaredLicense().toString() );
+        log.debug( "Default File Comment: " + getComment() );
+        log.debug( "Default File Copyright: " + getCopyright() );
+        log.debug( "Default File License Comment: " + getLicenseComment() );
+        log.debug( "Default File Notice: " + getNotice() );
+        log.debug( "Default File Concluded License: " + getConcludedLicense().toString() );
+        log.debug( "Default File Declared License: " + getDeclaredLicense().toString() );
         String[] contributors = getContributors();
-        if ( contributors != null ) 
+        if ( contributors != null )
         {
-            for (String contributor : contributors) {
-                log.debug( "Default File Contributors: "+contributor );
+            for ( String contributor : contributors )
+            {
+                log.debug( "Default File Contributors: " + contributor );
             }
         }
-        if (this.snippets != null) {
-            for ( SnippetInfo snippet:snippets ) {
+        if ( this.snippets != null )
+        {
+            for ( SnippetInfo snippet : snippets )
+            {
                 snippet.logInfo( log );
             }
         }

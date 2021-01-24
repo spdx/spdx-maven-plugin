@@ -47,14 +47,13 @@ import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
  * Collects SPDX file information from directories.
- * 
- * The method <code>collectFilesInDirectory(FileSet[] filesets)</code> will scan and
- * create SPDX File information for all files in the filesets.
- * 
- * @author Gary O'Neall
+ * <p>
+ * The method <code>collectFilesInDirectory(FileSet[] filesets)</code> will scan and create SPDX File information for
+ * all files in the filesets.
  *
+ * @author Gary O'Neall
  */
-public class SpdxFileCollector 
+public class SpdxFileCollector
 {
     static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
     // constants for mapping extensions to types.
@@ -65,44 +64,48 @@ public class SpdxFileCollector
     static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
     static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
     static final String SPDX_PROP_FILETYPE_ARCHIVE = "SpdxArchiveExtensions";
-    static 
+
+    static
     {
         loadFileExtensionConstants();
     }
-    
+
     static final String SHA1_ALGORITHM = "SHA-1";
     static final String PACKAGE_VERIFICATION_CHARSET = "UTF-8";
     private static MessageDigest digest;
-    static 
+
+    static
     {
-        try 
+        try
         {
             digest = MessageDigest.getInstance( SHA1_ALGORITHM );
-        } catch ( NoSuchAlgorithmException e ) {
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
             logger.error( "No such algorithm error initializing the SPDX file collector - SHA1", e );
             digest = null;
         }
     }
-    
-    
+
+
     Set<AnyLicenseInfo> licensesFromFiles = new HashSet<>();
     /**
      * Map of fileName, SPDXFile for all files in the SPDX document
      */
     Map<String, SpdxFile> spdxFiles = new HashMap<>();
     List<SpdxSnippet> spdxSnippets = new ArrayList<>();
-    
+
     FileSetManager fileSetManager = new FileSetManager();
     private Log log;
 
     /**
      * SpdxFileCollector collects SPDX file information for files
      */
-    public SpdxFileCollector( Log log ) 
+    public SpdxFileCollector( Log log )
     {
         this.log = log;
     }
- 
+
     /**
      * Load file type constants from the properties file
      */
@@ -110,12 +113,14 @@ public class SpdxFileCollector
     {
         InputStream is = null;
         Properties prop = new Properties();
-        try {
-            is = SpdxFileCollector.class.getClassLoader().getResourceAsStream(SPDX_FILE_TYPE_CONSTANTS_PROP_PATH);
-            if ( is == null ) {
-                logger.error( "Unable to load properties file "+SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
+        try
+        {
+            is = SpdxFileCollector.class.getClassLoader().getResourceAsStream( SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
+            if ( is == null )
+            {
+                logger.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
             }
-            prop.load(is);
+            prop.load( is );
             String sourceExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_SOURCE );
             loadSetUpcase( SOURCE_EXTENSIONS, sourceExtensionStr );
             String binaryExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_BINARY );
@@ -125,58 +130,65 @@ public class SpdxFileCollector
         }
         catch ( IOException e )
         {
-            logger.warn("WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other.");
-        } finally {
-            try {
-                if (is != null) {
+            logger.warn(
+                    "WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other." );
+        }
+        finally
+        {
+            try
+            {
+                if ( is != null )
+                {
                     is.close();
                 }
-            } catch (Throwable e) {
-                logger.warn("WARNING: Error closing SpdxFileTypeConstants properties file");
+            }
+            catch ( Throwable e )
+            {
+                logger.warn( "WARNING: Error closing SpdxFileTypeConstants properties file" );
             }
         }
     }
 
     /**
      * Load a set from a comma delimited string of values trimming and upcasing all values
+     *
      * @param set
      * @param str
      */
     private static void loadSetUpcase( Set<String> set, String str )
     {
         String[] values = str.split( "," );
-        for (String value : values) {
+        for ( String value : values )
+        {
             set.add( value.toUpperCase().trim() );
         }
     }
 
     /**
-     * Collect file information in the directory (including subdirectories).  
-     * @param fileSets FileSets containing the description of the directory to be scanned
-     * @param baseDir project base directory used to construct the relative paths for the SPDX files 
-     * @param pathPrefix Path string which should be removed when creating the SPDX file name
-     * @param defaultFileInformation Information on default SPDX field data for the files
+     * Collect file information in the directory (including subdirectories).
+     *
+     * @param fileSets                FileSets containing the description of the directory to be scanned
+     * @param baseDir                 project base directory used to construct the relative paths for the SPDX files
+     * @param pathPrefix              Path string which should be removed when creating the SPDX file name
+     * @param defaultFileInformation  Information on default SPDX field data for the files
      * @param pathSpecificInformation Map of path to file information used to override the default file information
-     * @param relationshipType Type of relationship to the project package 
-     * @param projectPackage Package to which the files belong
-     * @param container contains the extracted license infos that may be needed for license parsing
-     * @throws SpdxCollectionException 
+     * @param relationshipType        Type of relationship to the project package
+     * @param projectPackage          Package to which the files belong
+     * @param container               contains the extracted license infos that may be needed for license parsing
+     * @throws SpdxCollectionException
      */
-    public void collectFiles( FileSet[] fileSets,
-                              String baseDir, SpdxDefaultFileInformation defaultFileInformation,
-                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
-                              SpdxPackage projectPackage, RelationshipType relationshipType,
-                              SpdxDocumentContainer container) throws SpdxCollectionException 
+    public void collectFiles( FileSet[] fileSets, String baseDir, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType, SpdxDocumentContainer container ) throws SpdxCollectionException
     {
-        for (FileSet fileSet : fileSets)
+        for ( FileSet fileSet : fileSets )
         {
             String[] includedFiles = fileSetManager.getIncludedFiles( fileSet );
-            for (String includedFile : includedFiles)
+            for ( String includedFile : includedFiles )
             {
                 String filePath = fileSet.getDirectory() + File.separator + includedFile;
                 File file = new File( filePath );
                 String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 ).replace( '\\', '/' );
-                SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath, pathSpecificInformation );
+                SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath,
+                        pathSpecificInformation );
                 if ( fileInfo == null )
                 {
                     fileInfo = defaultFileInformation;
@@ -186,7 +198,8 @@ public class SpdxFileCollector
                 if ( fileSet.getOutputDirectory() != null )
                 {
                     outputFileName = fileSet.getOutputDirectory() + File.separator + includedFile;
-                } else
+                }
+                else
                 {
                     outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                 }
@@ -194,23 +207,25 @@ public class SpdxFileCollector
             }
         }
     }
-    
+
     /**
      * Find the most appropriate file information based on the lowset level match (closedt to file)
+     *
      * @param filePath
      * @param pathSpecificInformation
      * @return
      */
-    private SpdxDefaultFileInformation findDefaultFileInformation( String filePath,
-                                                                   Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
+    private SpdxDefaultFileInformation findDefaultFileInformation( String filePath, Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
     {
-        if ( log != null ) {
-            log.debug( "Checking for file path "+filePath );
-        }      
-        SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
-        if ( retval != null ) 
+        if ( log != null )
         {
-            if ( log != null ) {
+            log.debug( "Checking for file path " + filePath );
+        }
+        SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
+        if ( retval != null )
+        {
+            if ( log != null )
+            {
                 log.debug( "Found filepath" );
             }
             return retval;
@@ -221,7 +236,7 @@ public class SpdxFileCollector
         do
         {
             parentPathIndex = parentPath.lastIndexOf( "/" );
-            if ( parentPathIndex > 0 ) 
+            if ( parentPathIndex > 0 )
             {
                 parentPath = parentPath.substring( 0, parentPathIndex );
                 retval = pathSpecificInformation.get( parentPath );
@@ -229,18 +244,18 @@ public class SpdxFileCollector
         } while ( retval == null && parentPathIndex > 0 );
         if ( retval != null )
         {
-            debug( "Found directory containing file path for path specific information.  File path: "+parentPath );
+            debug( "Found directory containing file path for path specific information.  File path: " + parentPath );
         }
         return retval;
     }
 
     private void debug( String msg )
     {
-        if ( this.getLog() != null ) 
+        if ( this.getLog() != null )
         {
             this.getLog().debug( msg );
-        } 
-        else 
+        }
+        else
         {
             logger.debug( msg );
         }
@@ -248,49 +263,53 @@ public class SpdxFileCollector
 
     /**
      * Collect SPDX information for a specific file
+     *
      * @param file
-     * @param outputFileName Path to the output file name relative to the root of the output archive file
-     * @param relationshipType Type of relationship to the project package 
-     * @param projectPackage Package to which the files belong
+     * @param outputFileName   Path to the output file name relative to the root of the output archive file
+     * @param relationshipType Type of relationship to the project package
+     * @param projectPackage   Package to which the files belong
      * @throws SpdxCollectionException
      */
-    private void collectFile( File file, String outputFileName, 
-                              SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, 
-                              SpdxPackage projectPackage, SpdxDocumentContainer container ) throws SpdxCollectionException
+    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage, SpdxDocumentContainer container ) throws SpdxCollectionException
     {
-        if ( spdxFiles.containsKey( file.getPath() )) 
+        if ( spdxFiles.containsKey( file.getPath() ) )
         {
             return; // already added from a previous scan
         }
         SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo );
-        Relationship relationship = new Relationship(projectPackage, relationshipType, "");
+        Relationship relationship = new Relationship( projectPackage, relationshipType, "" );
         try
         {
             spdxFile.addRelationship( relationship );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            if ( log != null ) {
-                log.error( "Spdx exception creating file relationship: "+e.getMessage(), e );   
+            if ( log != null )
+            {
+                log.error( "Spdx exception creating file relationship: " + e.getMessage(), e );
             }
-            throw new SpdxCollectionException("Error creating SPDX file relationship: "+e.getMessage());
+            throw new SpdxCollectionException( "Error creating SPDX file relationship: " + e.getMessage() );
         }
-        if ( fileInfo.getSnippets() != null ) {
-            for ( SnippetInfo snippet:fileInfo.getSnippets() ) {
+        if ( fileInfo.getSnippets() != null )
+        {
+            for ( SnippetInfo snippet : fileInfo.getSnippets() )
+            {
                 SpdxSnippet spdxSnippet;
                 try
                 {
-                    spdxSnippet = convertToSpdxSnippet( snippet, spdxFile, container  );
+                    spdxSnippet = convertToSpdxSnippet( snippet, spdxFile, container );
                 }
                 catch ( InvalidLicenseStringException e )
                 {
                     logger.error( "Invalid license string creating snippet", e );
-                    throw new SpdxCollectionException( "Error processing SPDX snippet information.  Invalid license string specified in snippet.",e );
+                    throw new SpdxCollectionException(
+                            "Error processing SPDX snippet information.  Invalid license string specified in snippet.",
+                            e );
                 }
                 catch ( SpdxBuilderException e )
                 {
                     logger.error( "Error creating SPDX snippet", e );
-                    throw new SpdxCollectionException( "Error creating SPDX snippet information.",e );
+                    throw new SpdxCollectionException( "Error creating SPDX snippet information.", e );
                 }
                 spdxSnippets.add( spdxSnippet );
             }
@@ -303,68 +322,76 @@ public class SpdxFileCollector
     private SpdxSnippet convertToSpdxSnippet( SnippetInfo snippet, SpdxFile spdxFile, SpdxDocumentContainer container ) throws InvalidLicenseStringException, SpdxBuilderException
     {
         //TODO: Add annotations to snippet
-        SpdxSnippet retval = new SpdxSnippet(snippet.getName(), 
-                                             snippet.getComment(), 
-                                             new org.spdx.rdfparser.model.Annotation[0], 
-                                             new Relationship[0], 
-                                             snippet.getLicenseConcluded( container ), 
-                                             snippet.getLicenseInfoInSnippet( container ),
-                                             snippet.getCopyrightText(),
-                                             snippet.getLicensComment(), 
-                                             spdxFile, 
-                                             snippet.getByteRange(spdxFile),
-                                             snippet.getLineRange(spdxFile));
+        SpdxSnippet retval = new SpdxSnippet( snippet.getName(), snippet.getComment(),
+                new org.spdx.rdfparser.model.Annotation[0], new Relationship[0],
+                snippet.getLicenseConcluded( container ), snippet.getLicenseInfoInSnippet( container ),
+                snippet.getCopyrightText(), snippet.getLicensComment(), spdxFile, snippet.getByteRange( spdxFile ),
+                snippet.getLineRange( spdxFile ) );
         return retval;
     }
 
     /**
      * @param file
-     * @param outputFileName Path to the output file name relative to the root of the output archive file
+     * @param outputFileName         Path to the output file name relative to the root of the output archive file
      * @param defaultFileInformation Information on default SPDX field data for the files
      * @return
      * @throws SpdxCollectionException
      */
-    private SpdxFile convertToSpdxFile( File file, String outputFileName,
-                                        SpdxDefaultFileInformation defaultFileInformation) throws SpdxCollectionException 
+    private SpdxFile convertToSpdxFile( File file, String outputFileName, SpdxDefaultFileInformation defaultFileInformation ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
-        FileType[] fileTypes =  new FileType[] {extensionToFileType( getExtension( file ) )};
+        FileType[] fileTypes = new FileType[] {extensionToFileType( getExtension( file ) )};
         String sha1 = generateSha1( file );
         AnyLicenseInfo concludedLicense = null;
         AnyLicenseInfo license = null;
         String licenseComment = defaultFileInformation.getLicenseComment();
-        if ( isSourceFile( fileTypes ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH ) {
-        	List<AnyLicenseInfo> fileSpdxLicenses = null;
-        	try {
-        		fileSpdxLicenses = SpdxSourceFileParser.parseFileForSpdxLicenses( file );
-        	} catch ( SpdxSourceParserException ex) {
-    			if ( log != null ) {
-    				log.error( "Error parsing for SPDX license ID's", ex);
-    			}
-        	}
-        	if ( fileSpdxLicenses != null && fileSpdxLicenses.size() > 0) {
-        		// The file has declared licenses of the form SPDX-License-Identifier: licenseId
-        		if ( fileSpdxLicenses.size() == 1 ) {
-        			license = fileSpdxLicenses.get(0);
-        		} else {
-        			license = new ConjunctiveLicenseSet( fileSpdxLicenses.toArray( new AnyLicenseInfo[0] ) );
-        		}
-        		if ( licenseComment == null ) {
-        			licenseComment = "";
-        		} else if (licenseComment.length() > 0) {
-        			licenseComment = licenseComment.concat( ";  ");
-        		}
-        		licenseComment = licenseComment.concat( "This file contains SPDX-License-Identifiers for " );
-        		licenseComment = licenseComment.concat( license.toString() );
-        	}
+        if ( isSourceFile( fileTypes ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH )
+        {
+            List<AnyLicenseInfo> fileSpdxLicenses = null;
+            try
+            {
+                fileSpdxLicenses = SpdxSourceFileParser.parseFileForSpdxLicenses( file );
+            }
+            catch ( SpdxSourceParserException ex )
+            {
+                if ( log != null )
+                {
+                    log.error( "Error parsing for SPDX license ID's", ex );
+                }
+            }
+            if ( fileSpdxLicenses != null && fileSpdxLicenses.size() > 0 )
+            {
+                // The file has declared licenses of the form SPDX-License-Identifier: licenseId
+                if ( fileSpdxLicenses.size() == 1 )
+                {
+                    license = fileSpdxLicenses.get( 0 );
+                }
+                else
+                {
+                    license = new ConjunctiveLicenseSet( fileSpdxLicenses.toArray( new AnyLicenseInfo[0] ) );
+                }
+                if ( licenseComment == null )
+                {
+                    licenseComment = "";
+                }
+                else if ( licenseComment.length() > 0 )
+                {
+                    licenseComment = licenseComment.concat( ";  " );
+                }
+                licenseComment = licenseComment.concat( "This file contains SPDX-License-Identifiers for " );
+                licenseComment = licenseComment.concat( license.toString() );
+            }
         }
-        if ( license == null ) {
-        	license = defaultFileInformation.getDeclaredLicense();
-        	concludedLicense = defaultFileInformation.getConcludedLicense();
-        } else {
-        	concludedLicense = license;
+        if ( license == null )
+        {
+            license = defaultFileInformation.getDeclaredLicense();
+            concludedLicense = defaultFileInformation.getConcludedLicense();
         }
-        
+        else
+        {
+            concludedLicense = license;
+        }
+
         String copyright = defaultFileInformation.getCopyright();
         String notice = defaultFileInformation.getNotice();
         String comment = defaultFileInformation.getComment();
@@ -376,79 +403,91 @@ public class SpdxFileCollector
         //TODO: Add optional checksums
         try
         {
-            retval = new SpdxFile( relativePath, fileTypes, 
-                    sha1, concludedLicense, new AnyLicenseInfo[] {license}, 
+            retval = new SpdxFile( relativePath, fileTypes, sha1, concludedLicense, new AnyLicenseInfo[] {license},
                     licenseComment, copyright, artifactOf, comment );
             retval.setFileContributors( contributors );
             retval.setNoticeText( notice );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            if ( log != null ) {
-                log.error( "Spdx exception creating file: "+e.getMessage(), e );
+            if ( log != null )
+            {
+                log.error( "Spdx exception creating file: " + e.getMessage(), e );
             }
-            throw new SpdxCollectionException("Error creating SPDX file: "+e.getMessage());
+            throw new SpdxCollectionException( "Error creating SPDX file: " + e.getMessage() );
         }
 
         return retval;
     }
 
-	/**
-	 * @param fileTypes
-	 * @return true if the fileTypes contain a source file type
-	 */
-	protected boolean isSourceFile( FileType[] fileTypes ) {
-		for ( FileType ft:fileTypes ) {
-			if ( ft == FileType.fileType_source ) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * @param fileTypes
+     * @return true if the fileTypes contain a source file type
+     */
+    protected boolean isSourceFile( FileType[] fileTypes )
+    {
+        for ( FileType ft : fileTypes )
+        {
+            if ( ft == FileType.fileType_source )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
+    /**
      * Create the SPDX file name from a system specific path name
-     * @param filePath system specific file path relative to the top of the archive root
-     * to the top of the archive directory where the file is stored.
+     *
+     * @param filePath system specific file path relative to the top of the archive root to the top of the archive
+     *                 directory where the file is stored.
      * @return
      */
     public String convertFilePathToSpdxFileName( String filePath )
     {
         String result = filePath.replace( '\\', '/' );
-        if ( !result.startsWith( "./" )) 
+        if ( !result.startsWith( "./" ) )
         {
             result = "./" + result;
         }
         return result;
     }
 
-    public String getExtension( File file ) {
+    public String getExtension( File file )
+    {
         String fileName = file.getName();
         int lastDot = fileName.lastIndexOf( '.' );
-        if ( lastDot < 1 ) 
+        if ( lastDot < 1 )
         {
             return "";
-        } else {
-            return fileName.substring( lastDot+1 );
+        }
+        else
+        {
+            return fileName.substring( lastDot + 1 );
         }
     }
 
-    private static FileType extensionToFileType( String fileExtension ) {
+    private static FileType extensionToFileType( String fileExtension )
+    {
         //TODO: Add other file types
-        if ( fileExtension == null ) {
+        if ( fileExtension == null )
+        {
             return FileType.fileType_other;
         }
         String upperExtension = fileExtension.toUpperCase();
-        if ( SOURCE_EXTENSIONS.contains( upperExtension ) ) 
+        if ( SOURCE_EXTENSIONS.contains( upperExtension ) )
         {
             return FileType.fileType_source;
-        } else if ( BINARY_EXTENSIONS.contains( upperExtension ) ) 
+        }
+        else if ( BINARY_EXTENSIONS.contains( upperExtension ) )
         {
             return FileType.fileType_binary;
-        } else if ( ARCHIVE_EXTENSIONS.contains( upperExtension ) ) 
+        }
+        else if ( ARCHIVE_EXTENSIONS.contains( upperExtension ) )
         {
             return FileType.fileType_archive;
-        } else 
+        }
+        else
         {
             return FileType.fileType_other;
         }
@@ -458,15 +497,15 @@ public class SpdxFileCollector
     /**
      * @return SPDX Files which have been acquired through the collectFilesInDirectory method
      */
-    public SpdxFile[] getFiles() 
+    public SpdxFile[] getFiles()
     {
         return spdxFiles.values().toArray( new SpdxFile[0] );
     }
-    
+
     /**
      * @return SPDX Snippets collected through the collectFilesInDirectory method
      */
-    public List<SpdxSnippet> getSnippets() 
+    public List<SpdxSnippet> getSnippets()
     {
         return this.spdxSnippets;
     }
@@ -474,136 +513,152 @@ public class SpdxFileCollector
     /**
      * @return all license information used in the SPDX files
      */
-    public AnyLicenseInfo[] getLicenseInfoFromFiles() 
+    public AnyLicenseInfo[] getLicenseInfoFromFiles()
     {
         return licensesFromFiles.toArray( new AnyLicenseInfo[0] );
     }
 
     /**
      * Create a verification code from all SPDX files collected
+     *
      * @param spdxFilePath Complete file path for the SPDX file - this will be excluded from the verification code
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath ) throws NoSuchAlgorithmException 
+    public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath ) throws NoSuchAlgorithmException
     {
         ArrayList<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
 
-        if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) ) 
+        if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) )
         {
             excludedFileNamesFromVerificationCode.add( spdxFiles.get( spdxFilePath ).getName() );
-        }            
+        }
         SpdxPackageVerificationCode verificationCode;
-        verificationCode = calculatePackageVerificationCode( spdxFiles.values(), excludedFileNamesFromVerificationCode );
+        verificationCode = calculatePackageVerificationCode( spdxFiles.values(),
+                excludedFileNamesFromVerificationCode );
         return verificationCode;
     }
 
     /**
      * Calculate the package verification code for a collection of SPDX files
-     * @param spdxFiles Files used to calculate the verification code
+     *
+     * @param spdxFiles                             Files used to calculate the verification code
      * @param excludedFileNamesFromVerificationCode List of file names to exclude
      * @return
      * @throws NoSuchAlgorithmException
      */
-    private SpdxPackageVerificationCode calculatePackageVerificationCode(
-            Collection<SpdxFile> spdxFiles,
-            ArrayList<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException 
+    private SpdxPackageVerificationCode calculatePackageVerificationCode( Collection<SpdxFile> spdxFiles, ArrayList<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException
     {
         ArrayList<String> fileChecksums = new ArrayList<>();
-        for (SpdxFile file : spdxFiles) {
-            if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) ) {
+        for ( SpdxFile file : spdxFiles )
+        {
+            if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) )
+            {
                 fileChecksums.add( file.getSha1() );
             }
         }
         Collections.sort( fileChecksums );
         MessageDigest verificationCodeDigest = MessageDigest.getInstance( "SHA-1" );
-        for (String fileChecksum : fileChecksums)
+        for ( String fileChecksum : fileChecksums )
         {
             byte[] hashInput = fileChecksum.getBytes( StandardCharsets.UTF_8 );
             verificationCodeDigest.update( hashInput );
         }
         String value = convertChecksumToString( verificationCodeDigest.digest() );
-        return new SpdxPackageVerificationCode( value, excludedFileNamesFromVerificationCode.toArray(
-                new String[0] ) );
+        return new SpdxPackageVerificationCode( value, excludedFileNamesFromVerificationCode.toArray( new String[0] ) );
     }
 
-    private boolean includeInVerificationCode( String name, ArrayList<String> excludedFileNamesFromVerificationCode ) 
+    private boolean includeInVerificationCode( String name, ArrayList<String> excludedFileNamesFromVerificationCode )
     {
-        for (String s : excludedFileNamesFromVerificationCode)
+        for ( String s : excludedFileNamesFromVerificationCode )
         {
-            if ( s.equals( name ) ) {
+            if ( s.equals( name ) )
+            {
                 return false;
             }
         }
         return true;
     }
-    
+
     /**
      * Converts an array of bytes to a string compliant with the SPDX sha1 representation
+     *
      * @param digestBytes
      * @return
      */
-    public static String convertChecksumToString( byte[] digestBytes ) 
+    public static String convertChecksumToString( byte[] digestBytes )
     {
         StringBuilder sb = new StringBuilder();
-        for (byte digestByte : digestBytes) {
+        for ( byte digestByte : digestBytes )
+        {
             String hex = Integer.toHexString( 0xff & digestByte );
-            if ( hex.length() < 2 ) {
+            if ( hex.length() < 2 )
+            {
                 sb.append( '0' );
             }
             sb.append( hex );
         }
         return sb.toString();
     }
-    
+
     /**
      * Generate the Sha1 for a given file.  Must have read access to the file.
+     *
      * @param file
      * @return
      * @throws SpdxCollectionException
      */
-    public static String generateSha1( File file ) throws SpdxCollectionException 
+    public static String generateSha1( File file ) throws SpdxCollectionException
     {
-        if ( digest == null ) 
+        if ( digest == null )
         {
-            try {
-                digest = MessageDigest.getInstance( SHA1_ALGORITHM );
-            } catch ( NoSuchAlgorithmException e ) 
+            try
             {
-                throw( new SpdxCollectionException( "Unable to create the message digest for generating the File SHA1" ) );
+                digest = MessageDigest.getInstance( SHA1_ALGORITHM );
+            }
+            catch ( NoSuchAlgorithmException e )
+            {
+                throw ( new SpdxCollectionException(
+                        "Unable to create the message digest for generating the File SHA1" ) );
             }
         }
         digest.reset();
         InputStream in;
-        try 
+        try
         {
             in = new FileInputStream( file );
-        } catch ( IOException e1 ) 
-        {
-            throw( new SpdxCollectionException( "IO getting file content while calculating the SHA1" ) );
         }
-        try {
+        catch ( IOException e1 )
+        {
+            throw ( new SpdxCollectionException( "IO getting file content while calculating the SHA1" ) );
+        }
+        try
+        {
             byte[] buffer = new byte[2048];
             int numBytes = in.read( buffer );
-            while ( numBytes >= 0 ) 
+            while ( numBytes >= 0 )
             {
                 digest.update( buffer, 0, numBytes );
                 numBytes = in.read( buffer );
             }
             return convertChecksumToString( digest.digest() );
-        } catch ( IOException e ) 
+        }
+        catch ( IOException e )
         {
-            throw( new SpdxCollectionException( "IO error reading file input stream while calculating the SHA1" ) );
-        } finally {
-            try 
+            throw ( new SpdxCollectionException( "IO error reading file input stream while calculating the SHA1" ) );
+        }
+        finally
+        {
+            try
             {
-                if ( in != null ) 
+                if ( in != null )
                 {
-                      in.close(); 
+                    in.close();
                 }
-            } catch ( IOException e ) 
+            }
+            catch ( IOException e )
             {
-            	logger.warn( "IO error closing file input stream while calculating the SHA1" );
+                logger.warn( "IO error closing file input stream while calculating the SHA1" );
             }
         }
     }
@@ -612,7 +667,7 @@ public class SpdxFileCollector
     {
         this.log = log;
     }
-    
+
     private Log getLog()
     {
         return this.log;
