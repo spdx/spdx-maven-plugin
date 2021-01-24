@@ -153,9 +153,8 @@ public class SpdxFileCollector
     private static void loadSetUpcase( Set<String> set, String str )
     {
         String[] values = str.split( "," );
-        for ( int i = 0; i < values.length; i++ )
-        {
-            set.add( values[i].toUpperCase().trim() );
+        for (String value : values) {
+            set.add( value.toUpperCase().trim() );
         }
     }
 
@@ -177,31 +176,31 @@ public class SpdxFileCollector
                               SpdxPackage projectPackage, RelationshipType relationshipType,
                               SpdxDocumentContainer container) throws SpdxCollectionException 
     {
-       for ( int i = 0; i < fileSets.length; i++ ) 
-       {
-           String[] includedFiles = fileSetManager.getIncludedFiles( fileSets[i] );
-           for ( int j = 0; j < includedFiles.length; j++ )
-           {
-               String filePath = fileSets[i].getDirectory() + File.separator + includedFiles[j];
-               File file = new File( filePath );
-               String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 ).replace( '\\', '/' );;
-               SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath, pathSpecificInformation );
-               if ( fileInfo == null ) 
-               {
-                   fileInfo = defaultFileInformation;
-               }
-               
-               String outputFileName;
-               if ( fileSets[i].getOutputDirectory() != null ) 
-               {
-                   outputFileName = fileSets[i].getOutputDirectory() + File.separator + includedFiles[j];
-               } else 
-               {
-                   outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
-               }
-               collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container );
-           }
-       }
+        for (FileSet fileSet : fileSets)
+        {
+            String[] includedFiles = fileSetManager.getIncludedFiles( fileSet );
+            for (String includedFile : includedFiles)
+            {
+                String filePath = fileSet.getDirectory() + File.separator + includedFile;
+                File file = new File( filePath );
+                String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 ).replace( '\\', '/' );
+                SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath, pathSpecificInformation );
+                if ( fileInfo == null )
+                {
+                    fileInfo = defaultFileInformation;
+                }
+
+                String outputFileName;
+                if ( fileSet.getOutputDirectory() != null )
+                {
+                    outputFileName = fileSet.getOutputDirectory() + File.separator + includedFile;
+                } else
+                {
+                    outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
+                }
+                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container );
+            }
+        }
     }
     
     /**
@@ -306,9 +305,8 @@ public class SpdxFileCollector
         }
         spdxFiles.put( file.getPath(), spdxFile );
         AnyLicenseInfo[] licenseInfoFromFiles = spdxFile.getLicenseInfoFromFiles();
-        for ( int j = 0; j < licenseInfoFromFiles.length; j++ ) 
-        {
-            licensesFromFiles.add( licenseInfoFromFiles[j] );
+        for (AnyLicenseInfo licenseInfoFromFile : licenseInfoFromFiles) {
+            licensesFromFiles.add( licenseInfoFromFile );
         }
     }
 
@@ -522,20 +520,16 @@ public class SpdxFileCollector
             ArrayList<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException 
     {
         ArrayList<String> fileChecksums = new ArrayList<String>();
-        Iterator<SpdxFile> iter = spdxFiles.iterator();
-        while ( iter.hasNext() ) 
-        {
-            SpdxFile file = iter.next();
-            if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) ) 
-            {
+        for (SpdxFile file : spdxFiles) {
+            if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) ) {
                 fileChecksums.add( file.getSha1() );
             }
         }
         Collections.sort( fileChecksums );
         MessageDigest verificationCodeDigest = MessageDigest.getInstance( "SHA-1" );
-        for ( int i = 0;i < fileChecksums.size(); i++ ) 
+        for (String fileChecksum : fileChecksums)
         {
-            byte[] hashInput = fileChecksums.get( i ).getBytes( Charset.forName( "UTF-8" ) );
+            byte[] hashInput = fileChecksum.getBytes( Charset.forName( "UTF-8" ) );
             verificationCodeDigest.update( hashInput );
         }
         String value = convertChecksumToString( verificationCodeDigest.digest() );
@@ -545,10 +539,9 @@ public class SpdxFileCollector
 
     private boolean includeInVerificationCode( String name, ArrayList<String> excludedFileNamesFromVerificationCode ) 
     {
-        for ( int i = 0; i < excludedFileNamesFromVerificationCode.size(); i++ ) 
+        for (String s : excludedFileNamesFromVerificationCode)
         {
-            if ( excludedFileNamesFromVerificationCode.get( i ).equals( name ) ) 
-            {
+            if ( s.equals( name ) ) {
                 return false;
             }
         }
@@ -562,12 +555,10 @@ public class SpdxFileCollector
      */
     public static String convertChecksumToString( byte[] digestBytes ) 
     {
-        StringBuilder sb = new StringBuilder();   
-        for ( int i = 0; i < digestBytes.length; i++ ) 
-        {
-            String hex = Integer.toHexString( 0xff & digestBytes[i] );
-            if ( hex.length() < 2 ) 
-            {
+        StringBuilder sb = new StringBuilder();
+        for (byte digestByte : digestBytes) {
+            String hex = Integer.toHexString( 0xff & digestByte );
+            if ( hex.length() < 2 ) {
                 sb.append( '0' );
             }
             sb.append( hex );

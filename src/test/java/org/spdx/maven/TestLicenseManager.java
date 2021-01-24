@@ -177,10 +177,10 @@ public class TestLicenseManager
             fail( "Arrays not equal - a2 is null" );
         }
         assertEquals( a1.length, a2.length );
-        for ( int i = 0; i < a1.length; i++ ) {
+        for (Object o : a1) {
             boolean found = false;
-            for ( int j = 0; j < a2.length; j++ ) {
-                if ( a1[i].equals( a2[j] ) ) {
+            for (Object value : a2) {
+                if ( o.equals( value ) ) {
                     found = true;
                     break;
                 }

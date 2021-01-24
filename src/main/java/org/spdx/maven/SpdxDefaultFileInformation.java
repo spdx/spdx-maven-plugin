@@ -142,9 +142,8 @@ public class SpdxDefaultFileInformation
         String[] contributors = getContributors();
         if ( contributors != null ) 
         {
-            for ( int i = 0; i < contributors.length; i++ ) 
-            {
-                log.debug( "Default File Contributors: "+contributors[i] );
+            for (String contributor : contributors) {
+                log.debug( "Default File Contributors: "+contributor );
             }
         }
         if (this.snippets != null) {

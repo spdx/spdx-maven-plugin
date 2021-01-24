@@ -478,10 +478,9 @@ public class CreateSpdxMojo
             // report error
             StringBuilder sb = new StringBuilder("The following errors were found in the SPDX file:\n ");
             sb.append( spdxErrors.get( 0 ) );
-            for ( int i = 0; i < spdxErrors.size(); i++ ) 
-            {
+            for (String spdxError : spdxErrors) {
                 sb.append( "\n " );
-                sb.append( spdxErrors.get( i ) );
+                sb.append( spdxError );
             }
             this.getLog().warn( sb.toString() );
         }
@@ -536,10 +535,8 @@ public class CreateSpdxMojo
 
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
     {
-        Iterator<Entry<String, SpdxDefaultFileInformation>> iter = fileSpecificInformation.entrySet().iterator();
-        while ( iter.hasNext() ) 
+        for (Entry<String, SpdxDefaultFileInformation> entry : fileSpecificInformation.entrySet())
         {
-            Entry<String, SpdxDefaultFileInformation> entry = iter.next();
             this.getLog().debug( "File Specific Information for "+entry.getKey() );
             entry.getValue().logInfo( this.getLog() );
         }
@@ -559,10 +556,8 @@ public class CreateSpdxMojo
         HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<String, SpdxDefaultFileInformation>();
         if ( this.pathsWithSpecificSpdxInfo != null ) 
         {
-            Iterator<PathSpecificSpdxInfo> iter = this.pathsWithSpecificSpdxInfo.iterator();
-            while ( iter.hasNext() ) 
+            for (PathSpecificSpdxInfo spdxInfo : this.pathsWithSpecificSpdxInfo)
             {
-                PathSpecificSpdxInfo spdxInfo = iter.next();
                 SpdxDefaultFileInformation value = null;
                 try
                 {
@@ -572,12 +567,12 @@ public class CreateSpdxMojo
                 {
                     this.getLog().error( "Invalid license string used in the path specific SPDX information for file "+spdxInfo.getPath(), e );
                     throw( new MojoExecutionException( "Invalid license string used in the path specific SPDX information for file "+spdxInfo.getPath(), e ) );
-                } 
-                if ( retval.containsKey( spdxInfo.getPath() )) 
+                }
+                if ( retval.containsKey( spdxInfo.getPath() ))
                 {
                     this.getLog().warn( "Multiple file path specific SPDX data for "+spdxInfo.getPath() );
                 }
-                retval.put( spdxInfo.getPath(), value );            
+                retval.put( spdxInfo.getPath(), value );
             }
         }
         return retval;
@@ -594,17 +589,15 @@ public class CreateSpdxMojo
         {
             return;
         }
-        for ( int i = 0; i < nonStandardLicenses.length; i++ ) 
-        {
-            this.getLog().debug( "Non standard license ID: "+nonStandardLicenses[i].getLicenseId() );
-            this.getLog().debug( "Non standard license Text: "+nonStandardLicenses[i].getExtractedText() );
-            this.getLog().debug( "Non standard license Comment: "+nonStandardLicenses[i].getComment() );
-            this.getLog().debug( "Non standard license Name: "+nonStandardLicenses[i].getName() );
-            String[] crossReferences = nonStandardLicenses[i].getCrossReference();
-            if ( crossReferences != null ) 
-            {
-                for ( int j = 0; j < crossReferences.length; j++ ) {
-                    this.getLog().debug( "Non standard license cross reference: "+crossReferences[j] );
+        for (NonStandardLicense nonStandardLicens : nonStandardLicenses) {
+            this.getLog().debug( "Non standard license ID: "+nonStandardLicens.getLicenseId() );
+            this.getLog().debug( "Non standard license Text: "+nonStandardLicens.getExtractedText() );
+            this.getLog().debug( "Non standard license Comment: "+nonStandardLicens.getComment() );
+            this.getLog().debug( "Non standard license Name: "+nonStandardLicens.getName() );
+            String[] crossReferences = nonStandardLicens.getCrossReference();
+            if ( crossReferences != null ) {
+                for (String crossReference : crossReferences) {
+                    this.getLog().debug( "Non standard license cross reference: "+crossReference );
                 }
             }
         }
@@ -620,29 +613,25 @@ public class CreateSpdxMojo
             return;
         }
         this.getLog().debug( "Logging "+String.valueOf( includedDirectories.length ) + " filesets." );
-        for ( int i = 0; i < includedDirectories.length; i++ ) 
+        for (FileSet includedDirectory : includedDirectories)
         {
-            StringBuilder sb = new StringBuilder( "Included Directory: "+includedDirectories[i].getDirectory() );
+            StringBuilder sb = new StringBuilder( "Included Directory: "+includedDirectory.getDirectory() );
             @SuppressWarnings( "unchecked" )
-            List<String> includes = includedDirectories[i].getIncludes();
-            if ( includes != null && includes.size() > 0) 
-            {                
+            List<String> includes = includedDirectory.getIncludes();
+            if ( includes != null && includes.size() > 0) {
                 sb.append( "; Included=" );
                 sb.append( includes.get( 0 ) );
-                for ( int j = 1; j < includes.size(); j++ ) 
-                {
+                for (int j = 1; j < includes.size(); j++) {
                     sb.append( "," );
                     sb.append( includes.get(j) );
                 }
             }
             @SuppressWarnings( "unchecked" )
-            List<String> excludes = includedDirectories[i].getExcludes();
-            if ( excludes != null && excludes.size() > 0 ) 
-            {
+            List<String> excludes = includedDirectory.getExcludes();
+            if ( excludes != null && excludes.size() > 0 ) {
                 sb.append( "; Excluded=" );
                 sb.append( excludes.get( 0 ) );
-                for ( int j = 1; j < excludes.size(); j++ ) 
-                {
+                for (int j = 1; j < excludes.size(); j++) {
                     sb.append( "," );
                     sb.append( excludes.get( j ) );
                 }
@@ -852,10 +841,10 @@ public class CreateSpdxMojo
         List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
         if ( sourceRoots != null ) 
         {
-            Iterator<String> sourceRootIter = sourceRoots.iterator();
-            while ( sourceRootIter.hasNext() ) {
+            for (String sourceRoot : sourceRoots)
+            {
                 FileSet srcFileSet = new FileSet();
-                File sourceDir = new File( sourceRootIter.next() );
+                File sourceDir = new File( sourceRoot );
                 srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
                 srcFileSet.addInclude( INCLUDE_ALL );
                 result.add( srcFileSet );
@@ -877,10 +866,10 @@ public class CreateSpdxMojo
         List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
         if ( sourceRoots != null ) 
         {
-            Iterator<String> sourceRootIter = sourceRoots.iterator();
-            while ( sourceRootIter.hasNext() ) {
+            for (String sourceRoot : sourceRoots)
+            {
                 FileSet srcFileSet = new FileSet();
-                File sourceDir = new File( sourceRootIter.next() );
+                File sourceDir = new File( sourceRoot );
                 srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
                 srcFileSet.addInclude( INCLUDE_ALL );
                 result.add( srcFileSet );
@@ -891,10 +880,8 @@ public class CreateSpdxMojo
         List<Resource> resourceList = this.mavenProject.getResources();
         if ( resourceList != null ) 
         {
-            Iterator<Resource> resourceIter = resourceList.iterator();
-            while ( resourceIter.hasNext() ) 
+            for (Resource resource : resourceList)
             {
-                Resource resource = resourceIter.next();
                 FileSet resourceFileSet = new FileSet();
                 File resourceDir = new File( resource.getDirectory() );
                 resourceFileSet.setDirectory( resourceDir.getAbsolutePath() );
@@ -920,10 +907,9 @@ public class CreateSpdxMojo
         List<String> sourceRoots = this.mavenProject.getTestCompileSourceRoots();
         if ( sourceRoots != null ) 
         {
-            Iterator<String> sourceRootIter = sourceRoots.iterator();
-            while ( sourceRootIter.hasNext() ) {
+            for (String sourceRoot : sourceRoots) {
                 FileSet srcFileSet = new FileSet();
-                File sourceDir = new File( sourceRootIter.next() );
+                File sourceDir = new File( sourceRoot );
                 srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
                 srcFileSet.addInclude( INCLUDE_ALL );
                 result.add( srcFileSet );

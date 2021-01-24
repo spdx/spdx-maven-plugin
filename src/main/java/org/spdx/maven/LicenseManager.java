@@ -118,17 +118,17 @@ public class LicenseManager
         // add to URL mapping
         String[] urls = license.getCrossReference();
         if ( urls != null ) {
-            for ( int i = 0; i < urls.length; i++ ) {
-                if (this.urlStringToSpdxLicenseId.containsKey( urls[i] )) {
-                    String oldLicenseId = urlStringToSpdxLicenseId.get( urls[i] );
+            for (String url : urls) {
+                if ( this.urlStringToSpdxLicenseId.containsKey( url ) ) {
+                    String oldLicenseId = urlStringToSpdxLicenseId.get( url );
                     getLog().warn( "Duplicate URL for SPDX extracted license.  Replacing " +
-                                        oldLicenseId + " with " + license.getLicenseId() +
-                                        " for " + urls[i]);
+                            oldLicenseId + " with " + license.getLicenseId() +
+                            " for " + url );
                 }
                 if (getLog() != null) {
                     getLog().debug( "Adding URL mapping for non-standard license "+spdxLicense.getLicenseId() );
                 }
-                this.urlStringToSpdxLicenseId.put( urls[i], spdxLicense.getLicenseId() );
+                this.urlStringToSpdxLicenseId.put( url, spdxLicense.getLicenseId() );
             }
         }
         // add to extracted license cache
@@ -149,9 +149,7 @@ public class LicenseManager
             return new SpdxNoAssertionLicense();
         }
         List<AnyLicenseInfo> spdxLicenses = new ArrayList<AnyLicenseInfo>();
-        Iterator<License> iter = licenseList.iterator();
-        while( iter.hasNext() ) {
-            License license = iter.next();
+        for (License license : licenseList) {
             spdxLicenses.add( mavenLicenseToSpdxLicense( license ) );
         }
         if ( spdxLicenses.size() < 1) {

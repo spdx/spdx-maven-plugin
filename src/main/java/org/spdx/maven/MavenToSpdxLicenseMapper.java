@@ -151,16 +151,16 @@ public class MavenToSpdxLicenseMapper
         JSONArray listedLicenses = (JSONArray)listedLicenseSource.get( "licenses" );
         urlStringToSpdxLicenseId = new HashMap<String, String>();
         List<String> urlsWithMultipleIds = new ArrayList<String>();
-        for ( int i = 0; i < listedLicenses.size(); i++ ) {
-            JSONObject listedLicense = (JSONObject)listedLicenses.get( i );
-            String licenseId = (String)listedLicense.get( SpdxRdfConstants.PROP_LICENSE_ID );
-            this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX + licenseId, licenseId );
-            JSONArray urls = (JSONArray)listedLicense.get( SpdxRdfConstants.RDFS_PROP_SEE_ALSO );
+        for (Object _listedLicense : listedLicenses) {
+            JSONObject listedLicense = (JSONObject) _listedLicense;
+            String licenseId = (String) listedLicense.get( SpdxRdfConstants.PROP_LICENSE_ID );
+            this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX+licenseId, licenseId );
+            JSONArray urls = (JSONArray) listedLicense.get( SpdxRdfConstants.RDFS_PROP_SEE_ALSO );
             if ( urls != null ) {
-                for ( int j = 0; j < urls.size(); j++ ) {
-                    String url = (String)urls.get( j );
-                    url = url.replaceAll("https", "http");
-                    if (this.urlStringToSpdxLicenseId.containsKey( url )) {
+                for (Object o : urls) {
+                    String url = (String) o;
+                    url = url.replaceAll( "https", "http" );
+                    if ( this.urlStringToSpdxLicenseId.containsKey( url ) ) {
                         urlsWithMultipleIds.add( url );
                     } else {
                         this.urlStringToSpdxLicenseId.put( url, licenseId );
@@ -208,9 +208,7 @@ public class MavenToSpdxLicenseMapper
             return new SpdxNoAssertionLicense();
         }
         List<AnyLicenseInfo> spdxLicenses = new ArrayList<AnyLicenseInfo>();
-        Iterator<License> iter = licenseList.iterator();
-        while( iter.hasNext() ) {
-            License license = iter.next();
+        for (License license : licenseList) {
             SpdxListedLicense listedLicense = mavenLicenseToSpdxListedLicense( license );
             if (listedLicense != null) {
                 spdxLicenses.add( listedLicense );

@@ -154,15 +154,11 @@ public class SpdxDocumentBuilder
     {
         if ( nonStandardLicenses != null ) 
         {
-            for ( int i = 0; i < nonStandardLicenses.length; i++ ) 
-            {
-                try
-                {
+            for (NonStandardLicense nonStandardLicense : nonStandardLicenses) {
+                try {
                     // the following will add the non standard license to the document container
-                    licenseManager.addExtractedLicense( nonStandardLicenses[i] );
-                }
-                catch ( LicenseManagerException e )
-                {
+                    licenseManager.addExtractedLicense( nonStandardLicense );
+                } catch ( LicenseManagerException e ) {
                     this.getLog().error( "Error adding license "+e.getMessage(), e );
                     throw(new SpdxBuilderException("Error adding non standard license: "+e.getMessage(), e));
                 }
@@ -459,16 +455,16 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
 {
       ArrayList<String> creators = new ArrayList<String>();
       String[] parameterCreators = projectInformation.getCreators();
-      for ( int i = 0; i < parameterCreators.length; i++ ) 
+      for (String parameterCreator : parameterCreators)
       {
-          String verify = SpdxVerificationHelper.verifyCreator( parameterCreators[i] );
-          if ( verify == null ) 
+          String verify = SpdxVerificationHelper.verifyCreator( parameterCreator );
+          if ( verify == null )
           {
-              creators.add( parameterCreators[i] );
-          } else 
+              creators.add( parameterCreator );
+          } else
           {
               this.getLog().warn( "Invalid creator string ( "+verify+" ), "+
-                          parameterCreators[i]+" will be skipped." );
+                          parameterCreator+" will be skipped." );
           }
       }
       SPDXCreatorInformation spdxCreator = new SPDXCreatorInformation(

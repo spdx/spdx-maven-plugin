@@ -277,8 +277,8 @@ public class SpdxProjectInformation {
         }
         String[] creators = this.getCreators();
         if ( creators != null ) {
-            for ( int i = 0; i < creators.length; i++ ) {
-                log.debug( "SPDX Creator: "+creators[i] );
+            for (String creator : creators) {
+                log.debug( "SPDX Creator: "+creator );
             }
         }
         if (this.externalRefs != null) {

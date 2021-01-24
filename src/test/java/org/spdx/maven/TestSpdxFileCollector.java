@@ -113,21 +113,21 @@ public class TestSpdxFileCollector {
 	    
 	    this.directory = Files.createTempDir();
 	    int numFiles = FILE_NAMES.length;
-	    for ( int i = 0; i < SUBDIR_FILES.length; i++ )
-	    {
-	        numFiles = numFiles + SUBDIR_FILES[i].length;
-	    }
+        for (String[] subdirFile : SUBDIR_FILES)
+        {
+            numFiles = numFiles + subdirFile.length;
+        }
 	    numFiles++;	// for the SPDX file with license IDs
 	    this.filePaths = new String[numFiles];
 	    this.SpdxFileNames = new String[numFiles];
 	    int fpi = 0;   // file path index
-	    for ( int i = 0; i < FILE_NAMES.length; i++ ) {
-	        File newFile = new File( this.directory.getPath() + File.separator + FILE_NAMES[i] );
-	        newFile.createNewFile();
-	        createUniqueContent( newFile );
-	        this.filePaths[fpi] = newFile.getPath();
-	        this.SpdxFileNames[fpi++] = "./" + this.directory.getName() + "/" + FILE_NAMES[i];
-	    }
+        for (String fileName : FILE_NAMES) {
+            File newFile = new File( this.directory.getPath() + File.separator + fileName );
+            newFile.createNewFile();
+            createUniqueContent( newFile );
+            this.filePaths[fpi] = newFile.getPath();
+            this.SpdxFileNames[fpi++] = "./" + this.directory.getName() + "/" + fileName;
+        }
 	    for ( int i = 0; i < SUB_DIRS.length; i++ ) {
 	        File newDir = new File( this.directory.getPath() + File.separator + SUB_DIRS[i] );
 	        newDir.mkdir();
@@ -187,13 +187,13 @@ public class TestSpdxFileCollector {
         } else if ( dir.isDirectory() ) {
             File[] children = dir.listFiles();
             if ( children != null ) {
-                for ( int i = 0; i < children.length; i++ ) {
-                    if ( children[i].isFile() ) {
-                        if (!children[i].delete()) {
-                            System.console().writer().println("Unable to delete "+children[i].getPath() );
+                for (File child : children) {
+                    if ( child.isFile() ) {
+                        if ( !child.delete() ) {
+                            System.console().writer().println( "Unable to delete " + child.getPath() );
                         }
-                    } else if ( children[i].isDirectory() ) {
-                        deleteDirectory( children[i] );
+                    } else if ( child.isDirectory() ) {
+                        deleteDirectory( child );
                     }
                 }
             }           
@@ -246,11 +246,11 @@ public class TestSpdxFileCollector {
         assertEquals( filePaths.length - 2, SpdxFiles.length );
         Arrays.sort(  SpdxFiles );
         int SpdxFilesIndex = 0;
-        for ( int i = 0; i < SpdxFileNames.length; i++ ) {
-            if ( SpdxFileNames[i].endsWith( ".bin" )) {
+        for (String spdxFileName : SpdxFileNames) {
+            if ( spdxFileName.endsWith( ".bin" ) ) {
                 continue;
             }
-            assertEquals( SpdxFileNames[i], SpdxFiles[SpdxFilesIndex++].getName() );
+            assertEquals( spdxFileName, SpdxFiles[SpdxFilesIndex++].getName() );
         }
 	}
 
@@ -315,15 +315,15 @@ public class TestSpdxFileCollector {
 	        snippets = collector.getSnippets();
 	        assertEquals( filePaths.length, snippets.size() );
 	        Collections.sort( snippets );
-	        for ( int i = 0; i < snippets.size(); i++ ) {
-	            assertEquals( SNIPPET_NAMES, snippets.get( i ).getName() );
-	            assertEquals( DEFAULT_SNIPPET_COMMENT, snippets.get( i ).getComment() );
-	            assertEquals( DEFAULT_SNIPPET_CONCLUDED_LICENSE, snippets.get( i ).getLicenseConcluded().toString() );
-	            assertEquals( DEFAULT_SNIPPET_COPYRIGHT, snippets.get( i ).getCopyrightText() );
-	            assertEquals( DEFAULT_SNIPPET_DECLARED_LICENSE, snippets.get( i ).getLicenseInfoFromFiles()[0].toString() );
-	            assertEquals( DEFAULT_SNIPPET_LICENSE_COMMENT, snippets.get( i ).getLicenseComments() );
-	            assertEquals( DEFAULT_SNIPPET_BYTE_RANGE, startEndPointerToString( snippets.get( i ).getByteRange() ) );
-	            assertEquals( DEFAULT_SNIPPET_LINE_RANGE, startEndPointerToString( snippets.get( i ).getLineRange() ) );
+	        for (SpdxSnippet snippet : snippets) {
+	            assertEquals( SNIPPET_NAMES, snippet.getName() );
+	            assertEquals( DEFAULT_SNIPPET_COMMENT, snippet.getComment() );
+	            assertEquals( DEFAULT_SNIPPET_CONCLUDED_LICENSE, snippet.getLicenseConcluded().toString() );
+	            assertEquals( DEFAULT_SNIPPET_COPYRIGHT, snippet.getCopyrightText() );
+	            assertEquals( DEFAULT_SNIPPET_DECLARED_LICENSE, snippet.getLicenseInfoFromFiles()[0].toString() );
+	            assertEquals( DEFAULT_SNIPPET_LICENSE_COMMENT, snippet.getLicenseComments());
+	            assertEquals( DEFAULT_SNIPPET_BYTE_RANGE, startEndPointerToString( snippet.getByteRange() ));
+	            assertEquals( DEFAULT_SNIPPET_LINE_RANGE, startEndPointerToString( snippet.getLineRange() ));
 	        }
 	    }
 	   

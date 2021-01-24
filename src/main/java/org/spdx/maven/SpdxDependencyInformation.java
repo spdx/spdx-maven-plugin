@@ -375,10 +375,7 @@ public class SpdxDependencyInformation
         List<Resource> resourceList = model.getBuild().getResources();
         if ( resourceList != null ) 
         {
-            Iterator<Resource> resourceIter = resourceList.iterator();
-            while ( resourceIter.hasNext() ) 
-            {
-                Resource resource = resourceIter.next();
+            for (Resource resource : resourceList) {
                 FileSet resourceFileSet = new FileSet();
                 File resourceDir = new File( resource.getDirectory() );
                 resourceFileSet.setDirectory( resourceDir.getAbsolutePath() );
