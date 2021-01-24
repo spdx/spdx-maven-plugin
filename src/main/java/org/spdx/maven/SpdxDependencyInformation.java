@@ -21,7 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -305,7 +304,7 @@ public class SpdxDependencyInformation
         AnyLicenseInfo declaredLicense = mavenLicensesToSpdxLicense( model.getLicenses() );
         fileInfo.setComment( "" );
         fileInfo.setConcludedLicense( new SpdxNoAssertionLicense() );
-        fileInfo.setContributors( fileContributorList.toArray(new String[fileContributorList.size()]) );
+        fileInfo.setContributors( fileContributorList.toArray( new String[0] ) );
         fileInfo.setCopyright( copyright );
         fileInfo.setDeclaredLicense( declaredLicense );
         fileInfo.setLicenseComment( "" );
@@ -384,7 +383,7 @@ public class SpdxDependencyInformation
                 result.add( resourceFileSet );
             }
         }
-        return result.toArray( new FileSet[result.size()] );
+        return result.toArray( new FileSet[0] );
     }
     
     /**

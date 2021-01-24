@@ -46,7 +46,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -609,7 +608,7 @@ public class CreateSpdxMojo
         if ( includedDirectories == null ) {
             return;
         }
-        this.getLog().debug( "Logging "+String.valueOf( includedDirectories.length ) + " filesets." );
+        this.getLog().debug( "Logging " + includedDirectories.length + " filesets." );
         for (FileSet includedDirectory : includedDirectories)
         {
             StringBuilder sb = new StringBuilder( "Included Directory: "+includedDirectory.getDirectory() );
@@ -848,7 +847,7 @@ public class CreateSpdxMojo
                 this.getLog().debug( "Adding sourceRoot directory "+srcFileSet.getDirectory() );
             }
         }
-        return result.toArray( new FileSet[result.size()] );
+        return result.toArray( new FileSet[0] );
     }
     
     /**
@@ -888,8 +887,8 @@ public class CreateSpdxMojo
                 this.getLog().debug( "Adding resource directory "+resource.getDirectory() );
             }
         }
-        this.getLog().debug( "Number of filesets: "+String.valueOf( result.size() ) );
-        return result.toArray( new FileSet[result.size()] );
+        this.getLog().debug( "Number of filesets: " + result.size() );
+        return result.toArray( new FileSet[0] );
     }
     
     /**
@@ -913,6 +912,6 @@ public class CreateSpdxMojo
                 this.getLog().debug( "Adding TestSourceRoot directory "+srcFileSet.getDirectory() );
             }
         }
-        return result.toArray( new FileSet[result.size()] );
+        return result.toArray( new FileSet[0] );
     }
 }

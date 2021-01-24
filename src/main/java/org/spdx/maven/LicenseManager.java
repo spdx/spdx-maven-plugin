@@ -17,7 +17,6 @@ package org.spdx.maven;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -157,7 +156,7 @@ public class LicenseManager
         } else if ( spdxLicenses.size() == 1 ) {
             return spdxLicenses.get( 0 );
         } else {
-            AnyLicenseInfo[] licensesInSet = spdxLicenses.toArray( new AnyLicenseInfo[spdxLicenses.size()] );
+            AnyLicenseInfo[] licensesInSet = spdxLicenses.toArray( new AnyLicenseInfo[0] );
             AnyLicenseInfo conjunctiveLicense = new ConjunctiveLicenseSet( licensesInSet );
             return conjunctiveLicense;
         }

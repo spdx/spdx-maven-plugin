@@ -260,7 +260,7 @@ public class SpdxDocumentBuilder
         if ( externalDocRefs != null && !externalDocRefs.isEmpty() ) {
             try
             {
-                this.spdxDoc.setExternalDocumentRefs( externalDocRefs.toArray( new ExternalDocumentRef[externalDocRefs.size()] ) );
+                this.spdxDoc.setExternalDocumentRefs( externalDocRefs.toArray( new ExternalDocumentRef[0] ) );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
@@ -468,7 +468,7 @@ private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws
           }
       }
       SPDXCreatorInformation spdxCreator = new SPDXCreatorInformation(
-              creators.toArray( new String[creators.size()] ), format.format( new Date() ),
+              creators.toArray( new String[0] ), format.format( new Date() ),
               projectInformation.getCreatorComment(), 
               ListedLicenses.DEFAULT_LICENSE_LIST_VERSION );
       spdxDoc.setCreationInfo( spdxCreator );        

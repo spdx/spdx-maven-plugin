@@ -20,18 +20,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -89,7 +81,7 @@ public class SpdxFileCollector
         } catch ( NoSuchAlgorithmException e ) {
             logger.error( "No such algorithm error initializing the SPDX file collector - SHA1", e );
             digest = null;
-        };
+        }
     }
     
     
@@ -305,9 +297,7 @@ public class SpdxFileCollector
         }
         spdxFiles.put( file.getPath(), spdxFile );
         AnyLicenseInfo[] licenseInfoFromFiles = spdxFile.getLicenseInfoFromFiles();
-        for (AnyLicenseInfo licenseInfoFromFile : licenseInfoFromFiles) {
-            licensesFromFiles.add( licenseInfoFromFile );
-        }
+        licensesFromFiles.addAll( Arrays.asList( licenseInfoFromFiles ) );
     }
 
     private SpdxSnippet convertToSpdxSnippet( SnippetInfo snippet, SpdxFile spdxFile, SpdxDocumentContainer container ) throws InvalidLicenseStringException, SpdxBuilderException
@@ -357,7 +347,7 @@ public class SpdxFileCollector
         		if ( fileSpdxLicenses.size() == 1 ) {
         			license = fileSpdxLicenses.get(0);
         		} else {
-        			license = new ConjunctiveLicenseSet( fileSpdxLicenses.toArray( new AnyLicenseInfo[fileSpdxLicenses.size()] ) );
+        			license = new ConjunctiveLicenseSet( fileSpdxLicenses.toArray( new AnyLicenseInfo[0] ) );
         		}
         		if ( licenseComment == null ) {
         			licenseComment = "";
@@ -470,7 +460,7 @@ public class SpdxFileCollector
      */
     public SpdxFile[] getFiles() 
     {
-        return spdxFiles.values().toArray( new SpdxFile[spdxFiles.size()] );
+        return spdxFiles.values().toArray( new SpdxFile[0] );
     }
     
     /**
@@ -486,7 +476,7 @@ public class SpdxFileCollector
      */
     public AnyLicenseInfo[] getLicenseInfoFromFiles() 
     {
-        return licensesFromFiles.toArray( new AnyLicenseInfo[licensesFromFiles.size()] );
+        return licensesFromFiles.toArray( new AnyLicenseInfo[0] );
     }
 
     /**
@@ -529,12 +519,12 @@ public class SpdxFileCollector
         MessageDigest verificationCodeDigest = MessageDigest.getInstance( "SHA-1" );
         for (String fileChecksum : fileChecksums)
         {
-            byte[] hashInput = fileChecksum.getBytes( Charset.forName( "UTF-8" ) );
+            byte[] hashInput = fileChecksum.getBytes( StandardCharsets.UTF_8 );
             verificationCodeDigest.update( hashInput );
         }
         String value = convertChecksumToString( verificationCodeDigest.digest() );
         return new SpdxPackageVerificationCode( value, excludedFileNamesFromVerificationCode.toArray(
-                new String[excludedFileNamesFromVerificationCode.size()] ) );
+                new String[0] ) );
     }
 
     private boolean includeInVerificationCode( String name, ArrayList<String> excludedFileNamesFromVerificationCode ) 

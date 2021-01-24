@@ -35,7 +35,7 @@ public class SpdxDefaultFileInformation
     private String notice = "";
     private String comment = "";
     private String[] contributors = new String[0];
-    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();;
+    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
     private String licenseComment = "";
     private List<SnippetInfo> snippets = new ArrayList<>();
 

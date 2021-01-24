@@ -25,6 +25,7 @@ import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
+@SuppressWarnings( "BeforeOrAfterWithIncorrectSignature" )
 public class TestSpdxMojo
     extends AbstractMojoTestCase
 {
