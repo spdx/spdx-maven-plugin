@@ -63,5 +63,8 @@ a unique license ID and the verbatim license text.
 # Example
 See the file SpdxTools-POM-File-Example.xml for an example project using the spdx-maven-plugin.
 
+# Contributing
+See the [CONTRIBUTING.MD](CONTRIBUTING.MD) documentation.
+
 # License
 This project is licensed under the Apache 2.0 License
