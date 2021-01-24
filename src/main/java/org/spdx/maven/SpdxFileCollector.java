@@ -66,9 +66,9 @@ public class SpdxFileCollector
 {
     static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
     // constants for mapping extensions to types.
-    static HashSet<String> SOURCE_EXTENSIONS = new HashSet<String>();
-    static HashSet<String> BINARY_EXTENSIONS = new HashSet<String>();
-    static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<String>();
+    static HashSet<String> SOURCE_EXTENSIONS = new HashSet<>();
+    static HashSet<String> BINARY_EXTENSIONS = new HashSet<>();
+    static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<>();
     static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
     static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
     static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
@@ -93,12 +93,12 @@ public class SpdxFileCollector
     }
     
     
-    Set<AnyLicenseInfo> licensesFromFiles = new HashSet<AnyLicenseInfo>();
+    Set<AnyLicenseInfo> licensesFromFiles = new HashSet<>();
     /**
      * Map of fileName, SPDXFile for all files in the SPDX document
      */
-    Map<String, SpdxFile> spdxFiles = new HashMap<String, SpdxFile>();
-    List<SpdxSnippet> spdxSnippets = new ArrayList<SpdxSnippet>();
+    Map<String, SpdxFile> spdxFiles = new HashMap<>();
+    List<SpdxSnippet> spdxSnippets = new ArrayList<>();
     
     FileSetManager fileSetManager = new FileSetManager();
     private Log log;
@@ -497,7 +497,7 @@ public class SpdxFileCollector
      */
     public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath ) throws NoSuchAlgorithmException 
     {
-        ArrayList<String> excludedFileNamesFromVerificationCode = new ArrayList<String>();
+        ArrayList<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
 
         if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) ) 
         {
@@ -519,7 +519,7 @@ public class SpdxFileCollector
             Collection<SpdxFile> spdxFiles,
             ArrayList<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException 
     {
-        ArrayList<String> fileChecksums = new ArrayList<String>();
+        ArrayList<String> fileChecksums = new ArrayList<>();
         for (SpdxFile file : spdxFiles) {
             if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) ) {
                 fileChecksums.add( file.getSha1() );

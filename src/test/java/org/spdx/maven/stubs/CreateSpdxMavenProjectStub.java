@@ -62,11 +62,11 @@ public class CreateSpdxMavenProjectStub
         build.setTestOutputDirectory( getBasedir() + "/target/test-classes" );
         setBuild( build );
 
-        List<String> compileSourceRoots = new ArrayList<String>();
+        List<String> compileSourceRoots = new ArrayList<>();
         compileSourceRoots.add( getBasedir() + "/src/main/java" );
         setCompileSourceRoots( compileSourceRoots );
 
-        List<String> testCompileSourceRoots = new ArrayList<String>();
+        List<String> testCompileSourceRoots = new ArrayList<>();
         testCompileSourceRoots.add( getBasedir() + "/src/test/java" );
         setTestCompileSourceRoots( testCompileSourceRoots );
     }

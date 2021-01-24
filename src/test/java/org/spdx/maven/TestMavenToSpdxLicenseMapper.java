@@ -52,7 +52,7 @@ public class TestMavenToSpdxLicenseMapper
     @Test
     public void testMavenLicenseListToSpdxLicenseNone() throws LicenseMapperException
     {
-        List<License> licenseList = new ArrayList<License>();
+        List<License> licenseList = new ArrayList<>();
         AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense( licenseList );
         assertEquals( new SpdxNoAssertionLicense(), result );
     }
@@ -60,7 +60,7 @@ public class TestMavenToSpdxLicenseMapper
     @Test
     public void testMavenLicenseListToSpdxLicenseUnknown() throws LicenseMapperException
     {
-        List<License> licenseList = new ArrayList<License>();
+        List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( "http://not.a.known.url" );
         licenseList.add( license );
@@ -71,7 +71,7 @@ public class TestMavenToSpdxLicenseMapper
     @Test
     public void testMavenLicenseListToSpdxLicenseSingle() throws LicenseMapperException, InvalidLicenseStringException
     {
-        List<License> licenseList = new ArrayList<License>();
+        List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( APACHE2_URL );
         licenseList.add( license );
@@ -83,7 +83,7 @@ public class TestMavenToSpdxLicenseMapper
     @Test
     public void testMavenLicenseListToSpdxLicenseConjunctive() throws LicenseMapperException, InvalidLicenseStringException
     {
-        List<License> licenseList = new ArrayList<License>();
+        List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( APACHE2_URL );
         licenseList.add( license );
@@ -98,7 +98,7 @@ public class TestMavenToSpdxLicenseMapper
     @Test
     public void testMavenLicenseListToSpdxLicenseConunctiveUnknown() throws LicenseMapperException, InvalidLicenseStringException
     {
-        List<License> licenseList = new ArrayList<License>();
+        List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( APACHE2_URL );
         licenseList.add( license );

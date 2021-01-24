@@ -207,7 +207,7 @@ public class TestLicenseManager
         apsl.setName( LICENSE2_NAME );
         apsl.setUrl( APSL_CROSS_REF_URL );
         
-        ArrayList<License> licenseList = new ArrayList<License>();
+        ArrayList<License> licenseList = new ArrayList<>();
         licenseList.add( apache );
         licenseList.add( apsl );
         

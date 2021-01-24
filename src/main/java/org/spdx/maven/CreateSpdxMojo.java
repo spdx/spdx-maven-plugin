@@ -550,7 +550,7 @@ public class CreateSpdxMojo
                                                   SpdxDefaultFileInformation projectDefault,
                                                   SpdxDocumentContainer container) throws MojoExecutionException
     {
-        HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<String, SpdxDefaultFileInformation>();
+        HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<>();
         if ( this.pathsWithSpecificSpdxInfo != null ) 
         {
             for (PathSpecificSpdxInfo spdxInfo : this.pathsWithSpecificSpdxInfo)
@@ -833,7 +833,7 @@ public class CreateSpdxMojo
      */
     private FileSet[] getSourceDirectories() 
     {
-        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        ArrayList<FileSet> result = new ArrayList<>();
         @SuppressWarnings( "unchecked" )
         List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
         if ( sourceRoots != null ) 
@@ -858,7 +858,7 @@ public class CreateSpdxMojo
      */
     private FileSet[] getResourceDirectories() 
     {
-        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        ArrayList<FileSet> result = new ArrayList<>();
         @SuppressWarnings( "unchecked" )
         List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
         if ( sourceRoots != null ) 
@@ -899,7 +899,7 @@ public class CreateSpdxMojo
      */
     private FileSet[] getTestDirectories() 
     {
-        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        ArrayList<FileSet> result = new ArrayList<>();
         @SuppressWarnings( "unchecked" )
         List<String> sourceRoots = this.mavenProject.getTestCompileSourceRoots();
         if ( sourceRoots != null ) 

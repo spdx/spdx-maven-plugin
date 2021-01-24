@@ -149,8 +149,8 @@ public class MavenToSpdxLicenseMapper
         JSONObject listedLicenseSource = (JSONObject)parsedObject;
         
         JSONArray listedLicenses = (JSONArray)listedLicenseSource.get( "licenses" );
-        urlStringToSpdxLicenseId = new HashMap<String, String>();
-        List<String> urlsWithMultipleIds = new ArrayList<String>();
+        urlStringToSpdxLicenseId = new HashMap<>();
+        List<String> urlsWithMultipleIds = new ArrayList<>();
         for (Object _listedLicense : listedLicenses) {
             JSONObject listedLicense = (JSONObject) _listedLicense;
             String licenseId = (String) listedLicense.get( SpdxRdfConstants.PROP_LICENSE_ID );
@@ -207,7 +207,7 @@ public class MavenToSpdxLicenseMapper
         if ( licenseList == null ) {
             return new SpdxNoAssertionLicense();
         }
-        List<AnyLicenseInfo> spdxLicenses = new ArrayList<AnyLicenseInfo>();
+        List<AnyLicenseInfo> spdxLicenses = new ArrayList<>();
         for (License license : licenseList) {
             SpdxListedLicense listedLicense = mavenLicenseToSpdxListedLicense( license );
             if (listedLicense != null) {

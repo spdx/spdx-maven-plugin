@@ -194,7 +194,7 @@ public class TestSpdxMojo
             fail("Unexpected reference category");
         }
         // Test all files are included
-        List<String> filePaths = new ArrayList<String>();
+        List<String> filePaths = new ArrayList<>();
         File sourceDir = new File( getBasedir(),
                         UNIT_TEST_RESOURCE_DIR + "/src/main" );
         addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, sourceDir, filePaths );

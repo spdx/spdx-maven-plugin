@@ -65,9 +65,9 @@ public class SpdxDependencyInformation
     /**
      * List of all Relationships added for dependencies
      */
-    private List<Relationship> relationships = new ArrayList<Relationship>();
-    private Map<String, ExternalDocumentRef> externalDocuments = 
-                    new HashMap<String, ExternalDocumentRef>();
+    private List<Relationship> relationships = new ArrayList<>();
+    private Map<String, ExternalDocumentRef> externalDocuments =
+            new HashMap<>();
     private LicenseManager licenseManager;
     
     /**
@@ -293,7 +293,7 @@ public class SpdxDependencyInformation
             packageName = model.getArtifactId();
         }
         List<Contributor> contributors = model.getContributors();
-        ArrayList<String> fileContributorList = new ArrayList<String>();
+        ArrayList<String> fileContributorList = new ArrayList<>();
         if ( contributors != null ) {
             for ( Contributor contributor:contributors ) {
                 fileContributorList.add( contributor.getName() );
@@ -362,7 +362,7 @@ public class SpdxDependencyInformation
     private FileSet[] getIncludedDirectoriesFromModel( Model model ) 
     {
         //TODO: This can be refactored to common code from the CreateSpdxMojo
-        ArrayList<FileSet> result = new ArrayList<FileSet>();
+        ArrayList<FileSet> result = new ArrayList<>();
         String sourcePath = model.getBuild().getSourceDirectory();
         if ( sourcePath != null && !sourcePath.isEmpty() ) {
             FileSet srcFileSet = new FileSet();

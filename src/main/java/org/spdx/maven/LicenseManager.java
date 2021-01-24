@@ -55,12 +55,12 @@ public class LicenseManager
      * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX listed
      * license or a extracted license.
      */
-    Map<String, String> urlStringToSpdxLicenseId = new HashMap<String, String>();
+    Map<String, String> urlStringToSpdxLicenseId = new HashMap<>();
     
     /**
      * Map of extracted license ID's to the SPDX license
      */
-    Map<String, ExtractedLicenseInfo> extractedLicenses = new HashMap<String, ExtractedLicenseInfo>();
+    Map<String, ExtractedLicenseInfo> extractedLicenses = new HashMap<>();
 
     Log log;
 
@@ -148,7 +148,7 @@ public class LicenseManager
         if ( licenseList == null ) {
             return new SpdxNoAssertionLicense();
         }
-        List<AnyLicenseInfo> spdxLicenses = new ArrayList<AnyLicenseInfo>();
+        List<AnyLicenseInfo> spdxLicenses = new ArrayList<>();
         for (License license : licenseList) {
             spdxLicenses.add( mavenLicenseToSpdxLicense( license ) );
         }

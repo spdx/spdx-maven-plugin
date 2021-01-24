@@ -53,7 +53,7 @@ public class SpdxSourceFileParser {
 	}
     
     public static List<AnyLicenseInfo> parseTextForSpdxLicenses( String text ) throws SpdxSourceParserException {
-    	List<AnyLicenseInfo> retval = new ArrayList<AnyLicenseInfo>();
+    	List<AnyLicenseInfo> retval = new ArrayList<>();
 		Matcher match = SPDX_LICENSE_PATTERN.matcher( text );
 		int pos = 0;
 		while ( pos < text.length() && match.find( pos )  ) {

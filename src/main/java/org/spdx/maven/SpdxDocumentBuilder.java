@@ -453,7 +453,7 @@ private SpdxPackage createSpdxPackage( SpdxProjectInformation projectInformation
  */
 private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws InvalidSPDXAnalysisException 
 {
-      ArrayList<String> creators = new ArrayList<String>();
+      ArrayList<String> creators = new ArrayList<>();
       String[] parameterCreators = projectInformation.getCreators();
       for (String parameterCreator : parameterCreators)
       {

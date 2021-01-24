@@ -107,7 +107,7 @@ public class TestSpdxFileCollector {
 	    si.setCopyrightText( DEFAULT_SNIPPET_COPYRIGHT );
 	    si.setLineRange( DEFAULT_SNIPPET_LINE_RANGE );
 	    si.setName( SNIPPET_NAMES );
-	    ArrayList<SnippetInfo> snippets = new ArrayList<SnippetInfo>();
+	    ArrayList<SnippetInfo> snippets = new ArrayList<>();
 	    snippets.add( si );
 	    this.defaultFileInformation.setSnippets( snippets );
 	    
@@ -208,7 +208,7 @@ public class TestSpdxFileCollector {
         assertEquals( 0, SpdxFiles.length );
         
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                                           new HashMap<String, SpdxDefaultFileInformation>(),
+                new HashMap<>(),
                                            spdxPackage, RelationshipType.GENERATES, container );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
@@ -234,7 +234,7 @@ public class TestSpdxFileCollector {
         assertEquals( 0, SpdxFiles.length );
         
         collector.collectFiles( new FileSet[] {skipBin},  this.directory.getAbsolutePath(), this.defaultFileInformation,
-                                           new HashMap<String, SpdxDefaultFileInformation>(),
+                new HashMap<>(),
                                            spdxPackage, RelationshipType.GENERATES, container );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length - 2, SpdxFiles.length );
@@ -273,7 +273,7 @@ public class TestSpdxFileCollector {
         assertEquals( 0, SpdxFiles.length );
         
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                                           new HashMap<String, SpdxDefaultFileInformation>(),
+                new HashMap<>(),
                                            spdxPackage, RelationshipType.GENERATES, container );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
@@ -304,7 +304,7 @@ public class TestSpdxFileCollector {
 	        assertEquals( 0, snippets.size() );
 	        
 	        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-	                                           new HashMap<String, SpdxDefaultFileInformation>(),
+                    new HashMap<>(),
 	                                           spdxPackage, RelationshipType.GENERATES, container );
 	        snippets = collector.getSnippets();
 	        assertEquals( filePaths.length, snippets.size() );
@@ -344,8 +344,8 @@ public class TestSpdxFileCollector {
 	        SpdxFileCollector collector = new SpdxFileCollector( null );
 	        SpdxFile[] SpdxFiles = collector.getFiles();
 	        assertEquals( 0, SpdxFiles.length );
-	        HashMap<String, SpdxDefaultFileInformation> fileSpecificInfo = 
-	                        new HashMap<String, SpdxDefaultFileInformation>();
+	        HashMap<String, SpdxDefaultFileInformation> fileSpecificInfo =
+                    new HashMap<>();
 	        SpdxDefaultFileInformation file2Info = new SpdxDefaultFileInformation();
 	        String file2Comment = "File 2 comment";
             file2Info.setComment( file2Comment  );
@@ -433,7 +433,7 @@ public class TestSpdxFileCollector {
         assertEquals( 0, result.length );
         
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                                           new HashMap<String, SpdxDefaultFileInformation>(),
+                new HashMap<>(),
                                            spdxPackage, RelationshipType.GENERATES, container );
         result = collector.getLicenseInfoFromFiles();
         assertEquals( 2, result.length );
@@ -459,7 +459,7 @@ public class TestSpdxFileCollector {
             fileSet2.setDirectory( tempDir2.getPath() );
             
             collector.collectFiles( new FileSet[] { fileSet2 }, this.directory.getAbsolutePath(), info2,
-                                               new HashMap<String, SpdxDefaultFileInformation>(),
+                    new HashMap<>(),
                                                spdxPackage, RelationshipType.GENERATES, container );
             result = collector.getLicenseInfoFromFiles();
             assertEquals( 3, result.length );
@@ -492,7 +492,7 @@ public class TestSpdxFileCollector {
         assertEquals( 0, SpdxFiles.length );
         
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                                           new HashMap<String, SpdxDefaultFileInformation>(),
+                new HashMap<>(),
                                            spdxPackage, RelationshipType.GENERATES, container );
         File SpdxFile = new File( filePaths[0] );
         SpdxPackageVerificationCode result = collector.getVerificationCode( SpdxFile.getPath() );
