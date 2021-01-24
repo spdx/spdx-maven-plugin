@@ -405,10 +405,7 @@ public class CreateSpdxMojo
             this.getLog().error( "License mapping error creating SPDX Document Builder: "+e.getMessage(), e );
             throw( new MojoExecutionException( "License mapping error creating SPDX Document Builder: "+e.getMessage(), e ) );
 
-        } catch (MalformedURLException e) {
-            this.getLog().error( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e );
-            throw( new MojoExecutionException( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e ) );
-		} catch (URISyntaxException e) {
+        } catch ( MalformedURLException | URISyntaxException e) {
             this.getLog().error( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e );
             throw( new MojoExecutionException( "Invalid SPDX document namespace - not a valid URL: "+spdxDocumentNamespace, e ) );
 		}

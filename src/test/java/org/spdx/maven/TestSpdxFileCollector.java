@@ -142,11 +142,8 @@ public class TestSpdxFileCollector {
 	    }
 	    File fileWithIds = new File( this.directory.getPath() + File.separator + FILE_NAME_WITH_ID );
 	    fileWithIds.createNewFile();
-        PrintWriter writer = new PrintWriter( fileWithIds );
-        try {
+        try (PrintWriter writer = new PrintWriter( fileWithIds )) {
             writer.print( FILE_WITH_ID_CONTENT );
-        } finally {
-            writer.close();
         }
         this.filePaths[fpi] = fileWithIds.getPath();
         this.SpdxFileNames[fpi++] = "./" + this.directory.getName() + "/" + FILE_NAME_WITH_ID;
@@ -164,12 +161,9 @@ public class TestSpdxFileCollector {
 
 	private void createUniqueContent( File file ) throws FileNotFoundException
     {
-        PrintWriter writer = new PrintWriter( file );
-        try {
+        try (PrintWriter writer = new PrintWriter( file )) {
             writer.println( file.getPath() );
             writer.println( System.nanoTime() );
-        } finally {
-            writer.close();
         }
     }
 
