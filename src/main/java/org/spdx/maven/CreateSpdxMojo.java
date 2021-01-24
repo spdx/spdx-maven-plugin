@@ -328,7 +328,15 @@ public class CreateSpdxMojo
      */
     @Parameter( defaultValue ="NOASSERTION" )
     private String copyrightText;
-    
+
+    /**
+     * Configure whether only locally cached license list should be used.
+     * (a) If set to true, only locally cached version of license list is used.
+     * (b) otherwise, the license list is queried over the internet.
+     */
+    @Parameter
+    private boolean onlyUseLocalLicenses;
+
     // Path specific data
     /**
      * File or directories which have SPDX information different from the project
@@ -372,7 +380,11 @@ public class CreateSpdxMojo
             outputDir.mkdirs();
         }
         this.getLog().info( "Creating SPDX File "+spdxFile.getPath() );
-        
+
+        if ( onlyUseLocalLicenses ) {
+            System.setProperty( "SPDXParser.OnlyUseLocalLicenses", "true" );
+        }
+
         SpdxDocumentBuilder builder;
         try
         {
