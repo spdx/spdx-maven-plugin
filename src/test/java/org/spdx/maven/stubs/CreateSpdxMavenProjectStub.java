@@ -27,13 +27,13 @@ import org.codehaus.plexus.util.ReaderFactory;
 
 /**
  * Stub for the Maven project unit tests for the CreateSpdx Mojo
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class CreateSpdxMavenProjectStub
-    extends MavenProjectStub
+public class CreateSpdxMavenProjectStub extends MavenProjectStub
 {
-    public CreateSpdxMavenProjectStub() {
+    public CreateSpdxMavenProjectStub()
+    {
         MavenXpp3Reader pomReader = new MavenXpp3Reader();
         Model model;
         try
@@ -62,15 +62,15 @@ public class CreateSpdxMavenProjectStub
         build.setTestOutputDirectory( getBasedir() + "/target/test-classes" );
         setBuild( build );
 
-        List<String> compileSourceRoots = new ArrayList<String>();
+        List<String> compileSourceRoots = new ArrayList<>();
         compileSourceRoots.add( getBasedir() + "/src/main/java" );
         setCompileSourceRoots( compileSourceRoots );
 
-        List<String> testCompileSourceRoots = new ArrayList<String>();
+        List<String> testCompileSourceRoots = new ArrayList<>();
         testCompileSourceRoots.add( getBasedir() + "/src/test/java" );
         setTestCompileSourceRoots( testCompileSourceRoots );
     }
-    
+
     public File getBasedir()
     {
         return new File( super.getBasedir() + "/src/test/resources/unit/spdx-maven-plugin-test/" );

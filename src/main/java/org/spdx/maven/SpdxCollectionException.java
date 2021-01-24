@@ -17,34 +17,38 @@ package org.spdx.maven;
 
 /**
  * Exceptions for the collection of SPDX information
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class SpdxCollectionException extends Exception {
+public class SpdxCollectionException extends Exception
+{
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
-    public SpdxCollectionException() {
+    public SpdxCollectionException()
+    {
         super();
     }
 
     /**
      * @param message
      */
-    public SpdxCollectionException( String message ) {
+    public SpdxCollectionException( String message )
+    {
         super( message );
     }
 
     /**
      * @param cause
      */
-    public SpdxCollectionException( Throwable cause ) {
+    public SpdxCollectionException( Throwable cause )
+    {
         super( cause );
     }
 
@@ -52,7 +56,8 @@ public class SpdxCollectionException extends Exception {
      * @param message
      * @param cause
      */
-    public SpdxCollectionException( String message, Throwable cause ) {
+    public SpdxCollectionException( String message, Throwable cause )
+    {
         super( message, cause );
     }
 }

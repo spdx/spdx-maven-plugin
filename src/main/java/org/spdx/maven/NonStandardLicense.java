@@ -21,41 +21,41 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Non standard license (e.g. license which is not in the SPDX standard license list http://spdx.org/licenses)
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class NonStandardLicense {
-    
+public class NonStandardLicense
+{
+
     /**
-     * Required license ID.  Must be of the form "LicenseRef-"[idString] 
-     * where [idString] is a unique string containing letters, numbers, “.”, “-” or “+”.
-     * Note that this is required for the Maven use of non standard licenses.  The SPDX
-     * standard does not generally require this parameter.
+     * Required license ID.  Must be of the form "LicenseRef-"[idString] where [idString] is a unique string containing
+     * letters, numbers, “.”, “-” or “+”. Note that this is required for the Maven use of non standard licenses.  The
+     * SPDX standard does not generally require this parameter.
      */
     @Parameter( required = true )
     private String licenseId;
-    
+
     /**
      * Required verbatim license or licensing notice text
      */
     @Parameter( required = true )
     private String extractedText;
-    
+
     /**
-     * Optional: Common name of the license not on the SPDX list. 
-     * If there is no common name or it is not known, please use NOASSERTION.
+     * Optional: Common name of the license not on the SPDX list. If there is no common name or it is not known, please
+     * use NOASSERTION.
      */
     @Parameter
     private String name;
     /**
-     * 
+     *
      */
     @Parameter
     private String comment;
-    
+
     /**
-     * Provide a pointer to the official source of a license that is not included 
-     * in the SPDX table, that is referenced by the id.
+     * Provide a pointer to the official source of a license that is not included in the SPDX table, that is referenced
+     * by the id.
      */
     @Parameter
     URL[] crossReference;
@@ -63,29 +63,34 @@ public class NonStandardLicense {
     /**
      * Create a default, non standard license
      */
-    public NonStandardLicense() {
-        
+    public NonStandardLicense()
+    {
+
     }
 
     /**
      * @return the licenseId
      */
-    public String getLicenseId() {
+    public String getLicenseId()
+    {
         return licenseId;
     }
 
     /**
      * @return the extractedText
      */
-    public String getExtractedText() {
+    public String getExtractedText()
+    {
         return extractedText;
     }
 
     /**
      * @return the name
      */
-    public String getName() {
-        if ( name == null ) {
+    public String getName()
+    {
+        if ( name == null )
+        {
             return "";
         }
         return name;
@@ -94,8 +99,10 @@ public class NonStandardLicense {
     /**
      * @return the comment
      */
-    public String getComment() {
-        if ( comment == null ) {
+    public String getComment()
+    {
+        if ( comment == null )
+        {
             return "";
         }
         return comment;
@@ -104,13 +111,14 @@ public class NonStandardLicense {
     /**
      * @return the crossReference
      */
-    public String[] getCrossReference() {
-        if ( this.crossReference == null ) 
+    public String[] getCrossReference()
+    {
+        if ( this.crossReference == null )
         {
             return new String[0];
         }
         String[] retval = new String[this.crossReference.length];
-        for ( int i = 0; i < retval.length; i++ ) 
+        for ( int i = 0; i < retval.length; i++ )
         {
             retval[i] = this.crossReference[i].toString();
         }
@@ -120,7 +128,7 @@ public class NonStandardLicense {
     public void setComment( String comment )
     {
         this.comment = comment;
-        
+
     }
 
     public void setCrossReference( URL[] crossRefs )

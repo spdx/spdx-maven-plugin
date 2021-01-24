@@ -23,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,15 +43,14 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 
 /**
  * Singleton class which maps Maven license objects to SPDX licenses.
- * 
+ * <p>
  * The license mapping uses the JSON file from the spdx.org/licenses/licenses.json file
- * 
+ * <p>
  * If the site spdx.org/licenses is not accessible, then static version of the file will be used
- * 
+ * <p>
  * The seeAlso property of the SPDX file is matched to the Maven license URL.
- * 
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
 public class MavenToSpdxLicenseMapper
 {
@@ -62,71 +60,85 @@ public class MavenToSpdxLicenseMapper
 
     static MavenToSpdxLicenseMapper instance;
     private Map<String, String> urlStringToSpdxLicenseId;
-    
-    private MavenToSpdxLicenseMapper(Log log) throws LicenseMapperException {
+
+    private MavenToSpdxLicenseMapper( Log log ) throws LicenseMapperException
+    {
         // Can not instantiate directly - singleton class
         InputStream is = null;
         try
         {
-            URL listedLicenseJsonUrl  = new URL( LISTED_LICENSE_JSON_URL );
+            URL listedLicenseJsonUrl = new URL( LISTED_LICENSE_JSON_URL );
             is = listedLicenseJsonUrl.openStream();
         }
         catch ( MalformedURLException e )
         {
-            if (log != null) {
+            if ( log != null )
+            {
                 log.warn( "Invalid JSON URL for SPDX listed licenses.  Using cached version" );
             }
-        } catch (IOException e) {
-            if (log != null) {
+        }
+        catch ( IOException e )
+        {
+            if ( log != null )
+            {
                 log.warn( "IO Exception opening web page for JSON for SPDX listed licenses.  Using cached version" );
             }
-		}
-        if (is == null) {
+        }
+        if ( is == null )
+        {
             // use the cached version
-            is = LicenseManager.class.getClassLoader().getResourceAsStream(LISTED_LICENSE_JSON_PATH);
+            is = LicenseManager.class.getClassLoader().getResourceAsStream( LISTED_LICENSE_JSON_PATH );
         }
         InputStreamReader reader = new InputStreamReader( is );
-        try {
+        try
+        {
             initializeUrlMap( reader, log );
-        } finally {
+        }
+        finally
+        {
             try
             {
                 reader.close();
             }
             catch ( IOException e )
             {
-               if (log != null) {
-                   log.warn( "IO error closing listed license reader: "+e.getMessage() );
-               }
+                if ( log != null )
+                {
+                    log.warn( "IO error closing listed license reader: " + e.getMessage() );
+                }
             }
         }
-       
+
     }
-    
-    public static MavenToSpdxLicenseMapper getInstance( Log log ) throws LicenseMapperException {
-        if (instance == null) {
+
+    public static MavenToSpdxLicenseMapper getInstance( Log log ) throws LicenseMapperException
+    {
+        if ( instance == null )
+        {
             instance = new MavenToSpdxLicenseMapper( log );
         }
         return instance;
     }
-    
+
     /**
      * @param url URL string for a license
      * @return SPDX ID associated with the URL
      */
-    public String urlToSpdxId( String url ) {
+    public String urlToSpdxId( String url )
+    {
         return this.urlStringToSpdxLicenseId.get( url );
     }
 
     /**
      * Initialize the urlSTringToSpdxLicense map with the SPDX listed licenses
+     *
      * @param jsonReader Reader for the JSON input file containing the listed licenses
-     * @param log Optional logger
-     * @throws LicenseMapperException 
+     * @param log        Optional logger
+     * @throws LicenseMapperException
      */
     private void initializeUrlMap( Reader jsonReader, Log log ) throws LicenseMapperException
     {
-        JSONParser parser = new JSONParser();       
+        JSONParser parser = new JSONParser();
         Object parsedObject = null;
         try
         {
@@ -134,50 +146,59 @@ public class MavenToSpdxLicenseMapper
         }
         catch ( IOException e1 )
         {
-            if (log != null) {
-                log.error( "I/O error parsing listed licenses JSON file: "+e1.getMessage() );
+            if ( log != null )
+            {
+                log.error( "I/O error parsing listed licenses JSON file: " + e1.getMessage() );
             }
-            throw( new LicenseMapperException( "I/O Error parsing listed licenses" ));
+            throw ( new LicenseMapperException( "I/O Error parsing listed licenses" ) );
         }
         catch ( ParseException e1 )
         {
-            if (log != null) {
-                log.error( "JSON parsing error parsing listed licenses JSON file: "+e1.getMessage() );
+            if ( log != null )
+            {
+                log.error( "JSON parsing error parsing listed licenses JSON file: " + e1.getMessage() );
             }
-            throw( new LicenseMapperException( "JSON parsing error parsing listed licenses" ));
+            throw ( new LicenseMapperException( "JSON parsing error parsing listed licenses" ) );
         }
-        JSONObject listedLicenseSource = (JSONObject)parsedObject;
-        
-        JSONArray listedLicenses = (JSONArray)listedLicenseSource.get( "licenses" );
-        urlStringToSpdxLicenseId = new HashMap<String, String>();
-        List<String> urlsWithMultipleIds = new ArrayList<String>();
-        for ( int i = 0; i < listedLicenses.size(); i++ ) {
-            JSONObject listedLicense = (JSONObject)listedLicenses.get( i );
-            String licenseId = (String)listedLicense.get( SpdxRdfConstants.PROP_LICENSE_ID );
+        JSONObject listedLicenseSource = (JSONObject) parsedObject;
+
+        JSONArray listedLicenses = (JSONArray) listedLicenseSource.get( "licenses" );
+        urlStringToSpdxLicenseId = new HashMap<>();
+        List<String> urlsWithMultipleIds = new ArrayList<>();
+        for ( Object _listedLicense : listedLicenses )
+        {
+            JSONObject listedLicense = (JSONObject) _listedLicense;
+            String licenseId = (String) listedLicense.get( SpdxRdfConstants.PROP_LICENSE_ID );
             this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX + licenseId, licenseId );
-            JSONArray urls = (JSONArray)listedLicense.get( SpdxRdfConstants.RDFS_PROP_SEE_ALSO );
-            if ( urls != null ) {
-                for ( int j = 0; j < urls.size(); j++ ) {
-                    String url = (String)urls.get( j );
-                    url = url.replaceAll("https", "http");
-                    if (this.urlStringToSpdxLicenseId.containsKey( url )) {
+            JSONArray urls = (JSONArray) listedLicense.get( SpdxRdfConstants.RDFS_PROP_SEE_ALSO );
+            if ( urls != null )
+            {
+                for ( Object o : urls )
+                {
+                    String url = (String) o;
+                    url = url.replaceAll( "https", "http" );
+                    if ( this.urlStringToSpdxLicenseId.containsKey( url ) )
+                    {
                         urlsWithMultipleIds.add( url );
-                    } else {
+                    }
+                    else
+                    {
                         this.urlStringToSpdxLicenseId.put( url, licenseId );
                     }
                 }
             }
         }
         // Remove any mappings which have ambiguous URL mappings
-        for (String redundantUrl:urlsWithMultipleIds) {
+        for ( String redundantUrl : urlsWithMultipleIds )
+        {
             this.urlStringToSpdxLicenseId.remove( redundantUrl );
         }
         addManualMappings();
     }
-    
+
     /**
-     * This is a bit of an override on the official SPDX license list
-     * Add some specific URL mappings that are commonly used in SPDX files
+     * This is a bit of an override on the official SPDX license list Add some specific URL mappings that are commonly
+     * used in SPDX files
      */
     private void addManualMappings()
     {
@@ -192,36 +213,41 @@ public class MavenToSpdxLicenseMapper
     }
 
     /**
-     * Map a list of Maven licenses to an SPDX license.  If no licenses
-     * are supplied, SpdxNoAssertion license is returned.  if a single
-     * license is supplied, and a URL can be found matching a listed license,
-     * the listed license is returned.  if a single
-     * license is supplied, and a URL can not be found matching a listed license,
-     * SpdxNoAssertion is returned.  If
-     * multiple licenses are supplied, a conjunctive license is returned
-     * containing all mapped SPDX licenses.
+     * Map a list of Maven licenses to an SPDX license.  If no licenses are supplied, SpdxNoAssertion license is
+     * returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
+     * is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
+     * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
+     * mapped SPDX licenses.
+     *
      * @return
-     * @throws LicenseManagerException 
+     * @throws LicenseManagerException
      */
-    public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList ) {
-        if ( licenseList == null ) {
+    public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList )
+    {
+        if ( licenseList == null )
+        {
             return new SpdxNoAssertionLicense();
         }
-        List<AnyLicenseInfo> spdxLicenses = new ArrayList<AnyLicenseInfo>();
-        Iterator<License> iter = licenseList.iterator();
-        while( iter.hasNext() ) {
-            License license = iter.next();
+        List<AnyLicenseInfo> spdxLicenses = new ArrayList<>();
+        for ( License license : licenseList )
+        {
             SpdxListedLicense listedLicense = mavenLicenseToSpdxListedLicense( license );
-            if (listedLicense != null) {
+            if ( listedLicense != null )
+            {
                 spdxLicenses.add( listedLicense );
             }
         }
-        if ( spdxLicenses.size() < 1) {
+        if ( spdxLicenses.size() < 1 )
+        {
             return new SpdxNoAssertionLicense();
-        } else if ( spdxLicenses.size() == 1 ) {
+        }
+        else if ( spdxLicenses.size() == 1 )
+        {
             return spdxLicenses.get( 0 );
-        } else {
-            AnyLicenseInfo[] licensesInSet = spdxLicenses.toArray( new AnyLicenseInfo[spdxLicenses.size()] );
+        }
+        else
+        {
+            AnyLicenseInfo[] licensesInSet = spdxLicenses.toArray( new AnyLicenseInfo[0] );
             AnyLicenseInfo conjunctiveLicense = new ConjunctiveLicenseSet( licensesInSet );
             return conjunctiveLicense;
         }
@@ -229,14 +255,17 @@ public class MavenToSpdxLicenseMapper
 
     private SpdxListedLicense mavenLicenseToSpdxListedLicense( License license )
     {
-        if ( license == null ) {
+        if ( license == null )
+        {
             return null;
         }
-        if ( license.getUrl() == null || license.getUrl().isEmpty() ) {
+        if ( license.getUrl() == null || license.getUrl().isEmpty() )
+        {
             return null;
         }
-        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll("https", "http") );
-        if (spdxId == null) {
+        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll( "https", "http" ) );
+        if ( spdxId == null )
+        {
             return null;
         }
         try
@@ -256,6 +285,6 @@ public class MavenToSpdxLicenseMapper
     {
         return this.urlStringToSpdxLicenseId;
     }
-    
-    
+
+
 }

@@ -17,24 +17,23 @@ package org.spdx.maven;
 
 /**
  * Exceptions relating to the building of SPDX Documents
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class SpdxBuilderException
-    extends Exception
+public class SpdxBuilderException extends Exception
 {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     public SpdxBuilderException()
     {
-       super();
+        super();
     }
 
     /**

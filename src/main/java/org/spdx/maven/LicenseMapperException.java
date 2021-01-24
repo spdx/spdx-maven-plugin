@@ -17,20 +17,19 @@ package org.spdx.maven;
 
 /**
  * Errors related to mapping Maven licenses to SPDX licenses
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class LicenseMapperException
-    extends Exception
+public class LicenseMapperException extends Exception
 {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     public LicenseMapperException()
     {

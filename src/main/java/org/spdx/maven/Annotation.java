@@ -21,8 +21,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Represents an SPDX Annotation class in a Maven POM file
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
 public class Annotation
 {
@@ -38,12 +38,13 @@ public class Annotation
     private String annotator;
     @Parameter( required = true )
     private String annotationComment;
-    
+
     /**
      * Create a default (empty) annotation
      */
-    public Annotation() {
-        
+    public Annotation()
+    {
+
     }
 
     /**
@@ -55,7 +56,6 @@ public class Annotation
     }
 
 
-
     /**
      * @param annotationType the annotationType to set
      */
@@ -63,7 +63,6 @@ public class Annotation
     {
         this.annotationType = annotationType;
     }
-
 
 
     /**
@@ -75,7 +74,6 @@ public class Annotation
     }
 
 
-
     /**
      * @param annotationDate the annotationDate to set
      */
@@ -83,7 +81,6 @@ public class Annotation
     {
         this.annotationDate = annotationDate;
     }
-
 
 
     /**
@@ -95,7 +92,6 @@ public class Annotation
     }
 
 
-
     /**
      * @param annotator the annotator to set
      */
@@ -103,7 +99,6 @@ public class Annotation
     {
         this.annotator = annotator;
     }
-
 
 
     /**
@@ -115,7 +110,6 @@ public class Annotation
     }
 
 
-
     /**
      * @param annotationComment the annotationComment to set
      */
@@ -125,21 +119,20 @@ public class Annotation
     }
 
 
-
     /**
      * @return an SPDX model version of the annotation
      */
     public org.spdx.rdfparser.model.Annotation toSpdxAnnotation()
     {
-        org.spdx.rdfparser.model.Annotation retval = 
-                        new org.spdx.rdfparser.model.Annotation(this.annotator, 
-                                                                org.spdx.rdfparser.model.Annotation.TAG_TO_ANNOTATION_TYPE.get( this.annotationType ),
-                                                                this.annotationDate, this.annotationComment);
+        org.spdx.rdfparser.model.Annotation retval = new org.spdx.rdfparser.model.Annotation( this.annotator,
+                org.spdx.rdfparser.model.Annotation.TAG_TO_ANNOTATION_TYPE.get( this.annotationType ),
+                this.annotationDate, this.annotationComment );
         return retval;
     }
 
     public void logInfo( Log log )
     {
-        log.debug( "Annotator: "+this.annotator+", Date: "+this.annotationDate + ", Type: " + this.annotationType );
+        log.debug(
+                "Annotator: " + this.annotator + ", Date: " + this.annotationDate + ", Type: " + this.annotationType );
     }
 }

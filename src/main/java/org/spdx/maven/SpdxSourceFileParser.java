@@ -29,68 +29,92 @@ import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 /**
  * Helper class with static methods to parse SDPX source files
- * 
- * @author Gary O'Neall
  *
+ * @author Gary O'Neall
  */
-public class SpdxSourceFileParser {
-	public static final long MAXIMUM_SOURCE_FILE_LENGTH = 300000; // anything over this will not be parsed for SPDX license IDs
-    protected static final Pattern SPDX_LICENSE_PATTERN = Pattern.compile( "SPDX-License-Identifier:\\s*([^\\n^\\r]+)(\\n|\\r|$)", Pattern.DOTALL|Pattern.CASE_INSENSITIVE );
+public class SpdxSourceFileParser
+{
+    public static final long MAXIMUM_SOURCE_FILE_LENGTH = 300000; // anything over this will not be parsed for SPDX license IDs
+    protected static final Pattern SPDX_LICENSE_PATTERN = Pattern.compile(
+            "SPDX-License-Identifier:\\s*([^\\n^\\r]+)(\\n|\\r|$)", Pattern.DOTALL | Pattern.CASE_INSENSITIVE );
 
     /**
      * Parses a text file for matches to SPDX-License-Identifier:
+     *
      * @param file Text file to parse
      * @return list of all license expressions found following SPDX-License-Identifier:
      */
-    public static List<AnyLicenseInfo> parseFileForSpdxLicenses( File file ) throws SpdxSourceParserException {
-    	try {
-    		return parseTextForSpdxLicenses( FileUtils.readFileToString( file, "utf-8" ));
-		} catch( IOException e ) {
-			throw new SpdxSourceParserException( "I/O error reading text for source file "+file.getName(), e );
-		} catch( SpdxSourceParserException e ) {
-			throw new SpdxSourceParserException( "Error parsing license text for file "+file.getName(), e);
-		}
-	}
-    
-    public static List<AnyLicenseInfo> parseTextForSpdxLicenses( String text ) throws SpdxSourceParserException {
-    	List<AnyLicenseInfo> retval = new ArrayList<AnyLicenseInfo>();
-		Matcher match = SPDX_LICENSE_PATTERN.matcher( text );
-		int pos = 0;
-		while ( pos < text.length() && match.find( pos )  ) {
-			String matchingLine = match.group( 1 ).trim();
-			if ( matchingLine.startsWith("(") ) {
-				// This could be a multi-line expression, so we need to parse until we get to the last )
-				int parenCount = 1;
-				StringBuilder sb = new StringBuilder( "(" );
-				pos = match.start( 1 ) + 1;
-				while (parenCount > 0 && pos < text.length() ) {
-					char ch = text.charAt( pos );
-					if ( ch == '(' ) {
-						parenCount++;
-					} else if ( ch == ')' ) {
-						parenCount--;
-					}
-					if ( ch == '\n' || ch == '\r' ) {
-						sb.append( ' ' );
-					} else {
-						sb.append( ch );
-					}
-					pos++;
-				}
-				if ( parenCount > 0 ) {
-					throw( new SpdxSourceParserException( "Miss-matched parenthesis for expression" ));
-				}
-				matchingLine = sb.toString();
-			} else {
-				pos = match.end() + 1;
-			}
-			try {
-				retval.add( LicenseInfoFactory.parseSPDXLicenseString( matchingLine ));
-			} catch ( InvalidLicenseStringException e ) {
-				throw new SpdxSourceParserException( "Invalid SPDX license string '" + matchingLine + "'.");
-			}
-		}
-		return retval;
+    public static List<AnyLicenseInfo> parseFileForSpdxLicenses( File file ) throws SpdxSourceParserException
+    {
+        try
+        {
+            return parseTextForSpdxLicenses( FileUtils.readFileToString( file, "utf-8" ) );
+        }
+        catch ( IOException e )
+        {
+            throw new SpdxSourceParserException( "I/O error reading text for source file " + file.getName(), e );
+        }
+        catch ( SpdxSourceParserException e )
+        {
+            throw new SpdxSourceParserException( "Error parsing license text for file " + file.getName(), e );
+        }
+    }
+
+    public static List<AnyLicenseInfo> parseTextForSpdxLicenses( String text ) throws SpdxSourceParserException
+    {
+        List<AnyLicenseInfo> retval = new ArrayList<>();
+        Matcher match = SPDX_LICENSE_PATTERN.matcher( text );
+        int pos = 0;
+        while ( pos < text.length() && match.find( pos ) )
+        {
+            String matchingLine = match.group( 1 ).trim();
+            if ( matchingLine.startsWith( "(" ) )
+            {
+                // This could be a multi-line expression, so we need to parse until we get to the last )
+                int parenCount = 1;
+                StringBuilder sb = new StringBuilder( "(" );
+                pos = match.start( 1 ) + 1;
+                while ( parenCount > 0 && pos < text.length() )
+                {
+                    char ch = text.charAt( pos );
+                    if ( ch == '(' )
+                    {
+                        parenCount++;
+                    }
+                    else if ( ch == ')' )
+                    {
+                        parenCount--;
+                    }
+                    if ( ch == '\n' || ch == '\r' )
+                    {
+                        sb.append( ' ' );
+                    }
+                    else
+                    {
+                        sb.append( ch );
+                    }
+                    pos++;
+                }
+                if ( parenCount > 0 )
+                {
+                    throw ( new SpdxSourceParserException( "Miss-matched parenthesis for expression" ) );
+                }
+                matchingLine = sb.toString();
+            }
+            else
+            {
+                pos = match.end() + 1;
+            }
+            try
+            {
+                retval.add( LicenseInfoFactory.parseSPDXLicenseString( matchingLine ) );
+            }
+            catch ( InvalidLicenseStringException e )
+            {
+                throw new SpdxSourceParserException( "Invalid SPDX license string '" + matchingLine + "'." );
+            }
+        }
+        return retval;
     }
 
 }
