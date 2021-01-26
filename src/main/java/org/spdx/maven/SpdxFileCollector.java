@@ -19,8 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -57,9 +57,9 @@ public class SpdxFileCollector
 {
     static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
     // constants for mapping extensions to types.
-    static HashSet<String> SOURCE_EXTENSIONS = new HashSet<>();
-    static HashSet<String> BINARY_EXTENSIONS = new HashSet<>();
-    static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<>();
+    static Set<String> SOURCE_EXTENSIONS = new HashSet<>();
+    static Set<String> BINARY_EXTENSIONS = new HashSet<>();
+    static Set<String> ARCHIVE_EXTENSIONS = new HashSet<>();
     static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
     static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
     static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
@@ -71,7 +71,6 @@ public class SpdxFileCollector
     }
 
     static final String SHA1_ALGORITHM = "SHA-1";
-    static final String PACKAGE_VERIFICATION_CHARSET = "UTF-8";
     private static MessageDigest digest;
 
     static
@@ -111,11 +110,10 @@ public class SpdxFileCollector
      */
     private static void loadFileExtensionConstants()
     {
-        InputStream is = null;
         Properties prop = new Properties();
-        try
+        try ( InputStream is = SpdxFileCollector.class.getClassLoader().getResourceAsStream(
+                SPDX_FILE_TYPE_CONSTANTS_PROP_PATH ) )
         {
-            is = SpdxFileCollector.class.getClassLoader().getResourceAsStream( SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
             if ( is == null )
             {
                 logger.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
@@ -132,20 +130,6 @@ public class SpdxFileCollector
         {
             logger.warn(
                     "WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other." );
-        }
-        finally
-        {
-            try
-            {
-                if ( is != null )
-                {
-                    is.close();
-                }
-            }
-            catch ( Throwable e )
-            {
-                logger.warn( "WARNING: Error closing SpdxFileTypeConstants properties file" );
-            }
         }
     }
 
@@ -527,7 +511,7 @@ public class SpdxFileCollector
      */
     public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath ) throws NoSuchAlgorithmException
     {
-        ArrayList<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
+        List<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
 
         if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) )
         {
@@ -547,9 +531,9 @@ public class SpdxFileCollector
      * @return
      * @throws NoSuchAlgorithmException
      */
-    private SpdxPackageVerificationCode calculatePackageVerificationCode( Collection<SpdxFile> spdxFiles, ArrayList<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException
+    private SpdxPackageVerificationCode calculatePackageVerificationCode( Collection<SpdxFile> spdxFiles, List<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException
     {
-        ArrayList<String> fileChecksums = new ArrayList<>();
+        List<String> fileChecksums = new ArrayList<>();
         for ( SpdxFile file : spdxFiles )
         {
             if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) )
@@ -558,7 +542,7 @@ public class SpdxFileCollector
             }
         }
         Collections.sort( fileChecksums );
-        MessageDigest verificationCodeDigest = MessageDigest.getInstance( "SHA-1" );
+        MessageDigest verificationCodeDigest = MessageDigest.getInstance( SHA1_ALGORITHM );
         for ( String fileChecksum : fileChecksums )
         {
             byte[] hashInput = fileChecksum.getBytes( StandardCharsets.UTF_8 );
@@ -568,7 +552,7 @@ public class SpdxFileCollector
         return new SpdxPackageVerificationCode( value, excludedFileNamesFromVerificationCode.toArray( new String[0] ) );
     }
 
-    private boolean includeInVerificationCode( String name, ArrayList<String> excludedFileNamesFromVerificationCode )
+    private boolean includeInVerificationCode( String name, List<String> excludedFileNamesFromVerificationCode )
     {
         for ( String s : excludedFileNamesFromVerificationCode )
         {
@@ -604,8 +588,8 @@ public class SpdxFileCollector
     /**
      * Generate the Sha1 for a given file.  Must have read access to the file.
      *
-     * @param file
-     * @return
+     * @param file file to generate checksum for
+     * @return SHA1 checksum of the input file
      * @throws SpdxCollectionException
      */
     public static String generateSha1( File file ) throws SpdxCollectionException
@@ -623,16 +607,8 @@ public class SpdxFileCollector
             }
         }
         digest.reset();
-        InputStream in;
-        try
-        {
-            in = new FileInputStream( file );
-        }
-        catch ( IOException e1 )
-        {
-            throw ( new SpdxCollectionException( "IO getting file content while calculating the SHA1" ) );
-        }
-        try
+
+        try ( InputStream in = new FileInputStream( file ) )
         {
             byte[] buffer = new byte[2048];
             int numBytes = in.read( buffer );
@@ -645,21 +621,8 @@ public class SpdxFileCollector
         }
         catch ( IOException e )
         {
-            throw ( new SpdxCollectionException( "IO error reading file input stream while calculating the SHA1" ) );
-        }
-        finally
-        {
-            try
-            {
-                if ( in != null )
-                {
-                    in.close();
-                }
-            }
-            catch ( IOException e )
-            {
-                logger.warn( "IO error closing file input stream while calculating the SHA1" );
-            }
+            logger.warn( "IO error while calculating the SHA1" );
+            throw new SpdxCollectionException( "IO getting file content while calculating the SHA1" );
         }
     }
 
