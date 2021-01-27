@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -34,6 +35,7 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
@@ -69,25 +71,20 @@ public class SpdxFileCollector
         loadFileExtensionConstants();
     }
 
-    static final String SHA1_ALGORITHM = "SHA-1";
-    private static MessageDigest digest;
+    static final Map<Checksum.ChecksumAlgorithm, String> checksumAlgorithms = new HashMap<>();
 
     static
     {
-        try
-        {
-            digest = MessageDigest.getInstance( SHA1_ALGORITHM );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            logger.error( "No such algorithm error initializing the SPDX file collector - SHA1", e );
-            digest = null;
-        }
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1, "SHA-1" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha224, "SHA-224" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256, "SHA-256" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha384, "SHA-384" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha512, "SHA-512" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md2, "MD2" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md4, "MD4" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md5, "MD5" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md6, "MD6" );
     }
-
-    static final List<String> checksumAlgorithms = Arrays.asList( "SHA-224", "SHA-256", "SHA-384",
-            "SHA-512", "MD2", "MD4", "MD5", "MD6" );
-
 
     Set<AnyLicenseInfo> licensesFromFiles = new HashSet<>();
     /**
@@ -544,7 +541,7 @@ public class SpdxFileCollector
             }
         }
         Collections.sort( fileChecksums );
-        MessageDigest verificationCodeDigest = MessageDigest.getInstance( SHA1_ALGORITHM );
+        MessageDigest verificationCodeDigest = MessageDigest.getInstance( "SHA-1" );
         for ( String fileChecksum : fileChecksums )
         {
             byte[] hashInput = fileChecksum.getBytes( StandardCharsets.UTF_8 );
@@ -587,76 +584,64 @@ public class SpdxFileCollector
         return sb.toString();
     }
 
-    private static String generateChecksumWithDigest(File file, MessageDigest digest) throws SpdxCollectionException
-    {
-        digest.reset();
-        byte[] buffer = new byte[2048];
-        try ( InputStream in = new FileInputStream( file ) )
-        {
-            int numBytes = in.read( buffer );
-            while ( numBytes >= 0 )
-            {
-                digest.update( buffer, 0, numBytes );
-                numBytes = in.read( buffer );
-            }
-        }
-        catch ( IOException e )
-        {
-            String error = "IO error while calculating the " + digest.getAlgorithm() + " checksum";
-            logger.warn( error );
-            throw new SpdxCollectionException( error );
-        }
-        return convertChecksumToString( digest.digest() );
-    }
-
     /**
-     * Generate the Sha1 for a given file.  Must have read access to the file.
+     * Generate the Sha1 for a given file.  Must have read access to the file. This method is equivalent to calling
+     * {@code SpdxFileCollector.generateChecksum(file, "SHA-1")}.
      *
      * @param file file to generate checksum for
      * @return SHA1 checksum of the input file
-     * @throws SpdxCollectionException
+     * @throws SpdxCollectionException if the algorithm is unavailable or the file cannot be read
      */
     public static String generateSha1( File file ) throws SpdxCollectionException
     {
-        if ( digest == null )
-        {
-            try
-            {
-                digest = MessageDigest.getInstance( SHA1_ALGORITHM );
-            }
-            catch ( NoSuchAlgorithmException e )
-            {
-                throw ( new SpdxCollectionException(
-                        "Unable to create the message digest for generating the File SHA1" ) );
-            }
-        }
-        digest.reset();
-        return generateChecksumWithDigest( file, digest );
+        Set<Checksum.ChecksumAlgorithm> sha1 = new HashSet<>();
+        sha1.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+        Checksum sha1Checksum = generateChecksum( file, sha1 ).iterator().next();
+        return sha1Checksum.getValue();
     }
 
     /**
+     * Generate checksums for a given file using each algorithm supplied. Must have read access to the file.
      *
-     * @param file file whose checksum is to be generated
-     * @param algorithm algorithm to generate the checksum. Allowed values are SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, MD2, MD4, MD5, MD6
-     * @return checksum of the file
-     * @throws SpdxCollectionException if the input algorithm is invalid or unavailable
+     * @param file       file whose checksum is to be generated
+     * @param algorithms algorithms to generate the checksums
+     * @return {@code Set} of checksums for file using each algortihm specified
+     * @throws SpdxCollectionException if the input algorithm is invalid or unavailable or if the file cannot be read
      */
-    public static String generateOptionalChecksum(File file, String algorithm) throws SpdxCollectionException
+    public static Set<Checksum> generateChecksum( File file, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
-        if ( !checksumAlgorithms.contains( algorithm ) )
-        {
-            throw new SpdxCollectionException(algorithm + " algorithm is not supported for creating file checksums.");
-        }
+        Set<Checksum> checksums = new HashSet<>();
 
+        byte[] buffer;
         try
         {
-            MessageDigest digest = MessageDigest.getInstance( algorithm );
-            return generateChecksumWithDigest( file, digest );
+            buffer = Files.readAllBytes( file.toPath() );
         }
-        catch ( NoSuchAlgorithmException e )
+        catch ( IOException e )
         {
-            throw new SpdxCollectionException(e);
+            throw new SpdxCollectionException( "IO error while calculating checksums.", e );
         }
+
+        for ( Checksum.ChecksumAlgorithm algorithm : algorithms )
+        {
+            String checksumAlgorithm = checksumAlgorithms.get( algorithm );
+
+            MessageDigest digest;
+            try
+            {
+                digest = MessageDigest.getInstance( checksumAlgorithm );
+            }
+            catch ( NoSuchAlgorithmException e )
+            {
+                throw new SpdxCollectionException( e );
+            }
+
+            digest.update( buffer );
+            String checksum = convertChecksumToString( digest.digest() );
+            checksums.add( new Checksum( algorithm, checksum ) );
+        }
+
+        return checksums;
     }
 
     public void setLog( Log log )

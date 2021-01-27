@@ -16,12 +16,15 @@
 package org.spdx.maven;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.ExternalRef;
 import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 
@@ -32,27 +35,28 @@ import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
  */
 public class SpdxProjectInformation
 {
-    String[] creators = new String[0];
-    String creatorComment = "";
-    AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
-    AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
-    String description;
-    String downloadUrl;
-    String homePage;
-    String shortDescription;
-    String originator;
-    String supplier;
-    String packageArchiveFileName;
-    String versionInfo;
-    String licenseComment;
-    String sha1;
-    String name;
+    private String[] creators = new String[0];
+    private String creatorComment = "";
+    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
+    private AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
+    private String description;
+    private String downloadUrl;
+    private String homePage;
+    private String shortDescription;
+    private String originator;
+    private String supplier;
+    private String packageArchiveFileName;
+    private String versionInfo;
+    private String licenseComment;
+    private String sha1;
+    private String name;
     private String sourceInfo;
     private String copyrightText;
     private String documentComment;
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
     private List<ExternalReference> externalRefs;
+    private Set<Checksum> checksums;
 
     /**
      * @return the documentComment
@@ -84,6 +88,22 @@ public class SpdxProjectInformation
     public void setSha1( String sha1 )
     {
         this.sha1 = sha1;
+    }
+
+    /**
+     * @return checksums for the project
+     */
+    public Set<Checksum> getChecksums()
+    {
+        return checksums;
+    }
+
+    /**
+     * @param checksums the checksums to set for the project
+     */
+    public void setChecksums( Set<Checksum> checksums )
+    {
+        this.checksums = checksums;
     }
 
     /**
