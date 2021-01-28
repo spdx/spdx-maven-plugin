@@ -48,7 +48,6 @@ public class SpdxProjectInformation
     private String packageArchiveFileName;
     private String versionInfo;
     private String licenseComment;
-    private String sha1;
     private String name;
     private String sourceInfo;
     private String copyrightText;
@@ -72,22 +71,6 @@ public class SpdxProjectInformation
     public void setDocumentComment( String documentComment )
     {
         this.documentComment = documentComment;
-    }
-
-    /**
-     * @return the sha1
-     */
-    public String getSha1()
-    {
-        return sha1;
-    }
-
-    /**
-     * @param sha1 the sha1 to set
-     */
-    public void setSha1( String sha1 )
-    {
-        this.sha1 = sha1;
     }
 
     /**
@@ -338,7 +321,6 @@ public class SpdxProjectInformation
         log.debug( "SPDX License comment: " + this.getLicenseComment() );
         log.debug( "SPDX Originator: " + this.getOriginator() );
         log.debug( "SPDX PackageArchiveFileName: " + this.getPackageArchiveFileName() );
-        log.debug( "SPDX SHA1: " + this.getSha1() );
         log.debug( "SPDX Short description: " + this.getShortDescription() );
         log.debug( "SPDX Supplier: " + this.getSupplier() );
         log.debug( "SPDX Source Info:  " + this.getSourceInfo() );
@@ -400,6 +382,14 @@ public class SpdxProjectInformation
                     log.error( "Invalid external reference", e1 );
                 }
 
+            }
+        }
+        if ( checksums != null && checksums.size() > 0 )
+        {
+            for ( Checksum checksum : checksums )
+            {
+                String algorithm = SpdxFileCollector.checksumAlgorithms.get( checksum.getAlgorithm() );
+                log.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
             }
         }
     }

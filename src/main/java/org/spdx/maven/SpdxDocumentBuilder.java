@@ -416,13 +416,11 @@ public class SpdxDocumentBuilder
             pkg.setOriginator( projectInformation.getOriginator() );
         }
         // sha1 checksum
-        if ( projectInformation.getSha1() != null )
+        if ( projectInformation.getChecksums() != null )
         {
-            //TODO: Add options for additional checksums
-            Checksum checksum = new Checksum( ChecksumAlgorithm.checksumAlgorithm_sha1, projectInformation.getSha1() );
             try
             {
-                pkg.setChecksums( new Checksum[] {checksum} );
+                pkg.setChecksums( projectInformation.getChecksums().toArray( new Checksum[0] ) );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
