@@ -10,7 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.junit.After;
@@ -25,6 +27,7 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
@@ -574,5 +577,46 @@ public class TestSpdxFileCollector
         assertTrue( collector.isSourceFile( new FileType[] {FileType.fileType_source} ) );
         assertTrue( collector.isSourceFile( new FileType[] {FileType.fileType_text, FileType.fileType_source} ) );
         assertFalse( collector.isSourceFile( new FileType[] {FileType.fileType_binary, FileType.fileType_image} ) );
+    }
+
+    @Test
+    public void testGenerateChecksums() throws SpdxCollectionException
+    {
+        SpdxFileCollector collector = new SpdxFileCollector( null );
+        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+        File spdxFile = new File( filePaths[0] );
+
+        Set<Checksum.ChecksumAlgorithm> checksumAlgorithmSet = new HashSet<>();
+        checksumAlgorithmSet.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+        checksumAlgorithmSet.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256 );
+
+        Set<Checksum> expectedChecksums = new HashSet<>();
+        expectedChecksums.add( new Checksum( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1, "1834453c87b9188024c7b18d179eb64f95f29fcf" ) );
+        expectedChecksums.add( new Checksum( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256,  "1c94046c63f61f5dbe5c15cc6c4e34510132ab262aa266735b344d836ef8cb3c") );
+        // Checksum does not override equals currently. Hence, need to compare manually
+        Set<Checksum> actualChecksums = SpdxFileCollector.generateChecksum( spdxFile, checksumAlgorithmSet );
+        for ( Checksum expectedChecksum : expectedChecksums )
+        {
+            boolean found = false;
+            for ( Checksum actualChecksum : actualChecksums )
+            {
+                if ( expectedChecksum.getAlgorithm().equals( actualChecksum.getAlgorithm() ) )
+                {
+                    if ( expectedChecksum.getValue().equals( actualChecksum.getValue() ) )
+                    {
+                        found = true;
+                    }
+                    else
+                    {
+                        fail("Expected checksum : " + expectedChecksum + "does not match actual checksum : " + actualChecksum);
+                    }
+                }
+            }
+            if ( !found )
+            {
+                fail("Expected checksum : " + expectedChecksum + "not found in actual checksums : " + actualChecksums);
+            }
+        }
     }
 }
