@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -203,9 +204,10 @@ public class SpdxDocumentBuilder
      * @param pathSpecificInformation     Map of path to file information used to override the default file information
      * @param dependencyInformation       Dependencies to add to the SPDX file (typically based on project dependencies
      *                                    in the POM file)
+     * @param algorithms                  algorithms to use to generate checksums
      * @throws SpdxBuilderException
      */
-    public void buildDocumentFromFiles( FileSet[] includedSourceDirectories, FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, String baseDir, SpdxProjectInformation projectInformation, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
+    public void buildDocumentFromFiles( FileSet[] includedSourceDirectories, FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, String baseDir, SpdxProjectInformation projectInformation, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxDependencyInformation dependencyInformation, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxBuilderException
     {
         FileOutputStream spdxOut = null;
         try
@@ -214,7 +216,7 @@ public class SpdxDocumentBuilder
             spdxOut = new FileOutputStream( spdxFile );
             fillSpdxDocumentInformation( projectInformation );
             collectSpdxFileInformation( includedSourceDirectories, includedTestDirectories, includedResourceDirectories,
-                    baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation );
+                    baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation, algorithms );
             addDependencyInformation( dependencyInformation );
             container.getModel().write( spdxOut );
             this.log.debug( "Completed build document from files" );
@@ -520,21 +522,22 @@ public class SpdxDocumentBuilder
      * @param spdxFileName                SPDX file name - will be used for the skipped file names in the verification
      *                                    code
      * @param pathSpecificInformation     Map of path to file information used to override the default file information
+     * @param algorithms                  algorithms to use to generate checksums
      * @throws InvalidSPDXAnalysisException
      * @throws SpdxBuilderException
      */
-    private void collectSpdxFileInformation( FileSet[] includedSourceDirectories, FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, String baseDir, SpdxDefaultFileInformation defaultFileInformation, String spdxFileName, Map<String, SpdxDefaultFileInformation> pathSpecificInformation ) throws InvalidSPDXAnalysisException, SpdxBuilderException
+    private void collectSpdxFileInformation( FileSet[] includedSourceDirectories, FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, String baseDir, SpdxDefaultFileInformation defaultFileInformation, String spdxFileName, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, Set<Checksum.ChecksumAlgorithm> algorithms ) throws InvalidSPDXAnalysisException, SpdxBuilderException
     {
         SpdxFileCollector fileCollector = new SpdxFileCollector( getLog() );
         fileCollector.setLog( getLog() );
         try
         {
             fileCollector.collectFiles( includedSourceDirectories, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.GENERATES, container );
+                    pathSpecificInformation, projectPackage, RelationshipType.GENERATES, container, algorithms );
             fileCollector.collectFiles( includedTestDirectories, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.TEST_CASE_OF, container );
+                    pathSpecificInformation, projectPackage, RelationshipType.TEST_CASE_OF, container, algorithms );
             fileCollector.collectFiles( includedResourceDirectories, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.CONTAINED_BY, container );
+                    pathSpecificInformation, projectPackage, RelationshipType.CONTAINED_BY, container, algorithms );
         }
         catch ( SpdxCollectionException e )
         {

@@ -35,6 +35,7 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
+import org.spdx.rdfparser.model.Annotation;
 import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.model.Relationship;
@@ -158,9 +159,10 @@ public class SpdxFileCollector
      * @param relationshipType        Type of relationship to the project package
      * @param projectPackage          Package to which the files belong
      * @param container               contains the extracted license infos that may be needed for license parsing
+     *
      * @throws SpdxCollectionException
      */
-    public void collectFiles( FileSet[] fileSets, String baseDir, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType, SpdxDocumentContainer container ) throws SpdxCollectionException
+    public void collectFiles( FileSet[] fileSets, String baseDir, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType, SpdxDocumentContainer container, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
         for ( FileSet fileSet : fileSets )
         {
@@ -186,7 +188,7 @@ public class SpdxFileCollector
                 {
                     outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                 }
-                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container );
+                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container, algorithms );
             }
         }
     }
@@ -251,15 +253,16 @@ public class SpdxFileCollector
      * @param outputFileName   Path to the output file name relative to the root of the output archive file
      * @param relationshipType Type of relationship to the project package
      * @param projectPackage   Package to which the files belong
+     * @param algorithms       algorithms to use to generate checksums
      * @throws SpdxCollectionException
      */
-    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage, SpdxDocumentContainer container ) throws SpdxCollectionException
+    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage, SpdxDocumentContainer container, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() ) )
         {
             return; // already added from a previous scan
         }
-        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo );
+        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms );
         Relationship relationship = new Relationship( projectPackage, relationshipType, "" );
         try
         {
@@ -317,14 +320,15 @@ public class SpdxFileCollector
      * @param file
      * @param outputFileName         Path to the output file name relative to the root of the output archive file
      * @param defaultFileInformation Information on default SPDX field data for the files
+     * @param algorithms             algorithms to use to generate checksums
      * @return
      * @throws SpdxCollectionException
      */
-    private SpdxFile convertToSpdxFile( File file, String outputFileName, SpdxDefaultFileInformation defaultFileInformation ) throws SpdxCollectionException
+    private SpdxFile convertToSpdxFile( File file, String outputFileName, SpdxDefaultFileInformation defaultFileInformation, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
         FileType[] fileTypes = new FileType[] {extensionToFileType( getExtension( file ) )};
-        String sha1 = generateSha1( file );
+        Set<Checksum> checksums = generateChecksum( file, algorithms );
         AnyLicenseInfo concludedLicense = null;
         AnyLicenseInfo license = null;
         String licenseComment = defaultFileInformation.getLicenseComment();
@@ -383,11 +387,12 @@ public class SpdxFileCollector
 
         SpdxFile retval = null;
         //TODO: Add annotation
-        //TODO: Add optional checksums
         try
         {
-            retval = new SpdxFile( relativePath, fileTypes, sha1, concludedLicense, new AnyLicenseInfo[] {license},
-                    licenseComment, copyright, artifactOf, comment );
+            retval = new SpdxFile( relativePath, comment, new Annotation[0], new Relationship[0], concludedLicense,
+                    new AnyLicenseInfo[] {license}, copyright, licenseComment, fileTypes,
+                    checksums.toArray( new Checksum[0] ), new String[0], "", artifactOf );
+
             retval.setFileContributors( contributors );
             retval.setNoticeText( notice );
         }

@@ -446,7 +446,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             builder.buildDocumentFromFiles( includedSourceDirectories, includedTestDirectories,
                     includedResourceDirectories, mavenProject.getBasedir().getAbsolutePath(), projectInformation,
-                    defaultFileInformation, pathSpecificInformation, dependencyInformation );
+                    defaultFileInformation, pathSpecificInformation, dependencyInformation, getChecksumAlgorithms() );
         }
         catch ( SpdxBuilderException e )
         {
