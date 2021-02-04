@@ -19,8 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -35,6 +35,8 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
+import org.spdx.rdfparser.model.Annotation;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.DoapProject;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
@@ -57,9 +59,9 @@ public class SpdxFileCollector
 {
     static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
     // constants for mapping extensions to types.
-    static HashSet<String> SOURCE_EXTENSIONS = new HashSet<>();
-    static HashSet<String> BINARY_EXTENSIONS = new HashSet<>();
-    static HashSet<String> ARCHIVE_EXTENSIONS = new HashSet<>();
+    static Set<String> SOURCE_EXTENSIONS = new HashSet<>();
+    static Set<String> BINARY_EXTENSIONS = new HashSet<>();
+    static Set<String> ARCHIVE_EXTENSIONS = new HashSet<>();
     static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
     static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
     static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
@@ -70,23 +72,20 @@ public class SpdxFileCollector
         loadFileExtensionConstants();
     }
 
-    static final String SHA1_ALGORITHM = "SHA-1";
-    static final String PACKAGE_VERIFICATION_CHARSET = "UTF-8";
-    private static MessageDigest digest;
+    static final Map<Checksum.ChecksumAlgorithm, String> checksumAlgorithms = new HashMap<>();
 
     static
     {
-        try
-        {
-            digest = MessageDigest.getInstance( SHA1_ALGORITHM );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            logger.error( "No such algorithm error initializing the SPDX file collector - SHA1", e );
-            digest = null;
-        }
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1, "SHA-1" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha224, "SHA-224" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256, "SHA-256" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha384, "SHA-384" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha512, "SHA-512" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md2, "MD2" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md4, "MD4" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md5, "MD5" );
+        checksumAlgorithms.put( Checksum.ChecksumAlgorithm.checksumAlgorithm_md6, "MD6" );
     }
-
 
     Set<AnyLicenseInfo> licensesFromFiles = new HashSet<>();
     /**
@@ -111,11 +110,10 @@ public class SpdxFileCollector
      */
     private static void loadFileExtensionConstants()
     {
-        InputStream is = null;
         Properties prop = new Properties();
-        try
+        try ( InputStream is = SpdxFileCollector.class.getClassLoader().getResourceAsStream(
+                SPDX_FILE_TYPE_CONSTANTS_PROP_PATH ) )
         {
-            is = SpdxFileCollector.class.getClassLoader().getResourceAsStream( SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
             if ( is == null )
             {
                 logger.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
@@ -132,20 +130,6 @@ public class SpdxFileCollector
         {
             logger.warn(
                     "WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other." );
-        }
-        finally
-        {
-            try
-            {
-                if ( is != null )
-                {
-                    is.close();
-                }
-            }
-            catch ( Throwable e )
-            {
-                logger.warn( "WARNING: Error closing SpdxFileTypeConstants properties file" );
-            }
         }
     }
 
@@ -175,9 +159,10 @@ public class SpdxFileCollector
      * @param relationshipType        Type of relationship to the project package
      * @param projectPackage          Package to which the files belong
      * @param container               contains the extracted license infos that may be needed for license parsing
+     *
      * @throws SpdxCollectionException
      */
-    public void collectFiles( FileSet[] fileSets, String baseDir, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType, SpdxDocumentContainer container ) throws SpdxCollectionException
+    public void collectFiles( FileSet[] fileSets, String baseDir, SpdxDefaultFileInformation defaultFileInformation, Map<String, SpdxDefaultFileInformation> pathSpecificInformation, SpdxPackage projectPackage, RelationshipType relationshipType, SpdxDocumentContainer container, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
         for ( FileSet fileSet : fileSets )
         {
@@ -203,7 +188,7 @@ public class SpdxFileCollector
                 {
                     outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                 }
-                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container );
+                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, container, algorithms );
             }
         }
     }
@@ -268,15 +253,16 @@ public class SpdxFileCollector
      * @param outputFileName   Path to the output file name relative to the root of the output archive file
      * @param relationshipType Type of relationship to the project package
      * @param projectPackage   Package to which the files belong
+     * @param algorithms       algorithms to use to generate checksums
      * @throws SpdxCollectionException
      */
-    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage, SpdxDocumentContainer container ) throws SpdxCollectionException
+    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage, SpdxDocumentContainer container, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() ) )
         {
             return; // already added from a previous scan
         }
-        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo );
+        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms );
         Relationship relationship = new Relationship( projectPackage, relationshipType, "" );
         try
         {
@@ -334,14 +320,15 @@ public class SpdxFileCollector
      * @param file
      * @param outputFileName         Path to the output file name relative to the root of the output archive file
      * @param defaultFileInformation Information on default SPDX field data for the files
+     * @param algorithms             algorithms to use to generate checksums
      * @return
      * @throws SpdxCollectionException
      */
-    private SpdxFile convertToSpdxFile( File file, String outputFileName, SpdxDefaultFileInformation defaultFileInformation ) throws SpdxCollectionException
+    private SpdxFile convertToSpdxFile( File file, String outputFileName, SpdxDefaultFileInformation defaultFileInformation, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
         FileType[] fileTypes = new FileType[] {extensionToFileType( getExtension( file ) )};
-        String sha1 = generateSha1( file );
+        Set<Checksum> checksums = generateChecksum( file, algorithms );
         AnyLicenseInfo concludedLicense = null;
         AnyLicenseInfo license = null;
         String licenseComment = defaultFileInformation.getLicenseComment();
@@ -400,11 +387,12 @@ public class SpdxFileCollector
 
         SpdxFile retval = null;
         //TODO: Add annotation
-        //TODO: Add optional checksums
         try
         {
-            retval = new SpdxFile( relativePath, fileTypes, sha1, concludedLicense, new AnyLicenseInfo[] {license},
-                    licenseComment, copyright, artifactOf, comment );
+            retval = new SpdxFile( relativePath, comment, new Annotation[0], new Relationship[0], concludedLicense,
+                    new AnyLicenseInfo[] {license}, copyright, licenseComment, fileTypes,
+                    checksums.toArray( new Checksum[0] ), new String[0], "", artifactOf );
+
             retval.setFileContributors( contributors );
             retval.setNoticeText( notice );
         }
@@ -527,7 +515,7 @@ public class SpdxFileCollector
      */
     public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath ) throws NoSuchAlgorithmException
     {
-        ArrayList<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
+        List<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
 
         if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) )
         {
@@ -547,9 +535,9 @@ public class SpdxFileCollector
      * @return
      * @throws NoSuchAlgorithmException
      */
-    private SpdxPackageVerificationCode calculatePackageVerificationCode( Collection<SpdxFile> spdxFiles, ArrayList<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException
+    private SpdxPackageVerificationCode calculatePackageVerificationCode( Collection<SpdxFile> spdxFiles, List<String> excludedFileNamesFromVerificationCode ) throws NoSuchAlgorithmException
     {
-        ArrayList<String> fileChecksums = new ArrayList<>();
+        List<String> fileChecksums = new ArrayList<>();
         for ( SpdxFile file : spdxFiles )
         {
             if ( includeInVerificationCode( file.getName(), excludedFileNamesFromVerificationCode ) )
@@ -568,7 +556,7 @@ public class SpdxFileCollector
         return new SpdxPackageVerificationCode( value, excludedFileNamesFromVerificationCode.toArray( new String[0] ) );
     }
 
-    private boolean includeInVerificationCode( String name, ArrayList<String> excludedFileNamesFromVerificationCode )
+    private boolean includeInVerificationCode( String name, List<String> excludedFileNamesFromVerificationCode )
     {
         for ( String s : excludedFileNamesFromVerificationCode )
         {
@@ -602,65 +590,63 @@ public class SpdxFileCollector
     }
 
     /**
-     * Generate the Sha1 for a given file.  Must have read access to the file.
+     * Generate the Sha1 for a given file.  Must have read access to the file. This method is equivalent to calling
+     * {@code SpdxFileCollector.generateChecksum(file, "SHA-1")}.
      *
-     * @param file
-     * @return
-     * @throws SpdxCollectionException
+     * @param file file to generate checksum for
+     * @return SHA1 checksum of the input file
+     * @throws SpdxCollectionException if the algorithm is unavailable or the file cannot be read
      */
     public static String generateSha1( File file ) throws SpdxCollectionException
     {
-        if ( digest == null )
-        {
-            try
-            {
-                digest = MessageDigest.getInstance( SHA1_ALGORITHM );
-            }
-            catch ( NoSuchAlgorithmException e )
-            {
-                throw ( new SpdxCollectionException(
-                        "Unable to create the message digest for generating the File SHA1" ) );
-            }
-        }
-        digest.reset();
-        InputStream in;
+        Set<Checksum.ChecksumAlgorithm> sha1 = new HashSet<>();
+        sha1.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+        Checksum sha1Checksum = generateChecksum( file, sha1 ).iterator().next();
+        return sha1Checksum.getValue();
+    }
+
+    /**
+     * Generate checksums for a given file using each algorithm supplied. Must have read access to the file.
+     *
+     * @param file       file whose checksum is to be generated
+     * @param algorithms algorithms to generate the checksums
+     * @return {@code Set} of checksums for file using each algortihm specified
+     * @throws SpdxCollectionException if the input algorithm is invalid or unavailable or if the file cannot be read
+     */
+    public static Set<Checksum> generateChecksum( File file, Set<Checksum.ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
+    {
+        Set<Checksum> checksums = new HashSet<>();
+
+        byte[] buffer;
         try
         {
-            in = new FileInputStream( file );
-        }
-        catch ( IOException e1 )
-        {
-            throw ( new SpdxCollectionException( "IO getting file content while calculating the SHA1" ) );
-        }
-        try
-        {
-            byte[] buffer = new byte[2048];
-            int numBytes = in.read( buffer );
-            while ( numBytes >= 0 )
-            {
-                digest.update( buffer, 0, numBytes );
-                numBytes = in.read( buffer );
-            }
-            return convertChecksumToString( digest.digest() );
+            buffer = Files.readAllBytes( file.toPath() );
         }
         catch ( IOException e )
         {
-            throw ( new SpdxCollectionException( "IO error reading file input stream while calculating the SHA1" ) );
+            throw new SpdxCollectionException( "IO error while calculating checksums.", e );
         }
-        finally
+
+        for ( Checksum.ChecksumAlgorithm algorithm : algorithms )
         {
+            String checksumAlgorithm = checksumAlgorithms.get( algorithm );
+
+            MessageDigest digest;
             try
             {
-                if ( in != null )
-                {
-                    in.close();
-                }
+                digest = MessageDigest.getInstance( checksumAlgorithm );
             }
-            catch ( IOException e )
+            catch ( NoSuchAlgorithmException e )
             {
-                logger.warn( "IO error closing file input stream while calculating the SHA1" );
+                throw new SpdxCollectionException( e );
             }
+
+            digest.update( buffer );
+            String checksum = convertChecksumToString( digest.digest() );
+            checksums.add( new Checksum( algorithm, checksum ) );
         }
+
+        return checksums;
     }
 
     public void setLog( Log log )

@@ -35,6 +35,7 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -46,6 +47,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -314,6 +316,14 @@ public class CreateSpdxMojo extends AbstractMojo
     @Parameter
     private boolean onlyUseLocalLicenses;
 
+    /**
+     * File checksums provides a unique identifier to match analysis information on each specific file in a package. The
+     * SHA1 algorithm is always calculated. Configure which algorithms should be to calculate the file checksum. Other
+     * algorithms that can be provided optionally include SHA224, SHA256, SHA384, SHA512, MD2, MD4, MD5, MD6.
+     */
+    @Parameter
+    private String[] checksumAlgorithms;
+
     // Path specific data
     /**
      * File or directories which have SPDX information different from the project defaults.  The fileOrDirectory field
@@ -436,7 +446,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             builder.buildDocumentFromFiles( includedSourceDirectories, includedTestDirectories,
                     includedResourceDirectories, mavenProject.getBasedir().getAbsolutePath(), projectInformation,
-                    defaultFileInformation, pathSpecificInformation, dependencyInformation );
+                    defaultFileInformation, pathSpecificInformation, dependencyInformation, getChecksumAlgorithms() );
         }
         catch ( SpdxBuilderException e )
         {
@@ -808,20 +818,21 @@ public class CreateSpdxMojo extends AbstractMojo
             packageFileName = "NOASSERTION";
         }
         retval.setPackageArchiveFileName( packageFileName );
-        String sha1 = null;
+
+        Set<Checksum> checksums = null;
         if ( packageFile != null && packageFile.exists() )
         {
             try
             {
-                sha1 = SpdxFileCollector.generateSha1( packageFile );
+                Set<Checksum.ChecksumAlgorithm> algorithms = getChecksumAlgorithms();
+                checksums = SpdxFileCollector.generateChecksum( packageFile, algorithms );
             }
             catch ( SpdxCollectionException e )
             {
-                this.getLog().warn(
-                        "Unable to collect sha1 value for " + packageFile.getName() + ":" + e.getMessage() );
+                this.getLog().warn( "Unable to compute checksum for " + packageFile.getName() + ":" + e.getMessage() );
             }
         }
-        retval.setSha1( sha1 );
+        retval.setChecksums( checksums );
         retval.setShortDescription( mavenProject.getDescription() );
         if ( mavenProject.getOrganization() != null )
         {
@@ -943,5 +954,56 @@ public class CreateSpdxMojo extends AbstractMojo
             }
         }
         return result.toArray( new FileSet[0] );
+    }
+
+    /**
+     * Map user input algorithms to Checksum.ChecksumAlgorithm values. {@code ChecksumAlgorithm.checksumAlgorithm_sha1}
+     * is always added to the set because it is mandatory to include the SHA1 checksum. A warning is logged for invalid
+     * user input.
+     * @return set of algorithms to calculate checksum with
+     */
+    private Set<Checksum.ChecksumAlgorithm> getChecksumAlgorithms()
+    {
+        Set<Checksum.ChecksumAlgorithm> algorithms = new HashSet<>();
+        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+        if ( checksumAlgorithms != null )
+        {
+            for ( String checksumAlgorithm : checksumAlgorithms )
+            {
+                switch ( checksumAlgorithm.toUpperCase() )
+                {
+                    case "SHA1":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+                        break;
+                    case "SHA224":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha224 );
+                        break;
+                    case "SHA256":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256 );
+                        break;
+                    case "SHA384":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha384 );
+                        break;
+                    case "SHA512":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha512 );
+                        break;
+                    case "MD2":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_md2 );
+                        break;
+                    case "MD4":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_md4 );
+                        break;
+                    case "MD5":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_md5 );
+                        break;
+                    case "MD6":
+                        algorithms.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_md6 );
+                        break;
+                    default:
+                        this.getLog().warn( "Ignoring unsupported checksum algorithm: " + checksumAlgorithm );
+                }
+            }
+        }
+        return algorithms;
     }
 }

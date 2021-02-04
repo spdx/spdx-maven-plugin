@@ -16,12 +16,15 @@
 package org.spdx.maven;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.ExternalRef;
 import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 
@@ -32,27 +35,27 @@ import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
  */
 public class SpdxProjectInformation
 {
-    String[] creators = new String[0];
-    String creatorComment = "";
-    AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
-    AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
-    String description;
-    String downloadUrl;
-    String homePage;
-    String shortDescription;
-    String originator;
-    String supplier;
-    String packageArchiveFileName;
-    String versionInfo;
-    String licenseComment;
-    String sha1;
-    String name;
+    private String[] creators = new String[0];
+    private String creatorComment = "";
+    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
+    private AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
+    private String description;
+    private String downloadUrl;
+    private String homePage;
+    private String shortDescription;
+    private String originator;
+    private String supplier;
+    private String packageArchiveFileName;
+    private String versionInfo;
+    private String licenseComment;
+    private String name;
     private String sourceInfo;
     private String copyrightText;
     private String documentComment;
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
     private List<ExternalReference> externalRefs;
+    private Set<Checksum> checksums;
 
     /**
      * @return the documentComment
@@ -71,19 +74,19 @@ public class SpdxProjectInformation
     }
 
     /**
-     * @return the sha1
+     * @return checksums for the project
      */
-    public String getSha1()
+    public Set<Checksum> getChecksums()
     {
-        return sha1;
+        return checksums;
     }
 
     /**
-     * @param sha1 the sha1 to set
+     * @param checksums the checksums to set for the project
      */
-    public void setSha1( String sha1 )
+    public void setChecksums( Set<Checksum> checksums )
     {
-        this.sha1 = sha1;
+        this.checksums = checksums;
     }
 
     /**
@@ -318,7 +321,6 @@ public class SpdxProjectInformation
         log.debug( "SPDX License comment: " + this.getLicenseComment() );
         log.debug( "SPDX Originator: " + this.getOriginator() );
         log.debug( "SPDX PackageArchiveFileName: " + this.getPackageArchiveFileName() );
-        log.debug( "SPDX SHA1: " + this.getSha1() );
         log.debug( "SPDX Short description: " + this.getShortDescription() );
         log.debug( "SPDX Supplier: " + this.getSupplier() );
         log.debug( "SPDX Source Info:  " + this.getSourceInfo() );
@@ -380,6 +382,14 @@ public class SpdxProjectInformation
                     log.error( "Invalid external reference", e1 );
                 }
 
+            }
+        }
+        if ( checksums != null && checksums.size() > 0 )
+        {
+            for ( Checksum checksum : checksums )
+            {
+                String algorithm = SpdxFileCollector.checksumAlgorithms.get( checksum.getAlgorithm() );
+                log.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
             }
         }
     }

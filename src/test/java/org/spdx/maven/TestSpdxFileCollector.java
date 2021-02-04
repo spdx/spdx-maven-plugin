@@ -10,7 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.junit.After;
@@ -18,13 +20,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.spdx.maven.SpdxDefaultFileInformation;
-import org.spdx.maven.SpdxFileCollector;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.LicenseInfoFactory;
+import org.spdx.rdfparser.model.Checksum;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
@@ -77,6 +78,12 @@ public class TestSpdxFileCollector
     private static final String DEFAULT_SNIPPET_DECLARED_LICENSE = "LGPL-2.0";
     private static final String DEFAULT_SNIPPET_LICENSE_COMMENT = "Snippet License Comment";
     private static final String DEFAULT_SNIPPET_COPYRIGHT = "Snippet Copyright";
+
+    private static final Set<Checksum.ChecksumAlgorithm> sha1Algorithm = new HashSet<>();
+    static
+    {
+        sha1Algorithm.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+    }
 
     private SpdxDefaultFileInformation defaultFileInformation;
     private File directory;
@@ -228,7 +235,7 @@ public class TestSpdxFileCollector
         assertEquals( 0, SpdxFiles.length );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort( SpdxFiles );
@@ -253,7 +260,7 @@ public class TestSpdxFileCollector
         assertEquals( 0, SpdxFiles.length );
 
         collector.collectFiles( new FileSet[] {skipBin}, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length - 2, SpdxFiles.length );
         Arrays.sort( SpdxFiles );
@@ -295,7 +302,7 @@ public class TestSpdxFileCollector
         assertEquals( 0, SpdxFiles.length );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort( SpdxFiles );
@@ -330,7 +337,7 @@ public class TestSpdxFileCollector
         assertEquals( 0, snippets.size() );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         snippets = collector.getSnippets();
         assertEquals( filePaths.length, snippets.size() );
         Collections.sort( snippets );
@@ -414,7 +421,7 @@ public class TestSpdxFileCollector
 
         //TODO: Test directory patterns
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                fileSpecificInfo, spdxPackage, RelationshipType.GENERATES, container );
+                fileSpecificInfo, spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         SpdxFiles = collector.getFiles();
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort( SpdxFiles );
@@ -467,7 +474,7 @@ public class TestSpdxFileCollector
         assertEquals( 0, result.length );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         result = collector.getLicenseInfoFromFiles();
         assertEquals( 2, result.length );
         if ( DEFAULT_DECLARED_LICENSE.equals( result[0].toString() ) )
@@ -496,7 +503,7 @@ public class TestSpdxFileCollector
             fileSet2.setDirectory( tempDir2.getPath() );
 
             collector.collectFiles( new FileSet[] {fileSet2}, this.directory.getAbsolutePath(), info2, new HashMap<>(),
-                    spdxPackage, RelationshipType.GENERATES, container );
+                    spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
             result = collector.getLicenseInfoFromFiles();
             assertEquals( 3, result.length );
             boolean foundDefault = false;
@@ -535,7 +542,7 @@ public class TestSpdxFileCollector
         assertEquals( 0, SpdxFiles.length );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
         File SpdxFile = new File( filePaths[0] );
         SpdxPackageVerificationCode result = collector.getVerificationCode( SpdxFile.getPath() );
         assertTrue( !result.getValue().isEmpty() );
@@ -574,5 +581,46 @@ public class TestSpdxFileCollector
         assertTrue( collector.isSourceFile( new FileType[] {FileType.fileType_source} ) );
         assertTrue( collector.isSourceFile( new FileType[] {FileType.fileType_text, FileType.fileType_source} ) );
         assertFalse( collector.isSourceFile( new FileType[] {FileType.fileType_binary, FileType.fileType_image} ) );
+    }
+
+    @Test
+    public void testGenerateChecksums() throws SpdxCollectionException
+    {
+        SpdxFileCollector collector = new SpdxFileCollector( null );
+        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, container, sha1Algorithm );
+        File spdxFile = new File( filePaths[0] );
+
+        Set<Checksum.ChecksumAlgorithm> checksumAlgorithmSet = new HashSet<>();
+        checksumAlgorithmSet.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1 );
+        checksumAlgorithmSet.add( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256 );
+
+        Set<Checksum> expectedChecksums = new HashSet<>();
+        expectedChecksums.add( new Checksum( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1, "1834453c87b9188024c7b18d179eb64f95f29fcf" ) );
+        expectedChecksums.add( new Checksum( Checksum.ChecksumAlgorithm.checksumAlgorithm_sha256,  "1c94046c63f61f5dbe5c15cc6c4e34510132ab262aa266735b344d836ef8cb3c") );
+        // Checksum does not override equals currently. Hence, need to compare manually
+        Set<Checksum> actualChecksums = SpdxFileCollector.generateChecksum( spdxFile, checksumAlgorithmSet );
+        for ( Checksum expectedChecksum : expectedChecksums )
+        {
+            boolean found = false;
+            for ( Checksum actualChecksum : actualChecksums )
+            {
+                if ( expectedChecksum.getAlgorithm().equals( actualChecksum.getAlgorithm() ) )
+                {
+                    if ( expectedChecksum.getValue().equals( actualChecksum.getValue() ) )
+                    {
+                        found = true;
+                    }
+                    else
+                    {
+                        fail("Expected checksum : " + expectedChecksum + "does not match actual checksum : " + actualChecksum);
+                    }
+                }
+            }
+            if ( !found )
+            {
+                fail("Expected checksum : " + expectedChecksum + "not found in actual checksums : " + actualChecksums);
+            }
+        }
     }
 }
