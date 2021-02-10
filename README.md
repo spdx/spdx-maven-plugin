@@ -20,7 +20,8 @@ In the build plugins section add the plugin with a goal of createSPDX:
                 <plugin>
                     <groupId>org.spdx</groupId>
                     <artifactId>spdx-maven-plugin</artifactId>
-                    <version>0.4.0</version>
+                    <!-- please check for updates on https://search.maven.org/search?q=a:spdx-maven-plugin-->  
+                    <version>0.5.4</version>
                     <executions>
                         <execution>
                             <id>build-spdx</id>
