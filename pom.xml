@@ -37,9 +37,9 @@
   </scm>
   <distributionManagement>
 		<repository>
-			<id>bintray-spdx-maven-plugin</id>
+        	<id>ossrh</id>
 			<name>spdx-maven-plugin</name>
-        	<url>https://api.bintray.com/maven/spdx/spdx-maven-plugin/spdx-maven-plugin/;publish=1</url>
+        	<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     	</repository>
   </distributionManagement>
   <developers>
