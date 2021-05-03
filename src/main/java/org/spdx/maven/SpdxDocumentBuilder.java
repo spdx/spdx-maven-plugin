@@ -45,7 +45,6 @@ import org.spdx.rdfparser.license.ListedLicenses;
 import org.spdx.rdfparser.license.SpdxListedLicense;
 import org.spdx.rdfparser.model.Annotation;
 import org.spdx.rdfparser.model.Checksum;
-import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
 import org.spdx.rdfparser.model.ExternalDocumentRef;
 import org.spdx.rdfparser.model.ExternalRef;
 import org.spdx.rdfparser.model.Relationship;
