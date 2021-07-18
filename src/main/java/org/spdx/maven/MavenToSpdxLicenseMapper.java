@@ -65,23 +65,25 @@ public class MavenToSpdxLicenseMapper
     {
         // Can not instantiate directly - singleton class
         InputStream is = null;
-        try
-        {
-            URL listedLicenseJsonUrl = new URL( LISTED_LICENSE_JSON_URL );
-            is = listedLicenseJsonUrl.openStream();
-        }
-        catch ( MalformedURLException e )
-        {
-            if ( log != null )
+        if (!"true".equals(System.getProperty( "SPDXParser.OnlyUseLocalLicenses"))){
+            try
             {
-                log.warn( "Invalid JSON URL for SPDX listed licenses.  Using cached version" );
+                URL listedLicenseJsonUrl = new URL( LISTED_LICENSE_JSON_URL );
+                is = listedLicenseJsonUrl.openStream();
             }
-        }
-        catch ( IOException e )
-        {
-            if ( log != null )
+            catch ( MalformedURLException e )
             {
-                log.warn( "IO Exception opening web page for JSON for SPDX listed licenses.  Using cached version" );
+                if ( log != null )
+                {
+                    log.warn( "Invalid JSON URL for SPDX listed licenses.  Using cached version" );
+                }
+            }
+            catch ( IOException e )
+            {
+                if ( log != null )
+                {
+                    log.warn( "IO Exception opening web page for JSON for SPDX listed licenses.  Using cached version" );
+                }
             }
         }
         if ( is == null )
