@@ -118,7 +118,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * SPDX File name
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.name}-${project.version}.spdx.rdf.xml",
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx.rdf.xml",
                 property = "spdxFileName",
                 required = true )
     private File spdxFile;
@@ -126,7 +126,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Document namespace - must be unique for the artifact and SPDX file
      */
-    @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.name}-${project.version}",
+    @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}",
                 property = "spdxDocumentNamespace",
                 required = true )
     private String spdxDocumentNamespace;
@@ -483,7 +483,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * Collect dependency information from Maven dependencies
      *
      * @param dependencies Maven dependencies
-     * @param session2
+     * @param licenseManager
      * @return information collected from Maven dependencies
      * @throws LicenseMapperException
      */
