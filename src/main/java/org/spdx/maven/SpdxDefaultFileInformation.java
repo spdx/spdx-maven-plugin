@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.SpdxNoAssertionLicense;
 
 /**
  * Simple structure to hold information obout default file information
@@ -30,14 +31,20 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 public class SpdxDefaultFileInformation
 {
 
-    private AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
+    private AnyLicenseInfo declaredLicense;
     private String copyright = "NOASSERTION";
     private String notice = "";
     private String comment = "";
     private String[] contributors = new String[0];
-    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
+    private AnyLicenseInfo concludedLicense;
     private String licenseComment = "";
     private List<SnippetInfo> snippets = new ArrayList<>();
+    
+    public SpdxDefaultFileInformation() throws InvalidSPDXAnalysisException
+    {
+        declaredLicense = new SpdxNoAssertionLicense();
+        concludedLicense = new SpdxNoAssertionLicense();
+    }
 
     public AnyLicenseInfo getDeclaredLicense()
     {

@@ -16,13 +16,14 @@
 package org.spdx.maven.stubs;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
 import org.apache.maven.project.DefaultMavenProjectHelper;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusTestCase;
-
-import com.google.common.io.Files;
 
 /**
  * Testing stub for MavenProjectHelper
@@ -42,9 +43,9 @@ public class MavenProjectHelperStub extends DefaultMavenProjectHelper
         {
             outputFile.delete();
         }
-        try
+        try ( InputStream is = new FileInputStream(file ) )
         {
-            Files.copy( file, outputFile );
+            Files.copy( is, outputFile.toPath() );
         }
         catch ( IOException e )
         {

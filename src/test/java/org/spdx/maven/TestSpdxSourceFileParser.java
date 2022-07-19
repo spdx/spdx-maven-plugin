@@ -8,11 +8,12 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
-import org.spdx.rdfparser.license.DisjunctiveLicenseSet;
-import org.spdx.rdfparser.license.ExtractedLicenseInfo;
-import org.spdx.rdfparser.license.SpdxListedLicense;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.ConjunctiveLicenseSet;
+import org.spdx.library.model.license.DisjunctiveLicenseSet;
+import org.spdx.library.model.license.ExtractedLicenseInfo;
+import org.spdx.library.model.license.SpdxListedLicense;
 
 public class TestSpdxSourceFileParser
 {
@@ -52,7 +53,7 @@ public class TestSpdxSourceFileParser
     }
 
     @Test
-    public void testParseFileForSpdxLicenses() throws SpdxSourceParserException
+    public void testParseFileForSpdxLicenses() throws SpdxSourceParserException, InvalidSPDXAnalysisException
     {
         File javaFile = new File( getBaseDir(), TEST_CLASS_FILE_NAME );
         List<AnyLicenseInfo> result = SpdxSourceFileParser.parseFileForSpdxLicenses( javaFile );
@@ -60,11 +61,11 @@ public class TestSpdxSourceFileParser
         assertEquals( APACHE_LICENSE_ID, ( (SpdxListedLicense) result.get( 0 ) ).getLicenseId() );
         assertEquals( MIT_LICENSE_ID, ( (SpdxListedLicense) result.get( 1 ) ).getLicenseId() );
         assertTrue( result.get( 2 ) instanceof DisjunctiveLicenseSet );
-        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 2 ) ).getMembers().length );
+        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 2 ) ).getMembers().size() );
     }
 
     @Test
-    public void testParseTextForSpdxLicenses() throws SpdxSourceParserException
+    public void testParseTextForSpdxLicenses() throws SpdxSourceParserException, InvalidSPDXAnalysisException
     {
         // Empty String
         List<AnyLicenseInfo> result = SpdxSourceFileParser.parseTextForSpdxLicenses( EMPTY );
@@ -77,17 +78,17 @@ public class TestSpdxSourceFileParser
         result = SpdxSourceFileParser.parseTextForSpdxLicenses( CONJUNCTIVE );
         assertEquals( 1, result.size() );
         assertTrue( result.get( 0 ) instanceof ConjunctiveLicenseSet );
-        assertEquals( 3, ( (ConjunctiveLicenseSet) result.get( 0 ) ).getMembers().length );
+        assertEquals( 3, ( (ConjunctiveLicenseSet) result.get( 0 ) ).getMembers().size() );
         // Single Line complex
         result = SpdxSourceFileParser.parseTextForSpdxLicenses( COMPLEX );
         assertEquals( 1, result.size() );
         assertTrue( result.get( 0 ) instanceof DisjunctiveLicenseSet );
-        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 0 ) ).getMembers().length );
+        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 0 ) ).getMembers().size() );
         // Multi Line complex
         result = SpdxSourceFileParser.parseTextForSpdxLicenses( COMPLEX_MULTI );
         assertEquals( 1, result.size() );
         assertTrue( result.get( 0 ) instanceof DisjunctiveLicenseSet );
-        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 0 ) ).getMembers().length );
+        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 0 ) ).getMembers().size() );
         // Multiple SPDX ID's simple
         result = SpdxSourceFileParser.parseTextForSpdxLicenses( MULTIPLE_SIMPLE_IDS );
         assertEquals( 2, result.size() );
@@ -97,13 +98,13 @@ public class TestSpdxSourceFileParser
         result = SpdxSourceFileParser.parseTextForSpdxLicenses( MULTIPLE_COMPLEX_IDS );
         assertEquals( 6, result.size() );
         assertTrue( result.get( 0 ) instanceof DisjunctiveLicenseSet );
-        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 0 ) ).getMembers().length );
+        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 0 ) ).getMembers().size() );
         assertEquals( APACHE_LICENSE_ID, ( (SpdxListedLicense) result.get( 1 ) ).getLicenseId() );
         assertEquals( MIT_LICENSE_ID, ( (SpdxListedLicense) result.get( 2 ) ).getLicenseId() );
         assertTrue( result.get( 3 ) instanceof DisjunctiveLicenseSet );
-        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 3 ) ).getMembers().length );
+        assertEquals( 2, ( (DisjunctiveLicenseSet) result.get( 3 ) ).getMembers().size() );
         assertTrue( result.get( 4 ) instanceof ConjunctiveLicenseSet );
-        assertEquals( 3, ( (ConjunctiveLicenseSet) result.get( 4 ) ).getMembers().length );
+        assertEquals( 3, ( (ConjunctiveLicenseSet) result.get( 4 ) ).getMembers().size() );
         assertTrue( result.get( 5 ) instanceof ExtractedLicenseInfo );
         assertEquals( LICENSE_REF_ID, ( (ExtractedLicenseInfo) result.get( 5 ) ).getLicenseId() );
         // Miss matched parens (should error)

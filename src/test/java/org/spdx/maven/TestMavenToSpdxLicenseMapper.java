@@ -7,31 +7,66 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.License;
+import org.apache.maven.plugin.logging.Log;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
-import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.ModelCopyManager;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.InvalidLicenseStringException;
+import org.spdx.library.model.license.LicenseInfoFactory;
+import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.storage.simple.InMemSpdxStore;
 
 public class TestMavenToSpdxLicenseMapper
 {
-
+    private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
     private static final String APACHE2_URL = "http://www.apache.org/licenses/LICENSE-2.0";
     private static final String APACHE_SPDX_ID = "Apache-2.0";
 
     private static final String MIT_URL = "http://opensource.org/licenses/MIT";
     private static final String MIT_SPDX_ID = "MIT";
 
-    @Before
-    public void setUp() throws Exception
+    SpdxDocument spdxDoc = null;
+    Log log = null;
+
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception
     {
     }
 
+    /**
+     * @throws java.lang.Exception
+     */
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception
+    {
+        spdxDoc = new SpdxDocument( new InMemSpdxStore(), TEST_SPDX_DOCUMENT_URL, new ModelCopyManager(), true );
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
     @After
     public void tearDown() throws Exception
     {
+        spdxDoc = null;
     }
 
     @Test
@@ -49,41 +84,41 @@ public class TestMavenToSpdxLicenseMapper
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseNone() throws LicenseMapperException
+    public void testMavenLicenseListToSpdxLicenseNone() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
-                licenseList );
+                licenseList.subList( 0, 0 ), spdxDoc );
         assertEquals( new SpdxNoAssertionLicense(), result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseUnknown() throws LicenseMapperException
+    public void testMavenLicenseListToSpdxLicenseUnknown() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( "http://not.a.known.url" );
         licenseList.add( license );
         AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
-                licenseList );
+                licenseList, spdxDoc );
         assertEquals( new SpdxNoAssertionLicense(), result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseSingle() throws LicenseMapperException, InvalidLicenseStringException
+    public void testMavenLicenseListToSpdxLicenseSingle() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( APACHE2_URL );
         licenseList.add( license );
         AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
-                licenseList );
+                licenseList, spdxDoc );
         AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
         assertEquals( expected, result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseConjunctive() throws LicenseMapperException, InvalidLicenseStringException
+    public void testMavenLicenseListToSpdxLicenseConjunctive() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
@@ -93,13 +128,13 @@ public class TestMavenToSpdxLicenseMapper
         licenseM.setUrl( MIT_URL );
         licenseList.add( licenseM );
         AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
-                licenseList );
+                licenseList, spdxDoc );
         AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
         assertEquals( expected, result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseConunctiveUnknown() throws LicenseMapperException, InvalidLicenseStringException
+    public void testMavenLicenseListToSpdxLicenseConunctiveUnknown() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
@@ -109,7 +144,7 @@ public class TestMavenToSpdxLicenseMapper
         licenseM.setUrl( "http://unknown.url" );
         licenseList.add( licenseM );
         AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
-                licenseList );
+                licenseList, spdxDoc );
         AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
         assertEquals( expected, result );
     }

@@ -17,11 +17,12 @@ package org.spdx.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.model.ExternalRef;
-import org.spdx.rdfparser.model.ExternalRef.ReferenceCategory;
-import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
-import org.spdx.rdfparser.referencetype.ReferenceType;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.ExternalRef;
+import org.spdx.library.model.ReferenceType;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.enumerations.ReferenceCategory;
+import org.spdx.library.referencetype.ListedReferenceTypes;
 
 /**
  * An External Reference allows a Package to reference an external source of additional information, metadata,
@@ -43,13 +44,16 @@ public class ExternalReference
     @Parameter( required = false )
     private String comment;
 
-    public ExternalRef getExternalRef() throws MojoExecutionException
+    public ExternalRef getExternalRef( SpdxDocument spdxDoc ) throws MojoExecutionException
     {
-        ReferenceCategory cat = ReferenceCategory.fromTag( category );
-        if ( cat == null )
+        ReferenceCategory cat = null;
+        
+        try {
+            cat = ReferenceCategory.valueOf( category );
+        }
+        catch ( Exception ex )
         {
-            throw ( new MojoExecutionException(
-                    "External reference category " + category + " is not recognized as a valid, standard category." ) );
+            throw ( new MojoExecutionException("External reference category " + category + " is not recognized as a valid, standard category." ) );
         }
         ReferenceType refType = null;
         try
@@ -64,6 +68,13 @@ public class ExternalReference
         {
             throw ( new MojoExecutionException( "Listed reference type not found for " + type ) );
         }
-        return new ExternalRef( cat, refType, locator, comment );
+        try
+        {
+            return spdxDoc.createExternalRef( cat, refType, locator, comment );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            throw ( new MojoExecutionException( "Error createing External Reference: "+e.getMessage()));
+        }
     }
 }

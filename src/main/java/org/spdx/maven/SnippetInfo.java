@@ -15,19 +15,18 @@
  */
 package org.spdx.maven;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.spdx.rdfparser.SpdxDocumentContainer;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.rdfparser.model.SpdxElement;
-import org.spdx.rdfparser.model.pointer.ByteOffsetPointer;
-import org.spdx.rdfparser.model.pointer.LineCharPointer;
-import org.spdx.rdfparser.model.pointer.StartEndPointer;
-import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.InvalidLicenseStringException;
+import org.spdx.library.model.license.LicenseInfoFactory;
 
 /**
  * Simple class to hold information about snippets
@@ -100,14 +99,18 @@ public class SnippetInfo
         return this.comment;
     }
 
-    public AnyLicenseInfo getLicenseConcluded( SpdxDocumentContainer container ) throws InvalidLicenseStringException
+    public AnyLicenseInfo getLicenseConcluded( SpdxDocument spdxDoc ) throws InvalidLicenseStringException
     {
-        return LicenseInfoFactory.parseSPDXLicenseString( this.concludedLicense, container );
+        return LicenseInfoFactory.parseSPDXLicenseString( this.concludedLicense, spdxDoc.getModelStore(), 
+                                                          spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
     }
 
-    public AnyLicenseInfo[] getLicenseInfoInSnippet( SpdxDocumentContainer container ) throws InvalidLicenseStringException
+    public Collection<AnyLicenseInfo> getLicenseInfoInSnippet( SpdxDocument spdxDoc ) throws InvalidLicenseStringException
     {
-        return new AnyLicenseInfo[] {LicenseInfoFactory.parseSPDXLicenseString( this.licenseInfoInSnippet, container )};
+        List<AnyLicenseInfo> retval = new ArrayList<>();
+        retval.add( LicenseInfoFactory.parseSPDXLicenseString( this.licenseInfoInSnippet, spdxDoc.getModelStore(), 
+                                                                                spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() ));
+        return retval;                                                                    
     }
 
     public String getCopyrightText()
@@ -119,61 +122,73 @@ public class SnippetInfo
     {
         return this.licenseComment;
     }
-
-    public StartEndPointer getByteRange( SpdxElement fileReference ) throws SpdxBuilderException
+    
+    public int getByteRangeStart() throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher( byteRange.trim() );
         if ( !matcher.find() )
         {
             throw ( new SpdxBuilderException( "Invalid snippet byte range: " + byteRange ) );
         }
-        ByteOffsetPointer start = null;
         try
         {
-            start = new ByteOffsetPointer( fileReference, Integer.parseInt( matcher.group( 1 ) ) );
+            return Integer.parseInt( matcher.group( 1 ) );
         }
         catch ( Exception ex )
         {
             throw new SpdxBuilderException( "Non integer start to snippet byte offset: " + byteRange );
         }
-        ByteOffsetPointer end = null;
+    }
+    
+    public int getByteRangeEnd() throws SpdxBuilderException
+    {
+        Matcher matcher = NUMBER_RANGE_PATTERN.matcher( byteRange.trim() );
+        if ( !matcher.find() )
+        {
+            throw ( new SpdxBuilderException( "Invalid snippet byte range: " + byteRange ) );
+        }
         try
         {
-            end = new ByteOffsetPointer( fileReference, Integer.parseInt( matcher.group( 2 ) ) );
+            return Integer.parseInt( matcher.group( 2 ) );
         }
         catch ( Exception ex )
         {
             throw new SpdxBuilderException( "Non integer end to snippet byte offset: " + byteRange );
         }
-        return new StartEndPointer( start, end );
     }
-
-    public StartEndPointer getLineRange( SpdxElement fileReference ) throws SpdxBuilderException
+    
+    public int getLineRangeStart() throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher( lineRange );
         if ( !matcher.find() )
         {
             throw ( new SpdxBuilderException( "Invalid snippet line range: " + lineRange ) );
         }
-        LineCharPointer start = null;
         try
         {
-            start = new LineCharPointer( fileReference, Integer.parseInt( matcher.group( 1 ) ) );
-        }
-        catch ( Exception ex )
-        {
-            throw new SpdxBuilderException( "Non integer start to snippet line offset: " + lineRange );
-        }
-        LineCharPointer end = null;
-        try
-        {
-            end = new LineCharPointer( fileReference, Integer.parseInt( matcher.group( 2 ) ) );
+            return Integer.parseInt( matcher.group( 2 ) );
         }
         catch ( Exception ex )
         {
             throw new SpdxBuilderException( "Non integer end to snippet line offset: " + lineRange );
         }
-        return new StartEndPointer( start, end );
+    }
+    
+    public int getLineRangeEnd() throws SpdxBuilderException
+    {
+        Matcher matcher = NUMBER_RANGE_PATTERN.matcher( lineRange );
+        if ( !matcher.find() )
+        {
+            throw ( new SpdxBuilderException( "Invalid snippet line range: " + lineRange ) );
+        }
+        try
+        {
+            return Integer.parseInt( matcher.group( 2 ) );
+        }
+        catch ( Exception ex )
+        {
+            throw new SpdxBuilderException( "Non integer end to snippet line offset: " + lineRange );
+        }
     }
 
     /**

@@ -15,10 +15,10 @@
  */
 package org.spdx.maven;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,17 +29,15 @@ import java.util.Map;
 import org.apache.maven.model.License;
 
 import org.apache.maven.plugin.logging.Log;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.SpdxRdfConstants;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.ConjunctiveLicenseSet;
-import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.rdfparser.license.SpdxListedLicense;
-import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.LicenseInfoFactory;
+import org.spdx.library.model.license.SpdxListedLicense;
+import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.storage.listedlicense.LicenseJsonTOC;
+
+import com.google.gson.Gson;
 
 /**
  * Singleton class which maps Maven license objects to SPDX licenses.
@@ -91,7 +89,7 @@ public class MavenToSpdxLicenseMapper
             // use the cached version
             is = LicenseManager.class.getClassLoader().getResourceAsStream( LISTED_LICENSE_JSON_PATH );
         }
-        InputStreamReader reader = new InputStreamReader( is );
+        BufferedReader reader = new BufferedReader( new InputStreamReader( is ) );
         try
         {
             initializeUrlMap( reader, log );
@@ -138,13 +136,18 @@ public class MavenToSpdxLicenseMapper
      * @param log        Optional logger
      * @throws LicenseMapperException
      */
-    private void initializeUrlMap( Reader jsonReader, Log log ) throws LicenseMapperException
+    private void initializeUrlMap( BufferedReader jsonReader, Log log ) throws LicenseMapperException
     {
-        JSONParser parser = new JSONParser();
-        Object parsedObject = null;
+        LicenseJsonTOC jsonToc;
         try
         {
-            parsedObject = parser.parse( jsonReader );
+            Gson gson = new Gson();
+            StringBuilder tocJsonStr = new StringBuilder();
+            String line;
+            while((line = jsonReader.readLine()) != null) {
+                tocJsonStr.append(line);
+            }
+            jsonToc = gson.fromJson(tocJsonStr.toString(), LicenseJsonTOC.class);
         }
         catch ( IOException e1 )
         {
@@ -154,30 +157,17 @@ public class MavenToSpdxLicenseMapper
             }
             throw ( new LicenseMapperException( "I/O Error parsing listed licenses" ) );
         }
-        catch ( ParseException e1 )
-        {
-            if ( log != null )
-            {
-                log.error( "JSON parsing error parsing listed licenses JSON file: " + e1.getMessage() );
-            }
-            throw ( new LicenseMapperException( "JSON parsing error parsing listed licenses" ) );
-        }
-        JSONObject listedLicenseSource = (JSONObject) parsedObject;
-
-        JSONArray listedLicenses = (JSONArray) listedLicenseSource.get( "licenses" );
+        
         urlStringToSpdxLicenseId = new HashMap<>();
         List<String> urlsWithMultipleIds = new ArrayList<>();
-        for ( Object _listedLicense : listedLicenses )
+        for ( LicenseJsonTOC.LicenseJson licenseJson:jsonToc.getLicenses() )
         {
-            JSONObject listedLicense = (JSONObject) _listedLicense;
-            String licenseId = (String) listedLicense.get( SpdxRdfConstants.PROP_LICENSE_ID );
+            String licenseId = licenseJson.getLicenseId();
             this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX + licenseId, licenseId );
-            JSONArray urls = (JSONArray) listedLicense.get( SpdxRdfConstants.RDFS_PROP_SEE_ALSO );
-            if ( urls != null )
+            if ( licenseJson.getSeeAlso() != null )
             {
-                for ( Object o : urls )
+                for ( String url:licenseJson.getSeeAlso() )
                 {
-                    String url = (String) o;
                     url = url.replaceAll( "https", "http" );
                     if ( this.urlStringToSpdxLicenseId.containsKey( url ) )
                     {
@@ -221,10 +211,13 @@ public class MavenToSpdxLicenseMapper
      * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
      * mapped SPDX licenses.
      *
+     * @param licenseList list of licenses
+     * @param spdxDocument SPDX document which will hold the licenses
      * @return
+     * @throws InvalidSPDXAnalysisException 
      * @throws LicenseManagerException
      */
-    public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList )
+    public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList, SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
     {
         if ( licenseList == null )
         {
@@ -249,8 +242,7 @@ public class MavenToSpdxLicenseMapper
         }
         else
         {
-            AnyLicenseInfo[] licensesInSet = spdxLicenses.toArray( new AnyLicenseInfo[0] );
-            AnyLicenseInfo conjunctiveLicense = new ConjunctiveLicenseSet( licensesInSet );
+            AnyLicenseInfo conjunctiveLicense = spdxDoc.createConjunctiveLicenseSet( spdxLicenses );
             return conjunctiveLicense;
         }
     }

@@ -15,18 +15,21 @@
  */
 package org.spdx.maven;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
-import org.spdx.rdfparser.model.Checksum;
-import org.spdx.rdfparser.model.ExternalRef;
-import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.Checksum;
+import org.spdx.library.model.ExternalRef;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.enumerations.Purpose;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.library.referencetype.ListedReferenceTypes;
 
 /**
  * Simple structure to hold information about SPDX project
@@ -37,8 +40,8 @@ public class SpdxProjectInformation
 {
     private String[] creators = new String[0];
     private String creatorComment = "";
-    private AnyLicenseInfo concludedLicense = new SpdxNoAssertionLicense();
-    private AnyLicenseInfo declaredLicense = new SpdxNoAssertionLicense();
+    private AnyLicenseInfo concludedLicense;
+    private AnyLicenseInfo declaredLicense;
     private String description;
     private String downloadUrl;
     private String homePage;
@@ -56,6 +59,28 @@ public class SpdxProjectInformation
     private Annotation[] documentAnnotations;
     private List<ExternalReference> externalRefs;
     private Set<Checksum> checksums;
+    private Purpose primaryPurpose;
+    
+    /**
+     * @return the primaryPurpose
+     */
+    public Purpose getPrimaryPurpose()
+    {
+        return primaryPurpose;
+    }
+
+    /**
+     * @param primaryPurpose the primaryPurpose to set
+     */
+    public void setPrimaryPurpose( Purpose primaryPurpose )
+    {
+        this.primaryPurpose = primaryPurpose;
+    }
+
+    public SpdxProjectInformation () throws InvalidSPDXAnalysisException {
+        this.concludedLicense = new SpdxNoAssertionLicense();
+        this.declaredLicense = new SpdxNoAssertionLicense();
+    }
 
     /**
      * @return the documentComment
@@ -312,7 +337,7 @@ public class SpdxProjectInformation
      *
      * @param log
      */
-    public void logInfo( Log log )
+    public void logInfo( Log log, SpdxDocument spdxDoc )
     {
         log.debug( "SPDX Project Name: " + this.getName() );
         log.debug( "SPDX Document comment: " + this.getDocumentComment() );
@@ -360,21 +385,35 @@ public class SpdxProjectInformation
                 ExternalRef externalRef;
                 try
                 {
-                    externalRef = externalReference.getExternalRef();
+                    externalRef = externalReference.getExternalRef( spdxDoc );
                     StringBuilder externalRefString = new StringBuilder();
-                    externalRefString.append( externalRef.getReferenceCategory().getTag() );
+                    try
+                    {
+                        externalRefString.append( externalRef.getReferenceCategory().toString() );
+                    }
+                    catch ( InvalidSPDXAnalysisException e1 )
+                    {
+                        externalRefString.append( "Invalid Reference Category" );
+                    }
                     externalRefString.append( ' ' );
                     try
                     {
                         externalRefString.append( ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
-                                externalRef.getReferenceType().getReferenceTypeUri() ) );
+                                new URI( externalRef.getReferenceType().getIndividualURI() ) ) );
                     }
-                    catch ( InvalidSPDXAnalysisException e )
+                    catch ( InvalidSPDXAnalysisException | URISyntaxException e )
                     {
                         externalRefString.append( "Invalid Reference Type" );
                     }
                     externalRefString.append( ' ' );
-                    externalRefString.append( externalRef.getReferenceLocator() );
+                    try
+                    {
+                        externalRefString.append( externalRef.getReferenceLocator() );
+                    }
+                    catch ( InvalidSPDXAnalysisException e )
+                    {
+                        externalRefString.append( "Invalid Reference Locatoer" );
+                    }
                     log.debug( "External Ref: " + externalRefString.toString() );
                 }
                 catch ( MojoExecutionException e1 )
@@ -388,8 +427,14 @@ public class SpdxProjectInformation
         {
             for ( Checksum checksum : checksums )
             {
-                String algorithm = SpdxFileCollector.checksumAlgorithms.get( checksum.getAlgorithm() );
-                log.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
+                try 
+                {
+                    String algorithm = SpdxFileCollector.checksumAlgorithms.get( checksum.getAlgorithm() );
+                    log.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
+                } catch ( InvalidSPDXAnalysisException e )
+                {
+                    log.debug( "Invalid SPDX checksum" );
+                }
             }
         }
     }
