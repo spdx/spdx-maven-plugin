@@ -112,7 +112,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertEquals( "Test License", testLicense1.getName() );
             assertEquals( "Test license text", testLicense1.getExtractedText() );
             assertEquals( 1, testLicense1.getSeeAlso().size() );
-            assertEquals( "http://www.test.url/testLicense.html", testLicense1.getSeeAlso().toArray( new AnyLicenseInfo[testLicense1.getSeeAlso().size()]  )[0] );
+            assertEquals( "http://www.test.url/testLicense.html", testLicense1.getSeeAlso().toArray( new String[testLicense1.getSeeAlso().size()]  )[0] );
             assertEquals( "Test license comment", testLicense1.getComment() );
 
             assertTrue( testLicense2 != null );
@@ -136,7 +136,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertTrue( foundSeeAlso2 );
             assertEquals( "Second Test license comment", testLicense2.getComment() );
             // documentComment
-            assertEquals( "Document Comment", result.getComment() );
+            assertEquals( "Document Comment", result.getComment().get() );
             // documentAnnotations
             assertEquals( 2, result.getAnnotations().size() );
             org.spdx.library.model.Annotation annotation1 = null;
@@ -162,7 +162,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertEquals( "Organization:Test Organization", annotation2.getAnnotator() );
             assertEquals( AnnotationType.OTHER, annotation2.getAnnotationType() );
             //creatorComment
-            assertEquals( "Creator comment", result.getCreationInfo().getComment() );
+            assertEquals( "Creator comment", result.getCreationInfo().getComment().get() );
             // creators
             assertEquals( 3, result.getCreationInfo().getCreators().size() );
             boolean foundCreator1 = false;
@@ -199,11 +199,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseById( "BSD-3-Clause" );
             assertEquals( licenseConcluded, pkg.getLicenseConcluded() );
             //licenseComments
-            assertEquals( "License comments", pkg.getLicenseComments() );
+            assertEquals( "License comments", pkg.getLicenseComments().get() );
             //originator
-            assertEquals( "Organization: Originating org.", pkg.getOriginator() );
+            assertEquals( "Organization: Originating org.", pkg.getOriginator().get() );
             // sourceInfo
-            assertEquals( "Source info", pkg.getSourceInfo() );
+            assertEquals( "Source info", pkg.getSourceInfo().get() );
             //copyrightText
             assertEquals( "Copyright Text for Package", pkg.getCopyrightText() );
             //external Refs
@@ -211,11 +211,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertEquals( 2, externalRefs.length );
             if ( externalRefs[0].getReferenceCategory().equals( ReferenceCategory.SECURITY ) )
             {
-                assertEquals( "extref comment1", externalRefs[0].getComment() );
+                assertEquals( "extref comment1", externalRefs[0].getComment().get() );
                 assertEquals( "example-locator-CPE22Type", externalRefs[0].getReferenceLocator() );
                 assertEquals( "cpe22Type", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
                         new URI( externalRefs[0].getReferenceType().getIndividualURI() ) ) );
-                assertEquals( "extref comment2", externalRefs[1].getComment() );
+                assertEquals( "extref comment2", externalRefs[1].getComment().get() );
                 assertEquals( "org.apache.tomcat:tomcat:9.0.0.M4", externalRefs[1].getReferenceLocator() );
                 assertEquals( "maven-central", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
                         new URI( externalRefs[1].getReferenceType().getIndividualURI() ) ) );
@@ -223,11 +223,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             else if ( externalRefs[0].getReferenceCategory().equals(
                     ReferenceCategory.PACKAGE_MANAGER ) )
             {
-                assertEquals( "extref comment1", externalRefs[1].getComment() );
+                assertEquals( "extref comment1", externalRefs[1].getComment().get() );
                 assertEquals( "example-locator-CPE22Type", externalRefs[1].getReferenceLocator() );
                 assertEquals( "cpe22Type", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
                         new URI(externalRefs[1].getReferenceType().getIndividualURI() ) ) );
-                assertEquals( "extref comment2", externalRefs[0].getComment() );
+                assertEquals( "extref comment2", externalRefs[0].getComment().get() );
                 assertEquals( "org.apache.tomcat:tomcat:9.0.0.M4", externalRefs[0].getReferenceLocator() );
                 assertEquals( "maven-central", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
                         new URI( externalRefs[0].getReferenceType().getIndividualURI() ) ) );
@@ -251,23 +251,23 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             String fileWithSnippet = null;
             for ( SpdxFile sFile : pkgFiles )
             {
-                if ( sFile.getName().equals( "./src/main/java/CommonCode.java" ) )
+                if ( sFile.getName().get().equals( "./src/main/java/CommonCode.java" ) )
                 {
                     fileWithSnippet = sFile.getId();
-                    assertEquals( "Comment for CommonCode", sFile.getComment() );
+                    assertEquals( "Comment for CommonCode", sFile.getComment().get() );
                     assertEquals( "Common Code Copyright", sFile.getCopyrightText() );
-                    assertEquals( "License Comment for Common Code", sFile.getLicenseComments() );
-                    assertEquals( "Notice for Commmon Code", sFile.getNoticeText() );
+                    assertEquals( "License Comment for Common Code", sFile.getLicenseComments().get() );
+                    assertEquals( "Notice for Commmon Code", sFile.getNoticeText().get() );
                     assertEquals( "EPL-1.0", sFile.getLicenseConcluded().toString() );
                     assertEquals( "Contributor to CommonCode", sFile.getFileContributors().toArray( new String[sFile.getFileContributors().size()] )[0] );
                     assertEquals( "ISC", sFile.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[sFile.getLicenseInfoFromFiles().size()]  )[0].toString() );
                 }
                 else
                 {
-                    assertEquals( "Default file comment", sFile.getComment() );
+                    assertEquals( "Default file comment", sFile.getComment().get() );
                     assertEquals( "Copyright (c) 2012, 2013, 2014 Source Auditor Inc.", sFile.getCopyrightText() );
-                    assertEquals( "Default file license comment", sFile.getLicenseComments() );
-                    assertEquals( "Default file notice", sFile.getNoticeText() );
+                    assertEquals( "Default file license comment", sFile.getLicenseComments().get() );
+                    assertEquals( "Default file notice", sFile.getNoticeText().get() );
                     assertEquals( "Apache-2.0", sFile.getLicenseConcluded().toString() );
                     assertEquals( 2, sFile.getFileContributors().size() );
                     assertEquals( "Apache-1.1", sFile.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[sFile.getLicenseInfoFromFiles().size()] )[0].toString() );
@@ -281,10 +281,10 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             });
             assertEquals( 2, snippets.size() );
             Collections.sort( snippets );
-            assertEquals( "Snippet Comment", snippets.get( 0 ).getComment() );
+            assertEquals( "Snippet Comment", snippets.get( 0 ).getComment().get() );
             assertEquals( "Snippet Copyright Text", snippets.get( 0 ).getCopyrightText() );
-            assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments() );
-            assertEquals( "SnippetName", snippets.get( 0 ).getName() );
+            assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments().get() );
+            assertEquals( "SnippetName", snippets.get( 0 ).getName().get() );
             assertEquals( "1231:3442",
                     TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
             assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
@@ -292,10 +292,10 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
             assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
 
-            assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment() );
+            assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment().get() );
             assertEquals( "Snippet2 Copyright Text", snippets.get( 1 ).getCopyrightText() );
-            assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments() );
-            assertEquals( "SnippetName2", snippets.get( 1 ).getName() );
+            assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments().get() );
+            assertEquals( "SnippetName2", snippets.get( 1 ).getName().get() );
             assertEquals( "31231:33442",
                     TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
             assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );

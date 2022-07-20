@@ -49,7 +49,7 @@ public class ExternalReference
         ReferenceCategory cat = null;
         
         try {
-            cat = ReferenceCategory.valueOf( category );
+            cat = ReferenceCategory.valueOf( category.replaceAll( "-", "_" ) );
         }
         catch ( Exception ex )
         {

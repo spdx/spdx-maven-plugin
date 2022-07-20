@@ -166,7 +166,7 @@ public class SnippetInfo
         }
         try
         {
-            return Integer.parseInt( matcher.group( 2 ) );
+            return Integer.parseInt( matcher.group( 1 ) );
         }
         catch ( Exception ex )
         {
