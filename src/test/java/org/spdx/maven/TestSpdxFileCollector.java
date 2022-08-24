@@ -514,7 +514,7 @@ public class TestSpdxFileCollector
             FileSet fileSet2 = new FileSet();
             fileSet2.setDirectory( tempDir2.getPath() );
 
-            collector.collectFiles( new FileSet[] {fileSet2}, this.directory.getAbsolutePath(), info2, new HashMap<>(),
+            collector.collectFiles( new FileSet[] {fileSet2}, tempDir2.getAbsolutePath(), info2, new HashMap<>(),
                     spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
             result = collector.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[collector.getLicenseInfoFromFiles().size()] );
             assertEquals( 3, result.length );
