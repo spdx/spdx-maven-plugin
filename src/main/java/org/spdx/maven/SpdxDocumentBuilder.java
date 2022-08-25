@@ -33,6 +33,8 @@ import java.util.Set;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
+import org.spdx.jacksonstore.MultiFormatStore;
+import org.spdx.jacksonstore.MultiFormatStore.Format;
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.ModelCopyManager;
 import org.spdx.library.SpdxConstants;
@@ -53,6 +55,8 @@ import org.spdx.library.model.license.ListedLicenses;
 import org.spdx.library.model.license.SpdxListedLicense;
 import org.spdx.spdxRdfStore.RdfStore;
 import org.spdx.storage.IModelStore.IdType;
+import org.spdx.storage.ISerializableModelStore;
+import org.spdx.storage.simple.InMemSpdxStore;
 
 /**
  * Builds SPDX documents for a given set of source files. This is the primary class to use when creating SPDX documents
@@ -76,7 +80,7 @@ public class SpdxDocumentBuilder
     private LicenseManager licenseManager;
     private File spdxFile;
 
-    private RdfStore modelStore;
+    private ISerializableModelStore modelStore;
 
     private ModelCopyManager copyManager;
 
@@ -86,10 +90,12 @@ public class SpdxDocumentBuilder
      * @param spdxDocumentNamespace   URI for SPDX document - must be unique
      * @param useStdLicenseSourceUrls if true, map any SPDX standard license source URL to license ID.  Note:
      *                                significant performance degredation
+     * @param outputFormat            File format for the SPDX file
      * @throws SpdxBuilderException
      * @throws LicenseMapperException
      */
-    public SpdxDocumentBuilder( Log log, File spdxFile, URL spdxDocumentNamespace, boolean useStdLicenseSourceUrls ) throws SpdxBuilderException, LicenseMapperException
+    public SpdxDocumentBuilder( Log log, File spdxFile, URL spdxDocumentNamespace, 
+                                boolean useStdLicenseSourceUrls, String outputFormat ) throws SpdxBuilderException, LicenseMapperException
     {
         this.log = log;
         this.spdxFile = spdxFile;
@@ -139,7 +145,13 @@ public class SpdxDocumentBuilder
         // create the SPDX document
         try
         {
+            if (outputFormat.toUpperCase().contains( "RDF" )) {
             modelStore = new RdfStore();
+            }
+            else {
+                // use the default JSON
+                modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
+            }
             copyManager = new ModelCopyManager();
             spdxDoc = SpdxModelFactory.createSpdxDocument( modelStore, spdxDocumentNamespace.toString(), copyManager );
         }
