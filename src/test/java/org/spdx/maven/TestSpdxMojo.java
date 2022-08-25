@@ -346,7 +346,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertTrue( spdxFile.exists() );
             // Test output artifact file is created
             File artifactFile = new File( getBasedir(),
-                    "src/test/resources/unit/spdx-maven-plugin-test/test.spdx.json" );
+                    "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.json" );
             assertTrue( artifactFile.exists() );
             ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
             ModelCopyManager copyManager = new ModelCopyManager();

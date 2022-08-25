@@ -85,9 +85,15 @@ public class CreateSpdxMojo extends AbstractMojo
 {
     static final String INCLUDE_ALL = "**/*";
 
-    private static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
+    public static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
 
-    private static final String SPDX_ARTIFACT_TYPE = "spdx.rdf.xml";
+    public static final String SPDX_RDF_ARTIFACT_TYPE = "spdx.rdf.xml";
+    
+    public static final String SPDX_JSON_ARTIFACT_TYPE = "spdx.json";
+    
+    public static final String JSON_OUTPUT_FORMAT = "JSON";
+    
+    public static final String RDF_OUTPUT_FORMAT = "RDF/XML";
 
     /**
      * @parameter default-value="${project}"
@@ -349,8 +355,10 @@ public class CreateSpdxMojo extends AbstractMojo
      * - JSON - JSON SPDX format
      * - RDF/XML - RDF/XML format
      */
-    @Parameter( defaultValue = "JSON" )
+    @Parameter( required = false )
     private String outputFormat;
+    
+    private String artifactType;
 
     @SuppressWarnings( "unchecked" )
     public void execute() throws MojoExecutionException
@@ -380,7 +388,31 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             System.setProperty( "SPDXParser.OnlyUseLocalLicenses", "true" );
         }
+        
+        if ( this.outputFormat == null ) 
+        {
+            String spdxFileName = this.spdxFile.getName().toLowerCase();
+            if ( spdxFileName.endsWith( ".rdf.xml" ) ) 
+            {
+                this.outputFormat = RDF_OUTPUT_FORMAT;
+            }
+            else
+            {
+                this.outputFormat = JSON_OUTPUT_FORMAT;
+            }
+        }
+        else
+        {
+            this.outputFormat = this.outputFormat.toUpperCase();
+        }
+        
+        if ( !RDF_OUTPUT_FORMAT.equals( this.outputFormat ) && !JSON_OUTPUT_FORMAT.equals( this.outputFormat ))
+        {
+            this.getLog().warn( "Invalid SPDX output format: "+this.outputFormat+".  Defaulting to JSON format." );
+            this.outputFormat = JSON_OUTPUT_FORMAT;
+        }
 
+        this.artifactType = RDF_OUTPUT_FORMAT.equals( this.outputFormat ) ? SPDX_RDF_ARTIFACT_TYPE : SPDX_JSON_ARTIFACT_TYPE;
         this.getLog().info( "Creating SPDX File " + spdxFile.getPath() );
 
         SpdxDocumentBuilder builder;
@@ -484,13 +516,12 @@ public class CreateSpdxMojo extends AbstractMojo
         getLog().debug( "Project Helper: " + projectHelper );
         if ( projectHelper != null )
         {
-            projectHelper.attachArtifact( mavenProject, SPDX_ARTIFACT_TYPE, spdxFile );
+            projectHelper.attachArtifact( mavenProject, this.artifactType, spdxFile );
         }
         else
         {
             this.getLog().warn( "Unable to attach SPDX artifact file - no ProjectHelper exists" );
         }
-
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 )
         {

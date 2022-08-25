@@ -145,10 +145,12 @@ public class SpdxDocumentBuilder
         // create the SPDX document
         try
         {
-            if (outputFormat.toUpperCase().contains( "RDF" )) {
-            modelStore = new RdfStore();
+            if (outputFormat.equals( CreateSpdxMojo.RDF_OUTPUT_FORMAT )) 
+            {
+                modelStore = new RdfStore();
             }
-            else {
+            else 
+            {
                 // use the default JSON
                 modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
             }
