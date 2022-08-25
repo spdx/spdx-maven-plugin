@@ -280,13 +280,17 @@ public class SpdxDependencyInformation
      */
     private SpdxElement createExternalSpdxPackageReference( SpdxDocument externalSpdxDoc, File spdxFile, String externalRefId ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        ExternalDocumentRef externalRef = this.externalDocuments.get( fixExternalRefId( externalRefId ) );
+        String fixedExternalRefId = fixExternalRefId( externalRefId );
+        ExternalDocumentRef externalRef = this.externalDocuments.get( fixedExternalRefId );
         if ( externalRef == null )
         {
+            log.debug( "Creating external document ref " + fixedExternalRefId );
             String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
             Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
-            externalRef = externalSpdxDoc.createExternalDocumentRef( externalRefId, externalSpdxDoc.getDocumentUri(), cksum );
-            this.externalDocuments.put( externalRefId, externalRef );
+            externalRef = spdxDoc.createExternalDocumentRef( fixedExternalRefId, externalSpdxDoc.getDocumentUri(), cksum );
+            spdxDoc.getExternalDocumentRefs().add( externalRef );
+            this.externalDocuments.put( fixedExternalRefId, externalRef );
+            log.debug( "Created external document ref " + fixedExternalRefId );
         }
         SpdxItem[] describedItems = externalSpdxDoc.getDocumentDescribes().toArray( new SpdxItem[externalSpdxDoc.getDocumentDescribes().size()] );
         if ( describedItems == null || describedItems.length == 0 )
@@ -307,7 +311,8 @@ public class SpdxDependencyInformation
                 }
             }
         }
-        return new ExternalSpdxElement( externalRef + ":" + itemDescribed.getId() );
+        return new ExternalSpdxElement( spdxDoc.getModelStore(), spdxDoc.getDocumentUri(),  
+                                        fixedExternalRefId + ":" + itemDescribed.getId(), spdxDoc.getCopyManager(), true );
     }
 
     /**
@@ -393,6 +398,7 @@ public class SpdxDependencyInformation
         SpdxPackage retval = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri() ),
                                                     packageName, new SpdxNoAssertionLicense(), copyright, declaredLicense )
                         .setDownloadLocation( downloadLocation )
+                        .setFilesAnalyzed( false )
                         .build();
         if ( model.getVersion() != null )
         {
@@ -411,7 +417,6 @@ public class SpdxDependencyInformation
         {
             retval.setHomepage( model.getUrl() );
         }
-        retval.setFilesAnalyzed( false );
         return retval;
     }
 
