@@ -15,8 +15,12 @@
  */
 package org.spdx.maven;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.enumerations.AnnotationType;
 
 
 /**
@@ -120,14 +124,31 @@ public class Annotation
 
 
     /**
+     * @param spdxDoc SPDX document which will contain the annotation
      * @return an SPDX model version of the annotation
      */
-    public org.spdx.rdfparser.model.Annotation toSpdxAnnotation()
+    public org.spdx.library.model.Annotation toSpdxAnnotation( SpdxDocument spdxDoc ) throws MojoExecutionException
     {
-        org.spdx.rdfparser.model.Annotation retval = new org.spdx.rdfparser.model.Annotation( this.annotator,
-                org.spdx.rdfparser.model.Annotation.TAG_TO_ANNOTATION_TYPE.get( this.annotationType ),
-                this.annotationDate, this.annotationComment );
-        return retval;
+        AnnotationType annotationType = AnnotationType.OTHER;
+        try
+        {
+            annotationType = AnnotationType.valueOf( this.annotationType );
+        }
+        catch ( Exception ex )
+        {
+            throw new MojoExecutionException( "Invalid annotation type "+this.annotationType );
+        }
+        try
+        {
+            return spdxDoc.createAnnotation( this.annotator, 
+                                             annotationType,
+                                             annotationDate,
+                                             annotationComment );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            throw new MojoExecutionException( "Error creating annotation.", e );
+        }
     }
 
     public void logInfo( Log log )

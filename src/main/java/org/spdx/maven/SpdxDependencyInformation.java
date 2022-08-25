@@ -16,7 +16,10 @@
 package org.spdx.maven;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,22 +37,27 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.SPDXDocumentFactory;
-import org.spdx.rdfparser.SpdxRdfConstants;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
-import org.spdx.rdfparser.model.Checksum;
-import org.spdx.rdfparser.model.Checksum.ChecksumAlgorithm;
-import org.spdx.rdfparser.model.ExternalDocumentRef;
-import org.spdx.rdfparser.model.ExternalSpdxElement;
-import org.spdx.rdfparser.model.Relationship;
-import org.spdx.rdfparser.model.Relationship.RelationshipType;
-import org.spdx.rdfparser.model.SpdxDocument;
-import org.spdx.rdfparser.model.SpdxElement;
-import org.spdx.rdfparser.model.SpdxFile;
-import org.spdx.rdfparser.model.SpdxItem;
-import org.spdx.rdfparser.model.SpdxPackage;
+import org.spdx.jacksonstore.MultiFormatStore;
+import org.spdx.jacksonstore.MultiFormatStore.Format;
+import org.spdx.jacksonstore.MultiFormatStore.Verbose;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.SpdxConstants;
+import org.spdx.library.model.Checksum;
+import org.spdx.library.model.ExternalDocumentRef;
+import org.spdx.library.model.ExternalSpdxElement;
+import org.spdx.library.model.Relationship;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.SpdxElement;
+import org.spdx.library.model.SpdxItem;
+import org.spdx.library.model.SpdxPackage;
+import org.spdx.library.model.enumerations.ChecksumAlgorithm;
+import org.spdx.library.model.enumerations.RelationshipType;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.spdxRdfStore.RdfStore;
+import org.spdx.storage.IModelStore.IdType;
+import org.spdx.storage.ISerializableModelStore;
+import org.spdx.storage.simple.InMemSpdxStore;
 
 /**
  * Contains information about package dependencies collected from the Maven dependencies.
@@ -66,14 +74,16 @@ public class SpdxDependencyInformation
     private List<Relationship> relationships = new ArrayList<>();
     private Map<String, ExternalDocumentRef> externalDocuments = new HashMap<>();
     private LicenseManager licenseManager;
+    private SpdxDocument spdxDoc;
 
     /**
      * @param log Logger for Maven
      */
-    public SpdxDependencyInformation( Log log, LicenseManager licenseManager )
+    public SpdxDependencyInformation( Log log, LicenseManager licenseManager, SpdxDocument spdxDoc )
     {
         this.log = log;
         this.licenseManager = licenseManager;
+        this.spdxDoc = spdxDoc;
     }
 
     /**
@@ -81,8 +91,9 @@ public class SpdxDependencyInformation
      *
      * @param dependency
      * @throws LicenseMapperException
+     * @throws InvalidSPDXAnalysisException 
      */
-    public void addMavenDependency( Artifact dependency ) throws LicenseMapperException
+    public void addMavenDependency( Artifact dependency ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         String scope = dependency.getScope();
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
@@ -92,9 +103,8 @@ public class SpdxDependencyInformation
                     "Could not determine the SPDX relationship type for dependency artifact ID " + dependency.getArtifactId() + " scope " + scope );
         }
         SpdxElement dependencyPackage = createSpdxPackage( dependency );
-        Relationship relationship = new Relationship( dependencyPackage, relType,
-                "Relationship based on Maven POM file dependency information" );
-        this.relationships.add( relationship );
+        this.relationships.add( spdxDoc.createRelationship( dependencyPackage, relType, 
+                        "Relationship based on Maven POM file dependency information" ) );
     }
 
     /**
@@ -134,8 +144,9 @@ public class SpdxDependencyInformation
      * @param artifact Maven dependency artifact
      * @return
      * @throws LicenseMapperException
+     * @throws InvalidSPDXAnalysisException 
      */
-    private SpdxElement createSpdxPackage( Artifact artifact ) throws LicenseMapperException
+    private SpdxElement createSpdxPackage( Artifact artifact ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         log.debug( "Creating SPDX package for artifact " + artifact.getArtifactId() );
         if ( artifact.getFile() == null )
@@ -159,9 +170,10 @@ public class SpdxDependencyInformation
             {
                 log.debug(
                         "Dependency " + artifact.getArtifactId() + "Dependency information collected from SPDX file " + spdxFile.getAbsolutePath() );
-                SpdxDocument spdxDoc = SPDXDocumentFactory.createSpdxDocument( spdxFile.getPath() );
-                return createExternalSpdxPackageReference( spdxDoc, spdxFile,
-                        SpdxRdfConstants.EXTERNAL_DOC_REF_PRENUM + artifact.getArtifactId() );
+                
+                SpdxDocument externalSpdxDoc = spdxDocumentFromFile( spdxFile.getPath() );
+                return createExternalSpdxPackageReference( externalSpdxDoc, spdxFile,
+                        SpdxConstants.EXTERNAL_DOC_REF_PRENUM + artifact.getArtifactId() );
             }
             catch ( IOException e )
             {
@@ -220,37 +232,63 @@ public class SpdxDependencyInformation
         // Name will be the artifact ID
         log.debug(
                 "Dependency " + artifact.getArtifactId() + "Using only artifact information to create dependent package" );
-        SpdxPackage pkg = new SpdxPackage( artifact.getArtifactId(), new SpdxNoAssertionLicense(),
-                new AnyLicenseInfo[] {new SpdxNoAssertionLicense()}, "UNSPECIFIED", new SpdxNoAssertionLicense(),
-                "NOASSERTION", new SpdxFile[0], null );
-        pkg.setComment(
-                "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." );
-        pkg.setVersionInfo( artifact.getBaseVersion() );
-        pkg.setFilesAnalyzed( false );
+        SpdxPackage pkg = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri() ), 
+                                                 artifact.getArtifactId(), new SpdxNoAssertionLicense(), "NOASSERTION", 
+                                                 new SpdxNoAssertionLicense() )
+                        .setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." )
+                        .setVersionInfo( artifact.getBaseVersion() )
+                        .setFilesAnalyzed( false )
+                        .build();
         return pkg;
+    }
+
+    /**
+     * Creates an SPDX document from a file
+     * @param path Path to the SPDX file
+     * @return
+     * @throws IOException 
+     * @throws FileNotFoundException 
+     * @throws InvalidSPDXAnalysisException 
+     */
+    private SpdxDocument spdxDocumentFromFile( String path ) throws FileNotFoundException, IOException, InvalidSPDXAnalysisException
+    {
+        ISerializableModelStore modelStore;
+        if ( path.toLowerCase().endsWith( "json" ) ) 
+        {
+            modelStore = new MultiFormatStore(new InMemSpdxStore(), Format.JSON_PRETTY, Verbose.COMPACT);
+        }
+        else
+        {
+            modelStore = new RdfStore();
+        }
+        try ( InputStream inputStream = new FileInputStream( path ) ) 
+        {
+            String documentUri =  modelStore.deSerialize( inputStream, false );
+            return new SpdxDocument(modelStore, documentUri, spdxDoc.getCopyManager(), false);
+        }
     }
 
     /**
      * Create and return an external document reference for an existing package in an SPDX document
      *
-     * @param spdxDoc       SPDX Document containing the package to be referenced.
+     * @param externalSpdxDoc       SPDX Document containing the package to be referenced.
      * @param spdxFile      SPDX file containing the SPDX document
      * @param externalRefId A unique external reference ID for the external SPDX document
      * @return
      * @throws SpdxCollectionException
      * @throws InvalidSPDXAnalysisException
      */
-    private SpdxElement createExternalSpdxPackageReference( SpdxDocument spdxDoc, File spdxFile, String externalRefId ) throws SpdxCollectionException, InvalidSPDXAnalysisException
+    private SpdxElement createExternalSpdxPackageReference( SpdxDocument externalSpdxDoc, File spdxFile, String externalRefId ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
         ExternalDocumentRef externalRef = this.externalDocuments.get( fixExternalRefId( externalRefId ) );
         if ( externalRef == null )
         {
-            String sha1 = SpdxFileCollector.generateSha1( spdxFile );
-            Checksum cksum = new Checksum( ChecksumAlgorithm.checksumAlgorithm_sha1, sha1 );
-            externalRef = new ExternalDocumentRef( spdxDoc, cksum, externalRefId );
+            String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
+            Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
+            externalRef = externalSpdxDoc.createExternalDocumentRef( externalRefId, externalSpdxDoc.getDocumentUri(), cksum );
             this.externalDocuments.put( externalRefId, externalRef );
         }
-        SpdxItem[] describedItems = spdxDoc.getDocumentDescribes();
+        SpdxItem[] describedItems = externalSpdxDoc.getDocumentDescribes().toArray( new SpdxItem[externalSpdxDoc.getDocumentDescribes().size()] );
         if ( describedItems == null || describedItems.length == 0 )
         {
             throw ( new InvalidSPDXAnalysisException( "SPDX document does not contain any described items." ) );
@@ -315,8 +353,9 @@ public class SpdxDependencyInformation
      * @throws SpdxCollectionException
      * @throws NoSuchAlgorithmException
      * @throws LicenseMapperException
+     * @throws InvalidSPDXAnalysisException 
      */
-    private SpdxPackage createSpdxPackage( File pomFile ) throws IOException, XmlPullParserException, SpdxCollectionException, NoSuchAlgorithmException, LicenseMapperException
+    private SpdxPackage createSpdxPackage( File pomFile ) throws IOException, XmlPullParserException, SpdxCollectionException, NoSuchAlgorithmException, LicenseMapperException, InvalidSPDXAnalysisException
     {
         MavenXpp3Reader pomReader = new MavenXpp3Reader();
         Model model;
@@ -351,9 +390,10 @@ public class SpdxDependencyInformation
         fileInfo.setLicenseComment( "" );
         fileInfo.setNotice( notice );
 
-        SpdxPackage retval = new SpdxPackage( packageName, new SpdxNoAssertionLicense(),
-                new AnyLicenseInfo[] {new SpdxNoAssertionLicense()}, copyright, declaredLicense, downloadLocation,
-                new SpdxFile[0], null );
+        SpdxPackage retval = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri() ),
+                                                    packageName, new SpdxNoAssertionLicense(), copyright, declaredLicense )
+                        .setDownloadLocation( downloadLocation )
+                        .build();
         if ( model.getVersion() != null )
         {
             retval.setVersionInfo( model.getVersion() );
@@ -365,7 +405,7 @@ public class SpdxDependencyInformation
         }
         if ( model.getOrganization() != null )
         {
-            retval.setOriginator( SpdxRdfConstants.CREATOR_PREFIX_ORGANIZATION + model.getOrganization().getName() );
+            retval.setOriginator( SpdxConstants.CREATOR_PREFIX_ORGANIZATION + model.getOrganization().getName() );
         }
         if ( model.getUrl() != null )
         {
@@ -381,9 +421,10 @@ public class SpdxDependencyInformation
      * @param mavenLicenses List of maven licenses to map
      * @return
      * @throws LicenseMapperException
+     * @throws InvalidSPDXAnalysisException 
      * @throws LicenseManagerException
      */
-    private AnyLicenseInfo mavenLicensesToSpdxLicense( List<License> mavenLicenses ) throws LicenseMapperException
+    private AnyLicenseInfo mavenLicensesToSpdxLicense( List<License> mavenLicenses ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         try
         {
@@ -395,7 +436,7 @@ public class SpdxDependencyInformation
         }
         catch ( LicenseManagerException ex )
         {
-            return MavenToSpdxLicenseMapper.getInstance( log ).mavenLicenseListToSpdxLicense( mavenLicenses );
+            return MavenToSpdxLicenseMapper.getInstance( log ).mavenLicenseListToSpdxLicense( mavenLicenses, spdxDoc );
         }
 
     }
@@ -488,7 +529,7 @@ public class SpdxDependencyInformation
      * @return all relationship associated with SPDX dependencies based on the Maven dependencies for the package added
      * using the addMavenDependency method
      */
-    public List<Relationship> getPackageRelationships()
+    public List<org.spdx.library.model.Relationship> getPackageRelationships()
     {
         return this.relationships;
     }

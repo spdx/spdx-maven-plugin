@@ -23,9 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.InvalidLicenseStringException;
+import org.spdx.library.model.license.LicenseInfoFactory;
 
 /**
  * Helper class with static methods to parse SDPX source files

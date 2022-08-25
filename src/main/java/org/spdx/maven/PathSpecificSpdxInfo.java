@@ -18,10 +18,10 @@ package org.spdx.maven;
 import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
-import org.spdx.rdfparser.SpdxDocumentContainer;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.LicenseInfoFactory;
-import org.spdx.spdxspreadsheet.InvalidLicenseStringException;
+import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.license.AnyLicenseInfo;
+import org.spdx.library.model.license.LicenseInfoFactory;
 
 /**
  * Simple class to hold SPDX data for a file or directory.  Utilizes Mojo parameters for the values.  The only required
@@ -115,12 +115,13 @@ public class PathSpecificSpdxInfo
      * Get the default file information to be used with this file path
      *
      * @param defaults  Default file information to use if the parameter was not specified for this file path
-     * @param container Container containing any extracted license infos that may be needed for concluded or declared
+     * @param spdxDoc SPDX document containing any extracted license infos that may be needed for concluded or declared
      *                  licenses
      * @return default file information to be used with this file path
-     * @throws InvalidLicenseStringException
+     * @throws InvalidSPDXAnalysisException 
      */
-    public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults, SpdxDocumentContainer container ) throws InvalidLicenseStringException
+    public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults,
+                                                                 SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
     {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         if ( this.fileComment != null )
@@ -134,7 +135,10 @@ public class PathSpecificSpdxInfo
         if ( this.fileConcludedLicense != null )
         {
             AnyLicenseInfo concludedLicense = null;
-            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim(), container );
+            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim(),
+                                                                          spdxDoc.getModelStore(), 
+                                                                          spdxDoc.getDocumentUri(),
+                                                                          spdxDoc.getCopyManager() );
             retval.setConcludedLicense( concludedLicense );
         }
         else
@@ -176,7 +180,10 @@ public class PathSpecificSpdxInfo
         if ( this.licenseInformationInFile != null )
         {
             AnyLicenseInfo declaredLicense = null;
-            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim(), container );
+            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim(), 
+                                                                         spdxDoc.getModelStore(), 
+                                                                         spdxDoc.getDocumentUri(),
+                                                                         spdxDoc.getCopyManager() );
             retval.setDeclaredLicense( declaredLicense );
         }
         else
