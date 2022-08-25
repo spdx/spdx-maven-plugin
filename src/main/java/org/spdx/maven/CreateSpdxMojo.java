@@ -121,7 +121,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * SPDX File name
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx.rdf.xml",
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx.json",
                 property = "spdxFileName",
                 required = true )
     private File spdxFile;
@@ -343,6 +343,14 @@ public class CreateSpdxMojo extends AbstractMojo
 
     @Parameter( required = false )
     private List<ExternalReference> externalReferences;
+    
+    /**
+     * Output file format for the SPDX file.  One of:
+     * - JSON - JSON SPDX format
+     * - RDF/XML - RDF/XML format
+     */
+    @Parameter( defaultValue = "JSON" )
+    private String outputFormat;
 
     @SuppressWarnings( "unchecked" )
     public void execute() throws MojoExecutionException
@@ -383,7 +391,7 @@ public class CreateSpdxMojo extends AbstractMojo
                     namespaceUrl.getPort(), namespaceUrl.getPath(), namespaceUrl.getQuery(), namespaceUrl.getRef() );
             namespaceUrl = uri.toURL();
             builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, namespaceUrl,
-                    this.matchLicensesOnCrossReferenceUrls );
+                    this.matchLicensesOnCrossReferenceUrls, outputFormat );
         }
         catch ( SpdxBuilderException e )
         {
