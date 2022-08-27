@@ -576,7 +576,11 @@ public class SpdxFileCollector
 
         if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) )
         {
-            excludedFileNamesFromVerificationCode.add( spdxFiles.get( spdxFilePath ).getName().get() );
+            Optional<String> excludedFileName = spdxFiles.get( spdxFilePath ).getName();
+            if ( excludedFileName.isPresent() )
+            {
+                excludedFileNamesFromVerificationCode.add( excludedFileName.get() );
+            }
         }
         SpdxPackageVerificationCode verificationCode;
         verificationCode = calculatePackageVerificationCode( spdxFiles.values(),
@@ -601,7 +605,8 @@ public class SpdxFileCollector
         List<String> fileChecksums = new ArrayList<>();
         for ( SpdxFile file : spdxFiles )
         {
-            if ( includeInVerificationCode( file.getName().get(), excludedFileNamesFromVerificationCode ) )
+            Optional<String> filename = file.getName();
+            if ( filename.isPresent() && includeInVerificationCode( file.getName().get(), excludedFileNamesFromVerificationCode ) )
             {
                 fileChecksums.add( file.getSha1() );
             }
