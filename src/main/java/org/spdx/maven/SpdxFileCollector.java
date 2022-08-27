@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -57,13 +58,9 @@ public class SpdxFileCollector
 {
     static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
     // constants for mapping extensions to types.
-    static Set<String> SOURCE_EXTENSIONS = new HashSet<>();
-    static Set<String> BINARY_EXTENSIONS = new HashSet<>();
-    static Set<String> ARCHIVE_EXTENSIONS = new HashSet<>();
     static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
-    static final String SPDX_PROP_FILETYPE_SOURCE = "SpdxSourceExtensions";
-    static final String SPDX_PROP_FILETYPE_BINARY = "SpdxBinaryExtensions";
-    static final String SPDX_PROP_FILETYPE_ARCHIVE = "SpdxArchiveExtensions";
+    
+    static final Map<String, FileType> EXT_TO_FILE_TYPE = new HashMap<>();
 
     static
     {
@@ -117,32 +114,34 @@ public class SpdxFileCollector
                 logger.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
             }
             prop.load( is );
-            String sourceExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_SOURCE );
-            loadSetUpcase( SOURCE_EXTENSIONS, sourceExtensionStr );
-            String binaryExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_BINARY );
-            loadSetUpcase( BINARY_EXTENSIONS, binaryExtensionStr );
-            String archiveExtensionStr = prop.getProperty( SPDX_PROP_FILETYPE_ARCHIVE );
-            loadSetUpcase( ARCHIVE_EXTENSIONS, archiveExtensionStr );
+            Iterator<Entry<Object, Object>> iter = prop.entrySet().iterator();
+            while ( iter.hasNext() ) 
+            {
+                Entry<Object, Object> entry = iter.next();
+                String fileTypeStr = (String)entry.getKey();
+                FileType fileType = FileType.valueOf( fileTypeStr );
+                String[] extensions = ((String)entry.getValue()).split( "," );
+                for ( String extension:extensions )
+                {
+                    try
+                    {
+                        String trimmedExtension = extension.toUpperCase().trim();
+                        if ( EXT_TO_FILE_TYPE.containsKey( trimmedExtension ) )
+                        {
+                            logger.warn( "Dulicate file extension: "+trimmedExtension );
+                        }
+                        EXT_TO_FILE_TYPE.put( trimmedExtension, fileType );
+                    }
+                    catch ( Exception ex ) {
+                        logger.error( "Error adding file extensions to filetype map", ex );
+                    }
+                }
+            }
         }
         catch ( IOException e )
         {
             logger.warn(
                     "WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other." );
-        }
-    }
-
-    /**
-     * Load a set from a comma delimited string of values trimming and upcasing all values
-     *
-     * @param set
-     * @param str
-     */
-    private static void loadSetUpcase( Set<String> set, String str )
-    {
-        String[] values = str.split( "," );
-        for ( String value : values )
-        {
-            set.add( value.toUpperCase().trim() );
         }
     }
 
@@ -528,31 +527,14 @@ public class SpdxFileCollector
         }
     }
 
-    private static FileType extensionToFileType( String fileExtension )
+    protected static FileType extensionToFileType( String fileExtension )
     {
-        //TODO: Add other file types
-        if ( fileExtension == null )
+        FileType retval = EXT_TO_FILE_TYPE.get( fileExtension.trim().toUpperCase() );
+        if ( retval == null )
         {
-            return FileType.OTHER;
+            retval = FileType.OTHER;
         }
-        String upperExtension = fileExtension.toUpperCase();
-        if ( SOURCE_EXTENSIONS.contains( upperExtension ) )
-        {
-            return FileType.SOURCE;
-        }
-        else if ( BINARY_EXTENSIONS.contains( upperExtension ) )
-        {
-            return FileType.BINARY;
-        }
-        else if ( ARCHIVE_EXTENSIONS.contains( upperExtension ) )
-        {
-            return FileType.ARCHIVE;
-        }
-        else
-        {
-            return FileType.OTHER;
-        }
-        //TODO: Add new file types for SPDX 2.X
+        return retval;
     }
 
     /**

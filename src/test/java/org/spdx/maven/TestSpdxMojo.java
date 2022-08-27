@@ -578,7 +578,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         finally
         {
             File artifactFile = new File( getBasedir(),
-                    "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx" );
+                                          "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.json" );
             if ( artifactFile.exists() )
             {
                 if ( !artifactFile.delete() )
@@ -586,7 +586,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
                     artifactFile.deleteOnExit();
                 }
             }
-            File spdxFile = new File( getBasedir(), SPDX_FILE_NAME );
+            File spdxFile = new File( getBasedir(), SPDX_JSON_FILE_NAME );
             if ( spdxFile.exists() )
             {
                 if ( !spdxFile.delete() )

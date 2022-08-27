@@ -304,6 +304,13 @@ public class TestSpdxFileCollector
         result = collector.getExtension( multipleDots );
         assertEquals( ext, result );
     }
+    
+    @Test
+    public void testExtensionToFileType() throws InvalidSPDXAnalysisException
+    {
+        assertEquals( FileType.VIDEO, SpdxFileCollector.extensionToFileType( "SWF" ));
+        assertEquals( FileType.OTHER, SpdxFileCollector.extensionToFileType( "somerandom" ));
+    }
 
     @Test
     public void testGetFiles() throws SpdxCollectionException, InvalidSPDXAnalysisException
