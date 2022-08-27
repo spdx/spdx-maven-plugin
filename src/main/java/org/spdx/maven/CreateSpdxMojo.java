@@ -240,7 +240,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * should be separated with “or” and enclosed in brackets. Similarly when multiple licenses need to be applied
      * (“conjunctive license”), they should be separated with “and” and enclosed in parentheses.
      */
-    @Parameter( defaultValue = "NOASSERTION" )
+    @Parameter( required = false )
     private String defaultLicenseInformationInFile;
 
     // the following parameters are for the SPDX project
@@ -388,25 +388,27 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             System.setProperty( "SPDXParser.OnlyUseLocalLicenses", "true" );
         }
-        
+        if ( defaultLicenseInformationInFile == null ) {
+            defaultLicenseInformationInFile = defaultFileConcludedLicense;
+        }
         if ( this.outputFormat == null ) 
         {
-            String spdxFileName = this.spdxFile.getName().toLowerCase();
+            String spdxFileName = spdxFile.getName().toLowerCase();
             if ( spdxFileName.endsWith( ".rdf.xml" ) ) 
             {
-                this.outputFormat = RDF_OUTPUT_FORMAT;
+                outputFormat = RDF_OUTPUT_FORMAT;
             }
             else
             {
-                this.outputFormat = JSON_OUTPUT_FORMAT;
+                outputFormat = JSON_OUTPUT_FORMAT;
             }
         }
         else
         {
-            this.outputFormat = this.outputFormat.toUpperCase();
+            outputFormat = this.outputFormat.toUpperCase();
         }
         
-        if ( !RDF_OUTPUT_FORMAT.equals( this.outputFormat ) && !JSON_OUTPUT_FORMAT.equals( this.outputFormat ))
+        if ( !RDF_OUTPUT_FORMAT.equals( outputFormat ) && !JSON_OUTPUT_FORMAT.equals( outputFormat ))
         {
             this.getLog().warn( "Invalid SPDX output format: "+this.outputFormat+".  Defaulting to JSON format." );
             this.outputFormat = JSON_OUTPUT_FORMAT;
