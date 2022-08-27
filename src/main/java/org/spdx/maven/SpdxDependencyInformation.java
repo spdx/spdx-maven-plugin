@@ -265,6 +265,19 @@ public class SpdxDependencyInformation
         {
             String documentUri =  modelStore.deSerialize( inputStream, false );
             return new SpdxDocument(modelStore, documentUri, spdxDoc.getCopyManager(), false);
+        } 
+        finally
+        {
+            if ( modelStore != null ) {
+                try
+                {
+                    modelStore.close();
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Error closing SPDX model store", e );
+                }
+            }
         }
     }
 
