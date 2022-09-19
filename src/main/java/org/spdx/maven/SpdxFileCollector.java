@@ -440,7 +440,13 @@ public class SpdxFileCollector
         String copyright = defaultFileInformation.getCopyright();
         String notice = defaultFileInformation.getNotice();
         String comment = defaultFileInformation.getComment();
-        List<String> contributors = Arrays.asList( defaultFileInformation.getContributors() );
+        String[] defaultContributors = defaultFileInformation.getContributors();
+        List<String> contributors;
+        if ( defaultContributors != null ) {
+            contributors = Arrays.asList( defaultFileInformation.getContributors() );
+        } else {
+            contributors = new ArrayList<>();
+        }
 
         SpdxFile retval = null;
         //TODO: Add annotation

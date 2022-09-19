@@ -1,0 +1,238 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.spdx</groupId>
+  <artifactId>spdx maven plugin test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>Test SPDX Plugin</name>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <url>http://spdx.org/tools</url>
+    <organization>
+        <name>Linux Foundation</name>
+        <url>http://www.linuxfoundation.org</url>
+    </organization>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.1</version>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
+  	  <groupId>org.spdx</groupId>
+  	  <artifactId>java-spdx-library</artifactId>
+  	  <version>1.1.0</version>
+  	</dependency>
+  </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>Test</testSourceDirectory>
+        <resources>
+            <resource>
+                <targetPath>resources</targetPath>
+                <filtering>false</filtering>
+                <directory>resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <targetPath>META-INF</targetPath>
+                <filtering>false</filtering>
+                <directory>.</directory>
+                <includes>
+                    <include>NOTICE</include>
+                    <include>LICENSE</include>
+                    <include>README.txt</include>
+                    <include>changelog</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>Test</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>TestFiles</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.spdx</groupId>
+                <artifactId>spdx-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-spdx</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>createSPDX</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                                        <!-- The defined stubs -->
+                    <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
+                    <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
+                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx.rdf.xml</spdxFile>
+                    <outputFormat>RDF/XML</outputFormat>
+                    <spdxDocumentNamespace>http://spdx.org/documents/spdx toolsv2.0 rc1</spdxDocumentNamespace>
+                    <documentComment>Document Comment</documentComment>
+                    <documentAnnotations>
+                        <param>
+                            <annotationComment>Annotation1</annotationComment>
+                            <annotationType>REVIEW</annotationType>
+                            <annotationDate>2010-01-29T18:30:22Z</annotationDate>
+                            <annotator>Person:Test Person</annotator>
+                        </param>
+                        <param>
+                            <annotationComment>Annotation2</annotationComment>
+                            <annotationType>OTHER</annotationType>
+                            <annotationDate>2012-11-29T18:30:22Z</annotationDate>
+                            <annotator>Organization:Test Organization</annotator>
+                        </param>
+                    </documentAnnotations>
+                    <packageAnnotations>
+                        <param>
+                            <annotationComment>PackageAnnotation</annotationComment>
+                            <annotationType>REVIEW</annotationType>
+                            <annotationDate>2015-01-29T18:30:22Z</annotationDate>
+                            <annotator>Person:Test Package Person</annotator>
+                        </param>
+                    </packageAnnotations>
+                    <nonStandardLicenses>
+                        <param>
+                            <licenseId>LicenseRef-testLicense</licenseId>
+                            <extractedText>Test license text</extractedText>
+                            <name>Test License</name>
+                            <crossReference>
+                                <param>http://www.test.url/testLicense.html</param>
+                            </crossReference>
+                            <comment>Test license comment</comment>
+                        </param>
+                        <param>
+                            <licenseId>LicenseRef-testLicense2</licenseId>
+                            <extractedText>Second est license text</extractedText>
+                            <name>Second Test License</name>
+                            <crossReference>
+                                <param>http://www.test.url/testLicense2.html</param>
+                                <param>http://www.test.url/testLicense2-alt.html</param>
+                            </crossReference>
+                            <comment>Second Test license comment</comment>
+                        </param>
+                    </nonStandardLicenses>
+                    <defaultFileCopyright>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</defaultFileCopyright>
+                    <defaultFileComment>Default file comment</defaultFileComment>
+                    <defaultLicenseInformationInFile>Apache-1.1</defaultLicenseInformationInFile>
+                    <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
+                    <defaultFileLicenseComment>Default file license comment</defaultFileLicenseComment>
+                    <defaultFileNotice>Default file notice</defaultFileNotice>
+                    <licenseDeclared>BSD-2-Clause</licenseDeclared>
+                    <licenseConcluded>BSD-3-Clause</licenseConcluded>
+                    <creatorComment>Creator comment</creatorComment>
+                    <creators>
+                        <param>Person: Creator1</param>
+                        <param>Person: Creator2</param>
+                    </creators>
+                    <licenseComments>License comments</licenseComments>
+                    <originator>Organization: Originating org.</originator>
+                    <sourceInfo>Source info</sourceInfo>
+                    <copyrightText>Copyright Text for Package</copyrightText>
+                    <externalReferences>
+                        <ExternalReference>
+                            <category>
+                                SECURITY
+                            </category>
+                            <type>
+                                cpe22Type
+                            </type>
+                            <locator>
+                                example-locator-CPE22Type
+                            </locator>
+                            <comment>
+                                extref comment1
+                            </comment>
+                        </ExternalReference>
+                        <ExternalReference>
+                            <category>
+                                PACKAGE-MANAGER
+                            </category>
+                            <type>
+                                maven-central
+                            </type>
+                            <locator>
+                                org.apache.tomcat:tomcat:9.0.0.M4
+                            </locator>
+                            <comment>
+                                extref comment2
+                            </comment>
+                        </ExternalReference>
+                    </externalReferences>
+                    <pathsWithSpecificSpdxInfo>
+                        <PathSpecificSpdxInfo>
+                            <directoryOrFile>src/main/java/CommonCode.java</directoryOrFile>
+                            <fileComment>Comment for CommonCode</fileComment>
+                            <fileContributors>
+                                <param>Contributor to CommonCode</param>
+                            </fileContributors>
+                            <fileCopyright>Common Code Copyright</fileCopyright>
+                            <fileLicenseComment>License Comment for Common Code</fileLicenseComment>
+                            <fileNotice>Notice for Commmon Code</fileNotice>
+                            <fileConcludedLicense>EPL-1.0</fileConcludedLicense>
+                            <licenseInformationInFile>ISC</licenseInformationInFile>
+                            <snippets>
+                                <SnippetInfo>
+                                    <name>SnippetName</name>
+                                    <comment>Snippet Comment</comment>
+                                    <concludedLicense>BSD-2-Clause</concludedLicense>
+                                    <lineRange>44:55</lineRange>
+                                    <byteRange>1231:3442</byteRange>
+                                    <licenseComment>Snippet License Comment</licenseComment>
+                                    <copyrightText>Snippet Copyright Text</copyrightText>
+                                    <licenseInfoInSnippet>BSD-2-Clause-FreeBSD</licenseInfoInSnippet>
+                                </SnippetInfo>
+                                <SnippetInfo>
+                                    <name>SnippetName2</name>
+                                    <comment>Snippet Comment2</comment>
+                                    <concludedLicense>MITNFA</concludedLicense>
+                                    <lineRange>444:554</lineRange>
+                                    <byteRange>31231:33442</byteRange>
+                                    <licenseComment>Snippet2 License Comment</licenseComment>
+                                    <copyrightText>Snippet2 Copyright Text</copyrightText>
+                                    <licenseInfoInSnippet>LicenseRef-testLicense</licenseInfoInSnippet>
+                                </SnippetInfo>
+                            </snippets>
+                        </PathSpecificSpdxInfo>
+                    </pathsWithSpecificSpdxInfo>
+                </configuration>
+                </plugin>
+        </plugins>
+    </build>
+</project>
