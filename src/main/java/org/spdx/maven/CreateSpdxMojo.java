@@ -901,28 +901,31 @@ public class CreateSpdxMojo extends AbstractMojo
 
         if ( mainArtifact != null && mainArtifact.getFile() != null )
         {
-            packageFileName = mainArtifact.getArtifactId() + "." + mainArtifact.getType();
-            packageFile = mainArtifact.getFile();
+            packageFileName = mainArtifact.getArtifactId() + "-" + mainArtifact.getVersion() + "." + mainArtifact.getType();
+            packageFile = new File(mainArtifact.getFile().getParent() + File.separator + packageFileName);
         }
-        else
-        {
-            packageFileName = "NOASSERTION";
-        }
-        retval.setPackageArchiveFileName( packageFileName );
 
         Set<Checksum> checksums = null;
         if ( packageFile != null && packageFile.exists() )
         {
             try
             {
+                this.getLog().debug( "Generating checksum for file "+packageFile.getAbsolutePath() );
                 Set<ChecksumAlgorithm> algorithms = getChecksumAlgorithms();
                 checksums = SpdxFileCollector.generateChecksum( packageFile, algorithms, spdxDoc );
             }
             catch ( SpdxCollectionException | InvalidSPDXAnalysisException e )
             {
                 this.getLog().warn( "Unable to compute checksum for " + packageFile.getName() + ":" + e.getMessage() );
+                this.getLog().debug( "Exception information for checksum error", e );
             }
         }
+        else
+        {
+            this.getLog().warn( packageFile == null ? "Null package file" : "Package file " + packageFile.getAbsolutePath() + "does not exit" );
+            packageFileName = "NOASSERTION";
+        }
+        retval.setPackageArchiveFileName( packageFileName );
         retval.setChecksums( checksums );
         retval.setShortDescription( mavenProject.getDescription() );
         if ( mavenProject.getOrganization() != null )
