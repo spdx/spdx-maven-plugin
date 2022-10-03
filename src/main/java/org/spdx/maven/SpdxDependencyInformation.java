@@ -42,6 +42,7 @@ import org.spdx.jacksonstore.MultiFormatStore.Format;
 import org.spdx.jacksonstore.MultiFormatStore.Verbose;
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.SpdxConstants;
+import org.spdx.library.SpdxInvalidIdException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.ExternalDocumentRef;
 import org.spdx.library.model.ExternalSpdxElement;
@@ -177,18 +178,28 @@ public class SpdxDependencyInformation
             }
             catch ( IOException e )
             {
-                log.error(
+                log.warn(
                         "IO error reading SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
+            }
+            catch ( SpdxInvalidIdException e ) 
+            {
+                log.warn(
+                          "Invalid SPDX ID exception reading SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
-                log.error(
+                log.warn(
                         "Invalid SPDX analysis exception reading SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
             catch ( SpdxCollectionException e )
             {
-                log.error(
+                log.warn(
                         "Unable to create file checksum for external SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
+            }
+            catch ( Exception e )
+            {
+                log.warn(
+                        "Unknown error processing SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
         }
         File pomFile = null;
@@ -505,6 +516,10 @@ public class SpdxDependencyInformation
     private File artifactFileToSpdxFile( File file )
     {
         File retval = getFileWithDifferentType( file, "spdx.rdf.xml" );
+        if ( retval == null || !retval.exists() )
+        {
+            retval = getFileWithDifferentType( file, "spdx.json" );
+        }
         if ( retval == null || !retval.exists() )
         {
             retval = getFileWithDifferentType( file, "spdx" );
