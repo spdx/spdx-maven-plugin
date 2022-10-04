@@ -22,6 +22,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>spdx</sonar.organization>
     <sonar.projectKey>spdx-maven-plugin</sonar.projectKey>
+	<dependency-check-maven.version>7.2.1</dependency-check-maven.version>    
   </properties>
   <licenses>
       <license>
@@ -66,17 +67,17 @@
 	  <dependency>
 	  	<groupId>org.spdx</groupId>
 	  	<artifactId>java-spdx-library</artifactId>
-	  	<version>1.1.0</version>
+	  	<version>1.1.1</version>
 	  </dependency>
 	  <dependency>
 	  	<groupId>org.spdx</groupId>
 	  	<artifactId>spdx-rdf-store</artifactId>
-	  	<version>1.1.0</version>
+	  	<version>1.1.1</version>
 	  </dependency>
 	  <dependency>
 	  	<groupId>org.spdx</groupId>
 	  	<artifactId>spdx-jackson-store</artifactId>
-	  	<version>1.1.0</version>
+	  	<version>1.1.1</version>
 	  </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -98,7 +99,7 @@
     <dependency>
     	<groupId>org.codehaus.plexus</groupId>
     	<artifactId>plexus-utils</artifactId>
-    	<version>3.0.21</version>
+    	<version>3.4.2</version>
     </dependency>
     <dependency>
     	<groupId>org.apache.maven.shared</groupId>
@@ -134,7 +135,12 @@
        </resource>
     </resources>
     <plugins>
-      <plugin>
+	<plugin>
+		<groupId>org.owasp</groupId>
+		<artifactId>dependency-check-maven</artifactId>
+		<version>${dependency-check-maven.version}</version>
+	</plugin>
+    <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
         <version>3.6.0</version>
