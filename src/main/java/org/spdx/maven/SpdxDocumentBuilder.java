@@ -370,7 +370,16 @@ public class SpdxDocumentBuilder
         {
             copyrightText = UNSPECIFIED;
         }
-        String downloadUrl = projectInformation.getDownloadUrl();
+        String downloadUrl = null;
+        
+        if ( SpdxVerificationHelper.isValidUri( projectInformation.getDownloadUrl() ))
+        {
+            downloadUrl = projectInformation.getDownloadUrl();
+        }
+        else
+        {
+            log.warn( "Invalid download location in POM file: " + projectInformation.getDownloadUrl() );
+        }
         if ( downloadUrl == null )
         {
             downloadUrl = UNSPECIFIED;
@@ -437,7 +446,15 @@ public class SpdxDocumentBuilder
             // home page
             if ( projectInformation.getHomePage() != null )
             {
-                pkg.setHomepage( projectInformation.getHomePage() );
+                try
+                {
+                    pkg.setHomepage( projectInformation.getHomePage() );
+                }
+                catch( InvalidSPDXAnalysisException ex ) 
+                {
+                    log.warn( "Invalid URL in project POM file: "+projectInformation.getHomePage() );
+                }
+                
             }
             // source information
             if ( projectInformation.getSourceInfo() != null )

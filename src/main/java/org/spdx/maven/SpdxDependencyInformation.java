@@ -439,7 +439,11 @@ public class SpdxDependencyInformation
         }
         if ( model.getUrl() != null )
         {
-            retval.setHomepage( model.getUrl() );
+            try {
+                retval.setHomepage( model.getUrl() );
+            } catch ( InvalidSPDXAnalysisException e ) {
+                log.warn( "Invalid homepage for dependency " + model.getArtifactId() + ": " + model.getUrl() );
+            }
         }
         return retval;
     }
