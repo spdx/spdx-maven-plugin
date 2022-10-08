@@ -4,7 +4,7 @@
 
   <groupId>org.spdx</groupId>
   <artifactId>spdx-maven-plugin</artifactId>
-  <version>0.6.2-SNAPSHOT</version>
+  <version>0.6.3-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>spdx-maven-plugin Maven Plugin</name>
