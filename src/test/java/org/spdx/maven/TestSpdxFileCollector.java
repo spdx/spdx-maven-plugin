@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +43,6 @@ import org.spdx.library.model.pointer.LineCharPointer;
 import org.spdx.library.model.pointer.SinglePointer;
 import org.spdx.library.model.pointer.StartEndPointer;
 import org.spdx.storage.simple.InMemSpdxStore;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 
 public class TestSpdxFileCollector

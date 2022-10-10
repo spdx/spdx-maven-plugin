@@ -28,6 +28,7 @@ import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -41,14 +42,13 @@ import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +78,8 @@ import java.util.Set;
  * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
 @Mojo( name = "createSPDX",
-       defaultPhase = LifecyclePhase.VERIFY )
+       defaultPhase = LifecyclePhase.VERIFY,
+       requiresDependencyResolution = ResolutionScope.COMPILE )
 @Execute( goal = "createSPDX",
           phase = LifecyclePhase.VERIFY )
 public class CreateSpdxMojo extends AbstractMojo
@@ -360,10 +361,9 @@ public class CreateSpdxMojo extends AbstractMojo
     
     private String artifactType;
 
-    @SuppressWarnings( "unchecked" )
     public void execute() throws MojoExecutionException
     {
-        this.dependencies = mavenProject.getDependencyArtifacts();
+        this.dependencies = mavenProject.getArtifacts();
         if ( this.getLog() == null )
         {
             throw ( new MojoExecutionException( "Null log for Mojo" ) );
@@ -694,7 +694,6 @@ public class CreateSpdxMojo extends AbstractMojo
         for ( FileSet includedDirectory : includedDirectories )
         {
             StringBuilder sb = new StringBuilder( "Included Directory: " + includedDirectory.getDirectory() );
-            @SuppressWarnings( "unchecked" )
             List<String> includes = includedDirectory.getIncludes();
             if ( includes != null && includes.size() > 0 )
             {
@@ -706,7 +705,6 @@ public class CreateSpdxMojo extends AbstractMojo
                     sb.append( includes.get( j ) );
                 }
             }
-            @SuppressWarnings( "unchecked" )
             List<String> excludes = includedDirectory.getExcludes();
             if ( excludes != null && excludes.size() > 0 )
             {
@@ -809,7 +807,6 @@ public class CreateSpdxMojo extends AbstractMojo
         AnyLicenseInfo declaredLicense = null;
         if ( this.licenseDeclared == null )
         {
-            @SuppressWarnings( "unchecked" )
             List<License> mavenLicenses = mavenProject.getLicenses();
             try
             {
@@ -998,7 +995,6 @@ public class CreateSpdxMojo extends AbstractMojo
     private FileSet[] getSourceDirectories()
     {
         ArrayList<FileSet> result = new ArrayList<>();
-        @SuppressWarnings( "unchecked" )
         List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
         if ( sourceRoots != null )
         {
@@ -1024,7 +1020,6 @@ public class CreateSpdxMojo extends AbstractMojo
     private FileSet[] getResourceDirectories()
     {
         ArrayList<FileSet> result = new ArrayList<>();
-        @SuppressWarnings( "unchecked" )
         List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
         if ( sourceRoots != null )
         {
@@ -1038,7 +1033,6 @@ public class CreateSpdxMojo extends AbstractMojo
                 this.getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
             }
         }
-        @SuppressWarnings( "unchecked" )
         List<Resource> resourceList = this.mavenProject.getResources();
         if ( resourceList != null )
         {
@@ -1066,7 +1060,6 @@ public class CreateSpdxMojo extends AbstractMojo
     private FileSet[] getTestDirectories()
     {
         ArrayList<FileSet> result = new ArrayList<>();
-        @SuppressWarnings( "unchecked" )
         List<String> sourceRoots = this.mavenProject.getTestCompileSourceRoots();
         if ( sourceRoots != null )
         {
