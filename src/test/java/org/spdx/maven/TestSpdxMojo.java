@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -33,8 +34,6 @@ import org.spdx.library.referencetype.ListedReferenceTypes;
 import org.spdx.spdxRdfStore.RdfStore;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.simple.InMemSpdxStore;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public class TestSpdxMojo extends AbstractMojoTestCase
 {

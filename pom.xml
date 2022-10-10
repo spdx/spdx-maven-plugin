@@ -19,6 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.version>3.8.5</maven.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>spdx</sonar.organization>
     <sonar.projectKey>spdx-maven-plugin</sonar.projectKey>
@@ -56,12 +57,12 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>2.2.1</version>
+      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.3</version>
+      <version>3.6.4</version>
       <scope>provided</scope>
     </dependency>
 	  <dependency>
@@ -87,13 +88,13 @@
     </dependency>
     <dependency>
     	<groupId>org.apache.maven</groupId>
-    	<artifactId>maven-project</artifactId>
-    	<version>2.2.1</version>
+    	<artifactId>maven-core</artifactId>
+    	<version>${maven.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.maven.shared</groupId>
+    	<groupId>org.apache.maven.plugin-testing</groupId>
     	<artifactId>maven-plugin-testing-harness</artifactId>
-    	<version>1.1</version>
+    	<version>3.3.0</version>
     	<scope>test</scope>
     </dependency>
     <dependency>
@@ -104,12 +105,17 @@
     <dependency>
     	<groupId>org.apache.maven.shared</groupId>
     	<artifactId>file-management</artifactId>
-    	<version>1.2.1</version>
+    	<version>3.1.0</version>
     </dependency>
     <dependency>
     	<groupId>org.apache.maven</groupId>
     	<artifactId>maven-artifact</artifactId>
-    	<version>2.2.1</version>
+    	<version>${maven.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-compat</artifactId>
+        <version>${maven.version}</version>
     </dependency>
   </dependencies>
 
