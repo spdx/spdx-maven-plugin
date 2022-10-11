@@ -21,11 +21,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Contributor;
@@ -49,9 +56,10 @@ import org.spdx.library.model.ExternalSpdxElement;
 import org.spdx.library.model.Relationship;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.SpdxElement;
-import org.spdx.library.model.SpdxItem;
 import org.spdx.library.model.SpdxPackage;
+import org.spdx.library.model.enumerations.AnnotationType;
 import org.spdx.library.model.enumerations.ChecksumAlgorithm;
+import org.spdx.library.model.enumerations.Purpose;
 import org.spdx.library.model.enumerations.RelationshipType;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
@@ -73,18 +81,26 @@ public class SpdxDependencyInformation
      * List of all Relationships added for dependencies
      */
     private List<Relationship> relationships = new ArrayList<>();
+    /**
+     * Map of namespaces to ExternalDocumentRefs
+     */
     private Map<String, ExternalDocumentRef> externalDocuments = new HashMap<>();
+    private List<org.spdx.library.model.Annotation> documentAnnotations = new ArrayList<>();
     private LicenseManager licenseManager;
     private SpdxDocument spdxDoc;
+    private boolean createExternalRefs = false;
+    DateFormat format = new SimpleDateFormat( SpdxConstants.SPDX_DATE_FORMAT );
 
     /**
      * @param log Logger for Maven
      */
-    public SpdxDependencyInformation( Log log, LicenseManager licenseManager, SpdxDocument spdxDoc )
+    public SpdxDependencyInformation( Log log, LicenseManager licenseManager, 
+                                      SpdxDocument spdxDoc, boolean createExternalRefs )
     {
         this.log = log;
         this.licenseManager = licenseManager;
         this.spdxDoc = spdxDoc;
+        this.createExternalRefs = createExternalRefs;
     }
 
     /**
@@ -173,8 +189,15 @@ public class SpdxDependencyInformation
                         "Dependency " + artifact.getArtifactId() + "Dependency information collected from SPDX file " + spdxFile.getAbsolutePath() );
                 
                 SpdxDocument externalSpdxDoc = spdxDocumentFromFile( spdxFile.getPath() );
-                return createExternalSpdxPackageReference( externalSpdxDoc, spdxFile,
-                        SpdxConstants.EXTERNAL_DOC_REF_PRENUM + artifact.getArtifactId() );
+                if ( createExternalRefs )
+                {
+                    return createExternalSpdxPackageReference( externalSpdxDoc, spdxFile, artifact.getGroupId(), 
+                                                               artifact.getArtifactId(), artifact.getVersion() );
+                } else
+                {
+                    return copyPackageInfoFromExternalDoc( externalSpdxDoc, artifact.getGroupId(), 
+                                                           artifact.getArtifactId(), artifact.getVersion() );
+                }
             }
             catch ( IOException e )
             {
@@ -254,6 +277,143 @@ public class SpdxDependencyInformation
     }
 
     /**
+     * Copies the closest matching described package in the externalSpdxDoc to the returned element
+     * @param externalSpdxDoc
+     * @param groupId Group ID of the artifact
+     * @param artifactId Artifact ID to search for
+     * @param version Version of the artifact
+     * @return SPDX Package with values copied from the externalSpdxDoc
+     * @throws InvalidSPDXAnalysisException 
+     */
+    private SpdxPackage copyPackageInfoFromExternalDoc( SpdxDocument externalSpdxDoc, String groupId,
+                                                        String artifactId, String version ) throws InvalidSPDXAnalysisException
+    {
+        SpdxPackage source = findMatchingDescribedPackage( externalSpdxDoc, artifactId );
+        Optional<String> downloadLocation = source.getDownloadLocation();
+        Optional<String> name = source.getName();
+        SpdxPackage dest = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri()),
+                                                  name.isPresent() ? name.get() : "NONE", source.getLicenseConcluded(), source.getCopyrightText(), 
+                                                  source.getLicenseDeclared() )
+                      .setFilesAnalyzed( false )
+                      .setAnnotations( source.getAnnotations() )
+                      .setChecksums( source.getChecksums() )
+                      .setDownloadLocation( downloadLocation.isPresent() ? downloadLocation.get() : "NOASSERTION" )
+                      .setExternalRefs( source.getExternalRefs() )
+                      .build();
+        // We don't want to copy any of the properties which have other elements since it
+        // may duplicate artifacts already included in the document - so we can't use copyFrom
+
+        Optional<String> builtDate = source.getBuiltDate();
+        if ( builtDate.isPresent() )
+        {
+            dest.setBuiltDate( builtDate.get() );
+        }
+        Optional<String> comment = source.getComment();
+        if ( comment.isPresent() )
+        {
+            dest.setComment( comment.get() );
+        }
+        Optional<String> desc = source.getDescription();
+        if ( desc.isPresent() )
+        {
+            dest.setDescription( desc.get() );
+        }
+        Optional<String> homePage = source.getHomepage();
+        if ( homePage.isPresent() )
+        {
+            dest.setHomepage( homePage.get() );
+        }
+        Optional<String> licenseComments = source.getLicenseComments();
+        if ( licenseComments.isPresent() )
+        {
+            dest.setLicenseComments( licenseComments.get() );
+        }
+        Optional<String> originator = source.getOriginator();
+        if ( originator.isPresent() )
+        {
+            dest.setOriginator( originator.get() );
+        }
+        Optional<String> pkgFileName = source.getPackageFileName();
+        if ( pkgFileName.isPresent() )
+        {
+            dest.setPackageFileName( pkgFileName.get() );
+        }
+        Optional<Purpose> primaryPurpose = source.getPrimaryPurpose();
+        if ( primaryPurpose.isPresent() )
+        {
+            dest.setPrimaryPurpose( primaryPurpose.get() );
+        }
+        Optional<String> releaseDate = source.getReleaseDate();
+        if ( releaseDate.isPresent() )
+        {
+            dest.setReleaseDate( releaseDate.get() );
+        }
+        Optional<String> sourceInfo = source.getSourceInfo();
+        if ( sourceInfo.isPresent() )
+        {
+            dest.setSourceInfo( sourceInfo.get() );
+        }
+        Optional<String> summary = source.getSummary();
+        if ( summary.isPresent() )
+        {
+            dest.setSummary( summary.get() );
+        }
+        Optional<String> supplier = source.getSupplier();
+        if ( supplier.isPresent() ) {
+            dest.setSupplier( supplier.get() );
+        }
+        Optional<String> validUntil = source.getValidUntilDate();
+        if ( validUntil.isPresent() )
+        {
+            dest.setValidUntilDate( validUntil.get() );
+        }
+        Optional<String> versionInfo = source.getVersionInfo();
+        if ( versionInfo.isPresent() )
+        {
+            dest.setVersionInfo( versionInfo.get() );
+        }
+        return dest;
+    }
+
+    /**
+     * Searched the described packages for the SPDX document for the closest matching package to the artifactId
+     * @param externalSpdxDoc Doc containing the package
+     * @param artifactId Maven artifact ID
+     * @return the closest matching package described by the doc 
+     * @throws InvalidSPDXAnalysisException 
+     */
+    private SpdxPackage findMatchingDescribedPackage( SpdxDocument externalSpdxDoc, String artifactId ) throws InvalidSPDXAnalysisException
+    {
+        SpdxElement itemDescribed = null;
+        // Find an item described with matching artifact ID
+        for ( SpdxElement item : externalSpdxDoc.getDocumentDescribes() )
+        {
+            Optional<String> name = item.getName();
+            if ( item instanceof SpdxPackage && name.isPresent() && item.getName().get().equals( artifactId )  )
+            {
+                itemDescribed = item;
+                break;
+            }
+        }
+        if ( itemDescribed == null ) {
+            // Find the first package
+            log.warn( "Could not find matching artifact ID in SPDX file for "+artifactId+".  Using the first package found in SPDX file." );
+            for ( SpdxElement item : externalSpdxDoc.getDocumentDescribes() )
+            {
+                if ( item instanceof SpdxPackage  )
+                {
+                    itemDescribed = item;
+                    break;
+                }
+            }
+        }
+        if ( itemDescribed == null ) {
+            throw ( new InvalidSPDXAnalysisException( "SPDX document does not contain any described items." ) );
+        }
+        return (SpdxPackage)itemDescribed;
+    }
+
+    /**
      * Creates an SPDX document from a file
      * @param path Path to the SPDX file
      * @return
@@ -297,46 +457,46 @@ public class SpdxDependencyInformation
      *
      * @param externalSpdxDoc       SPDX Document containing the package to be referenced.
      * @param spdxFile      SPDX file containing the SPDX document
-     * @param externalRefId A unique external reference ID for the external SPDX document
-     * @return
+     * @param groupId Group ID for the external artifact
+     * @param artifactId Artifact ID for the external artifact
+     * @param version version for the external artifact
+     * @return created SPDX element
      * @throws SpdxCollectionException
      * @throws InvalidSPDXAnalysisException
      */
-    private SpdxElement createExternalSpdxPackageReference( SpdxDocument externalSpdxDoc, File spdxFile, String externalRefId ) throws SpdxCollectionException, InvalidSPDXAnalysisException
+    private SpdxElement createExternalSpdxPackageReference( SpdxDocument externalSpdxDoc, 
+                                                            File spdxFile, 
+                                                            String groupId,
+                                                            String artifactId,
+                                                            @Nullable String version ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        String fixedExternalRefId = fixExternalRefId( externalRefId );
-        ExternalDocumentRef externalRef = this.externalDocuments.get( fixedExternalRefId );
+        String externalDocNamespace = externalSpdxDoc.getDocumentUri();
+        ExternalDocumentRef externalRef = this.externalDocuments.get( externalDocNamespace );
+        StringBuilder sb = new StringBuilder( groupId ).append( artifactId );
+        if ( Objects.nonNull( version )) {
+            sb.append( version );
+        }
+        String fullArtifactId = sb.toString();
         if ( externalRef == null )
         {
-            log.debug( "Creating external document ref " + fixedExternalRefId );
+            String externalRefDocId = SpdxConstants.EXTERNAL_DOC_REF_PRENUM + fixExternalRefId( fullArtifactId );
+            log.debug( "Creating external document ref " + externalDocNamespace );
             String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
             Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
-            externalRef = spdxDoc.createExternalDocumentRef( fixedExternalRefId, externalSpdxDoc.getDocumentUri(), cksum );
+            externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
             spdxDoc.getExternalDocumentRefs().add( externalRef );
-            this.externalDocuments.put( fixedExternalRefId, externalRef );
-            log.debug( "Created external document ref " + fixedExternalRefId );
+            org.spdx.library.model.Annotation docRefAddedAnnotation = spdxDoc.createAnnotation( "Tool: spdx-maven-plugin", 
+                                                                         AnnotationType.OTHER, 
+                                                                         format.format( new Date() ), 
+                                                                         "External document ref '"+externalRefDocId+"' created for artifact "+fullArtifactId );
+            spdxDoc.getAnnotations().add( docRefAddedAnnotation );
+            this.documentAnnotations.add( docRefAddedAnnotation );
+            this.externalDocuments.put( externalDocNamespace, externalRef );
+            log.debug( "Created external document ref " + externalRefDocId );
         }
-        SpdxItem[] describedItems = externalSpdxDoc.getDocumentDescribes().toArray( new SpdxItem[externalSpdxDoc.getDocumentDescribes().size()] );
-        if ( describedItems == null || describedItems.length == 0 )
-        {
-            throw ( new InvalidSPDXAnalysisException( "SPDX document does not contain any described items." ) );
-        }
-        SpdxItem itemDescribed = describedItems[0];
-        if ( describedItems.length > 1 )
-        {
-            // pick out the first described package
-            for ( SpdxItem item : describedItems )
-            {
-                if ( item instanceof SpdxPackage )
-                {
-                    itemDescribed = item;
-                    break;
-                    //TODO: This could be more sophisticated looking for a matching package name
-                }
-            }
-        }
+        SpdxPackage pkg = findMatchingDescribedPackage( externalSpdxDoc, artifactId );
         return new ExternalSpdxElement( spdxDoc.getModelStore(), spdxDoc.getDocumentUri(),  
-                                        fixedExternalRefId + ":" + itemDescribed.getId(), spdxDoc.getCopyManager(), true );
+                                        externalRef.getId() + ":" + pkg.getId(), spdxDoc.getCopyManager(), true );
     }
 
     /**
@@ -369,7 +529,7 @@ public class SpdxDependencyInformation
      */
     private boolean validExternalRefIdChar( char ch )
     {
-        return ( ( ch >= 'a' && ch <= 'z' ) || ( ch >= 'A' && ch <= 'Z' ) || ch == '.' || ch == '-' );
+        return ( ( ch >= 'a' && ch <= 'z' ) || ( ch >= 'A' && ch <= 'Z' ) || ( ch >= '0' && ch <= '9' ) || ch == '.' || ch == '-' );
     }
 
     /**
@@ -579,4 +739,43 @@ public class SpdxDependencyInformation
         return this.externalDocuments.values();
     }
 
+    /**
+     * @return the relationships
+     */
+    public List<Relationship> getRelationships()
+    {
+        return relationships;
+    }
+
+    /**
+     * @return the externalDocuments
+     */
+    public Map<String, ExternalDocumentRef> getExternalDocuments()
+    {
+        return externalDocuments;
+    }
+
+    /**
+     * @return the documentAnnotations
+     */
+    public List<org.spdx.library.model.Annotation> getDocumentAnnotations()
+    {
+        return documentAnnotations;
+    }
+
+    /**
+     * @return the spdxDoc
+     */
+    public SpdxDocument getSpdxDoc()
+    {
+        return spdxDoc;
+    }
+
+    /**
+     * @return the createExternalRefs
+     */
+    public boolean isCreateExternalRefs()
+    {
+        return createExternalRefs;
+    }
 }

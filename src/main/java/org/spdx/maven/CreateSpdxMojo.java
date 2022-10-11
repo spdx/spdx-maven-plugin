@@ -359,11 +359,33 @@ public class CreateSpdxMojo extends AbstractMojo
     @Parameter( required = false )
     private String outputFormat;
     
+    /**
+     * If true, external document references will be created for any dependencies which
+     * contain SPDX documents.  If false, the dependent package information will be copied
+     * from the SPDX document into the generated SPDX document.
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean createExternalRefs;
+    
+    /**
+     * If true, all transitive dependencies will be included in the SPDX document.  If false,
+     * only direct dependencies will be included.
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean includeTransitiveDependencies;
+    
     private String artifactType;
 
     public void execute() throws MojoExecutionException
     {
-        this.dependencies = mavenProject.getArtifacts();
+        if ( includeTransitiveDependencies )
+        {
+            this.dependencies = mavenProject.getArtifacts();
+        }
+        else
+        {
+            this.dependencies = mavenProject.getDependencyArtifacts();
+        }
         if ( this.getLog() == null )
         {
             throw ( new MojoExecutionException( "Null log for Mojo" ) );
@@ -553,7 +575,7 @@ public class CreateSpdxMojo extends AbstractMojo
                                                                     LicenseManager licenseManager,
                                                                     SpdxDocument spdxDoc ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog(), licenseManager, spdxDoc );
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog(), licenseManager, spdxDoc, createExternalRefs );
         if ( dependencies != null )
         {
             for ( Artifact dependency : dependencies )
