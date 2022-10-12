@@ -301,12 +301,6 @@ public class SpdxDocumentBuilder
                 }
             }
         }
-        Collection<ExternalDocumentRef> externalDocRefs = dependencyInformation.getDocumentExternalReferences();
-
-        if ( externalDocRefs != null && !externalDocRefs.isEmpty() )
-        {
-            this.spdxDoc.setExternalDocumentRefs( externalDocRefs );
-        }
     }
 
     /**
