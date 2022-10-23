@@ -79,7 +79,7 @@ import java.util.Set;
  */
 @Mojo( name = "createSPDX",
        defaultPhase = LifecyclePhase.VERIFY,
-       requiresDependencyResolution = ResolutionScope.COMPILE )
+       requiresDependencyResolution = ResolutionScope.TEST )
 @Execute( goal = "createSPDX",
           phase = LifecyclePhase.VERIFY )
 public class CreateSpdxMojo extends AbstractMojo
