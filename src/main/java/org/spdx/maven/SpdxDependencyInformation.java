@@ -75,12 +75,64 @@ import org.spdx.storage.simple.InMemSpdxStore;
  */
 public class SpdxDependencyInformation
 {
+    /**
+     * Store information about a relationship which will be from a package to 
+     * a package yet to be determined.
+     */
+    static class FromRelationship {
+        private SpdxPackage fromPackage;
+        private RelationshipType relationshipType;
+        
+        /**
+         * @param fromPackage Package which is to be related TO the relatedPackage
+         * @param relationshipType type of relationship
+         */
+        FromRelationship( SpdxPackage fromPackage, RelationshipType relationshipType ) {
+            this.fromPackage = fromPackage;
+            this.relationshipType = relationshipType;
+        }
+        
+        /**
+         * Creates a relationship to the toPackage and adds that relationship to the fromPackage
+         * @param toPackage Package which is related to the dependency
+         * @return the created relationship
+         * @throws InvalidSPDXAnalysisException
+         */
+        Relationship createAndAddRelationship(SpdxPackage toPackage) throws InvalidSPDXAnalysisException {
+            Relationship retval = fromPackage.createRelationship( toPackage, relationshipType, 
+                                                                  "Relationship created based on Maven POM information" );
+            fromPackage.addRelationship( retval );
+            return retval;
+        }
+
+        /**
+         * @return the fromPackage
+         */
+        public SpdxPackage getFromPackage()
+        {
+            return fromPackage;
+        }
+
+        /**
+         * @return the relationshipType
+         */
+        public RelationshipType getRelationshipType()
+        {
+            return relationshipType;
+        }
+    }
 
     private Log log;
     /**
-     * List of all Relationships added for dependencies
+     * List of all Relationships added for for dependances To a related element
      */
-    private List<Relationship> relationships = new ArrayList<>();
+    private List<Relationship> toRelationships = new ArrayList<>();
+    
+    /**
+     * List of relationships from a package to a TBD package
+     */
+    private List<FromRelationship> fromRelationships = new ArrayList<>();
+    
     /**
      * Map of namespaces to ExternalDocumentRefs
      */
@@ -120,8 +172,25 @@ public class SpdxDependencyInformation
                     "Could not determine the SPDX relationship type for dependency artifact ID " + dependency.getArtifactId() + " scope " + scope );
         }
         SpdxElement dependencyPackage = createSpdxPackage( dependency );
-        this.relationships.add( spdxDoc.createRelationship( dependencyPackage, relType, 
-                        "Relationship based on Maven POM file dependency information" ) );
+        if ( relType.toString().endsWith( "_OF" ))
+        {
+            if ( dependencyPackage instanceof SpdxPackage)
+            {
+                this.fromRelationships.add( new FromRelationship( (SpdxPackage)dependencyPackage, relType ) );
+                log.debug( "Added relationship of type "+relType.toString() + " for "+dependencyPackage.getName() );
+            }
+            else
+            {
+                this.toRelationships.add( spdxDoc.createRelationship( dependencyPackage, RelationshipType.OTHER, 
+                                "This relationship is the inverse of "+relType.toString()+" to an external document reference." ) );
+                log.debug( "Could not create proper to relationships for external element "+dependencyPackage.getId() );
+            }
+        } 
+        else
+        {
+            this.toRelationships.add( spdxDoc.createRelationship( dependencyPackage, relType, 
+                            "Relationship based on Maven POM file dependency information" ) );
+        }
     }
 
     /**
@@ -147,7 +216,7 @@ public class SpdxDependencyInformation
         }
         else if ( scope.equals( "test" ) )
         {
-            return RelationshipType.TEST_CASE_OF;
+            return RelationshipType.TEST_DEPENDENCY_OF;
         }
         else
         {
@@ -723,16 +792,7 @@ public class SpdxDependencyInformation
     }
 
     /**
-     * @return all relationship associated with SPDX dependencies based on the Maven dependencies for the package added
-     * using the addMavenDependency method
-     */
-    public List<org.spdx.library.model.Relationship> getPackageRelationships()
-    {
-        return this.relationships;
-    }
-
-    /**
-     * @return All external document references used by any dependency relationships
+     * @return All external document references used by any dependency toRelationships
      */
     public Collection<ExternalDocumentRef> getDocumentExternalReferences()
     {
@@ -740,11 +800,16 @@ public class SpdxDependencyInformation
     }
 
     /**
-     * @return the relationships
+     * @return the toRelationships
      */
-    public List<Relationship> getRelationships()
+    public List<Relationship> getToRelationships()
     {
-        return relationships;
+        return toRelationships;
+    }
+    
+    public List<FromRelationship> getFromRelationships()
+    {
+        return fromRelationships;
     }
 
     /**

@@ -40,7 +40,6 @@ import org.spdx.library.ModelCopyManager;
 import org.spdx.library.SpdxConstants;
 import org.spdx.library.SpdxVerificationHelper;
 import org.spdx.library.model.Annotation;
-import org.spdx.library.model.ExternalDocumentRef;
 import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.Relationship;
 import org.spdx.library.model.SpdxCreatorInformation;
@@ -285,7 +284,7 @@ public class SpdxDocumentBuilder
      */
     private void addDependencyInformation( SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
     {
-        List<Relationship> packageRelationships = dependencyInformation.getPackageRelationships();
+        List<Relationship> packageRelationships = dependencyInformation.getToRelationships();
         if ( packageRelationships != null )
         {
             for ( Relationship relationship : packageRelationships )
@@ -298,6 +297,24 @@ public class SpdxDocumentBuilder
                 {
                     log.error( "Unable to set package dependencies: " + e.getMessage() );
                     throw new SpdxBuilderException( "Unable to set package dependencies", e );
+                }
+            }
+        }
+        List<SpdxDependencyInformation.FromRelationship> fromRelationships = dependencyInformation.getFromRelationships();
+        if ( fromRelationships != null )
+        {
+            for ( SpdxDependencyInformation.FromRelationship fromRelationship : fromRelationships )
+            {
+                try
+                {
+                    Relationship rel =fromRelationship.createAndAddRelationship( projectPackage );
+                    log.debug( "Created relationship of type "+rel.getRelationshipType().toString() +  
+                               " from "+fromRelationship.getFromPackage().getName() );
+                }
+                catch ( InvalidSPDXAnalysisException e )
+                {
+                    log.error( "Unable to dependency to package: " + e.getMessage() );
+                    throw new SpdxBuilderException( "Unable to set dependency to package", e );
                 }
             }
         }
