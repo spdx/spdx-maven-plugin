@@ -47,7 +47,7 @@ public class LicenseManager
     SpdxDocument spdxDoc = null;
 
     /**
-     * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX listed license or a extracted license.
+     * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX listed license or an extracted license.
      */
     Map<String, String> urlStringToSpdxLicenseId = new HashMap<>();
 
@@ -64,7 +64,7 @@ public class LicenseManager
      *
      * @param spdxDoc                 SPDX document to add any extracted licenses
      * @param useStdLicenseSourceUrls if true, map any SPDX listed license source URL to license ID.  Note: significant
-     *                                performance degredation
+     *                                performance degradation
      * @param Log                     plugin logger
      * @throws LicenseMapperException
      */

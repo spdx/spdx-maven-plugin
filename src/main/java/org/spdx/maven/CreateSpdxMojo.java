@@ -146,8 +146,8 @@ public class CreateSpdxMojo extends AbstractMojo
     private String componentName;
 
     /**
-     * Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All non
-     * standard licenses must be configured containing the required license ID and license text.
+     * Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All
+     * non-standard licenses must be configured containing the required license ID and license text.
      */
     @Parameter
     private NonStandardLicense[] nonStandardLicenses;
@@ -341,7 +341,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * SPDX data specified in the PathSpecificSpdxInfo parameters.  All of the SPDX data parameters are optional.  If
      * any SPDX field is not specified, the project level default data will be used.
      * <p>
-     * If a file or directory is nested within another pathsWithSpcificSpdxInfo, the lowest level values will be used.
+     * If a file or directory is nested within another pathsWithSpecificSpdxInfo, the lowest level values will be used.
      * Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default
      * project level fields NOT the higher level PathSpecificSpdxInfo.
      */
@@ -393,7 +393,7 @@ public class CreateSpdxMojo extends AbstractMojo
         if ( this.spdxFile == null )
         {
             throw ( new MojoExecutionException(
-                    "No SPDX file referenced.  " + "Specify a configuration paramaeter spdxFile to resolve." ) );
+                    "No SPDX file referenced.  " + "Specify a configuration parameter spdxFile to resolve." ) );
         }
         File outputDir = this.spdxFile.getParentFile();
         if ( outputDir == null )
@@ -684,13 +684,13 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             return;
         }
-        for ( NonStandardLicense nonStandardLicens : nonStandardLicenses )
+        for ( NonStandardLicense nonStandardLicense : nonStandardLicenses )
         {
-            this.getLog().debug( "Non standard license ID: " + nonStandardLicens.getLicenseId() );
-            this.getLog().debug( "Non standard license Text: " + nonStandardLicens.getExtractedText() );
-            this.getLog().debug( "Non standard license Comment: " + nonStandardLicens.getComment() );
-            this.getLog().debug( "Non standard license Name: " + nonStandardLicens.getName() );
-            String[] crossReferences = nonStandardLicens.getCrossReference();
+            this.getLog().debug( "Non standard license ID: " + nonStandardLicense.getLicenseId() );
+            this.getLog().debug( "Non standard license Text: " + nonStandardLicense.getExtractedText() );
+            this.getLog().debug( "Non standard license Comment: " + nonStandardLicense.getComment() );
+            this.getLog().debug( "Non standard license Name: " + nonStandardLicense.getName() );
+            String[] crossReferences = nonStandardLicense.getCrossReference();
             if ( crossReferences != null )
             {
                 for ( String crossReference : crossReferences )
@@ -793,7 +793,7 @@ public class CreateSpdxMojo extends AbstractMojo
 
     /**
      * Get the SPDX project level information from the parameters The following project level information is taken from
-     * the POM project description: declaredLicense - mapped by the license parameter in the project.  Can be overriden
+     * the POM project description: declaredLicense - mapped by the license parameter in the project.  Can be overridden
      * by specifying a plugin configuration declaredLicense string concludedLicense - same as the declared license
      * unless overridden by the plugin configuration parameter concludedLicense name - name of the project.  If not
      * provided, the artifactId is used downloadUrl - distributionManagement().downloadUrl - If not provided, a default

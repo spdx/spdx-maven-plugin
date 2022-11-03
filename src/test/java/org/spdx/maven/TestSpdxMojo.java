@@ -94,7 +94,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             // Test configuration parameters found in the test resources pom.xml file
             // Document namespace
             assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
-            // Non standard licenses
+            // Non-standard licenses
             ExtractedLicenseInfo[] licenseInfos = result.getExtractedLicenseInfos().toArray( new ExtractedLicenseInfo[result.getExtractedLicenseInfos().size()] );
             assertEquals( 2, licenseInfos.length );
             ExtractedLicenseInfo testLicense1 = null;
@@ -361,7 +361,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             // Test configuration parameters found in the test resources pom.xml file
             // Document namespace
             assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
-            // Non standard licenses
+            // Non-standard licenses
             ExtractedLicenseInfo[] licenseInfos = result.getExtractedLicenseInfos().toArray( new ExtractedLicenseInfo[result.getExtractedLicenseInfos().size()] );
             assertEquals( 2, licenseInfos.length );
             ExtractedLicenseInfo testLicense1 = null;
@@ -599,7 +599,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
     /**
      * Add relative file paths to the filePaths list
      *
-     * @param prefix    Absolute path of the directory to which the filpaths are relative
+     * @param prefix    Absolute path of the directory to which the filepaths are relative
      * @param dir       Directory of files to add
      * @param filePaths return list of file paths to which paths are added
      */
@@ -667,7 +667,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             // Test configuration parameters found in the test resources pom.xml file
             // Document namespace
             assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
-            // Non standard licenses
+            // Non-standard licenses
             ExtractedLicenseInfo[] licenseInfos = result.getExtractedLicenseInfos().toArray( new ExtractedLicenseInfo[result.getExtractedLicenseInfos().size()] );
             assertEquals( 2, licenseInfos.length );
             ExtractedLicenseInfo testLicense1 = null;

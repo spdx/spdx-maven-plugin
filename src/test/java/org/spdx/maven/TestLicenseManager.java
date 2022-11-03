@@ -328,7 +328,7 @@ public class TestLicenseManager
         assertEquals( LICENSE_NAME, result.getName() );
         assertEquals( CROSS_REF_URLS.get( 0 ), result.getUrl() );
 
-        // non standard without name
+        // non-standard without name
         final String LICENSE_ID2 = "LicenseRef-second";
         final String LICENSE_TEXT2 = "second text";
         AnyLicenseInfo noName = new ExtractedLicenseInfo( LICENSE_ID2, LICENSE_TEXT2 );
