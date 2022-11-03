@@ -20,7 +20,7 @@ import java.net.URL;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * Non standard license (e.g. license which is not in the SPDX standard license list http://spdx.org/licenses)
+ * Non-standard license (e.g. license which is not in the SPDX standard license list http://spdx.org/licenses)
  *
  * @author Gary O'Neall
  */
@@ -29,7 +29,7 @@ public class NonStandardLicense
 
     /**
      * Required license ID.  Must be of the form "LicenseRef-"[idString] where [idString] is a unique string containing
-     * letters, numbers, “.”, “-” or “+”. Note that this is required for the Maven use of non standard licenses.  The
+     * letters, numbers, “.”, “-” or “+”. Note that this is required for the Maven use of non-standard licenses.  The
      * SPDX standard does not generally require this parameter.
      */
     @Parameter( required = true )
@@ -42,7 +42,7 @@ public class NonStandardLicense
     private String extractedText;
 
     /**
-     * Optional: Common name of the license not on the SPDX list. If there is no common name or it is not known, please
+     * Optional: Common name of the license not on the SPDX list. If there is no common name, or it is not known, please
      * use NOASSERTION.
      */
     @Parameter

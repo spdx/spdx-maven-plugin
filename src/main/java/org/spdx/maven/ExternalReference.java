@@ -74,7 +74,7 @@ public class ExternalReference
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new MojoExecutionException( "Error createing External Reference: "+e.getMessage()));
+            throw ( new MojoExecutionException( "Error creating External Reference: "+e.getMessage()));
         }
     }
 }

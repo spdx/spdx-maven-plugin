@@ -130,7 +130,7 @@ public class MavenToSpdxLicenseMapper
     }
 
     /**
-     * Initialize the urlSTringToSpdxLicense map with the SPDX listed licenses
+     * Initialize the urlStringToSpdxLicense map with the SPDX listed licenses
      *
      * @param jsonReader Reader for the JSON input file containing the listed licenses
      * @param log        Optional logger

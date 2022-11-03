@@ -124,7 +124,7 @@ public class SpdxDependencyInformation
 
     private Log log;
     /**
-     * List of all Relationships added for for dependances To a related element
+     * List of all Relationships added for dependances To a related element
      */
     private List<Relationship> toRelationships = new ArrayList<>();
     
@@ -690,7 +690,7 @@ public class SpdxDependencyInformation
     {
         try
         {
-            // The call below will map non standard licenses as well as standard licenses
+            // The call below will map non-standard licenses as well as standard licenses
             // but will throw an exception if no mapping is found - we'll try this first
             // and if there is an error, try just the standard license mapper which will
             // return an UNSPECIFIED license type if there is no mapping

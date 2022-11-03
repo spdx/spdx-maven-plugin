@@ -28,7 +28,7 @@ import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
 
 /**
- * Helper class with static methods to parse SDPX source files
+ * Helper class with static methods to parse SPDX source files
  *
  * @author Gary O'Neall
  */

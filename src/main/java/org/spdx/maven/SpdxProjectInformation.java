@@ -412,7 +412,7 @@ public class SpdxProjectInformation
                     }
                     catch ( InvalidSPDXAnalysisException e )
                     {
-                        externalRefString.append( "Invalid Reference Locatoer" );
+                        externalRefString.append( "Invalid Reference Locator" );
                     }
                     log.debug( "External Ref: " + externalRefString.toString() );
                 }

@@ -128,7 +128,7 @@ public class SpdxFileCollector
                         String trimmedExtension = extension.toUpperCase().trim();
                         if ( EXT_TO_FILE_TYPE.containsKey( trimmedExtension ) )
                         {
-                            logger.warn( "Dulicate file extension: "+trimmedExtension );
+                            logger.warn( "Duplicate file extension: "+trimmedExtension );
                         }
                         EXT_TO_FILE_TYPE.put( trimmedExtension, fileType );
                     }
@@ -195,7 +195,7 @@ public class SpdxFileCollector
     }
 
     /**
-     * Find the most appropriate file information based on the lowset level match (closedt to file)
+     * Find the most appropriate file information based on the lowest level match (closed to file)
      *
      * @param filePath
      * @param pathSpecificInformation
@@ -324,7 +324,7 @@ public class SpdxFileCollector
     }
 
     /**
-     * Create an SpdxSnippt from the snippet information provided
+     * Create an SpdxSnippet from the snippet information provided
      * @param snippet
      * @param spdxFile
      * @param spdxDoc
@@ -685,7 +685,7 @@ public class SpdxFileCollector
      * @param file       file whose checksum is to be generated
      * @param algorithms algorithms to generate the checksums
      * @param spdxDoc    SPDX document which will contain the checksum
-     * @return {@code Set} of checksums for file using each algortihm specified
+     * @return {@code Set} of checksums for file using each algorithm specified
      * @throws SpdxCollectionException if the input algorithm is invalid or unavailable or if the file cannot be read
      * @throws InvalidSPDXAnalysisException 
      */

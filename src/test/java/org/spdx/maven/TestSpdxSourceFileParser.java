@@ -94,7 +94,7 @@ public class TestSpdxSourceFileParser
         assertEquals( 2, result.size() );
         assertEquals( APACHE_LICENSE_ID, ( (SpdxListedLicense) result.get( 0 ) ).getLicenseId() );
         assertEquals( MIT_LICENSE_ID, ( (SpdxListedLicense) result.get( 1 ) ).getLicenseId() );
-        // Multpile SPDX ID's complex
+        // Multiple SPDX ID's complex
         result = SpdxSourceFileParser.parseTextForSpdxLicenses( MULTIPLE_COMPLEX_IDS );
         assertEquals( 6, result.size() );
         assertTrue( result.get( 0 ) instanceof DisjunctiveLicenseSet );
@@ -117,7 +117,7 @@ public class TestSpdxSourceFileParser
         {
             //IGNORE - this is success
         }
-        // Invalid expression (shoud error)
+        // Invalid expression (should error)
         try
         {
             result = SpdxSourceFileParser.parseTextForSpdxLicenses( INVALID_EXPRESSION );
