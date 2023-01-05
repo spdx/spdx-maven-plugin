@@ -17,6 +17,7 @@ package org.spdx.maven;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Resource;
@@ -31,6 +32,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.Checksum;
@@ -101,11 +104,20 @@ public class CreateSpdxMojo extends AbstractMojo
      * @required
      * @readonly
      */
-    @Parameter( defaultValue = "${project}" )
+    @Parameter( defaultValue = "${project}", readonly = true )
     MavenProject mavenProject;
 
     @Component
     private MavenProjectHelper projectHelper;
+    
+    @Component
+    private RepositorySystem repositorySystem;
+    
+    @Component
+    private ProjectBuilder mavenProjectBuilder;
+
+    @Parameter( defaultValue = "${session}", readonly = true )
+    private MavenSession session;
 
     /**
      * @requiresDependencyResolution test
@@ -118,12 +130,6 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     private Set<Artifact> dependencies;
 
-    //    /**
-    //     * @parameter default-value="${session}"
-    //     * @readonly
-    //     */
-    //    private MavenSession session;
-    //
     // Parameters for the plugin
     /**
      * SPDX File name
@@ -580,7 +586,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             for ( Artifact dependency : dependencies )
             {
-                retval.addMavenDependency( dependency );
+                retval.addMavenDependency( dependency, mavenProjectBuilder, session );
             }
         }
         return retval;
