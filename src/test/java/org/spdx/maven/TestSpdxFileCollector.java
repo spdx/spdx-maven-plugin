@@ -332,9 +332,8 @@ public class TestSpdxFileCollector
             assertEquals( DEFAULT_COPYRIGHT, SpdxFiles[i].getCopyrightText() );
             if ( SpdxFileNames[i].endsWith( FILE_NAME_WITH_ID ) )
             {
-                assertEquals( FILE_WITH_IDS_DECLARED_LICENSE, SpdxFiles[i].getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[SpdxFiles[i].getLicenseInfoFromFiles().size()] )[0].toString() );
-                assertTrue( SpdxFiles[i].getLicenseComments().get().contains( FILE_WITH_IDS_DECLARED_LICENSE ) );
-                assertEquals( FILE_WITH_IDS__CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString() );
+                assertEquals(LicenseInfoFactory.parseSPDXLicenseString( FILE_WITH_IDS_DECLARED_LICENSE ), SpdxFiles[i].getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[SpdxFiles[i].getLicenseInfoFromFiles().size()] )[0] );
+                assertEquals( LicenseInfoFactory.parseSPDXLicenseString( FILE_WITH_IDS__CONCLUDED_LICENSE ), SpdxFiles[i].getLicenseConcluded() );
             }
             else
             {
@@ -497,7 +496,7 @@ public class TestSpdxFileCollector
         assertEquals( 2, result.length );
         if ( DEFAULT_DECLARED_LICENSE.equals( result[0].toString() ) )
         {
-            assertEquals( FILE_WITH_IDS_DECLARED_LICENSE, result[1].toString() );
+            assertEquals( LicenseInfoFactory.parseSPDXLicenseString( FILE_WITH_IDS_DECLARED_LICENSE ), result[1] );
         }
         else
         {
@@ -527,13 +526,15 @@ public class TestSpdxFileCollector
             boolean foundDefault = false;
             boolean foundFileWithIds = false;
             boolean foundNewLicense = false;
+            AnyLicenseInfo defaultDecaredLicense = LicenseInfoFactory.parseSPDXLicenseString( DEFAULT_DECLARED_LICENSE );
+            AnyLicenseInfo fileWithIdstDecaredLicense = LicenseInfoFactory.parseSPDXLicenseString( FILE_WITH_IDS_DECLARED_LICENSE );
             for ( AnyLicenseInfo lic : result )
             {
-                if ( lic.toString().equals( DEFAULT_DECLARED_LICENSE ) )
+                if ( lic.equals( defaultDecaredLicense ) )
                 {
                     foundDefault = true;
                 }
-                if ( lic.toString().equals( FILE_WITH_IDS_DECLARED_LICENSE ) )
+                if ( lic.equals( fileWithIdstDecaredLicense ) )
                 {
                     foundFileWithIds = true;
                 }
