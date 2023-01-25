@@ -23,7 +23,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>spdx</sonar.organization>
     <sonar.projectKey>spdx-maven-plugin</sonar.projectKey>
-	<dependency-check-maven.version>7.2.1</dependency-check-maven.version>    
+	<dependency-check-maven.version>8.0.1</dependency-check-maven.version>    
   </properties>
   <licenses>
       <license>
@@ -68,17 +68,17 @@
 	  <dependency>
 	  	<groupId>org.spdx</groupId>
 	  	<artifactId>java-spdx-library</artifactId>
-	  	<version>1.1.2</version>
+	  	<version>1.1.3</version>
 	  </dependency>
 	  <dependency>
 	  	<groupId>org.spdx</groupId>
 	  	<artifactId>spdx-rdf-store</artifactId>
-	  	<version>1.1.2</version>
+	  	<version>1.1.3</version>
 	  </dependency>
 	  <dependency>
 	  	<groupId>org.spdx</groupId>
 	  	<artifactId>spdx-jackson-store</artifactId>
-	  	<version>1.1.2</version>
+	  	<version>1.1.3</version>
 	  </dependency>
     <dependency>
       <groupId>junit</groupId>
