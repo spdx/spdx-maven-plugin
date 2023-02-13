@@ -31,6 +31,11 @@
       <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+  	  <groupId>org.spdx</groupId>
+  	  <artifactId>java-spdx-library</artifactId>
+  	  <version>1.1.0</version>
+  	</dependency>
   </dependencies>
 
     <build>
@@ -96,9 +101,9 @@
                                         <!-- The defined stubs -->
                     <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
                     <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
-                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx.json</spdxFile>
-                    <outputFormat>JSON</outputFormat>
-                    <spdxDocumentNamespace>http://spdx.org/documents/spdx%20toolsv2.0%20rc1</spdxDocumentNamespace>
+                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx.rdf.xml</spdxFile>
+                    <outputFormat>RDF/XML</outputFormat>
+                    <spdxDocumentNamespace>spdx://sbom.foobar.dev/2.3/test-package-1.1.0</spdxDocumentNamespace>
                     <documentComment>Document Comment</documentComment>
                     <documentAnnotations>
                         <param>

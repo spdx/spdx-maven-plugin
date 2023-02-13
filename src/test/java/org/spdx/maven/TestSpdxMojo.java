@@ -635,6 +635,60 @@ public class TestSpdxMojo extends AbstractMojoTestCase
     }
     
     @Test
+    public void testExecuteUriNotUrl()  throws Exception
+    {
+        try
+        {
+            File testPom = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/uri-pom.xml" );
+            //        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
+            // if the below does not work due to a lookup error, run mvn test goal
+            CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
+            assertNotNull( mojo );
+            mojo.execute();
+            File spdxFile = new File( getBasedir(), SPDX_FILE_NAME );
+            assertTrue( spdxFile.exists() );
+            // Test output artifact file is created
+            File artifactFile = new File( getBasedir(),
+                    "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml" );
+            assertTrue( artifactFile.exists() );
+            ISerializableModelStore modelStore = new RdfStore();
+            ModelCopyManager copyManager = new ModelCopyManager();
+            SpdxDocument result;
+            String documentUri;
+            try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
+            {
+                documentUri = modelStore.deSerialize( is, false );
+                result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+            }
+            List<String> warnings = result.verify();
+            assertEquals( 0, warnings.size() );
+            // Test configuration parameters found in the test resources pom.xml file
+            // Document namespace
+            assertEquals( "spdx://sbom.foobar.dev/2.3/test-package-1.1.0", result.getDocumentUri() );
+        }
+        finally
+        {
+            File artifactFile = new File( getBasedir(),
+                    "src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx" );
+            if ( artifactFile.exists() )
+            {
+                if ( !artifactFile.delete() )
+                {
+                    artifactFile.deleteOnExit();
+                }
+            }
+            File spdxFile = new File( getBasedir(), SPDX_FILE_NAME );
+            if ( spdxFile.exists() )
+            {
+                if ( !spdxFile.delete() )
+                {
+                    spdxFile.deleteOnExit();
+                }
+            }
+        }
+    }
+    
+    @Test
     public void testExecuteNoContributors() throws Exception
     // Test regression for issue #53
     {

@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -93,7 +93,7 @@ public class SpdxDocumentBuilder
      * @throws SpdxBuilderException
      * @throws LicenseMapperException
      */
-    public SpdxDocumentBuilder( Log log, File spdxFile, URL spdxDocumentNamespace, 
+    public SpdxDocumentBuilder( Log log, File spdxFile, URI spdxDocumentNamespace, 
                                 boolean useStdLicenseSourceUrls, String outputFormat ) throws SpdxBuilderException, LicenseMapperException
     {
         this.log = log;
