@@ -103,7 +103,7 @@
                     <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
                     <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx.rdf.xml</spdxFile>
                     <outputFormat>RDF/XML</outputFormat>
-                    <spdxDocumentNamespace>http://spdx.org/documents/spdx%20toolsv2.0%20rc1</spdxDocumentNamespace>
+                    <spdxDocumentNamespace>http://spdx.org/spdxpackages/spdx toolsv2.0 rc1</spdxDocumentNamespace>
                     <documentComment>Document Comment</documentComment>
                     <documentAnnotations>
                         <param>

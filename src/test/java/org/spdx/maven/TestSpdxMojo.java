@@ -93,7 +93,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
             assertEquals( 0, warnings.size() );
             // Test configuration parameters found in the test resources pom.xml file
             // Document namespace
-            assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
+            assertEquals( "http://spdx.org/spdxpackages/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
             // Non-standard licenses
             ExtractedLicenseInfo[] licenseInfos = result.getExtractedLicenseInfos().toArray( new ExtractedLicenseInfo[result.getExtractedLicenseInfos().size()] );
             assertEquals( 2, licenseInfos.length );

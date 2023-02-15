@@ -1,7 +1,5 @@
 package org.spdx.maven;
 
-import org.apache.commons.lang3.StringUtils;
-
 /*
  * Copyright 2014 Source Auditor Inc.
  *
@@ -47,9 +45,9 @@ import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -380,6 +378,7 @@ public class CreateSpdxMojo extends AbstractMojo
     
     private String artifactType;
 
+    @SuppressWarnings( "deprecation" )
     public void execute() throws MojoExecutionException
     {
         if ( includeTransitiveDependencies )
@@ -446,6 +445,10 @@ public class CreateSpdxMojo extends AbstractMojo
         SpdxDocumentBuilder builder;
         try
         {
+            if ( spdxDocumentNamespace.startsWith( "http://spdx.org/spdxpackages/" )) {
+                // Fix up any URI encoding issues with the default
+                spdxDocumentNamespace = spdxDocumentNamespace.replace( " ", "%20" );
+            }
             URI namespaceUri = new URI( spdxDocumentNamespace );
             builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, namespaceUri,
                     this.matchLicensesOnCrossReferenceUrls, outputFormat );
