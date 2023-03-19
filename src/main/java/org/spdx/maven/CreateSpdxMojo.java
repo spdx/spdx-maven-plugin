@@ -47,7 +47,6 @@ import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -584,7 +583,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             for ( Artifact dependency : dependencies )
             {
-                retval.addMavenDependency( dependency, mavenProjectBuilder, session );
+                retval.addMavenDependency( dependency, mavenProjectBuilder, session, mavenProject );
             }
         }
         return retval;
