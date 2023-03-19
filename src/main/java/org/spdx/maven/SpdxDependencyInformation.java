@@ -35,15 +35,18 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -164,11 +167,12 @@ public class SpdxDependencyInformation
      * @param dependency
      * @param mavenProjectBuilder project builder for the repo containing the POM file
      * @param session Maven session for building the project
+     * @param  mavenProject Maven project
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
     public void addMavenDependency( Artifact dependency, ProjectBuilder mavenProjectBuilder, 
-                                    MavenSession session ) throws LicenseMapperException, InvalidSPDXAnalysisException
+                                    MavenSession session, MavenProject mavenProject ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         String scope = dependency.getScope();
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
@@ -177,7 +181,7 @@ public class SpdxDependencyInformation
             log.warn(
                     "Could not determine the SPDX relationship type for dependency artifact ID " + dependency.getArtifactId() + " scope " + scope );
         }
-        SpdxElement dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session );
+        SpdxElement dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session, mavenProject );
         if ( relType.toString().endsWith( "_OF" ))
         {
             if ( dependencyPackage instanceof SpdxPackage)
@@ -236,12 +240,14 @@ public class SpdxDependencyInformation
      * @param artifact Maven dependency artifact
      * @param mavenProjectBuilder project builder for the repo containing the POM file
      * @param session Maven session for building the project
+     * @param mavenProject Maven project
      * @return SPDX Package build from the MavenProject metadata
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
     private SpdxElement createSpdxPackage( Artifact artifact, 
-                                           ProjectBuilder mavenProjectBuilder, MavenSession session ) throws LicenseMapperException, InvalidSPDXAnalysisException
+                                           ProjectBuilder mavenProjectBuilder, MavenSession session,
+                                           MavenProject mavenProject ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         log.debug( "Creating SPDX package for artifact " + artifact.getArtifactId() );
         if ( artifact.getFile() == null )
@@ -306,7 +312,16 @@ public class SpdxDependencyInformation
         }
         try
         {
-            ProjectBuildingResult build = mavenProjectBuilder.build(artifact, session.getProjectBuildingRequest());
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+            request.setProject( mavenProject );
+            request.setRemoteRepositories( mavenProject.getRemoteArtifactRepositories() );
+            for (ArtifactRepository ar:request.getRemoteRepositories()) {
+                log.debug( "request Remote repository ID: " + ar.getId() );
+            }
+            for (ArtifactRepository ar:mavenProject.getRemoteArtifactRepositories()) {
+                log.debug( "Project Remote repository ID: " + ar.getId() );
+            }
+            ProjectBuildingResult build = mavenProjectBuilder.build( artifact, request );
             MavenProject depProject = build.getProject();
             log.debug(
                       "Dependency " + artifact.getArtifactId() + "Collecting information from project metadata for " + depProject.getArtifactId() );
