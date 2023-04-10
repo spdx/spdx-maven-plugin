@@ -130,7 +130,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * SPDX File name
      */
     @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx",
-                property = "spdxFile",
+                property = "spdxFileName",
                 required = true )
     private File spdxFile;
 
@@ -394,10 +394,8 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         if ( this.spdxFile == null )
         {
-            this.spdxFile = new File( this.mavenProject.getReporting().getOutputDirectory() + 
-                                      this.mavenProject.getArtifactId() + 
-                                      this.mavenProject.getVersion() +
-                                      ".spdx" );
+            throw ( new MojoExecutionException("No SPDX file referenced.  " + 
+                            "Specify a configuration parameter spdxFile to resolve." ) );
         }
         if ( this.outputFormat == null ) 
         {
