@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -129,7 +130,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * SPDX File name
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx.json",
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx",
                 property = "spdxFileName",
                 required = true )
     private File spdxFile;
@@ -394,8 +395,35 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         if ( this.spdxFile == null )
         {
-            throw ( new MojoExecutionException(
-                    "No SPDX file referenced.  " + "Specify a configuration parameter spdxFile to resolve." ) );
+            throw ( new MojoExecutionException("No SPDX file referenced.  " + 
+                            "Specify a configuration parameter spdxFile to resolve." ) );
+        }
+        if ( this.outputFormat == null ) 
+        {
+            if ( spdxFile.getName().toLowerCase().endsWith( ".rdf.xml" ) ) 
+            {
+                outputFormat = RDF_OUTPUT_FORMAT;
+            }
+            else
+            {
+                outputFormat = JSON_OUTPUT_FORMAT;
+            }
+        }
+        else
+        {
+            outputFormat = this.outputFormat.toUpperCase();
+        }
+        if ( !RDF_OUTPUT_FORMAT.equals( outputFormat ) && !JSON_OUTPUT_FORMAT.equals( outputFormat ))
+        {
+            this.getLog().warn( "Invalid SPDX output format: "+this.outputFormat+".  Defaulting to JSON format." );
+            this.outputFormat = JSON_OUTPUT_FORMAT;
+        }
+        this.artifactType = RDF_OUTPUT_FORMAT.equals( this.outputFormat ) ? SPDX_RDF_ARTIFACT_TYPE : SPDX_JSON_ARTIFACT_TYPE;
+        if (spdxFile.getName().endsWith( ".spdx" )) {
+            // add a default extension
+            String spdxFileType = Objects.equals(this.artifactType, SPDX_RDF_ARTIFACT_TYPE) ? ".rdf.xml" : ".json";
+            getLog().info( "spdx file type = "+spdxFileType );            
+            spdxFile = new File( spdxFile.getAbsolutePath() + spdxFileType );
         }
         File outputDir = this.spdxFile.getParentFile();
         if ( outputDir == null )
@@ -415,31 +443,8 @@ public class CreateSpdxMojo extends AbstractMojo
         if ( defaultLicenseInformationInFile == null ) {
             defaultLicenseInformationInFile = defaultFileConcludedLicense;
         }
-        if ( this.outputFormat == null ) 
-        {
-            String spdxFileName = spdxFile.getName().toLowerCase();
-            if ( spdxFileName.endsWith( ".rdf.xml" ) ) 
-            {
-                outputFormat = RDF_OUTPUT_FORMAT;
-            }
-            else
-            {
-                outputFormat = JSON_OUTPUT_FORMAT;
-            }
-        }
-        else
-        {
-            outputFormat = this.outputFormat.toUpperCase();
-        }
         
-        if ( !RDF_OUTPUT_FORMAT.equals( outputFormat ) && !JSON_OUTPUT_FORMAT.equals( outputFormat ))
-        {
-            this.getLog().warn( "Invalid SPDX output format: "+this.outputFormat+".  Defaulting to JSON format." );
-            this.outputFormat = JSON_OUTPUT_FORMAT;
-        }
-
-        this.artifactType = RDF_OUTPUT_FORMAT.equals( this.outputFormat ) ? SPDX_RDF_ARTIFACT_TYPE : SPDX_JSON_ARTIFACT_TYPE;
-        this.getLog().info( "Creating SPDX File " + spdxFile.getPath() );
+       this.getLog().info( "Creating SPDX File " + spdxFile.getPath() );
 
         SpdxDocumentBuilder builder;
         try
