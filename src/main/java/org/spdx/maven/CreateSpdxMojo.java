@@ -420,7 +420,7 @@ public class CreateSpdxMojo extends AbstractMojo
         this.artifactType = RDF_OUTPUT_FORMAT.equals( this.outputFormat ) ? SPDX_RDF_ARTIFACT_TYPE : SPDX_JSON_ARTIFACT_TYPE;
         if (spdxFile.getName().endsWith( ".spdx" )) {
             // add a default extension
-            String spdxFileType = SPDX_RDF_ARTIFACT_TYPE.equals( this.artifactType ) ? ".rdf.xml" : ".json";
+            String spdxFileType = Objects.equals(this.artifactType, SPDX_RDF_ARTIFACT_TYPE) ? ".rdf.xml" : ".json";
             getLog().info( "spdx file type = "+spdxFileType );            
             spdxFile = new File( spdxFile.getAbsolutePath() + spdxFileType );
         }
