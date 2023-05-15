@@ -339,6 +339,9 @@ public class SpdxProjectInformation
      */
     public void logInfo( Log log, SpdxDocument spdxDoc )
     {
+        if ( !log.isDebugEnabled() ) {
+            return;
+        }
         log.debug( "SPDX Project Name: " + this.getName() );
         log.debug( "SPDX Document comment: " + this.getDocumentComment() );
         log.debug( "SPDX Creator comment: " + this.getCreatorComment() );
@@ -370,7 +373,6 @@ public class SpdxProjectInformation
                 annotation.logInfo( log );
             }
         }
-        String[] creators = this.getCreators();
         if ( creators != null )
         {
             for ( String creator : creators )

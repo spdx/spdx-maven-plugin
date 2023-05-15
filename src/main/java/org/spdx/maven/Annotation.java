@@ -153,6 +153,9 @@ public class Annotation
 
     public void logInfo( Log log )
     {
+        if ( !log.isDebugEnabled() ) {
+            return;
+        }
         log.debug(
                 "Annotator: " + this.annotator + ", Date: " + this.annotationDate + ", Type: " + this.annotationType );
     }

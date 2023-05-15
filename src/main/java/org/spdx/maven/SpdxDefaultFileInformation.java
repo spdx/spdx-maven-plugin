@@ -140,13 +140,15 @@ public class SpdxDefaultFileInformation
      */
     public void logInfo( Log log )
     {
+        if ( !log.isDebugEnabled() ) {
+            return;
+        }
         log.debug( "Default File Comment: " + getComment() );
         log.debug( "Default File Copyright: " + getCopyright() );
         log.debug( "Default File License Comment: " + getLicenseComment() );
         log.debug( "Default File Notice: " + getNotice() );
         log.debug( "Default File Concluded License: " + getConcludedLicense().toString() );
         log.debug( "Default File Declared License: " + getDeclaredLicense().toString() );
-        String[] contributors = getContributors();
         if ( contributors != null )
         {
             for ( String contributor : contributors )

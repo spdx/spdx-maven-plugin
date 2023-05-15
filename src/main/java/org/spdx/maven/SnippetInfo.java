@@ -63,6 +63,9 @@ public class SnippetInfo
 
     public void logInfo( Log log )
     {
+        if ( !log.isDebugEnabled() ) {
+            return;
+        }
         log.debug( "Snippet information follows:" );
         if ( this.name != null )
         {

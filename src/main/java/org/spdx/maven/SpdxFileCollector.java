@@ -112,6 +112,7 @@ public class SpdxFileCollector
             if ( is == null )
             {
                 logger.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
+                return;
             }
             prop.load( is );
             Iterator<Entry<Object, Object>> iter = prop.entrySet().iterator();
@@ -272,11 +273,7 @@ public class SpdxFileCollector
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            if ( log != null )
-            {
-                log.error( "Spdx exception creating file relationship: " + e.getMessage(), e );
-            }
-            throw new SpdxCollectionException( "Error creating SPDX file relationship: " + e.getMessage() );
+            throw new SpdxCollectionException( "Error creating SPDX file relationship", e );
         }
         if ( fileInfo.getSnippets() != null )
         {
@@ -289,19 +286,16 @@ public class SpdxFileCollector
                 }
                 catch ( InvalidLicenseStringException e )
                 {
-                    logger.error( "Invalid license string creating snippet", e );
                     throw new SpdxCollectionException(
                             "Error processing SPDX snippet information.  Invalid license string specified in snippet.",
                             e );
                 }
                 catch ( SpdxBuilderException e )
                 {
-                    logger.error( "Error creating SPDX snippet", e );
                     throw new SpdxCollectionException( "Error creating SPDX snippet information.", e );
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    logger.error( "SPDX Analysis error creating snippet", e );
                     throw new SpdxCollectionException(
                             "Error processing SPDX snippet information.",
                             e );
@@ -318,7 +312,6 @@ public class SpdxFileCollector
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            logger.error( "Error getting license information from files", e );
             throw new SpdxCollectionException( "Error getting license information from files.", e );
         }
     }
@@ -370,10 +363,6 @@ public class SpdxFileCollector
         }
         catch ( SpdxCollectionException | InvalidSPDXAnalysisException e1 )
         {
-            if ( log != null )
-            {
-                log.error( "Error generating checksums for file "+file.getName() );
-            }
             throw new SpdxCollectionException( "Unable to generate checksum for file "+file.getName() );
         }
         AnyLicenseInfo concludedLicense = null;
@@ -408,10 +397,6 @@ public class SpdxFileCollector
                     }
                     catch ( InvalidSPDXAnalysisException e )
                     {
-                        if ( log != null )
-                        {
-                            log.error( "Spdx exception creating conjunctive license set: " + e.getMessage(), e );
-                        }
                         throw new SpdxCollectionException( "Error creating SPDX file - unable to create a license set", e );
                     }
                 }
@@ -476,11 +461,7 @@ public class SpdxFileCollector
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            if ( log != null )
-            {
-                log.error( "Spdx exception creating file: " + e.getMessage(), e );
-            }
-            throw new SpdxCollectionException( "Error creating SPDX file: " + e.getMessage() );
+            throw new SpdxCollectionException( "Error creating SPDX file", e );
         }
 
         return retval;
