@@ -101,7 +101,7 @@
                                         <!-- The defined stubs -->
                     <mavenProject implementation="org.spdx.maven.stubs.CreateSpdxMavenProjectStub"/>
                     <projectHelper implementation="org.spdx.maven.stubs.MavenProjectHelperStub"/>
-                    <spdxFile>src/test/resources/unit/spdx-maven-plugin-test/test.spdx.rdf.xml</spdxFile>
+                    <spdxFile>target/test-classes/unit/spdx-maven-plugin-test/test.spdx.rdf.xml</spdxFile>
                     <outputFormat>RDF/XML</outputFormat>
                     <spdxDocumentNamespace>spdx://sbom.foobar.dev/2.3/test-package-1.1.0</spdxDocumentNamespace>
                     <documentComment>Document Comment</documentComment>

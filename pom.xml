@@ -237,7 +237,7 @@
               </pomIncludes>
               <postBuildHookScript>verify</postBuildHookScript>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <settingsFile>src/it/settings.xml</settingsFile>
+              <settingsFile>${project.build.directory}/it/settings.xml</settingsFile>
               <goals>
                 <goal>clean</goal>
                 <goal>test-compile</goal>
