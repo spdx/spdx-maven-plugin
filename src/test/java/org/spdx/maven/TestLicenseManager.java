@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.After;
@@ -135,7 +136,7 @@ public class TestLicenseManager
         ExtractedLicenseInfo[] result = spdxDoc.getExtractedLicenseInfos().toArray( new ExtractedLicenseInfo[spdxDoc.getExtractedLicenseInfos().size()] );
         assertEquals( 1, result.length );
         assertEquals( COMMENT, result[0].getComment() );
-        assertArraysEqual( CROSS_REF_STR, result[0].getSeeAlso().toArray( new String[result[0].getSeeAlso().size()] ) );
+        assertArrayEquals( CROSS_REF_STR, TestUtils.toSortedArray( result[0].getSeeAlso() ) );
         assertEquals( EXTRACTED_TEXT, result[0].getExtractedText() );
         assertEquals( LICENSE_ID, result[0].getLicenseId() );
         assertEquals( LICENSE_NAME, result[0].getName() );
@@ -158,39 +159,6 @@ public class TestLicenseManager
         assertEquals( EXTRACTED_TEXT2, licResult.getExtractedText() );
         assertEquals( LICENSE_ID2, licResult.getLicenseId() );
 
-    }
-
-    public static void assertArraysEqual( Object[] a1, Object[] a2 )
-    {
-        if ( a1 == null )
-        {
-            if ( a2 == null )
-            {
-                return;
-            }
-            else
-            {
-                fail( "Arrays not equal - a1 is null" );
-            }
-        }
-        if ( a2 == null )
-        {
-            fail( "Arrays not equal - a2 is null" );
-        }
-        assertEquals( a1.length, a2.length );
-        for ( Object o : a1 )
-        {
-            boolean found = false;
-            for ( Object value : a2 )
-            {
-                if ( o.equals( value ) )
-                {
-                    found = true;
-                    break;
-                }
-            }
-            assertTrue( found );
-        }
     }
 
     /**
@@ -286,7 +254,7 @@ public class TestLicenseManager
         assertTrue( result instanceof ExtractedLicenseInfo );
         ExtractedLicenseInfo nonStdResult = (ExtractedLicenseInfo) result;
         assertEquals( COMMENT, nonStdResult.getComment() );
-        assertArraysEqual( CROSS_REF_STR, nonStdResult.getSeeAlso().toArray( new String[nonStdResult.getSeeAlso().size()] ) );
+        assertArrayEquals( CROSS_REF_STR, TestUtils.toSortedArray( nonStdResult.getSeeAlso() ) );
         assertEquals( EXTRACTED_TEXT, nonStdResult.getExtractedText() );
         assertEquals( LICENSE_ID, nonStdResult.getLicenseId() );
         assertEquals( LICENSE_NAME, nonStdResult.getName() );
@@ -335,5 +303,4 @@ public class TestLicenseManager
         result = licenseManager.spdxLicenseToMavenLicense( noName );
         assertEquals( LICENSE_ID2, result.getName() );
     }
-
 }
