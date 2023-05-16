@@ -94,7 +94,7 @@ public class SpdxDocumentBuilder
      * @throws LicenseMapperException
      */
     public SpdxDocumentBuilder( Log log, File spdxFile, URI spdxDocumentNamespace, 
-                                boolean useStdLicenseSourceUrls, String outputFormat ) throws SpdxBuilderException, LicenseMapperException
+                                boolean useStdLicenseSourceUrls, OutputFormat outputFormat ) throws SpdxBuilderException, LicenseMapperException
     {
         this.log = log;
         this.spdxFile = spdxFile;
@@ -137,15 +137,7 @@ public class SpdxDocumentBuilder
         // create the SPDX document
         try
         {
-            if (outputFormat.equals( CreateSpdxMojo.RDF_OUTPUT_FORMAT )) 
-            {
-                modelStore = new RdfStore();
-            }
-            else 
-            {
-                // use the default JSON
-                modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
-            }
+            modelStore = outputFormat == OutputFormat.RDF_XML ? new RdfStore() :  new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
             copyManager = new ModelCopyManager();
             spdxDoc = SpdxModelFactory.createSpdxDocument( modelStore, spdxDocumentNamespace.toString(), copyManager );
         }

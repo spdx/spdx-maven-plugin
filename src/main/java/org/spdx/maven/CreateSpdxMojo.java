@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -382,24 +381,20 @@ public class CreateSpdxMojo extends AbstractMojo
     public void execute() throws MojoExecutionException
     {
         dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
-        if ( this.outputFormat == null ) 
+        OutputFormat outputFormatEnum = OutputFormat.JSON;
+        try
         {
-            outputFormat = spdxFile.getName().toLowerCase().endsWith( ".rdf.xml" ) ? RDF_OUTPUT_FORMAT : JSON_OUTPUT_FORMAT;
+            outputFormatEnum = OutputFormat.getOutputFormat(outputFormat, spdxFile);
         }
-        else
+        catch (final IllegalArgumentException iae)
         {
-            outputFormat = this.outputFormat.toUpperCase();
+            this.getLog().warn( "Invalid SPDX output format, defaulting to JSON format." );
         }
-        if ( !RDF_OUTPUT_FORMAT.equals( outputFormat ) && !JSON_OUTPUT_FORMAT.equals( outputFormat ))
-        {
-            this.getLog().warn( "Invalid SPDX output format: "+this.outputFormat+".  Defaulting to JSON format." );
-            this.outputFormat = JSON_OUTPUT_FORMAT;
-        }
-        this.artifactType = RDF_OUTPUT_FORMAT.equals( this.outputFormat ) ? SPDX_RDF_ARTIFACT_TYPE : SPDX_JSON_ARTIFACT_TYPE;
+        this.artifactType = outputFormatEnum.getArtifactType();
         if (spdxFile.getName().endsWith( ".spdx" )) {
             // add a default extension
-            String spdxFileType = Objects.equals(this.artifactType, SPDX_RDF_ARTIFACT_TYPE) ? ".rdf.xml" : ".json";
-            getLog().info( "spdx file type = "+spdxFileType );            
+            String spdxFileType = outputFormatEnum.getFileType();
+            getLog().info( "spdx file type = "+spdxFileType );
             spdxFile = new File( spdxFile.getAbsolutePath() + spdxFileType );
         }
         File outputDir = this.spdxFile.getParentFile();
@@ -429,7 +424,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             URI namespaceUri = new URI( spdxDocumentNamespace );
             builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, namespaceUri,
-                    this.matchLicensesOnCrossReferenceUrls, outputFormat );
+                    this.matchLicensesOnCrossReferenceUrls, outputFormatEnum );
         }
         catch ( SpdxBuilderException e )
         {
@@ -901,34 +896,11 @@ public class CreateSpdxMojo extends AbstractMojo
         retval.setDocumentAnnotations( this.documentAnnotations );
         retval.setPackageAnnotations( this.packageAnnotations );
         retval.setExternalRefs( this.externalReferences );
-        String packaging = mavenProject.getPackaging();
-        if ( "pom".equals( packaging ) )
+
+        final Packaging packaging = Packaging.valueOfPackaging( mavenProject.getPackaging() );
+        if (packaging != null)
         {
-            retval.setPrimaryPurpose( Purpose.INSTALL );
-        }
-        else if ( "ejb".equals( packaging ) )
-        {
-            retval.setPrimaryPurpose( Purpose.LIBRARY );
-        }
-        else if ( "jar".equals( packaging ) )
-        {
-            retval.setPrimaryPurpose( Purpose.LIBRARY );
-        }
-        else if ( "maven-plugin".equals( packaging ) )
-        {
-            retval.setPrimaryPurpose( Purpose.LIBRARY );
-        }
-        else if ( "war".equals( packaging ) )
-        {
-            retval.setPrimaryPurpose( Purpose.APPLICATION );
-        }
-        else if ( "ear".equals( packaging ) )
-        {
-            retval.setPrimaryPurpose( Purpose.APPLICATION );
-        }
-        else if ( "rar".equals( packaging ) )
-        {
-            retval.setPrimaryPurpose( Purpose.OTHER );
+            retval.setPrimaryPurpose(packaging.getPurpose());
         }
         else
         {
@@ -1052,37 +1024,13 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             for ( String checksumAlgorithm : checksumAlgorithms )
             {
-                switch ( checksumAlgorithm.toUpperCase() )
+                try
                 {
-                    case "SHA1":
-                        algorithms.add( ChecksumAlgorithm.SHA1 );
-                        break;
-                    case "SHA224":
-                        algorithms.add( ChecksumAlgorithm.SHA224 );
-                        break;
-                    case "SHA256":
-                        algorithms.add( ChecksumAlgorithm.SHA256 );
-                        break;
-                    case "SHA384":
-                        algorithms.add( ChecksumAlgorithm.SHA384 );
-                        break;
-                    case "SHA512":
-                        algorithms.add( ChecksumAlgorithm.SHA512 );
-                        break;
-                    case "MD2":
-                        algorithms.add( ChecksumAlgorithm.MD2 );
-                        break;
-                    case "MD4":
-                        algorithms.add( ChecksumAlgorithm.MD4 );
-                        break;
-                    case "MD5":
-                        algorithms.add( ChecksumAlgorithm.MD5 );
-                        break;
-                    case "MD6":
-                        algorithms.add( ChecksumAlgorithm.MD6 );
-                        break;
-                    default:
-                        this.getLog().warn( "Ignoring unsupported checksum algorithm: " + checksumAlgorithm );
+                    algorithms.add( ChecksumAlgorithm.valueOf( checksumAlgorithm.toUpperCase() ) );
+                }
+                catch (final IllegalArgumentException iae)
+                {
+                    this.getLog().warn( "Ignoring unsupported checksum algorithm: " + checksumAlgorithm );
                 }
             }
         }
