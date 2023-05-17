@@ -32,8 +32,8 @@ public enum Packaging
     EAR("ear", Purpose.APPLICATION),
     RAR("rar", Purpose.OTHER);
 
-    private String name;
-    private Purpose purpose;
+    private final String name;
+    private final Purpose purpose;
 
     private Packaging(final String name, final Purpose purpose)
     {

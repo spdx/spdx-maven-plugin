@@ -27,9 +27,9 @@ public enum OutputFormat
     RDF_XML("RDF/XML", "spdx.rdf.xml", ".rdf.xml"),
     JSON("JSON", "spdx.json", ".json");
 
-    private String value;
-    private String artifactType;
-    private String fileType;
+    private final String value;
+    private final String artifactType;
+    private final String fileType;
 
     private OutputFormat(final String value, final String artifactType, final String fileType)
     {
