@@ -55,7 +55,7 @@ public class MavenProjectHelperStub extends DefaultMavenProjectHelper
 
     public File getBaseDir()
     {
-        return new File( PlexusTestCase.getBasedir() + "/src/test/resources/unit/spdx-maven-plugin-test/" );
+        return PlexusTestCase.getTestFile( "/target/test-classes/unit/spdx-maven-plugin-test/" );
     }
 
 }

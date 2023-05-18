@@ -328,7 +328,7 @@ public class TestSpdxFileCollector
             assertEquals( SpdxFileNames[i], SpdxFiles[i].getName().get() );
             assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment().get() );
             assertEquals( DEFAULT_CONTRIBUTORS.length, SpdxFiles[i].getFileContributors().size() );
-            TestLicenseManager.assertArraysEqual( DEFAULT_CONTRIBUTORS, SpdxFiles[i].getFileContributors().toArray( new String[SpdxFiles[i].getFileContributors().size()] ) );
+            assertArrayEquals( DEFAULT_CONTRIBUTORS, TestUtils.toSortedArray( SpdxFiles[i].getFileContributors() ) );
             assertEquals( DEFAULT_COPYRIGHT, SpdxFiles[i].getCopyrightText() );
             if ( SpdxFileNames[i].endsWith( FILE_NAME_WITH_ID ) )
             {
@@ -451,7 +451,7 @@ public class TestSpdxFileCollector
                 assertEquals( file2Comment, SpdxFiles[1].getComment().get() );
                 assertEquals( file2License.toString(), SpdxFiles[1].getLicenseConcluded().toString() );
                 assertEquals( file2Contributors.length, SpdxFiles[1].getFileContributors().size() );
-                TestLicenseManager.assertArraysEqual( file2Contributors, SpdxFiles[1].getFileContributors().toArray( new String[SpdxFiles[1].getFileContributors().size()] ) );
+                assertArrayEquals( file2Contributors, TestUtils.toSortedArray( SpdxFiles[1].getFileContributors() ) );
                 assertEquals( file2Copyright, SpdxFiles[1].getCopyrightText() );
                 assertEquals( file2DeclaredLicense.toString(), SpdxFiles[1].getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[SpdxFiles[1].getLicenseInfoFromFiles().size()] )[0].toString() );
                 assertEquals( file2LicenseComment, SpdxFiles[1].getLicenseComments().get() );
@@ -462,7 +462,7 @@ public class TestSpdxFileCollector
                 assertEquals( file3Comment, SpdxFiles[i].getComment().get() );
                 assertEquals( file3License.toString(), SpdxFiles[i].getLicenseConcluded().toString() );
                 assertEquals( file3Contributors.length, SpdxFiles[i].getFileContributors().size() );
-                TestLicenseManager.assertArraysEqual( file3Contributors, SpdxFiles[i].getFileContributors().toArray( new String[SpdxFiles[i].getFileContributors().size()] ) );
+                assertArrayEquals( file3Contributors, TestUtils.toSortedArray( SpdxFiles[i].getFileContributors() ) );
                 assertEquals( file3Copyright, SpdxFiles[i].getCopyrightText() );
                 assertEquals( file3DeclaredLicense.toString(), SpdxFiles[i].getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[SpdxFiles[i].getLicenseInfoFromFiles().size()] )[0].toString() );
                 assertEquals( file3LicenseComment, SpdxFiles[i].getLicenseComments().get() );
@@ -473,7 +473,7 @@ public class TestSpdxFileCollector
                 assertEquals( DEFAULT_COMMENT, SpdxFiles[i].getComment().get() );
                 assertEquals( DEFAULT_CONCLUDED_LICENSE, SpdxFiles[i].getLicenseConcluded().toString() );
                 assertEquals( DEFAULT_CONTRIBUTORS.length, SpdxFiles[i].getFileContributors().size() );
-                TestLicenseManager.assertArraysEqual( DEFAULT_CONTRIBUTORS, SpdxFiles[i].getFileContributors().toArray( new String[SpdxFiles[i].getFileContributors().size()] ) );
+                assertArrayEquals( DEFAULT_CONTRIBUTORS, TestUtils.toSortedArray( SpdxFiles[i].getFileContributors() ) );
                 assertEquals( DEFAULT_COPYRIGHT, SpdxFiles[i].getCopyrightText() );
                 assertEquals( DEFAULT_DECLARED_LICENSE, SpdxFiles[i].getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[SpdxFiles[i].getLicenseInfoFromFiles().size()] )[0].toString() );
                 assertEquals( DEFAULT_LICENSE_COMMENT, SpdxFiles[i].getLicenseComments().get() );

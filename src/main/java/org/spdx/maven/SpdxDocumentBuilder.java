@@ -94,14 +94,13 @@ public class SpdxDocumentBuilder
      * @throws LicenseMapperException
      */
     public SpdxDocumentBuilder( Log log, File spdxFile, URI spdxDocumentNamespace, 
-                                boolean useStdLicenseSourceUrls, String outputFormat ) throws SpdxBuilderException, LicenseMapperException
+                                boolean useStdLicenseSourceUrls, OutputFormat outputFormat ) throws SpdxBuilderException, LicenseMapperException
     {
         this.log = log;
         this.spdxFile = spdxFile;
 
         if ( spdxDocumentNamespace == null )
         {
-            this.getLog().error( "spdxDocumentNamespace must be specified as a configuration parameter" );
             throw ( new SpdxBuilderException( "Missing spdxDocumentNamespace" ) );
         }
 
@@ -113,8 +112,6 @@ public class SpdxDocumentBuilder
             {
                 if ( !parentDir.mkdirs() )
                 {
-                    this.getLog().error(
-                            "Unable to create directory containing the SPDX file: " + parentDir.getPath() );
                     throw ( new SpdxBuilderException( "Unable to create directories for SPDX file" ) );
                 }
             }
@@ -123,20 +120,16 @@ public class SpdxDocumentBuilder
             {
                 if ( !spdxFile.createNewFile() )
                 {
-                    this.getLog().error( "Unable to create the SPDX file: " + spdxFile.getPath() );
                     throw ( new SpdxBuilderException( "Unable to create the SPDX file" ) );
                 }
             }
             catch ( IOException e )
             {
-                this.getLog().error( "IO error creating the SPDX file " + spdxFile.getPath() + ":" + e.getMessage(),
-                        e );
-                throw ( new SpdxBuilderException( "IO error creating the SPDX file" ) );
+                throw ( new SpdxBuilderException( "IO error creating the SPDX file", e ) );
             }
         }
         if ( !spdxFile.canWrite() )
         {
-            this.getLog().error( "Can not write to SPDX file " + spdxFile.getPath() );
             throw ( new SpdxBuilderException(
                     "Unable to write to SPDX file - check permissions: " + spdxFile.getPath() ) );
         }
@@ -144,22 +137,13 @@ public class SpdxDocumentBuilder
         // create the SPDX document
         try
         {
-            if (outputFormat.equals( CreateSpdxMojo.RDF_OUTPUT_FORMAT )) 
-            {
-                modelStore = new RdfStore();
-            }
-            else 
-            {
-                // use the default JSON
-                modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
-            }
+            modelStore = outputFormat == OutputFormat.RDF_XML ? new RdfStore() :  new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
             copyManager = new ModelCopyManager();
             spdxDoc = SpdxModelFactory.createSpdxDocument( modelStore, spdxDocumentNamespace.toString(), copyManager );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            this.getLog().error( "Error creating SPDX document", e );
-            throw ( new SpdxBuilderException( "Error creating SPDX document: " + e.getMessage() ) );
+            throw ( new SpdxBuilderException( "Error creating SPDX document", e ) );
         }
 
         // process the licenses
@@ -185,8 +169,7 @@ public class SpdxDocumentBuilder
                 }
                 catch ( LicenseManagerException e )
                 {
-                    this.getLog().error( "Error adding license " + e.getMessage(), e );
-                    throw ( new SpdxBuilderException( "Error adding non standard license: " + e.getMessage(), e ) );
+                    throw ( new SpdxBuilderException( "Error adding non standard license", e ) );
                 }
             }
         }
@@ -232,11 +215,9 @@ public class SpdxDocumentBuilder
                                         Set<ChecksumAlgorithm> algorithms,
                                         String spdxDocumentNamespace ) throws SpdxBuilderException
     {
-        FileOutputStream spdxOut = null;
-        try
+        try (FileOutputStream spdxOut = new FileOutputStream( spdxFile ))
         {
             this.log.debug( "Starting buid document from files" );
-            spdxOut = new FileOutputStream( spdxFile );
             fillSpdxDocumentInformation( projectInformation );
             collectSpdxFileInformation( includedSourceDirectories, includedTestDirectories, includedResourceDirectories,
                     baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation, algorithms );
@@ -246,32 +227,15 @@ public class SpdxDocumentBuilder
         }
         catch ( FileNotFoundException e )
         {
-            this.getLog().error( "Error saving SPDX data to file", e );
-            throw ( new SpdxBuilderException( "Error saving SPDX data to file: " + e.getMessage() ) );
+            throw ( new SpdxBuilderException( "Error saving SPDX data to file", e ) );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            this.getLog().error( "Error collecting SPDX file data", e );
-            throw ( new SpdxBuilderException( "Error collecting SPDX file data: " + e.getMessage() ) );
+            throw ( new SpdxBuilderException( "Error collecting SPDX file data", e ) );
         }
         catch ( IOException e )
         {
-            this.getLog().error( "I/O Error saving SPDX data to file", e );
-            throw ( new SpdxBuilderException( "I/O Error saving SPDX data to file: " + e.getMessage() ) );
-        }
-        finally
-        {
-            if ( spdxOut != null )
-            {
-                try
-                {
-                    spdxOut.close();
-                }
-                catch ( IOException e )
-                {
-                    this.getLog().warn( "Error closing SPDX output file", e );
-                }
-            }
+            throw ( new SpdxBuilderException( "I/O Error saving SPDX data to file", e ) );
         }
     }
 
@@ -295,7 +259,6 @@ public class SpdxDocumentBuilder
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    log.error( "Unable to set package dependencies: " + e.getMessage() );
                     throw new SpdxBuilderException( "Unable to set package dependencies", e );
                 }
             }
@@ -313,7 +276,6 @@ public class SpdxDocumentBuilder
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    log.error( "Unable to dependency to package: " + e.getMessage() );
                     throw new SpdxBuilderException( "Unable to set dependency to package", e );
                 }
             }
@@ -355,9 +317,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException | MojoExecutionException e )
         {
-            this.getLog().error( "SPDX error filling SPDX information", e );
-            throw ( new SpdxBuilderException( "Error adding package information to SPDX document: " + e.getMessage(),
-                    e ) );
+            throw ( new SpdxBuilderException( "Error adding package information to SPDX document", e ) );
         }
     }
 
@@ -402,9 +362,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            this.getLog().error( "Error creating null package verification code", e );
-            throw ( new SpdxBuilderException(
-                    "Error creating null package verification code: " + e.getMessage(), e ) );
+            throw ( new SpdxBuilderException( "Error creating null package verification code", e ) );
         }
         SpdxPackage pkg;
         try
@@ -419,9 +377,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            this.getLog().error( "Error creating initial package", e );
-            throw ( new SpdxBuilderException(
-                    "Error creating initial package: " + e.getMessage(), e ) );
+            throw ( new SpdxBuilderException( "Error creating initial package", e ) );
         }
         // Annotations
         if ( projectInformation.getPackageAnnotations() != null && projectInformation.getPackageAnnotations().length > 0 )
@@ -432,9 +388,7 @@ public class SpdxDocumentBuilder
             }
             catch ( InvalidSPDXAnalysisException | MojoExecutionException e )
             {
-                this.getLog().error( "Invalid package annotation", e );
-                throw ( new SpdxBuilderException(
-                        "Error adding package annotations to SPDX document: " + e.getMessage(), e ) );
+                throw ( new SpdxBuilderException( "Error adding package annotations to SPDX document", e ) );
             }
         }
         try
@@ -500,9 +454,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            this.getLog().error( "Error adding package properties", e );
-            throw ( new SpdxBuilderException(
-                    "Error adding package properties: " + e.getMessage(), e ) );
+            throw ( new SpdxBuilderException( "Error adding package properties", e ) );
         }
         
         // sha1 checksum
@@ -514,10 +466,8 @@ public class SpdxDocumentBuilder
             }
             catch ( InvalidSPDXAnalysisException e )
             {
-                this.getLog().error( "Invalid checksum value for package", e );
                 throw ( new SpdxBuilderException(
-                        "Error adding package information to SPDX document - Invalid checksum provided: " + e.getMessage(),
-                        e ) );
+                        "Error adding package information to SPDX document - Invalid checksum provided", e ) );
             }
         }
         // external references
@@ -534,10 +484,8 @@ public class SpdxDocumentBuilder
                 }
                 catch ( MojoExecutionException | InvalidSPDXAnalysisException e )
                 {
-                    this.getLog().error( "Invalid external refs", e );
                     throw ( new SpdxBuilderException(
-                            "Error adding package information to SPDX document - Invalid external refs provided: " + e.getMessage(),
-                            e ) );
+                            "Error adding package information to SPDX document - Invalid external refs provided", e ) );
                 }
             }
         }
@@ -607,8 +555,7 @@ public class SpdxDocumentBuilder
         }
         catch ( SpdxCollectionException e )
         {
-            this.getLog().error( "SPDX error collecting file information", e );
-            throw ( new SpdxBuilderException( "Error collecting SPDX file information: " + e.getMessage() ) );
+            throw ( new SpdxBuilderException( "Error collecting SPDX file information", e ) );
         }
         projectPackage.getFiles().addAll( fileCollector.getFiles() );
         projectPackage.getLicenseInfoFromFiles().addAll( fileCollector.getLicenseInfoFromFiles() );
@@ -618,13 +565,11 @@ public class SpdxDocumentBuilder
         }
         catch ( NoSuchAlgorithmException e )
         {
-            this.getLog().error( "Error calculating verification code", e );
-            throw ( new SpdxBuilderException( "Unable to calculate verification code" ) );
+            throw ( new SpdxBuilderException( "Unable to calculate verification code", e ) );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            this.getLog().error( "SPDX Error updating verification code", e );
-            throw ( new SpdxBuilderException( "Unable to update verification code" ) );
+            throw ( new SpdxBuilderException( "Unable to update verification code", e ) );
         }
     }
 

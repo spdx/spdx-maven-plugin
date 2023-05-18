@@ -124,7 +124,7 @@ public class LicenseManager
                 licenseId = "[NullLicenseId]";
             }
             throw ( new LicenseManagerException(
-                    "Unable to add non listed license " + licenseId + ": " + e.getMessage(), e ) );
+                    "Unable to add non listed license " + licenseId, e ) );
         }
         // add to URL mapping
         String[] urls = license.getCrossReference();
@@ -183,7 +183,6 @@ public class LicenseManager
             }
         } catch ( InvalidSPDXAnalysisException e )
         {
-            getLog().error( "Error converting Maven license to SPDX license", e );
             throw new LicenseManagerException( "Error converting Maven license to SPDX license", e );
         }
     }
@@ -199,7 +198,6 @@ public class LicenseManager
     {
         if ( mavenLicense.getUrl() == null )
         {
-            getLog().error( "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" );
             throw ( new LicenseManagerException(
                     "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" ) );
         }
@@ -220,7 +218,6 @@ public class LicenseManager
             }
             catch ( InvalidLicenseStringException e )
             {
-                getLog().error( "Can not map maven license " + mavenLicense.getName() + "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() );
                 throw ( new LicenseManagerException(
                         "Can not map maven license " + mavenLicense.getName() + "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() ) );
             }
@@ -247,7 +244,6 @@ public class LicenseManager
         }
         else
         {
-            getLog().error( "Can not create a Maven license from this SPDX license type.  " + "Must be an ExtractedLicenseInfo or an SpdxListedLicense " );
             throw ( new LicenseManagerException(
                     "Can not create a Maven license from this SPDX license type.  " + "Must be an ExtractedLicenseInfo or an SpdxListedLicense " ) );
         }
@@ -287,7 +283,6 @@ public class LicenseManager
             return retval; 
         } catch ( InvalidSPDXAnalysisException e )
         {
-            getLog().error( "Error converting SPDX Listed License to Maven license", e );
             throw new LicenseManagerException( "Error converting SPDX Listed License to Maven license", e );
         }
     }
@@ -327,7 +322,6 @@ public class LicenseManager
         } 
         catch ( InvalidSPDXAnalysisException e )
         {
-            getLog().error( "Error converting SPDX non-standard license to Maven license", e );
             throw new LicenseManagerException( "Error converting SPDX non-standard license to Maven license", e );
         }
     }

@@ -30,7 +30,7 @@ public class TestSpdxSourceFileParser
     private static final String MULTIPLE_COMPLEX_IDS = COMPLEX + "\nNow is the time\n" + "SPDX-License-Identifier:" + APACHE_LICENSE_ID + "\nFor all good men" + "\n  SPDX-License-Identifier:   " + MIT_LICENSE_ID + "\nto come to the aid of their country.\n" + COMPLEX_MULTI + "\n" + CONJUNCTIVE + "\n\n\nSPDX-License-Identifier:" + LICENSE_REF_ID;
     private static final String MISSMATCHED_PARENS = "  SPDX-License-Identifier: (((" + MIT_LICENSE_ID + " OR \n" + APACHE_LICENSE_ID + ") OR \n" + APACHE_LICENSE_ID + ")";
     private static final String INVALID_EXPRESSION = "  SPDX-License-Identifier:   " + APACHE_LICENSE_ID + " NOTVALID " + MIT_LICENSE_ID + " AND " + LICENSE_REF_ID;
-    private static final String TEST_CLASS_FILE_NAME = "src/test/resources/unit/ClassWithManySpdxIDs.java";
+    private static final String TEST_CLASS_FILE_NAME = "target/test-classes/unit/ClassWithManySpdxIDs.java";
 
     @Before
     public void setUp() throws Exception

@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,26 +90,18 @@ public class MavenToSpdxLicenseMapper
             // use the cached version
             is = LicenseManager.class.getClassLoader().getResourceAsStream( LISTED_LICENSE_JSON_PATH );
         }
-        BufferedReader reader = new BufferedReader( new InputStreamReader( is ) );
-        try
+
+        try (BufferedReader reader = new BufferedReader( new InputStreamReader( is, Charset.defaultCharset() ) ))
         {
             initializeUrlMap( reader, log );
         }
-        finally
+        catch ( IOException e )
         {
-            try
+            if ( log != null )
             {
-                reader.close();
-            }
-            catch ( IOException e )
-            {
-                if ( log != null )
-                {
-                    log.warn( "IO error closing listed license reader: " + e.getMessage() );
-                }
+                log.warn( "IO error closing listed license reader: " + e.getMessage() );
             }
         }
-
     }
 
     public static MavenToSpdxLicenseMapper getInstance( Log log ) throws LicenseMapperException
@@ -151,11 +144,7 @@ public class MavenToSpdxLicenseMapper
         }
         catch ( IOException e1 )
         {
-            if ( log != null )
-            {
-                log.error( "I/O error parsing listed licenses JSON file: " + e1.getMessage() );
-            }
-            throw ( new LicenseMapperException( "I/O Error parsing listed licenses" ) );
+            throw ( new LicenseMapperException( "I/O Error parsing listed licenses", e1 ) );
         }
         
         urlStringToSpdxLicenseId = new HashMap<>();

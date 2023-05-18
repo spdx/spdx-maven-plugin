@@ -78,6 +78,6 @@ public class CreateSpdxMavenProjectStub extends MavenProjectStub
 
     public File getBasedir()
     {
-        return new File( super.getBasedir() + "/src/test/resources/unit/spdx-maven-plugin-test/" );
+        return getTestFile( "/target/test-classes/unit/spdx-maven-plugin-test/" );
     }
 }
