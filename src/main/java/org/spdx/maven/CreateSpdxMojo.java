@@ -87,43 +87,24 @@ public class CreateSpdxMojo extends AbstractMojo
     public static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
 
     public static final String SPDX_RDF_ARTIFACT_TYPE = "spdx.rdf.xml";
-    
+
     public static final String SPDX_JSON_ARTIFACT_TYPE = "spdx.json";
-    
+
     public static final String JSON_OUTPUT_FORMAT = "JSON";
-    
+
     public static final String RDF_OUTPUT_FORMAT = "RDF/XML";
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
     @Parameter( defaultValue = "${project}", readonly = true )
     MavenProject mavenProject;
 
     @Component
     private MavenProjectHelper projectHelper;
-    
-    @Component
-    private RepositorySystem repositorySystem;
-    
+
     @Component
     private ProjectBuilder mavenProjectBuilder;
 
     @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
-
-    /**
-     * @requiresDependencyResolution test
-     */
-    /**
-     * @requiresDependencyResolution compile
-     */
-    /**
-     * @requiresDependencyResolution runtime
-     */
-    private Set<Artifact> dependencies;
 
     // Parameters for the plugin
     /**
@@ -351,7 +332,7 @@ public class CreateSpdxMojo extends AbstractMojo
 
     @Parameter( required = false )
     private List<ExternalReference> externalReferences;
-    
+
     /**
      * Output file format for the SPDX file.  One of:
      * - JSON - JSON SPDX format
@@ -359,7 +340,7 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     @Parameter( required = false )
     private String outputFormat;
-    
+
     /**
      * If true, external document references will be created for any dependencies which
      * contain SPDX documents.  If false, the dependent package information will be copied
@@ -367,20 +348,19 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     @Parameter( defaultValue = "true" )
     private boolean createExternalRefs;
-    
+
     /**
      * If true, all transitive dependencies will be included in the SPDX document.  If false,
      * only direct dependencies will be included.
      */
     @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
-    
-    private String artifactType;
 
     @SuppressWarnings( "deprecation" )
     public void execute() throws MojoExecutionException
     {
-        dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
+        Set<Artifact> dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
+
         OutputFormat outputFormatEnum = OutputFormat.JSON;
         try
         {
@@ -390,7 +370,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             this.getLog().warn( "Invalid SPDX output format, defaulting to JSON format." );
         }
-        this.artifactType = outputFormatEnum.getArtifactType();
+        String artifactType = outputFormatEnum.getArtifactType();
         if (spdxFile.getName().endsWith( ".spdx" )) {
             // add a default extension
             String spdxFileType = outputFormatEnum.getFileType();
@@ -400,8 +380,8 @@ public class CreateSpdxMojo extends AbstractMojo
         File outputDir = this.spdxFile.getParentFile();
         if ( outputDir == null )
         {
-            throw ( new MojoExecutionException(
-                    "Invalid path for SPDX output file.  " + "Specify a configuration parameter spdxFile with a valid directory path to resolve." ) );
+            throw new MojoExecutionException(
+                    "Invalid path for SPDX output file.  " + "Specify a configuration parameter spdxFile with a valid directory path to resolve." );
         }
         outputDir.mkdirs();
 
@@ -412,8 +392,8 @@ public class CreateSpdxMojo extends AbstractMojo
         if ( defaultLicenseInformationInFile == null ) {
             defaultLicenseInformationInFile = defaultFileConcludedLicense;
         }
-        
-       this.getLog().info( "Creating SPDX File " + spdxFile.getPath() );
+
+        this.getLog().info( "Creating SPDX File " + spdxFile.getPath() );
 
         SpdxDocumentBuilder builder;
         try
@@ -428,18 +408,15 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch ( SpdxBuilderException e )
         {
-            throw ( new MojoExecutionException( "Error creating SPDX Document Builder", e ) );
+            throw new MojoExecutionException( "Error creating SPDX Document Builder", e );
         }
         catch ( LicenseMapperException e )
         {
-            throw ( new MojoExecutionException(
-                    "License mapping error creating SPDX Document Builder", e ) );
-
+            throw new MojoExecutionException( "License mapping error creating SPDX Document Builder", e );
         }
         catch ( URISyntaxException e )
         {
-            throw ( new MojoExecutionException(
-                    "Invalid SPDX document namespace - not a valid URI: " + spdxDocumentNamespace, e ) );
+            throw new MojoExecutionException( "Invalid SPDX document namespace - not a valid URI: " + spdxDocumentNamespace, e );
         }
         if ( nonStandardLicenses != null )
         {
@@ -450,7 +427,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             catch ( SpdxBuilderException e )
             {
-                throw ( new MojoExecutionException( "Error adding non standard licenses", e ) );
+                throw new MojoExecutionException( "Error adding non standard licenses", e );
             }
         }
         SpdxDocument spdxDoc = builder.getSpdxDoc();
@@ -461,38 +438,40 @@ public class CreateSpdxMojo extends AbstractMojo
         SpdxProjectInformation projectInformation;
         try
         {
-            projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager(),
-                    spdxDoc );
+            projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager(), spdxDoc );
         }
         catch ( InvalidSPDXAnalysisException e2 )
         {
-            throw ( new MojoExecutionException( "Error getting project information from parameters", e2 ) );
+            throw new MojoExecutionException( "Error getting project information from parameters", e2 );
         }
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters( spdxDoc );
-        HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters(
-                defaultFileInformation, spdxDoc );
+        HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation, spdxDoc );
         SpdxDependencyInformation dependencyInformation = null;
         try
         {
-            dependencyInformation = getSpdxDependencyInformation( this.dependencies, builder.getLicenseManager(), spdxDoc );
+            dependencyInformation = getSpdxDependencyInformation( dependencies, builder.getLicenseManager(), spdxDoc );
         }
         catch ( LicenseMapperException e1 )
         {
-            throw ( new MojoExecutionException( "Error mapping licenses for dependencies", e1 ) );
+            throw new MojoExecutionException( "Error mapping licenses for dependencies", e1 );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new MojoExecutionException( "SPDX analysis error processing dependencies", e ) );
+            throw new MojoExecutionException( "SPDX analysis error processing dependencies", e );
         }
-        // The following is for debugging purposes
-        logIncludedDirectories( includedSourceDirectories );
-        logIncludedDirectories( includedTestDirectories );
-        logIncludedDirectories( includedResourceDirectories );
-        logNonStandardLicenses( this.nonStandardLicenses );
-        projectInformation.logInfo( this.getLog(), spdxDoc );
-        defaultFileInformation.logInfo( this.getLog() );
-        logFileSpecificInfo( pathSpecificInformation );
-        logDependencies( this.dependencies );
+
+        if ( this.getLog().isDebugEnabled() )
+        {
+            logIncludedDirectories( includedSourceDirectories );
+            logIncludedDirectories( includedTestDirectories );
+            logIncludedDirectories( includedResourceDirectories );
+            logNonStandardLicenses( this.nonStandardLicenses );
+            projectInformation.logInfo( this.getLog(), spdxDoc );
+            defaultFileInformation.logInfo( this.getLog() );
+            logFileSpecificInfo( pathSpecificInformation );
+            logDependencies( dependencies );
+        }
+
         try
         {
             builder.buildDocumentFromFiles( includedSourceDirectories, includedTestDirectories,
@@ -502,24 +481,16 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch ( SpdxBuilderException e )
         {
-            throw ( new MojoExecutionException( "Error building SPDX document from project files", e ) );
+            throw new MojoExecutionException( "Error building SPDX document from project files", e );
         }
-        getLog().debug( "Project Helper: " + projectHelper );
-        if ( projectHelper != null )
-        {
-            projectHelper.attachArtifact( mavenProject, this.artifactType, spdxFile );
-        }
-        else
-        {
-            this.getLog().warn( "Unable to attach SPDX artifact file - no ProjectHelper exists" );
-        }
+
+        projectHelper.attachArtifact( mavenProject, artifactType, spdxFile );
+
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 )
         {
             // report error
-            StringBuilder sb = new StringBuilder( "The following errors were found in the SPDX file:\n " );
-            sb.append( String.join( "\n ", spdxErrors ) );
-            this.getLog().warn( sb.toString() );
+            this.getLog().warn( "The following errors were found in the SPDX file:\n " + String.join( "\n ", spdxErrors ) );
         }
     }
 
@@ -610,9 +581,8 @@ public class CreateSpdxMojo extends AbstractMojo
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    throw ( new MojoExecutionException(
-                            "Invalid license string used in the path specific SPDX information for file " + spdxInfo.getPath(),
-                            e ) );
+                    throw new MojoExecutionException(
+                            "Invalid license string used in the path specific SPDX information for file " + spdxInfo.getPath(), e );
                 }
                 if ( retval.containsKey( spdxInfo.getPath() ) )
                 {
@@ -697,7 +667,7 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch ( InvalidSPDXAnalysisException e1 )
         {
-            throw ( new MojoExecutionException( "Error getting default file information", e1 ) );
+            throw new MojoExecutionException( "Error getting default file information", e1 );
         }
         retval.setComment( defaultFileComment );
         AnyLicenseInfo concludedLicense = null;
@@ -708,7 +678,7 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch ( InvalidLicenseStringException e )
         {
-            throw ( new MojoExecutionException( "Invalid default file concluded license", e ) );
+            throw new MojoExecutionException( "Invalid default file concluded license", e );
         }
         retval.setConcludedLicense( concludedLicense );
         retval.setContributors( defaultFileContributors );
@@ -721,7 +691,7 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch ( InvalidLicenseStringException e )
         {
-            throw ( new MojoExecutionException( "Invalid default file declared license", e ) );
+            throw new MojoExecutionException( "Invalid default file declared license", e );
         }
         retval.setDeclaredLicense( declaredLicense );
         retval.setLicenseComment( defaultFileLicenseComment );
@@ -757,7 +727,7 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch ( InvalidSPDXAnalysisException e1 )
         {
-            throw ( new MojoExecutionException( "Unable to get SPDX project information: " + e1.getMessage() ) );
+            throw new MojoExecutionException( "Unable to get SPDX project information: " + e1.getMessage() );
         }
         if ( this.documentComment != null )
         {
@@ -788,7 +758,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             catch ( InvalidLicenseStringException e )
             {
-                throw ( new MojoExecutionException( "Invalid declared license: " + e.getMessage() ) );
+                throw new MojoExecutionException( "Invalid declared license: " + e.getMessage() );
             }
         }
         AnyLicenseInfo concludedLicense = null;
@@ -807,7 +777,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             catch ( InvalidLicenseStringException e )
             {
-                throw ( new MojoExecutionException( "Invalid concluded license: " + e.getMessage() ) );
+                throw new MojoExecutionException( "Invalid concluded license: " + e.getMessage() );
             }
         }
         retval.setConcludedLicense( concludedLicense );
@@ -898,17 +868,9 @@ public class CreateSpdxMojo extends AbstractMojo
         retval.setExternalRefs( this.externalReferences );
 
         final Packaging packaging = Packaging.valueOfPackaging( mavenProject.getPackaging() );
-        if (packaging != null)
-        {
-            retval.setPrimaryPurpose(packaging.getPurpose());
-        }
-        else
-        {
-            retval.setPrimaryPurpose( Purpose.LIBRARY );
-        }
+        retval.setPrimaryPurpose(packaging != null ? packaging.getPurpose() : Purpose.LIBRARY);
         return retval;
     }
-
 
     /**
      * Get the default project name if no project name is specified in the POM
