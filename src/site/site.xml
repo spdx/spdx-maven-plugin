@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd">
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.11.1</version>
+  </skin>
+
+  <edit>${project.scm.url}</edit>
+
+  <publishDate position="right" />
+  <version position="right" />
+
+  <body>
+
+    <breadcrumbs>
+      <item name="SPDX" href="https://spdx.dev/" />
+      <item name="GH"  href="https://github.com/spdx/" />
+      <item name="SPDX Maven Plugin"  href="https://github.com/spdx/spdx-maven-plugin/" />
+    </breadcrumbs>
+
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="Goals" href="plugin-info.html">
+        <item name="spdx:createSPDX" href="createSPDX-mojo.html"/>
+        <item name="spdx:help" href="help-mojo.html"/>
+      </item>
+    </menu>
+
+    <menu ref="reports" />
+  </body>
+</project>
