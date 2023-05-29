@@ -9,11 +9,11 @@
 
   <name>spdx-maven-plugin Maven Plugin</name>
 
-  <url>https://github.com/goneall/spdx-maven-plugin</url>
+  <url>https://github.com/spdx/spdx-maven-plugin</url>
   <description>Plugin for supporting SPDX in a Maven build.  See README.md</description>
   <organization>
-  	<name>SPDX</name>
-  	<url>http://spdx.org</url>
+    <name>SPDX</name>
+    <url>http://spdx.dev</url>
   </organization>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,26 +23,26 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>spdx</sonar.organization>
     <sonar.projectKey>spdx-maven-plugin</sonar.projectKey>
-<dependency-check-maven.version>8.0.1</dependency-check-maven.version>    
+    <dependency-check-maven.version>8.0.1</dependency-check-maven.version>
   </properties>
   <licenses>
-      <license>
-          <name>The Apache Software License, Version 2.0</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-          <distribution>repo</distribution>
-      </license>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
   </licenses>
   <scm>
-	<url>https://github.com/spdx/spdx-maven-plugin</url>
-	<connection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</connection>
-	<developerConnection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
+  <url>https://github.com/spdx/spdx-maven-plugin</url>
+  <connection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</connection>
+  <developerConnection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
   </scm>
   <distributionManagement>
-		<repository>
-        	<id>ossrh</id>
-			<name>spdx-maven-plugin</name>
-        	<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    	</repository>
+    <repository>
+      <id>ossrh</id>
+      <name>spdx-maven-plugin</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
   </distributionManagement>
   <developers>
      <developer>
@@ -58,6 +58,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>${maven.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -65,21 +66,40 @@
       <version>3.6.4</version>
       <scope>provided</scope>
     </dependency>
-	  <dependency>
-	  	<groupId>org.spdx</groupId>
-	  	<artifactId>java-spdx-library</artifactId>
-	  	<version>1.1.5</version>
-	  </dependency>
-	  <dependency>
-	  	<groupId>org.spdx</groupId>
-	  	<artifactId>spdx-rdf-store</artifactId>
-	  	<version>1.1.5</version>
-	  </dependency>
-	  <dependency>
-	  	<groupId>org.spdx</groupId>
-	  	<artifactId>spdx-jackson-store</artifactId>
-	  	<version>1.1.5</version>
-	  </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>file-management</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.spdx</groupId>
+      <artifactId>java-spdx-library</artifactId>
+      <version>1.1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.spdx</groupId>
+      <artifactId>spdx-rdf-store</artifactId>
+      <version>1.1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.spdx</groupId>
+      <artifactId>spdx-jackson-store</artifactId>
+      <version>1.1.5</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -87,40 +107,16 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.apache.maven</groupId>
-    	<artifactId>maven-core</artifactId>
-    	<version>${maven.version}</version>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>${maven.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.apache.maven.plugin-testing</groupId>
-    	<artifactId>maven-plugin-testing-harness</artifactId>
-    	<version>3.3.0</version>
-    	<scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.apache.maven.shared</groupId>
-    	<artifactId>file-management</artifactId>
-    	<version>3.1.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.apache.maven</groupId>
-    	<artifactId>maven-artifact</artifactId>
-    	<version>${maven.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-compat</artifactId>
-        <version>${maven.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.apache.maven</groupId>
-    	<artifactId>maven-model</artifactId>
-    	<version>${maven.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.apache.maven</groupId>
-    	<artifactId>maven-repository-metadata</artifactId>
-    	<version>${maven.version}</version>
+      <groupId>org.apache.maven.plugin-testing</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+      <version>3.3.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -165,17 +161,17 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>		
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-compiler-plugin</artifactId>
-		<version>3.6.1</version>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
       </plugin>
-	  <plugin>
-		<groupId>org.owasp</groupId>
-		<artifactId>dependency-check-maven</artifactId>
-		<version>${dependency-check-maven.version}</version>
-	  </plugin>
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${dependency-check-maven.version}</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
@@ -258,29 +254,29 @@
       </build>
     </profile>
     <profile>
-    	<id>gpg-signing</id>
-			<build>
-				<plugins>
-					<plugin>
-		      			<groupId>org.apache.maven.plugins</groupId>
-		      			<artifactId>maven-gpg-plugin</artifactId>
-		      			<version>1.6</version>
-		      			<executions>
-		        			<execution>
-		          				<id>sign-artifacts</id>
-		          				<phase>verify</phase>
-		          				<goals>
-		            				<goal>sign</goal>
-		          				</goals>
-		          				<configuration>
-		              				<keyname>${gpg.keyname}</keyname>
-		              				<passphraseServerId>${gpg.keyname}</passphraseServerId>
-		            			</configuration>
-		        			</execution>
-		      			</executions>
-	    			</plugin>
-				</plugins>
-			</build>
+      <id>gpg-signing</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <keyname>${gpg.keyname}</keyname>
+                  <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
