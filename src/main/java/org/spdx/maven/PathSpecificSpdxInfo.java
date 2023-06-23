@@ -17,8 +17,6 @@ package org.spdx.maven;
 
 import java.util.List;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
@@ -27,7 +25,7 @@ import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.maven.utils.SpdxDefaultFileInformation;
 
 /**
- * Simple class to hold SPDX data for a file or directory.  Utilizes Mojo parameters for the values.  The only required
+ * Simple class to hold SPDX data for a file or directory.  The only required
  * parameter is the File.
  *
  * @author Gary O'Neall
@@ -37,13 +35,11 @@ public class PathSpecificSpdxInfo
     /**
      * File or directory for which the specific file information is referred to
      */
-    @Parameter( required = true )
     String directoryOrFile;
     /**
      * SPDX file comment field. The file comment field provides a place for the SPDX file creator to record any general
      * comments about the file.
      */
-    @Parameter
     private String fileComment;
 
     /**
@@ -51,7 +47,6 @@ public class PathSpecificSpdxInfo
      * Contributors could include names of copyright holders and/or authors who may not be copyright holders, yet
      * contributed to the file content.
      */
-    @Parameter
     private String[] fileContributors;
 
     /**
@@ -62,28 +57,24 @@ public class PathSpecificSpdxInfo
      * NOASSERTION, if the SPDX creator has not examined the contents of the actual file or if the SPDX creator has
      * intentionally provided no information(no meaning should be implied from the absence of an assertion).
      */
-    @Parameter
     private String fileCopyright;
 
     /**
      * File license comment. The licenseComments property allows the preparer of the SPDX document to describe why the
      * licensing in spdx:licenseConcluded was chosen.
      */
-    @Parameter
     private String fileLicenseComment;
 
     /**
      * File notice text. This field provides a place for the SPDX file creator to record potential legal notices found
      * in the file. This may or may not include copyright statements.
      */
-    @Parameter
     private String fileNotice;
 
     /**
      * This field contains the license the SPDX file creator has concluded as governing the file or alternative values
      * if the governing license cannot be determined. If no concluded license is specified "NOASSERTION" will be used.
      */
-    @Parameter
     private String fileConcludedLicense;
 
     /**
@@ -100,10 +91,8 @@ public class PathSpecificSpdxInfo
      * in brackets. Similarly when multiple licenses need to be applied (“conjunctive license”), they should be
      * separated with “and” and enclosed in parentheses.
      */
-    @Parameter
     private String licenseInformationInFile;
 
-    @Parameter( required = false )
     private List<SnippetInfo> snippets;
 
     /**

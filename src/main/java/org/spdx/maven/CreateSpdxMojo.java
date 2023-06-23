@@ -339,10 +339,10 @@ public class CreateSpdxMojo extends AbstractMojo
      * project level fields NOT the higher level PathSpecificSpdxInfo.
      */
     @Parameter( required = false )
-    private List<PathSpecificSpdxInfo> pathsWithSpecificSpdxInfo;
+    private PathSpecificSpdxInfo[] pathsWithSpecificSpdxInfo;
 
     @Parameter( required = false )
-    private List<ExternalReference> externalReferences;
+    private ExternalReference[] externalReferences;
 
     /**
      * Output file format for the SPDX file.  One of:

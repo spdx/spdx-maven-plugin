@@ -462,16 +462,15 @@ public class SpdxDocumentBuilder
             }
         }
         // external references
-        List<ExternalReference> externalRefs = projectInformation.getExternalRefs();
-        if ( externalRefs != null && externalRefs.size() > 0 )
+        ExternalReference[] externalRefs = projectInformation.getExternalRefs();
+        if ( externalRefs != null && externalRefs.length > 0 )
         {
-            
-            ExternalRef[] externalRefAr = new ExternalRef[externalRefs.size()];
-            for ( int i = 0; i < externalRefAr.length; i++ )
+            ExternalRef[] externalRefAr = new ExternalRef[externalRefs.length];
+            for ( ExternalReference externalRef: externalRefs )
             {
                 try
                 {
-                    pkg.getExternalRefs().add( externalRefs.get( i ).getExternalRef( spdxDoc ) );
+                    pkg.getExternalRefs().add( externalRef.getExternalRef( spdxDoc ) );
                 }
                 catch ( MojoExecutionException | InvalidSPDXAnalysisException e )
                 {

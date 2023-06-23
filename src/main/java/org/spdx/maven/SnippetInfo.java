@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.InvalidLicenseStringException;
@@ -43,28 +41,20 @@ public class SnippetInfo
     private static final Logger LOG = LoggerFactory.getLogger( SnippetInfo.class );
     private static final Pattern NUMBER_RANGE_PATTERN = Pattern.compile( "(\\d+):(\\d+)" );
 
-    @Parameter( required = false )
     private String name;
 
-    @Parameter( required = false )
     private String comment;
 
-    @Parameter( defaultValue = "NOASSERTION" )
     private String concludedLicense;
 
-    @Parameter( required = false )
     private String lineRange;
 
-    @Parameter( required = true )
     private String byteRange;
 
-    @Parameter( required = false )
     private String licenseComment;
 
-    @Parameter( defaultValue = "NOASSERTION" )
     private String copyrightText;
 
-    @Parameter( defaultValue = "NOASSERTION" )
     private String licenseInfoInSnippet;
 
     public void logInfo()
