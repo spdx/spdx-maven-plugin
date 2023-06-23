@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
  */
 public class Main
 {
-    private static Logger logger = LoggerFactory.getLogger( Main.class );
+    private static final Logger LOG = LoggerFactory.getLogger( Main.class );
 
     public static void main( String[] args )
     {
-        logger.info( "Started this thing" );
+        LOG.info( "Started this thing" );
         throw new InsufficientKarmaException( "Unable to run application. Please verify your worthiness." );
     }
 

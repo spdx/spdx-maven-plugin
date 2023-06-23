@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.shared.model.fileset.FileSet;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.ModelCopyManager;
 import org.spdx.library.SpdxConstants;
@@ -231,7 +233,7 @@ public class TestSpdxFileCollector
     @Test
     public void testSpdxFileCollector() throws InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         Collection<SpdxFile> files = collector.getFiles();
         assertEquals( 0, files.size() );
     }
@@ -239,7 +241,7 @@ public class TestSpdxFileCollector
     @Test
     public void testCollectFilesInDirectory() throws InvalidSPDXAnalysisException, SpdxCollectionException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         SpdxFile[] SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( 0, SpdxFiles.length );
 
@@ -265,7 +267,7 @@ public class TestSpdxFileCollector
         skipBin.setDirectory( this.fileSets[0].getDirectory() );
         skipBin.addExclude( "**/*.bin" );
         skipBin.setOutputDirectory( this.fileSets[0].getOutputDirectory() );
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         SpdxFile[] SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( 0, SpdxFiles.length );
 
@@ -288,7 +290,7 @@ public class TestSpdxFileCollector
     @Test
     public void testGetExtension() throws InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         File noExtension = new File( "noextension" );
         String result = collector.getExtension( noExtension );
         assertTrue( result.isEmpty() );
@@ -314,7 +316,7 @@ public class TestSpdxFileCollector
     @Test
     public void testGetFiles() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         SpdxFile[] SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( 0, SpdxFiles.length );
 
@@ -348,7 +350,7 @@ public class TestSpdxFileCollector
     @Test
     public void testGetSnippets() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         List<SpdxSnippet> snippets = collector.getSnippets();
         assertEquals( 0, snippets.size() );
 
@@ -395,7 +397,7 @@ public class TestSpdxFileCollector
     @Test
     public void testCollectFilesWithPattern() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         SpdxFile[] SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( 0, SpdxFiles.length );
         HashMap<String, SpdxDefaultFileInformation> fileSpecificInfo = new HashMap<>();
@@ -485,7 +487,7 @@ public class TestSpdxFileCollector
     @Test
     public void testGetLicenseInfoFromFiles() throws SpdxCollectionException, IOException, InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         AnyLicenseInfo[] result = collector.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[collector.getLicenseInfoFromFiles().size()] );
         assertEquals( 0, result.length );
 
@@ -556,7 +558,7 @@ public class TestSpdxFileCollector
     @Test
     public void testGetVerificationCode() throws SpdxCollectionException, NoSuchAlgorithmException, InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         SpdxFile[] SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( 0, SpdxFiles.length );
 
@@ -583,7 +585,7 @@ public class TestSpdxFileCollector
     {
         String dosFilePath = "subdir\\subdir2\\file.c";
         String dosSpdxFile = "./subdir/subdir2/file.c";
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         String result = collector.convertFilePathToSpdxFileName( dosFilePath );
         assertEquals( dosSpdxFile, result );
 
@@ -596,7 +598,7 @@ public class TestSpdxFileCollector
     @Test
     public void testIsSourceFile()
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         assertTrue( collector.isSourceFile( toFileTypeCollection( new FileType[] {FileType.SOURCE} ) ) );
         assertTrue( collector.isSourceFile( toFileTypeCollection( new FileType[] {FileType.TEXT, FileType.SOURCE} ) ) );
         assertFalse( collector.isSourceFile( toFileTypeCollection( new FileType[] {FileType.BINARY, FileType.IMAGE} ) ) );
@@ -618,7 +620,7 @@ public class TestSpdxFileCollector
     @Test
     public void testGenerateChecksums() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        SpdxFileCollector collector = new SpdxFileCollector( null );
+        SpdxFileCollector collector = new SpdxFileCollector();
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
                 new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
         File spdxFile = new File( filePaths[0] );

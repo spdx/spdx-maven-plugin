@@ -368,7 +368,7 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         catch (final IllegalArgumentException iae)
         {
-            this.getLog().warn( "Invalid SPDX output format, defaulting to JSON format." );
+            getLog().warn( "Invalid SPDX output format, defaulting to JSON format." );
         }
         String artifactType = outputFormatEnum.getArtifactType();
         if (spdxFile.getName().endsWith( ".spdx" )) {
@@ -393,7 +393,7 @@ public class CreateSpdxMojo extends AbstractMojo
             defaultLicenseInformationInFile = defaultFileConcludedLicense;
         }
 
-        this.getLog().info( "Creating SPDX File " + spdxFile.getPath() );
+        getLog().info( "Creating SPDX File " + spdxFile.getPath() );
 
         SpdxDocumentBuilder builder;
         try
@@ -403,7 +403,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 spdxDocumentNamespace = spdxDocumentNamespace.replace( " ", "%20" );
             }
             URI namespaceUri = new URI( spdxDocumentNamespace );
-            builder = new SpdxDocumentBuilder( this.getLog(), spdxFile, namespaceUri,
+            builder = new SpdxDocumentBuilder( spdxFile, namespaceUri,
                     this.matchLicensesOnCrossReferenceUrls, outputFormatEnum );
         }
         catch ( SpdxBuilderException e )
@@ -460,14 +460,14 @@ public class CreateSpdxMojo extends AbstractMojo
             throw new MojoExecutionException( "SPDX analysis error processing dependencies", e );
         }
 
-        if ( this.getLog().isDebugEnabled() )
+        if ( getLog().isDebugEnabled() )
         {
             logIncludedDirectories( includedSourceDirectories );
             logIncludedDirectories( includedTestDirectories );
             logIncludedDirectories( includedResourceDirectories );
             logNonStandardLicenses( this.nonStandardLicenses );
-            projectInformation.logInfo( this.getLog(), spdxDoc );
-            defaultFileInformation.logInfo( this.getLog() );
+            projectInformation.logInfo( spdxDoc );
+            defaultFileInformation.logInfo();
             logFileSpecificInfo( pathSpecificInformation );
             logDependencies( dependencies );
         }
@@ -490,7 +490,7 @@ public class CreateSpdxMojo extends AbstractMojo
         if ( spdxErrors != null && spdxErrors.size() > 0 )
         {
             // report error
-            this.getLog().warn( "The following errors were found in the SPDX file:\n " + String.join( "\n ", spdxErrors ) );
+            getLog().warn( "The following errors were found in the SPDX file:\n " + String.join( "\n ", spdxErrors ) );
         }
     }
 
@@ -508,7 +508,7 @@ public class CreateSpdxMojo extends AbstractMojo
                                                                     LicenseManager licenseManager,
                                                                     SpdxDocument spdxDoc ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation( getLog(), licenseManager, spdxDoc, createExternalRefs );
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( licenseManager, spdxDoc, createExternalRefs );
         if ( dependencies != null )
         {
             for ( Artifact dependency : dependencies )
@@ -521,40 +521,40 @@ public class CreateSpdxMojo extends AbstractMojo
 
     private void logDependencies( Set<Artifact> dependencies )
     {
-        if ( !this.getLog().isDebugEnabled() )
+        if ( !getLog().isDebugEnabled() )
         {
             return;
         }
-        this.getLog().debug( "Dependencies:" );
+        getLog().debug( "Dependencies:" );
         if ( dependencies == null )
         {
-            this.getLog().debug( "\tNull dependencies" );
+            getLog().debug( "\tNull dependencies" );
             return;
         }
         if ( dependencies.isEmpty() )
         {
-            this.getLog().debug( "\tZero dependencies" );
+            getLog().debug( "\tZero dependencies" );
             return;
         }
         for ( Artifact dependency : dependencies )
         {
             String filePath = dependency.getFile() != null ? dependency.getFile().getAbsolutePath() : "[NONE]";
             String scope = dependency.getScope() != null ? dependency.getScope() : "[NONE]";
-            this.getLog().debug(
+            getLog().debug(
                     "ArtifactId: " + dependency.getArtifactId() + ", file path: " + filePath + ", Scope: " + scope );
         }
     }
 
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
     {
-        if ( !this.getLog().isDebugEnabled() )
+        if ( !getLog().isDebugEnabled() )
         {
             return;
         }
         for ( Entry<String, SpdxDefaultFileInformation> entry : fileSpecificInformation.entrySet() )
         {
-            this.getLog().debug( "File Specific Information for " + entry.getKey() );
-            entry.getValue().logInfo( this.getLog() );
+            getLog().debug( "File Specific Information for " + entry.getKey() );
+            entry.getValue().logInfo();
         }
     }
 
@@ -586,7 +586,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 }
                 if ( retval.containsKey( spdxInfo.getPath() ) )
                 {
-                    this.getLog().warn( "Multiple file path specific SPDX data for " + spdxInfo.getPath() );
+                    getLog().warn( "Multiple file path specific SPDX data for " + spdxInfo.getPath() );
                 }
                 retval.put( spdxInfo.getPath(), value );
             }
@@ -601,22 +601,22 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     private void logNonStandardLicenses( NonStandardLicense[] nonStandardLicenses )
     {
-        if (( nonStandardLicenses == null ) || !this.getLog().isDebugEnabled() )
+        if (( nonStandardLicenses == null ) || !getLog().isDebugEnabled() )
         {
             return;
         }
         for ( NonStandardLicense nonStandardLicense : nonStandardLicenses )
         {
-            this.getLog().debug( "Non standard license ID: " + nonStandardLicense.getLicenseId() );
-            this.getLog().debug( "Non standard license Text: " + nonStandardLicense.getExtractedText() );
-            this.getLog().debug( "Non standard license Comment: " + nonStandardLicense.getComment() );
-            this.getLog().debug( "Non standard license Name: " + nonStandardLicense.getName() );
+            getLog().debug( "Non standard license ID: " + nonStandardLicense.getLicenseId() );
+            getLog().debug( "Non standard license Text: " + nonStandardLicense.getExtractedText() );
+            getLog().debug( "Non standard license Comment: " + nonStandardLicense.getComment() );
+            getLog().debug( "Non standard license Name: " + nonStandardLicense.getName() );
             String[] crossReferences = nonStandardLicense.getCrossReference();
             if ( crossReferences != null )
             {
                 for ( String crossReference : crossReferences )
                 {
-                    this.getLog().debug( "Non standard license cross reference: " + crossReference );
+                    getLog().debug( "Non standard license cross reference: " + crossReference );
                 }
             }
         }
@@ -629,11 +629,11 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     private void logIncludedDirectories( FileSet[] includedDirectories )
     {
-        if (( includedDirectories == null ) || !this.getLog().isDebugEnabled() )
+        if (( includedDirectories == null ) || !getLog().isDebugEnabled() )
         {
             return;
         }
-        this.getLog().debug( "Logging " + includedDirectories.length + " filesets." );
+        getLog().debug( "Logging " + includedDirectories.length + " filesets." );
         for ( FileSet includedDirectory : includedDirectories )
         {
             StringBuilder sb = new StringBuilder( "Included Directory: " + includedDirectory.getDirectory() );
@@ -649,7 +649,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 sb.append( "; Excluded=" );
                 sb.append( String.join(",", excludes) );
             }
-            this.getLog().debug( sb.toString() );
+            getLog().debug( sb.toString() );
         }
     }
 
@@ -743,7 +743,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             catch ( LicenseManagerException e )
             {
-                this.getLog().warn( "Unable to map maven licenses to a declared license.  Using NOASSERTION" );
+                getLog().warn( "Unable to map maven licenses to a declared license.  Using NOASSERTION" );
                 declaredLicense = new SpdxNoAssertionLicense();
             }
         }
@@ -834,19 +834,19 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             try
             {
-                this.getLog().debug( "Generating checksum for file "+packageFile.getAbsolutePath() );
+                getLog().debug( "Generating checksum for file "+packageFile.getAbsolutePath() );
                 Set<ChecksumAlgorithm> algorithms = getChecksumAlgorithms();
                 checksums = SpdxFileCollector.generateChecksum( packageFile, algorithms, spdxDoc );
             }
             catch ( SpdxCollectionException | InvalidSPDXAnalysisException e )
             {
-                this.getLog().warn( "Unable to compute checksum for " + packageFile.getName() + ":" + e.getMessage() );
-                this.getLog().debug( "Exception information for checksum error", e );
+                getLog().warn( "Unable to compute checksum for " + packageFile.getName() + ":" + e.getMessage() );
+                getLog().debug( "Exception information for checksum error", e );
             }
         }
         else
         {
-            this.getLog().warn( packageFile == null ? "Null package file" : "Package file " + packageFile.getAbsolutePath() + "does not exit" );
+            getLog().warn( packageFile == null ? "Null package file" : "Package file " + packageFile.getAbsolutePath() + "does not exit" );
             packageFileName = "NOASSERTION";
         }
         retval.setPackageArchiveFileName( packageFileName );
@@ -901,7 +901,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
                 srcFileSet.addInclude( INCLUDE_ALL );
                 result.add( srcFileSet );
-                this.getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
+                getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
             }
         }
         return result.toArray( new FileSet[0] );
@@ -926,7 +926,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
                 srcFileSet.addInclude( INCLUDE_ALL );
                 result.add( srcFileSet );
-                this.getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
+                getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
             }
         }
         List<Resource> resourceList = this.mavenProject.getResources();
@@ -940,10 +940,10 @@ public class CreateSpdxMojo extends AbstractMojo
                 resourceFileSet.setExcludes( resource.getExcludes() );
                 resourceFileSet.setIncludes( resource.getIncludes() );
                 result.add( resourceFileSet );
-                this.getLog().debug( "Adding resource directory " + resource.getDirectory() );
+                getLog().debug( "Adding resource directory " + resource.getDirectory() );
             }
         }
-        this.getLog().debug( "Number of filesets: " + result.size() );
+        getLog().debug( "Number of filesets: " + result.size() );
         return result.toArray( new FileSet[0] );
     }
 
@@ -966,7 +966,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
                 srcFileSet.addInclude( INCLUDE_ALL );
                 result.add( srcFileSet );
-                this.getLog().debug( "Adding TestSourceRoot directory " + srcFileSet.getDirectory() );
+                getLog().debug( "Adding TestSourceRoot directory " + srcFileSet.getDirectory() );
             }
         }
         return result.toArray( new FileSet[0] );
@@ -992,7 +992,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 }
                 catch (final IllegalArgumentException iae)
                 {
-                    this.getLog().warn( "Ignoring unsupported checksum algorithm: " + checksumAlgorithm );
+                    getLog().warn( "Ignoring unsupported checksum algorithm: " + checksumAlgorithm );
                 }
             }
         }

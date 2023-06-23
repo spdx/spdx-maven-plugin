@@ -23,6 +23,9 @@ import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Simple structure to hold information obout default file information
  *
@@ -30,6 +33,7 @@ import org.spdx.library.model.license.SpdxNoAssertionLicense;
  */
 public class SpdxDefaultFileInformation
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxDefaultFileInformation.class );
 
     private AnyLicenseInfo declaredLicense;
     private String copyright = "NOASSERTION";
@@ -135,32 +139,27 @@ public class SpdxDefaultFileInformation
 
     /**
      * Primarily for debugging purposes.  Dump all the field information to the log Info
-     *
-     * @param log
      */
-    public void logInfo( Log log )
+    public void logInfo()
     {
-        if ( !log.isDebugEnabled() ) {
-            return;
-        }
-        log.debug( "Default File Comment: " + getComment() );
-        log.debug( "Default File Copyright: " + getCopyright() );
-        log.debug( "Default File License Comment: " + getLicenseComment() );
-        log.debug( "Default File Notice: " + getNotice() );
-        log.debug( "Default File Concluded License: " + getConcludedLicense().toString() );
-        log.debug( "Default File Declared License: " + getDeclaredLicense().toString() );
+        LOG.debug( "Default File Comment: " + getComment() );
+        LOG.debug( "Default File Copyright: " + getCopyright() );
+        LOG.debug( "Default File License Comment: " + getLicenseComment() );
+        LOG.debug( "Default File Notice: " + getNotice() );
+        LOG.debug( "Default File Concluded License: " + getConcludedLicense().toString() );
+        LOG.debug( "Default File Declared License: " + getDeclaredLicense().toString() );
         if ( contributors != null )
         {
             for ( String contributor : contributors )
             {
-                log.debug( "Default File Contributors: " + contributor );
+                LOG.debug( "Default File Contributors: " + contributor );
             }
         }
         if ( this.snippets != null )
         {
             for ( SnippetInfo snippet : snippets )
             {
-                snippet.logInfo( log );
+                snippet.logInfo();
             }
         }
     }
