@@ -65,7 +65,7 @@ public class SpdxProjectInformation
     private String documentComment;
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
-    private List<ExternalReference> externalRefs;
+    private ExternalReference[] externalRefs;
     private Set<Checksum> checksums;
     private Purpose primaryPurpose;
     
@@ -488,12 +488,12 @@ public class SpdxProjectInformation
         return this.documentAnnotations;
     }
 
-    public void setExternalRefs( List<ExternalReference> externalReferences )
+    public void setExternalRefs( ExternalReference[] externalReferences )
     {
         this.externalRefs = externalReferences;
     }
 
-    public List<ExternalReference> getExternalRefs()
+    public ExternalReference[] getExternalRefs()
     {
         return this.externalRefs;
     }

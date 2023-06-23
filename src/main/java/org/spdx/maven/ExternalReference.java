@@ -16,8 +16,6 @@
 package org.spdx.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.ReferenceType;
@@ -33,16 +31,12 @@ import org.spdx.library.referencetype.ListedReferenceTypes;
  */
 public class ExternalReference
 {
-    @Parameter( required = true )
     private String category;
 
-    @Parameter( required = true )
     private String type;
 
-    @Parameter( required = true )
     private String locator;
 
-    @Parameter( required = false )
     private String comment;
 
     public ExternalRef getExternalRef( SpdxDocument spdxDoc ) throws MojoExecutionException

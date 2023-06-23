@@ -16,8 +16,6 @@
 package org.spdx.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.enumerations.AnnotationType;
@@ -27,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Represents an SPDX Annotation class in a Maven POM file
+ * Simple class to hold an SPDX Annotation.
  *
  * @author Gary O'Neall
  */
@@ -38,13 +36,12 @@ public class Annotation
     /**
      * Tag value text description of the annotation type
      */
-    @Parameter( required = true )
     private String annotationType;
-    @Parameter( required = true )
+
     private String annotationDate;
-    @Parameter( required = true )
+
     private String annotator;
-    @Parameter( required = true )
+
     private String annotationComment;
 
     /**
