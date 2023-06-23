@@ -72,14 +72,14 @@ public class TestMavenToSpdxLicenseMapper
     @Test
     public void testUrlToSpdxId() throws LicenseMapperException
     {
-        String retval = MavenToSpdxLicenseMapper.getInstance( null ).urlToSpdxId( APACHE2_URL );
+        String retval = MavenToSpdxLicenseMapper.getInstance().urlToSpdxId( APACHE2_URL );
         assertEquals( APACHE_SPDX_ID, retval );
     }
 
     @Test
     public void testGetMap() throws LicenseMapperException
     {
-        Map<String, String> retval = MavenToSpdxLicenseMapper.getInstance( null ).getMap();
+        Map<String, String> retval = MavenToSpdxLicenseMapper.getInstance().getMap();
         assertEquals( MIT_SPDX_ID, retval.get( MIT_URL ) );
     }
 
@@ -87,7 +87,7 @@ public class TestMavenToSpdxLicenseMapper
     public void testMavenLicenseListToSpdxLicenseNone() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
+        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxLicense(
                 licenseList.subList( 0, 0 ), spdxDoc );
         assertEquals( new SpdxNoAssertionLicense(), result );
     }
@@ -99,7 +99,7 @@ public class TestMavenToSpdxLicenseMapper
         License license = new License();
         license.setUrl( "http://not.a.known.url" );
         licenseList.add( license );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
+        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxLicense(
                 licenseList, spdxDoc );
         assertEquals( new SpdxNoAssertionLicense(), result );
     }
@@ -111,7 +111,7 @@ public class TestMavenToSpdxLicenseMapper
         License license = new License();
         license.setUrl( APACHE2_URL );
         licenseList.add( license );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
+        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxLicense(
                 licenseList, spdxDoc );
         AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
         assertEquals( expected, result );
@@ -127,7 +127,7 @@ public class TestMavenToSpdxLicenseMapper
         License licenseM = new License();
         licenseM.setUrl( MIT_URL );
         licenseList.add( licenseM );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
+        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxLicense(
                 licenseList, spdxDoc );
         AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
         assertEquals( expected, result );
@@ -143,7 +143,7 @@ public class TestMavenToSpdxLicenseMapper
         License licenseM = new License();
         licenseM.setUrl( "http://unknown.url" );
         licenseList.add( licenseM );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance( null ).mavenLicenseListToSpdxLicense(
+        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxLicense(
                 licenseList, spdxDoc );
         AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
         assertEquals( expected, result );

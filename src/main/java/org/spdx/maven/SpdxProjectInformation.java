@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.ExternalRef;
@@ -31,6 +30,9 @@ import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import org.spdx.library.referencetype.ListedReferenceTypes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Simple structure to hold information about SPDX project
  *
@@ -38,6 +40,8 @@ import org.spdx.library.referencetype.ListedReferenceTypes;
  */
 public class SpdxProjectInformation
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxProjectInformation.class );
+
     private String[] creators = new String[0];
     private String creatorComment = "";
     private AnyLicenseInfo concludedLicense;
@@ -334,50 +338,48 @@ public class SpdxProjectInformation
 
     /**
      * Log information on all fields - typically used for debugging
-     *
-     * @param log
      */
-    public void logInfo( Log log, SpdxDocument spdxDoc )
+    public void logInfo( SpdxDocument spdxDoc )
     {
-        if ( !log.isDebugEnabled() ) {
+        if ( !LOG.isDebugEnabled() ) {
             return;
         }
-        log.debug( "SPDX Project Name: " + this.getName() );
-        log.debug( "SPDX Document comment: " + this.getDocumentComment() );
-        log.debug( "SPDX Creator comment: " + this.getCreatorComment() );
-        log.debug( "SPDX Description: " + this.getDescription() );
-        log.debug( "SPDX License comment: " + this.getLicenseComment() );
-        log.debug( "SPDX Originator: " + this.getOriginator() );
-        log.debug( "SPDX PackageArchiveFileName: " + this.getPackageArchiveFileName() );
-        log.debug( "SPDX Short description: " + this.getShortDescription() );
-        log.debug( "SPDX Supplier: " + this.getSupplier() );
-        log.debug( "SPDX Source Info:  " + this.getSourceInfo() );
-        log.debug( "SPDX Version info: " + this.getVersionInfo() );
-        log.debug( "SPDX Concluded license: " + this.getConcludedLicense().toString() );
-        log.debug( "SPDX Declared license: " + this.getDeclaredLicense().toString() );
-        log.debug( "SPDX Download URL: " + this.getDownloadUrl() );
-        log.debug( "SPDX Home page: " + this.getHomePage() );
+        LOG.debug( "SPDX Project Name: " + this.getName() );
+        LOG.debug( "SPDX Document comment: " + this.getDocumentComment() );
+        LOG.debug( "SPDX Creator comment: " + this.getCreatorComment() );
+        LOG.debug( "SPDX Description: " + this.getDescription() );
+        LOG.debug( "SPDX License comment: " + this.getLicenseComment() );
+        LOG.debug( "SPDX Originator: " + this.getOriginator() );
+        LOG.debug( "SPDX PackageArchiveFileName: " + this.getPackageArchiveFileName() );
+        LOG.debug( "SPDX Short description: " + this.getShortDescription() );
+        LOG.debug( "SPDX Supplier: " + this.getSupplier() );
+        LOG.debug( "SPDX Source Info:  " + this.getSourceInfo() );
+        LOG.debug( "SPDX Version info: " + this.getVersionInfo() );
+        LOG.debug( "SPDX Concluded license: " + this.getConcludedLicense().toString() );
+        LOG.debug( "SPDX Declared license: " + this.getDeclaredLicense().toString() );
+        LOG.debug( "SPDX Download URL: " + this.getDownloadUrl() );
+        LOG.debug( "SPDX Home page: " + this.getHomePage() );
         if ( this.documentAnnotations != null && this.documentAnnotations.length > 0 )
         {
-            log.debug( "Document annotations: " );
+            LOG.debug( "Document annotations: " );
             for ( Annotation annotation : documentAnnotations )
             {
-                annotation.logInfo( log );
+                annotation.logInfo();
             }
         }
         if ( this.packageAnnotations != null && this.packageAnnotations.length > 0 )
         {
-            log.debug( "Package annotations: " );
+            LOG.debug( "Package annotations: " );
             for ( Annotation annotation : packageAnnotations )
             {
-                annotation.logInfo( log );
+                annotation.logInfo();
             }
         }
         if ( creators != null )
         {
             for ( String creator : creators )
             {
-                log.debug( "SPDX Creator: " + creator );
+                LOG.debug( "SPDX Creator: " + creator );
             }
         }
         if ( this.externalRefs != null )
@@ -416,11 +418,11 @@ public class SpdxProjectInformation
                     {
                         externalRefString.append( "Invalid Reference Locator" );
                     }
-                    log.debug( "External Ref: " + externalRefString.toString() );
+                    LOG.debug( "External Ref: " + externalRefString.toString() );
                 }
                 catch ( MojoExecutionException e1 )
                 {
-                    log.error( "Invalid external reference", e1 );
+                    LOG.error( "Invalid external reference", e1 );
                 }
 
             }
@@ -432,10 +434,10 @@ public class SpdxProjectInformation
                 try 
                 {
                     String algorithm = SpdxFileCollector.checksumAlgorithms.get( checksum.getAlgorithm() );
-                    log.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
+                    LOG.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
                 } catch ( InvalidSPDXAnalysisException e )
                 {
-                    log.debug( "Invalid SPDX checksum" );
+                    LOG.debug( "Invalid SPDX checksum" );
                 }
             }
         }

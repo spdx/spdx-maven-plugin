@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.apache.maven.model.License;
 
-import org.apache.maven.plugin.logging.Log;
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
@@ -37,6 +36,9 @@ import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxListedLicense;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import org.spdx.storage.listedlicense.LicenseJsonTOC;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -53,6 +55,8 @@ import com.google.gson.Gson;
  */
 public class MavenToSpdxLicenseMapper
 {
+    private static final Logger LOG = LoggerFactory.getLogger( MavenToSpdxLicenseMapper.class );
+
     private static final String SPDX_LICENSE_URL_PREFIX = "https://spdx.org/licenses/";
     private static final String LISTED_LICENSE_JSON_URL = SPDX_LICENSE_URL_PREFIX + "licenses.json";
     private static final String LISTED_LICENSE_JSON_PATH = "resources/licenses.json";
@@ -60,7 +64,7 @@ public class MavenToSpdxLicenseMapper
     static MavenToSpdxLicenseMapper instance;
     private Map<String, String> urlStringToSpdxLicenseId;
 
-    private MavenToSpdxLicenseMapper( Log log ) throws LicenseMapperException
+    private MavenToSpdxLicenseMapper() throws LicenseMapperException
     {
         // Can not instantiate directly - singleton class
         InputStream is = null;
@@ -72,17 +76,11 @@ public class MavenToSpdxLicenseMapper
             }
             catch ( MalformedURLException e )
             {
-                if ( log != null )
-                {
-                    log.warn( "Invalid JSON URL for SPDX listed licenses.  Using cached version" );
-                }
+                LOG.warn( "Invalid JSON URL for SPDX listed licenses.  Using cached version" );
             }
             catch ( IOException e )
             {
-                if ( log != null )
-                {
-                    log.warn( "IO Exception opening web page for JSON for SPDX listed licenses.  Using cached version" );
-                }
+                LOG.warn( "IO Exception opening web page for JSON for SPDX listed licenses.  Using cached version" );
             }
         }
         if ( is == null )
@@ -93,22 +91,19 @@ public class MavenToSpdxLicenseMapper
 
         try (BufferedReader reader = new BufferedReader( new InputStreamReader( is, Charset.defaultCharset() ) ))
         {
-            initializeUrlMap( reader, log );
+            initializeUrlMap( reader );
         }
         catch ( IOException e )
         {
-            if ( log != null )
-            {
-                log.warn( "IO error closing listed license reader: " + e.getMessage() );
-            }
+            LOG.warn( "IO error closing listed license reader: " + e.getMessage() );
         }
     }
 
-    public static MavenToSpdxLicenseMapper getInstance( Log log ) throws LicenseMapperException
+    public static MavenToSpdxLicenseMapper getInstance() throws LicenseMapperException
     {
         if ( instance == null )
         {
-            instance = new MavenToSpdxLicenseMapper( log );
+            instance = new MavenToSpdxLicenseMapper();
         }
         return instance;
     }
@@ -126,10 +121,9 @@ public class MavenToSpdxLicenseMapper
      * Initialize the urlStringToSpdxLicense map with the SPDX listed licenses
      *
      * @param jsonReader Reader for the JSON input file containing the listed licenses
-     * @param log        Optional logger
      * @throws LicenseMapperException
      */
-    private void initializeUrlMap( BufferedReader jsonReader, Log log ) throws LicenseMapperException
+    private void initializeUrlMap( BufferedReader jsonReader ) throws LicenseMapperException
     {
         LicenseJsonTOC jsonToc;
         try

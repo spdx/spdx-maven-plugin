@@ -41,7 +41,6 @@ import org.apache.maven.model.Contributor;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -73,6 +72,8 @@ import org.spdx.spdxRdfStore.RdfStore;
 import org.spdx.storage.IModelStore.IdType;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.simple.InMemSpdxStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains information about package dependencies collected from the Maven dependencies.
@@ -81,6 +82,8 @@ import org.spdx.storage.simple.InMemSpdxStore;
  */
 public class SpdxDependencyInformation
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxDependencyInformation.class );
+
     /**
      * Store information about a relationship which will be from a package to 
      * a package yet to be determined.
@@ -128,7 +131,6 @@ public class SpdxDependencyInformation
         }
     }
 
-    private Log log;
     /**
      * List of all Relationships added for dependances To a related element
      */
@@ -150,12 +152,10 @@ public class SpdxDependencyInformation
     DateFormat format = new SimpleDateFormat( SpdxConstants.SPDX_DATE_FORMAT );
 
     /**
-     * @param log Logger for Maven
      */
-    public SpdxDependencyInformation( Log log, LicenseManager licenseManager, 
+    public SpdxDependencyInformation( LicenseManager licenseManager, 
                                       SpdxDocument spdxDoc, boolean createExternalRefs )
     {
-        this.log = log;
         this.licenseManager = licenseManager;
         this.spdxDoc = spdxDoc;
         this.createExternalRefs = createExternalRefs;
@@ -178,7 +178,7 @@ public class SpdxDependencyInformation
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
         if ( relType == RelationshipType.OTHER )
         {
-            log.warn(
+            LOG.warn(
                     "Could not determine the SPDX relationship type for dependency artifact ID " + dependency.getArtifactId() + " scope " + scope );
         }
         SpdxElement dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session, mavenProject );
@@ -187,13 +187,13 @@ public class SpdxDependencyInformation
             if ( dependencyPackage instanceof SpdxPackage)
             {
                 this.fromRelationships.add( new FromRelationship( (SpdxPackage)dependencyPackage, relType ) );
-                log.debug( "Added relationship of type "+relType.toString() + " for "+dependencyPackage.getName() );
+                LOG.debug( "Added relationship of type "+relType.toString() + " for "+dependencyPackage.getName() );
             }
             else
             {
                 this.toRelationships.add( spdxDoc.createRelationship( dependencyPackage, RelationshipType.OTHER, 
                                 "This relationship is the inverse of "+relType.toString()+" to an external document reference." ) );
-                log.debug( "Could not create proper to relationships for external element "+dependencyPackage.getId() );
+                LOG.debug( "Could not create proper to relationships for external element "+dependencyPackage.getId() );
             }
         } 
         else
@@ -249,14 +249,14 @@ public class SpdxDependencyInformation
                                            ProjectBuilder mavenProjectBuilder, MavenSession session,
                                            MavenProject mavenProject ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
-        log.debug( "Creating SPDX package for artifact " + artifact.getArtifactId() );
+        LOG.debug( "Creating SPDX package for artifact " + artifact.getArtifactId() );
         if ( artifact.getFile() == null )
         {
-            log.debug( "Artifact file is null" );
+            LOG.debug( "Artifact file is null" );
         }
         else
         {
-            log.debug( "Artifact file name = " + artifact.getFile().getName() );
+            LOG.debug( "Artifact file name = " + artifact.getFile().getName() );
         }
         File spdxFile = null;
         if ( artifact.getFile() != null )
@@ -265,11 +265,11 @@ public class SpdxDependencyInformation
         }
         if ( spdxFile != null && spdxFile.exists() )
         {
-            log.debug(
+            LOG.debug(
                     "Dependency " + artifact.getArtifactId() + "Looking for SPDX file " + spdxFile.getAbsolutePath() );
             try
             {
-                log.debug(
+                LOG.debug(
                         "Dependency " + artifact.getArtifactId() + "Dependency information collected from SPDX file " + spdxFile.getAbsolutePath() );
                 
                 SpdxDocument externalSpdxDoc = spdxDocumentFromFile( spdxFile.getPath() );
@@ -286,27 +286,27 @@ public class SpdxDependencyInformation
             }
             catch ( IOException e )
             {
-                log.warn(
+                LOG.warn(
                         "IO error reading SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
             catch ( SpdxInvalidIdException e ) 
             {
-                log.warn(
+                LOG.warn(
                           "Invalid SPDX ID exception reading SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
-                log.warn(
+                LOG.warn(
                         "Invalid SPDX analysis exception reading SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
             catch ( SpdxCollectionException e )
             {
-                log.warn(
+                LOG.warn(
                         "Unable to create file checksum for external SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
             catch ( Exception e )
             {
-                log.warn(
+                LOG.warn(
                         "Unknown error processing SPDX document for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() + ".  Using POM file information for creating SPDX package data." );
             }
         }
@@ -315,37 +315,37 @@ public class SpdxDependencyInformation
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
             request.setRemoteRepositories( mavenProject.getRemoteArtifactRepositories() );
             for (ArtifactRepository ar:request.getRemoteRepositories()) {
-                log.debug( "request Remote repository ID: " + ar.getId() );
+                LOG.debug( "request Remote repository ID: " + ar.getId() );
             }
             for (ArtifactRepository ar:mavenProject.getRemoteArtifactRepositories()) {
-                log.debug( "Project Remote repository ID: " + ar.getId() );
+                LOG.debug( "Project Remote repository ID: " + ar.getId() );
             }
             ProjectBuildingResult build = mavenProjectBuilder.build( artifact, request );
             MavenProject depProject = build.getProject();
-            log.debug(
+            LOG.debug(
                       "Dependency " + artifact.getArtifactId() + "Collecting information from project metadata for " + depProject.getArtifactId() );
             return createSpdxPackage( depProject );
         }
         catch ( SpdxCollectionException e )
         {
-            log.error(
+            LOG.error(
                     "SPDX File Collection Error creating SPDX package for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() );
         }
         catch ( NoSuchAlgorithmException e )
         {
-            log.error(
+            LOG.error(
                     "Verification Code Error creating SPDX package for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() );
         }
         catch ( ProjectBuildingException e )
         {
-            log.error(
+            LOG.error(
                       "Maven Project Build Error creating SPDX package for dependency artifact ID " + artifact.getArtifactId() + ":" + e.getMessage() );
         }
-        this.log.warn(
+        LOG.warn(
                 "Error creating SPDX package for dependency artifact ID " + artifact.getArtifactId() + ".  A minimal SPDX package will be created." );
         // Create a minimal SPDX package from dependency
         // Name will be the artifact ID
-        log.debug(
+        LOG.debug(
                 "Dependency " + artifact.getArtifactId() + "Using only artifact information to create dependent package" );
         SpdxPackage pkg = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri() ), 
                                                  artifact.getArtifactId(), new SpdxNoAssertionLicense(), "NOASSERTION", 
@@ -478,7 +478,7 @@ public class SpdxDependencyInformation
         }
         if ( itemDescribed == null ) {
             // Find the first package
-            log.warn( "Could not find matching artifact ID in SPDX file for "+artifactId+".  Using the first package found in SPDX file." );
+            LOG.warn( "Could not find matching artifact ID in SPDX file for "+artifactId+".  Using the first package found in SPDX file." );
             for ( SpdxElement item : externalSpdxDoc.getDocumentDescribes() )
             {
                 if ( item instanceof SpdxPackage  )
@@ -527,7 +527,7 @@ public class SpdxDependencyInformation
                 }
                 catch ( Exception e )
                 {
-                    log.error( "Error closing SPDX model store", e );
+                    LOG.error( "Error closing SPDX model store", e );
                 }
             }
         }
@@ -561,7 +561,7 @@ public class SpdxDependencyInformation
         if ( externalRef == null )
         {
             String externalRefDocId = SpdxConstants.EXTERNAL_DOC_REF_PRENUM + fixExternalRefId( fullArtifactId );
-            log.debug( "Creating external document ref " + externalDocNamespace );
+            LOG.debug( "Creating external document ref " + externalDocNamespace );
             String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
             Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
             externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
@@ -573,7 +573,7 @@ public class SpdxDependencyInformation
             spdxDoc.getAnnotations().add( docRefAddedAnnotation );
             this.documentAnnotations.add( docRefAddedAnnotation );
             this.externalDocuments.put( externalDocNamespace, externalRef );
-            log.debug( "Created external document ref " + externalRefDocId );
+            LOG.debug( "Created external document ref " + externalRefDocId );
         }
         SpdxPackage pkg = findMatchingDescribedPackage( externalSpdxDoc, artifactId );
         return new ExternalSpdxElement( spdxDoc.getModelStore(), spdxDoc.getDocumentUri(),  
@@ -679,7 +679,7 @@ public class SpdxDependencyInformation
             try {
                 retval.setHomepage( project.getUrl() );
             } catch ( InvalidSPDXAnalysisException e ) {
-                log.warn( "Invalid homepage for dependency " + project.getArtifactId() + ": " + project.getUrl() );
+                LOG.warn( "Invalid homepage for dependency " + project.getArtifactId() + ": " + project.getUrl() );
             }
         }
         return retval;
@@ -706,7 +706,7 @@ public class SpdxDependencyInformation
         }
         catch ( LicenseManagerException ex )
         {
-            return MavenToSpdxLicenseMapper.getInstance( log ).mavenLicenseListToSpdxLicense( mavenLicenses, spdxDoc );
+            return MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxLicense( mavenLicenses, spdxDoc );
         }
 
     }

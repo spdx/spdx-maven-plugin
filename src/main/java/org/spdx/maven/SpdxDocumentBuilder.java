@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
+
 import org.spdx.jacksonstore.MultiFormatStore;
 import org.spdx.jacksonstore.MultiFormatStore.Format;
 import org.spdx.library.InvalidSPDXAnalysisException;
@@ -57,6 +57,9 @@ import org.spdx.storage.IModelStore.IdType;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.simple.InMemSpdxStore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Builds SPDX documents for a given set of source files. This is the primary class to use when creating SPDX documents
  * based on project files.
@@ -65,6 +68,8 @@ import org.spdx.storage.simple.InMemSpdxStore;
  */
 public class SpdxDocumentBuilder
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxDocumentBuilder.class );
+
     private static final String UNSPECIFIED = "UNSPECIFIED";
 
     public static final String NULL_SHA1 = "cf23df2207d99a74fbe169e3eba035e633b65d94";
@@ -73,7 +78,6 @@ public class SpdxDocumentBuilder
     //TODO: Map the SPDX document to the Maven build artifacts
     DateFormat format = new SimpleDateFormat( SpdxConstants.SPDX_DATE_FORMAT );
 
-    private Log log;
     private SpdxDocument spdxDoc;
     private SpdxPackage projectPackage;
     private LicenseManager licenseManager;
@@ -84,7 +88,6 @@ public class SpdxDocumentBuilder
     private ModelCopyManager copyManager;
 
     /**
-     * @param log                     Log for logging information and errors
      * @param spdxFile                File to store the SPDX document results
      * @param spdxDocumentNamespace   URI for SPDX document - must be unique
      * @param useStdLicenseSourceUrls if true, map any SPDX standard license source URL to license ID.  Note:
@@ -93,10 +96,9 @@ public class SpdxDocumentBuilder
      * @throws SpdxBuilderException
      * @throws LicenseMapperException
      */
-    public SpdxDocumentBuilder( Log log, File spdxFile, URI spdxDocumentNamespace, 
+    public SpdxDocumentBuilder( File spdxFile, URI spdxDocumentNamespace, 
                                 boolean useStdLicenseSourceUrls, OutputFormat outputFormat ) throws SpdxBuilderException, LicenseMapperException
     {
-        this.log = log;
         this.spdxFile = spdxFile;
 
         if ( spdxDocumentNamespace == null )
@@ -147,7 +149,7 @@ public class SpdxDocumentBuilder
         }
 
         // process the licenses
-        licenseManager = new LicenseManager( spdxDoc, getLog(), useStdLicenseSourceUrls );
+        licenseManager = new LicenseManager( spdxDoc, useStdLicenseSourceUrls );
     }
 
     /**
@@ -173,16 +175,6 @@ public class SpdxDocumentBuilder
                 }
             }
         }
-    }
-
-    public Log getLog()
-    {
-        return this.log;
-    }
-
-    public void setLog( Log log )
-    {
-        this.log = log;
     }
 
     public SpdxDocument getSpdxDoc()
@@ -217,13 +209,13 @@ public class SpdxDocumentBuilder
     {
         try (FileOutputStream spdxOut = new FileOutputStream( spdxFile ))
         {
-            this.log.debug( "Starting buid document from files" );
+            LOG.debug( "Starting buid document from files" );
             fillSpdxDocumentInformation( projectInformation );
             collectSpdxFileInformation( includedSourceDirectories, includedTestDirectories, includedResourceDirectories,
                     baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation, algorithms );
             addDependencyInformation( dependencyInformation );
             modelStore.serialize( spdxDocumentNamespace, spdxOut );
-            this.log.debug( "Completed build document from files" );
+            LOG.debug( "Completed build document from files" );
         }
         catch ( FileNotFoundException e )
         {
@@ -271,8 +263,8 @@ public class SpdxDocumentBuilder
                 try
                 {
                     Relationship rel =fromRelationship.createAndAddRelationship( projectPackage );
-                    log.debug( "Created relationship of type "+rel.getRelationshipType().toString() +  
-                               " from "+fromRelationship.getFromPackage().getName() );
+                    LOG.debug( "Created relationship of type " + rel.getRelationshipType().toString() +  
+                               " from " + fromRelationship.getFromPackage().getName() );
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
@@ -349,7 +341,7 @@ public class SpdxDocumentBuilder
         }
         else
         {
-            log.warn( "Invalid download location in POM file: " + projectInformation.getDownloadUrl() );
+            LOG.warn( "Invalid download location in POM file: " + projectInformation.getDownloadUrl() );
         }
         if ( downloadUrl == null )
         {
@@ -417,7 +409,7 @@ public class SpdxDocumentBuilder
                 }
                 catch( InvalidSPDXAnalysisException ex ) 
                 {
-                    log.warn( "Invalid URL in project POM file: "+projectInformation.getHomePage() );
+                    LOG.warn( "Invalid URL in project POM file: "+projectInformation.getHomePage() );
                 }
                 
             }
@@ -511,7 +503,7 @@ public class SpdxDocumentBuilder
             }
             else
             {
-                this.getLog().warn(
+                LOG.warn(
                         "Invalid creator string ( " + verify + " ), " + parameterCreator + " will be skipped." );
             }
         }
@@ -542,8 +534,7 @@ public class SpdxDocumentBuilder
                                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                                              Set<ChecksumAlgorithm> algorithms ) throws InvalidSPDXAnalysisException, SpdxBuilderException
     {
-        SpdxFileCollector fileCollector = new SpdxFileCollector( getLog() );
-        fileCollector.setLog( getLog() );
+        SpdxFileCollector fileCollector = new SpdxFileCollector();
         try
         {
             fileCollector.collectFiles( includedSourceDirectories, baseDir, defaultFileInformation,

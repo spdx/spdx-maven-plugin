@@ -22,6 +22,9 @@ import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.enumerations.AnnotationType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Represents an SPDX Annotation class in a Maven POM file
@@ -30,6 +33,7 @@ import org.spdx.library.model.enumerations.AnnotationType;
  */
 public class Annotation
 {
+    private static final Logger LOG = LoggerFactory.getLogger( Annotation.class );
 
     /**
      * Tag value text description of the annotation type
@@ -151,12 +155,9 @@ public class Annotation
         }
     }
 
-    public void logInfo( Log log )
+    public void logInfo()
     {
-        if ( !log.isDebugEnabled() ) {
-            return;
-        }
-        log.debug(
+        LOG.debug(
                 "Annotator: " + this.annotator + ", Date: " + this.annotationDate + ", Type: " + this.annotationType );
     }
 }

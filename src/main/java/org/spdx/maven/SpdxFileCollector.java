@@ -25,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.slf4j.Logger;
@@ -45,6 +44,9 @@ import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.storage.IModelStore.IdType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Collects SPDX file information from directories.
@@ -56,7 +58,8 @@ import org.spdx.storage.IModelStore.IdType;
  */
 public class SpdxFileCollector
 {
-    static Logger logger = LoggerFactory.getLogger( SpdxFileCollector.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxFileCollector.class );
+
     // constants for mapping extensions to types.
     static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
     
@@ -90,14 +93,12 @@ public class SpdxFileCollector
     List<SpdxSnippet> spdxSnippets = new ArrayList<>();
 
     FileSetManager fileSetManager = new FileSetManager();
-    private Log log;
 
     /**
      * SpdxFileCollector collects SPDX file information for files
      */
-    public SpdxFileCollector( Log log )
+    public SpdxFileCollector()
     {
-        this.log = log;
     }
 
     /**
@@ -111,7 +112,7 @@ public class SpdxFileCollector
         {
             if ( is == null )
             {
-                logger.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
+                LOG.error( "Unable to load properties file " + SPDX_FILE_TYPE_CONSTANTS_PROP_PATH );
                 return;
             }
             prop.load( is );
@@ -129,19 +130,19 @@ public class SpdxFileCollector
                         String trimmedExtension = extension.toUpperCase().trim();
                         if ( EXT_TO_FILE_TYPE.containsKey( trimmedExtension ) )
                         {
-                            logger.warn( "Duplicate file extension: "+trimmedExtension );
+                            LOG.warn( "Duplicate file extension: "+trimmedExtension );
                         }
                         EXT_TO_FILE_TYPE.put( trimmedExtension, fileType );
                     }
                     catch ( Exception ex ) {
-                        logger.error( "Error adding file extensions to filetype map", ex );
+                        LOG.error( "Error adding file extensions to filetype map", ex );
                     }
                 }
             }
         }
         catch ( IOException e )
         {
-            logger.warn(
+            LOG.warn(
                     "WARNING: Error reading SpdxFileTypeConstants properties file.  All file types will be mapped to Other." );
         }
     }
@@ -204,17 +205,11 @@ public class SpdxFileCollector
      */
     private SpdxDefaultFileInformation findDefaultFileInformation( String filePath, Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
     {
-        if ( log != null )
-        {
-            log.debug( "Checking for file path " + filePath );
-        }
+        LOG.debug( "Checking for file path " + filePath );
         SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
         if ( retval != null )
         {
-            if ( log != null )
-            {
-                log.debug( "Found filepath" );
-            }
+            LOG.debug( "Found filepath" );
             return retval;
         }
         // see if any of the parent directories contain default information which should be used
@@ -231,21 +226,9 @@ public class SpdxFileCollector
         } while ( retval == null && parentPathIndex > 0 );
         if ( retval != null )
         {
-            debug( "Found directory containing file path for path specific information.  File path: " + parentPath );
+            LOG.debug( "Found directory containing file path for path specific information.  File path: " + parentPath );
         }
         return retval;
-    }
-
-    private void debug( String msg )
-    {
-        if ( this.getLog() != null )
-        {
-            this.getLog().debug( msg );
-        }
-        else
-        {
-            logger.debug( msg );
-        }
     }
 
     /**
@@ -377,10 +360,7 @@ public class SpdxFileCollector
             }
             catch ( SpdxSourceParserException ex )
             {
-                if ( log != null )
-                {
-                    log.error( "Error parsing for SPDX license ID's", ex );
-                }
+                LOG.error( "Error parsing for SPDX license ID's", ex );
             }
             if ( fileSpdxLicenses != null && fileSpdxLicenses.size() > 0 )
             {
@@ -705,15 +685,5 @@ public class SpdxFileCollector
         }
 
         return checksums;
-    }
-
-    public void setLog( Log log )
-    {
-        this.log = log;
-    }
-
-    private Log getLog()
-    {
-        return this.log;
     }
 }
