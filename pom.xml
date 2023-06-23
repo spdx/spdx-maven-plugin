@@ -13,8 +13,9 @@
   <description>Plugin for supporting SPDX in a Maven build.  See README.md</description>
   <organization>
     <name>SPDX</name>
-    <url>http://spdx.dev</url>
+    <url>https://spdx.dev</url>
   </organization>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.outputTimestamp>1675930644</project.build.outputTimestamp>
@@ -25,6 +26,7 @@
     <sonar.projectKey>spdx-maven-plugin</sonar.projectKey>
     <dependency-check-maven.version>8.0.1</dependency-check-maven.version>
   </properties>
+
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -32,11 +34,13 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <scm>
-  <url>https://github.com/spdx/spdx-maven-plugin</url>
-  <connection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</connection>
-  <developerConnection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
+    <url>https://github.com/spdx/spdx-maven-plugin</url>
+    <connection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
   </scm>
+
   <distributionManagement>
     <repository>
       <id>ossrh</id>
@@ -44,15 +48,17 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
+
   <developers>
-     <developer>
-       <id>goneall</id>
-       <name>Gary O'Neall</name>
-       <email>gary@sourceauditor.com</email>
-       <organization>SPDX</organization>
-       <organizationUrl>http://spdx.org</organizationUrl>
-     </developer>
-   </developers>
+    <developer>
+      <id>goneall</id>
+      <name>Gary O'Neall</name>
+      <email>gary@sourceauditor.com</email>
+      <organization>SPDX</organization>
+      <organizationUrl>https://spdx.dev</organizationUrl>
+    </developer>
+  </developers>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -252,24 +258,28 @@
   <profiles>
     <profile>
       <id>run-its</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.7</version>
+            <version>3.6.0</version>
             <configuration>
-              <debug>true</debug>
+              <debug>false</debug>
+              <streamLogsOnFailures>true</streamLogsOnFailures>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <pomIncludes>
                 <pomInclude>*/pom.xml</pomInclude>
               </pomIncludes>
               <postBuildHookScript>verify</postBuildHookScript>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <settingsFile>${project.build.directory}/it/settings.xml</settingsFile>
+              <settingsFile>src/it/settings.xml</settingsFile>
               <goals>
                 <goal>clean</goal>
-                <goal>test-compile</goal>
+                <goal>verify</goal>
               </goals>
             </configuration>
             <executions>
@@ -293,7 +303,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

@@ -1,3 +1,3 @@
-File touchFile = new File( basedir, "target/touch.txt" );
+File spdxFile = new File( basedir, "target/site/org.spdx.it_simple-it-1.0-SNAPSHOT.spdx.json" );
 
-assert touchFile.isFile()
+assert spdxFile.isFile()
