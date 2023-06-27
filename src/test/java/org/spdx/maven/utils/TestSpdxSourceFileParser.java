@@ -1,4 +1,4 @@
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import static org.junit.Assert.*;
 

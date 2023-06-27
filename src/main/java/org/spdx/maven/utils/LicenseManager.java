@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.License;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
@@ -29,6 +30,8 @@ import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxListedLicense;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
+
+import org.spdx.maven.NonStandardLicense;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import static org.junit.Assert.*;
 
@@ -44,6 +44,7 @@ import org.spdx.library.model.pointer.ByteOffsetPointer;
 import org.spdx.library.model.pointer.LineCharPointer;
 import org.spdx.library.model.pointer.SinglePointer;
 import org.spdx.library.model.pointer.StartEndPointer;
+import org.spdx.maven.SnippetInfo;
 import org.spdx.storage.simple.InMemSpdxStore;
 
 

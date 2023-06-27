@@ -32,8 +32,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.fileset.FileSet;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.SpdxDocument;
@@ -43,6 +43,17 @@ import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
+
+import org.spdx.maven.utils.LicenseManager;
+import org.spdx.maven.utils.LicenseManagerException;
+import org.spdx.maven.utils.LicenseMapperException;
+import org.spdx.maven.utils.SpdxBuilderException;
+import org.spdx.maven.utils.SpdxCollectionException;
+import org.spdx.maven.utils.SpdxDefaultFileInformation;
+import org.spdx.maven.utils.SpdxDependencyInformation;
+import org.spdx.maven.utils.SpdxDocumentBuilder;
+import org.spdx.maven.utils.SpdxFileCollector;
+import org.spdx.maven.utils.SpdxProjectInformation;
 
 import java.io.File;
 import java.net.URI;
@@ -82,7 +93,7 @@ import java.util.Set;
        requiresDependencyResolution = ResolutionScope.TEST )
 public class CreateSpdxMojo extends AbstractMojo
 {
-    static final String INCLUDE_ALL = "**/*";
+    public static final String INCLUDE_ALL = "**/*";
 
     public static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
 

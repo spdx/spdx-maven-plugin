@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import static org.junit.Assert.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.After;
@@ -36,6 +35,7 @@ import org.spdx.library.model.license.ConjunctiveLicenseSet;
 import org.spdx.library.model.license.ExtractedLicenseInfo;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxListedLicense;
+import org.spdx.maven.NonStandardLicense;
 import org.spdx.storage.simple.InMemSpdxStore;
 import org.apache.maven.model.License;
 
@@ -92,7 +92,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument)}.
+     * Test method for {@link org.spdx.maven.utils.LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument)}.
      *
      * @throws LicenseMapperException
      */
@@ -104,7 +104,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#addExtractedLicense(org.spdx.maven.NonStandardLicense)}.
+     * Test method for {@link org.spdx.maven.utils.LicenseManager#addExtractedLicense(org.spdx.maven.NonStandardLicense)}.
      *
      * @throws MalformedURLException
      * @throws LicenseManagerException
@@ -159,7 +159,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#mavenLicenseListToSpdxLicense(java.util.List)}.
+     * Test method for {@link org.spdx.maven.utils.LicenseManager#mavenLicenseListToSpdxLicense(java.util.List)}.
      *
      * @throws LicenseManagerException
      * @throws LicenseMapperException
@@ -206,7 +206,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#mavenLicenseToSpdxLicense(org.apache.maven.model.License)}.
+     * Test method for {@link org.spdx.maven.utils.LicenseManager#mavenLicenseToSpdxLicense(org.apache.maven.model.License)}.
      *
      * @throws LicenseManagerException
      * @throws MalformedURLException
@@ -258,7 +258,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.AnyLicenseInfo)}.
+     * Test method for {@link org.spdx.maven.utils.LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.AnyLicenseInfo)}.
      *
      * @throws InvalidLicenseStringException
      * @throws LicenseManagerException

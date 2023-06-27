@@ -17,6 +17,7 @@ package org.spdx.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.ReferenceType;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.ExternalRef;
@@ -29,6 +30,9 @@ import org.spdx.library.model.enumerations.Purpose;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import org.spdx.library.referencetype.ListedReferenceTypes;
+
+import org.spdx.maven.Annotation;
+import org.spdx.maven.ExternalReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Source Auditor Inc.
+ * Copyright Source Auditor Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,53 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 /**
- * Exceptions relating to the building of SPDX Documents
+ * Exceptions related to the LicenseManager
  *
  * @author Gary O'Neall
  */
-public class SpdxBuilderException extends Exception
+public class LicenseManagerException extends Exception
 {
 
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1672757028355331818L;
 
     /**
-     *
+     * @param arg0
      */
-    public SpdxBuilderException()
+    public LicenseManagerException( String arg0 )
     {
-        super();
+        super( arg0 );
     }
 
     /**
-     * @param message
+     * @param arg0
      */
-    public SpdxBuilderException( String message )
+    public LicenseManagerException( Throwable arg0 )
     {
-        super( message );
+        super( arg0 );
     }
 
     /**
-     * @param cause
+     * @param arg0
+     * @param arg1
      */
-    public SpdxBuilderException( Throwable cause )
+    public LicenseManagerException( String arg0, Throwable arg1 )
     {
-        super( cause );
+        super( arg0, arg1 );
     }
-
-    /**
-     * @param message
-     * @param cause
-     */
-    public SpdxBuilderException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
-
 
 }

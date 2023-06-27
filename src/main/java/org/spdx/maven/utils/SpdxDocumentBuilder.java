@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,6 +52,9 @@ import org.spdx.library.model.enumerations.RelationshipType;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.ListedLicenses;
 import org.spdx.library.model.license.SpdxListedLicense;
+import org.spdx.maven.ExternalReference;
+import org.spdx.maven.NonStandardLicense;
+import org.spdx.maven.OutputFormat;
 import org.spdx.spdxRdfStore.RdfStore;
 import org.spdx.storage.IModelStore.IdType;
 import org.spdx.storage.ISerializableModelStore;
