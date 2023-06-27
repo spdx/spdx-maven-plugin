@@ -1,4 +1,4 @@
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import static org.junit.Assert.*;
 
@@ -17,7 +17,6 @@ import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.ModelCopyManager;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import org.spdx.storage.simple.InMemSpdxStore;

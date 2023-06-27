@@ -22,10 +22,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.plugins.annotations.Parameter;
+
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
+
+import org.spdx.maven.utils.SpdxBuilderException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.plugin.logging.Log;
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
+
+import org.spdx.maven.SnippetInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

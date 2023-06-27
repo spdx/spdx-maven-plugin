@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 /**
- * Errors related to mapping Maven licenses to SPDX licenses
+ * Exceptions relating to the building of SPDX Documents
  *
  * @author Gary O'Neall
  */
-public class LicenseMapperException extends Exception
+public class SpdxBuilderException extends Exception
 {
 
     /**
@@ -31,15 +31,15 @@ public class LicenseMapperException extends Exception
     /**
      *
      */
-    public LicenseMapperException()
+    public SpdxBuilderException()
     {
-        // default constructor
+        super();
     }
 
     /**
      * @param message
      */
-    public LicenseMapperException( String message )
+    public SpdxBuilderException( String message )
     {
         super( message );
     }
@@ -47,7 +47,7 @@ public class LicenseMapperException extends Exception
     /**
      * @param cause
      */
-    public LicenseMapperException( Throwable cause )
+    public SpdxBuilderException( Throwable cause )
     {
         super( cause );
     }
@@ -56,9 +56,10 @@ public class LicenseMapperException extends Exception
      * @param message
      * @param cause
      */
-    public LicenseMapperException( String message, Throwable cause )
+    public SpdxBuilderException( String message, Throwable cause )
     {
         super( message, cause );
     }
+
 
 }

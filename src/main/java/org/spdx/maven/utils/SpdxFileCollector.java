@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.Relationship;
@@ -42,6 +41,7 @@ import org.spdx.library.model.enumerations.FileType;
 import org.spdx.library.model.enumerations.RelationshipType;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.InvalidLicenseStringException;
+import org.spdx.maven.SnippetInfo;
 import org.spdx.storage.IModelStore.IdType;
 
 import org.slf4j.Logger;

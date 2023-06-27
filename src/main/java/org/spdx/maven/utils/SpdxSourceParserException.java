@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.spdx.maven;
+package org.spdx.maven.utils;
 
 /**
  * Exceptions related to parsing source files for SPDX identifiers

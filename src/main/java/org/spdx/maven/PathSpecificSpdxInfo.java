@@ -18,10 +18,13 @@ package org.spdx.maven;
 import java.util.List;
 
 import org.apache.maven.plugins.annotations.Parameter;
+
 import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.LicenseInfoFactory;
+
+import org.spdx.maven.utils.SpdxDefaultFileInformation;
 
 /**
  * Simple class to hold SPDX data for a file or directory.  Utilizes Mojo parameters for the values.  The only required
