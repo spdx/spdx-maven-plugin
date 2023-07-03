@@ -58,7 +58,7 @@ is available, a `nonStandardLicense` must be declared as a parameter including
 a unique license ID and the verbatim license text.
 
 # Example
-See the file [`SpdxTools-POM-File-Example.xml`](SpdxTools-POM-File-Example.xml) for an example project using the spdx-maven-plugin.
+See the file [`src/it/advanced/pom.xml`](src/it/advanced/pom.xml) for an example project using the spdx-maven-plugin.
 
 # Contributing
 See the [CONTRIBUTING.MD](CONTRIBUTING.md) documentation.
