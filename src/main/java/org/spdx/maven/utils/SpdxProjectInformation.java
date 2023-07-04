@@ -85,9 +85,16 @@ public class SpdxProjectInformation
         this.primaryPurpose = primaryPurpose;
     }
 
-    public SpdxProjectInformation () throws InvalidSPDXAnalysisException {
-        this.concludedLicense = new SpdxNoAssertionLicense();
-        this.declaredLicense = new SpdxNoAssertionLicense();
+    public SpdxProjectInformation () {
+        try
+        {
+            this.concludedLicense = new SpdxNoAssertionLicense();
+            this.declaredLicense = new SpdxNoAssertionLicense();
+        }
+        catch ( InvalidSPDXAnalysisException isae )
+        {
+            // ignore: cannot happen, why does SpdxNoAssertionLicense() constructor throw this exception?
+        }
     }
 
     /**
