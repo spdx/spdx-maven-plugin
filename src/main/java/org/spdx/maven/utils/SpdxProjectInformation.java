@@ -85,7 +85,8 @@ public class SpdxProjectInformation
         this.primaryPurpose = primaryPurpose;
     }
 
-    public SpdxProjectInformation () throws InvalidSPDXAnalysisException {
+    public SpdxProjectInformation () throws InvalidSPDXAnalysisException
+    {
         this.concludedLicense = new SpdxNoAssertionLicense();
         this.declaredLicense = new SpdxNoAssertionLicense();
     }
