@@ -129,21 +129,15 @@
   <build>
     <resources>
       <resource>
-        <targetPath>resources</targetPath>
-        <filtering>false</filtering>
-        <directory>resources</directory>
-        <includes>
-          <include>**/*</include>
-        </includes>
+        <directory>${project.basedir}/src/main/resources</directory>
       </resource>
       <resource>
+         <directory>${project.basedir}</directory>
          <targetPath>META-INF</targetPath>
-         <filtering>false</filtering>
-         <directory>.</directory>
          <includes>
             <include>NOTICE</include>
             <include>LICENSE</include>
-            <include>README.txt</include>
+            <include>README.md</include>
          </includes>
        </resource>
     </resources>
