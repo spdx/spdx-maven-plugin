@@ -198,23 +198,23 @@
 						<defaultFileComment>test file comment</defaultFileComment>
 						<testParameter>test parm</testParameter>
 						<documentAnnotations>
-							<param>
+							<documentAnnotation>
 								<annotator>Person: Gary O'Neall</annotator>
 								<annotationDate> 2015-07-23T18:30:22Z</annotationDate>
 								<annotationType>OTHER</annotationType>
 								<annotationComment>Initial submission for the SPDX 2.0 document bake-off</annotationComment>
-							</param>
+							</documentAnnotation>
 						</documentAnnotations>
 						<packageAnnotations>
-							<param>
+							<packageAnnotation>
 								<annotator>Person: Gary O'Neall</annotator>
 								<annotationDate> 2015-07-23T18:30:22Z</annotationDate>
 								<annotationType>OTHER</annotationType>
 								<annotationComment>SPDX Tools package submitted for the SPDX 2.0 bake-off</annotationComment>
-							</param>
+							</packageAnnotation>
 						</packageAnnotations>
 						<nonStandardLicenses>
-							<param>
+							<nonStandardLicense>
 								<licenseId>LicenseRef-CyberNeko</licenseId>
 								<extractedText>The CyberNeko Software License, Version 1.0
 
@@ -264,11 +264,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This license is based on the Apache Software License, version 1.1.</extractedText>
 							<name>The CyberNeko Software License, Version 1.0</name>
-						</param>
+						</nonStandardLicense>
 					</nonStandardLicenses>
 					<defaultFileCopyright>Copyright (c) 2012, 2013, 2014, 2015 Source Auditor Inc.</defaultFileCopyright>
 					<defaultFileContributors>
-						<param>Gary O'Neall</param>
+						<defaultFileContributor>Gary O'Neall</defaultFileContributor>
 					</defaultFileContributors>
 					<defaultLicenseInformationInFile>Apache-2.0</defaultLicenseInformationInFile>
 					<defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
@@ -287,7 +287,7 @@ This license is based on the Apache Software License, version 1.1.</extractedTex
 					<licenseConcluded>(Apache-2.0 AND MIT AND LicenseRef-CyberNeko AND LGPL-2.1 AND BSD-3-Clause AND X11 AND MPL-1.0)</licenseConcluded>
 						<creatorComment>Created for Linux Con. SPDX Bakeoff 2015</creatorComment>
 					<creators>
-						<param>Person: Gary O'Neall</param>
+					<creator>Person: Gary O'Neall</creator>
 					</creators>
 					<originator>Organization: Linux Foundation</originator>
 				</configuration>
