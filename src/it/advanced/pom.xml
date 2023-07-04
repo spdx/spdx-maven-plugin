@@ -53,10 +53,10 @@
             <type>pom</type>
         </dependency>
         <dependency>
-        <!-- Force the dependency version to 2.9.8 for Jena - resolves vulnerability -->
+        <!-- Force the dependency version to 2.12.7.1 for Jena - resolves vulnerability -->
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.8</version>
+            <version>2.12.7.1</version>
         </dependency>
         <dependency>
         <!-- Force the dependency version to 1.18 for Jena - resolves vulnerability -->
