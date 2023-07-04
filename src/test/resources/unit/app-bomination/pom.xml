@@ -79,7 +79,7 @@
               <spdxDocumentNamespace>http://spdx.org/documents/APP-BOM-Ination-3d81ad36-2ee1-45be-85b6-83eba529424c</spdxDocumentNamespace>
               <documentComment>This document is an example of an SPDX 2.1 file created by the SPDX Maven plugin</documentComment>
               <nonStandardLicenses>
-                  <param>
+                  <nonStandardLicense>
                       <licenseId>LicenseRef-FaustProprietary</licenseId>
                       <extractedText>FAUST, INC. PROPRIETARY LICENSE:
 
@@ -94,11 +94,11 @@ Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.
                       </extractedText>
                       <name>Faust (really) Proprietary License</name>
                       <comment>This license was extracted from the file InsufficientKarmaException</comment>
-                  </param>
+                  </nonStandardLicense>
               </nonStandardLicenses>
               <defaultFileCopyright>NOASSERTION</defaultFileCopyright>
               <defaultFileContributors>
-                  <param>yevster</param>
+                  <defaultFileContributor>yevster</defaultFileContributor>
               </defaultFileContributors>
               <defaultLicenseInformationInFile>Apache-2.0</defaultLicenseInformationInFile>
               <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
@@ -107,8 +107,8 @@ Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.
               <licenseConcluded>Apache-2.0 AND LicenseRef-FaustProprietary</licenseConcluded>
               <creatorComment>Created for the SPDX 2.1 BakeOff - wish I could be there in Berlin!</creatorComment>
               <creators>
-                  <param>Person: Gary O'Neall</param>
-                  <param>Organization: Source Auditor Inc.</param>
+                  <creator>Person: Gary O'Neall</creator>
+                  <creator>Organization: Source Auditor Inc.</creator>
               </creators>
               <copyrightText>Copyright (c) 2016 Faust, Inc.,</copyrightText>
               <pathsWithSpecificSpdxInfo>

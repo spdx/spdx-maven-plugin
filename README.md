@@ -28,7 +28,7 @@ In the build plugins section add the plugin with a goal of createSPDX:
                     </executions>
                     <configuration>
                       <excludedFilePatterns>
-                        <param>*.spdx</param>
+                        <excludedFilePattern>*.spdx</excludedFilePattern>
                       </excludedFilePatterns>
                       <!-- See documentation below for additional configuration -->
                     </configuration>

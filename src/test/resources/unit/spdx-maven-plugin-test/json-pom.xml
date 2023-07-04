@@ -101,53 +101,53 @@
                     <spdxDocumentNamespace>http://spdx.org/documents/spdx%20toolsv2.0%20rc1</spdxDocumentNamespace>
                     <documentComment>Document Comment</documentComment>
                     <documentAnnotations>
-                        <param>
+                        <documentAnnotation>
                             <annotationComment>Annotation1</annotationComment>
                             <annotationType>REVIEW</annotationType>
                             <annotationDate>2010-01-29T18:30:22Z</annotationDate>
                             <annotator>Person:Test Person</annotator>
-                        </param>
-                        <param>
+                        </documentAnnotation>
+                        <documentAnnotation>
                             <annotationComment>Annotation2</annotationComment>
                             <annotationType>OTHER</annotationType>
                             <annotationDate>2012-11-29T18:30:22Z</annotationDate>
                             <annotator>Organization:Test Organization</annotator>
-                        </param>
+                        </documentAnnotation>
                     </documentAnnotations>
                     <packageAnnotations>
-                        <param>
+                        <packageAnnotation>
                             <annotationComment>PackageAnnotation</annotationComment>
                             <annotationType>REVIEW</annotationType>
                             <annotationDate>2015-01-29T18:30:22Z</annotationDate>
                             <annotator>Person:Test Package Person</annotator>
-                        </param>
+                        </packageAnnotation>
                     </packageAnnotations>
                     <nonStandardLicenses>
-                        <param>
+                        <nonStandardLicense>
                             <licenseId>LicenseRef-testLicense</licenseId>
                             <extractedText>Test license text</extractedText>
                             <name>Test License</name>
                             <crossReference>
-                                <param>http://www.test.url/testLicense.html</param>
+                                <crossReference>http://www.test.url/testLicense.html</crossReference>
                             </crossReference>
                             <comment>Test license comment</comment>
-                        </param>
-                        <param>
+                        </nonStandardLicense>
+                        <nonStandardLicense>
                             <licenseId>LicenseRef-testLicense2</licenseId>
                             <extractedText>Second est license text</extractedText>
                             <name>Second Test License</name>
                             <crossReference>
-                                <param>http://www.test.url/testLicense2.html</param>
-                                <param>http://www.test.url/testLicense2-alt.html</param>
+                                <crossReference>http://www.test.url/testLicense2.html</crossReference>
+                                <crossReference>http://www.test.url/testLicense2-alt.html</crossReference>
                             </crossReference>
                             <comment>Second Test license comment</comment>
-                        </param>
+                        </nonStandardLicense>
                     </nonStandardLicenses>
                     <defaultFileCopyright>Copyright (c) 2012, 2013, 2014 Source Auditor Inc.</defaultFileCopyright>
                     <defaultFileComment>Default file comment</defaultFileComment>
                     <defaultFileContributors>
-                        <param>First contributor</param>
-                        <param>Second contributor</param>
+                        <defaultFileContributor>First contributor</defaultFileContributor>
+                        <defaultFileContributor>Second contributor</defaultFileContributor>
                     </defaultFileContributors>
                     <defaultLicenseInformationInFile>Apache-1.1</defaultLicenseInformationInFile>
                     <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
@@ -157,8 +157,8 @@
                     <licenseConcluded>BSD-3-Clause</licenseConcluded>
                     <creatorComment>Creator comment</creatorComment>
                     <creators>
-                        <param>Person: Creator1</param>
-                        <param>Person: Creator2</param>
+                        <creator>Person: Creator1</creator>
+                        <creator>Person: Creator2</creator>
                     </creators>
                     <licenseComments>License comments</licenseComments>
                     <originator>Organization: Originating org.</originator>
@@ -199,7 +199,7 @@
                             <directoryOrFile>src/main/java/CommonCode.java</directoryOrFile>
                             <fileComment>Comment for CommonCode</fileComment>
                             <fileContributors>
-                                <param>Contributor to CommonCode</param>
+                                <fileContributor>Contributor to CommonCode</fileContributor>
                             </fileContributors>
                             <fileCopyright>Common Code Copyright</fileCopyright>
                             <fileLicenseComment>License Comment for Common Code</fileLicenseComment>
