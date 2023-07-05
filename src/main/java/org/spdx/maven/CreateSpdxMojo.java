@@ -442,9 +442,8 @@ public class CreateSpdxMojo extends AbstractMojo
             }
         }
         SpdxDocument spdxDoc = builder.getSpdxDoc();
-        FileSet[] includedSourceDirectories = getSourceDirectories();
-        FileSet[] includedResourceDirectories = getResourceDirectories();
-        FileSet[] includedTestDirectories = getTestDirectories();
+        List<FileSet> sources = toFileSet( mavenProject.getCompileSourceRoots(), mavenProject.getResources() );
+        sources.addAll( toFileSet( mavenProject.getTestCompileSourceRoots(), null ) ); // TODO: why not test resources given source resources are taken into account?
 
         SpdxProjectInformation projectInformation;
         try
@@ -473,9 +472,7 @@ public class CreateSpdxMojo extends AbstractMojo
 
         if ( getLog().isDebugEnabled() )
         {
-            logIncludedDirectories( includedSourceDirectories );
-            logIncludedDirectories( includedTestDirectories );
-            logIncludedDirectories( includedResourceDirectories );
+            logIncludedDirectories( sources );
             logNonStandardLicenses( this.nonStandardLicenses );
             projectInformation.logInfo( spdxDoc );
             defaultFileInformation.logInfo();
@@ -485,8 +482,7 @@ public class CreateSpdxMojo extends AbstractMojo
 
         try
         {
-            builder.buildDocumentFromFiles( includedSourceDirectories, includedTestDirectories,
-                    includedResourceDirectories, mavenProject.getBasedir().getAbsolutePath(), projectInformation,
+            builder.buildDocumentFromFiles( sources, mavenProject.getBasedir().getAbsolutePath(), projectInformation,
                     defaultFileInformation, pathSpecificInformation, dependencyInformation, getChecksumAlgorithms(),
                     spdxDoc.getDocumentUri() );
         }
@@ -638,13 +634,13 @@ public class CreateSpdxMojo extends AbstractMojo
      *
      * @param includedDirectories
      */
-    private void logIncludedDirectories( FileSet[] includedDirectories )
+    private void logIncludedDirectories( List<FileSet> includedDirectories )
     {
         if (( includedDirectories == null ) || !getLog().isDebugEnabled() )
         {
             return;
         }
-        getLog().debug( "Logging " + includedDirectories.length + " filesets." );
+        getLog().debug( "Logging " + includedDirectories.size() + " filesets." );
         for ( FileSet includedDirectory : includedDirectories )
         {
             StringBuilder sb = new StringBuilder( "Included Directory: " + includedDirectory.getDirectory() );
@@ -894,93 +890,40 @@ public class CreateSpdxMojo extends AbstractMojo
     }
 
     /**
-     * Combine all inputs for source files which are to be included in the SPDX analysis. FileSets are all normalized to
-     * include the full (absolute) path and use filtering.
+     * FileSets are all normalized to include the full (absolute) path and use filtering.
      *
-     * @return included files from the project source roots, resources, and includedDirectories parameter
+     * @param roots the source roots as Strings
+     * @param resources the resources
+     * @return the source roots and resources as FileSets
      */
-    private FileSet[] getSourceDirectories()
+    private static List<FileSet> toFileSet( List<String> roots, List<Resource> resources )
     {
-        ArrayList<FileSet> result = new ArrayList<>();
-        List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
-        if ( sourceRoots != null )
+        List<FileSet> result = new ArrayList<>();
+        if ( roots != null )
         {
-            for ( String sourceRoot : sourceRoots )
+            for ( String root : roots )
             {
-                FileSet srcFileSet = new FileSet();
-                File sourceDir = new File( sourceRoot );
-                srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
-                srcFileSet.addInclude( INCLUDE_ALL );
-                result.add( srcFileSet );
-                getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
+                FileSet fileSet = new FileSet();
+                File dir = new File( root );
+                fileSet.setDirectory( dir.getAbsolutePath() );
+                fileSet.addInclude( INCLUDE_ALL );
+                result.add( fileSet );
             }
         }
-        return result.toArray( new FileSet[0] );
-    }
 
-    /**
-     * Combine all inputs for resource files which are to be included in the SPDX analysis. FileSets are all normalized
-     * to include the full (absolute) path and use filtering.
-     *
-     * @return included files from the project source roots, resources, and includedDirectories parameter
-     */
-    private FileSet[] getResourceDirectories()
-    {
-        ArrayList<FileSet> result = new ArrayList<>();
-        List<String> sourceRoots = this.mavenProject.getCompileSourceRoots();
-        if ( sourceRoots != null )
+        if ( resources != null )
         {
-            for ( String sourceRoot : sourceRoots )
+            for ( Resource resource : resources )
             {
-                FileSet srcFileSet = new FileSet();
-                File sourceDir = new File( sourceRoot );
-                srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
-                srcFileSet.addInclude( INCLUDE_ALL );
-                result.add( srcFileSet );
-                getLog().debug( "Adding sourceRoot directory " + srcFileSet.getDirectory() );
+                FileSet fileSet = new FileSet();
+                File dir = new File( resource.getDirectory() );
+                fileSet.setDirectory( dir.getAbsolutePath() );
+                fileSet.setExcludes( resource.getExcludes() );
+                fileSet.setIncludes( resource.getIncludes() );
+                result.add( fileSet );
             }
         }
-        List<Resource> resourceList = this.mavenProject.getResources();
-        if ( resourceList != null )
-        {
-            for ( Resource resource : resourceList )
-            {
-                FileSet resourceFileSet = new FileSet();
-                File resourceDir = new File( resource.getDirectory() );
-                resourceFileSet.setDirectory( resourceDir.getAbsolutePath() );
-                resourceFileSet.setExcludes( resource.getExcludes() );
-                resourceFileSet.setIncludes( resource.getIncludes() );
-                result.add( resourceFileSet );
-                getLog().debug( "Adding resource directory " + resource.getDirectory() );
-            }
-        }
-        getLog().debug( "Number of filesets: " + result.size() );
-        return result.toArray( new FileSet[0] );
-    }
-
-    /**
-     * Combine all inputs for test files which are to be included in the SPDX analysis. FileSets are all normalized to
-     * include the full (absolute) path and use filtering.
-     *
-     * @return included files from the project source roots, resources, and includedDirectories parameter
-     */
-    private FileSet[] getTestDirectories()
-    {
-        ArrayList<FileSet> result = new ArrayList<>();
-        List<String> sourceRoots = this.mavenProject.getTestCompileSourceRoots();
-        if ( sourceRoots != null )
-        {
-            for ( String sourceRoot : sourceRoots )
-            {
-                FileSet srcFileSet = new FileSet();
-                File sourceDir = new File( sourceRoot );
-                srcFileSet.setDirectory( sourceDir.getAbsolutePath() );
-                srcFileSet.addInclude( INCLUDE_ALL );
-                result.add( srcFileSet );
-                getLog().debug( "Adding TestSourceRoot directory " + srcFileSet.getDirectory() );
-            }
-        }
-        return result.toArray( new FileSet[0] );
+        return result;
     }
 
     /**

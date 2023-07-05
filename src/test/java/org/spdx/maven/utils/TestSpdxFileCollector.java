@@ -95,7 +95,7 @@ public class TestSpdxFileCollector
     private File directory;
     private String[] filePaths;
     private String[] SpdxFileNames;
-    private FileSet[] fileSets;
+    private List<FileSet> fileSets;
     private SpdxPackage spdxPackage;
     SpdxDocument spdxDoc = null;
 
@@ -172,7 +172,7 @@ public class TestSpdxFileCollector
         FileSet dirFileSet = new FileSet();
         dirFileSet.setDirectory( directory.getPath() );
         dirFileSet.setOutputDirectory( this.directory.getName() );
-        this.fileSets = new FileSet[] {dirFileSet};
+        this.fileSets = Arrays.asList( dirFileSet );
         this.spdxPackage = spdxDoc.createPackage( SpdxConstants.SPDX_ELEMENT_REF_PRENUM+"test", 
                                                   "TestPackage", 
                                                   concludedLicense, 
@@ -265,14 +265,14 @@ public class TestSpdxFileCollector
     public void testCollectFileInDirectoryPattern() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
         FileSet skipBin = new FileSet();
-        skipBin.setDirectory( this.fileSets[0].getDirectory() );
+        skipBin.setDirectory( this.fileSets.get(0).getDirectory() );
         skipBin.addExclude( "**/*.bin" );
-        skipBin.setOutputDirectory( this.fileSets[0].getOutputDirectory() );
+        skipBin.setOutputDirectory( this.fileSets.get(0).getOutputDirectory() );
         SpdxFileCollector collector = new SpdxFileCollector();
         SpdxFile[] SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( 0, SpdxFiles.length );
 
-        collector.collectFiles( new FileSet[] {skipBin}, this.directory.getAbsolutePath(), this.defaultFileInformation,
+        collector.collectFiles( Arrays.asList( skipBin ), this.directory.getAbsolutePath(), this.defaultFileInformation,
                 new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
         SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( filePaths.length - 2, SpdxFiles.length );
@@ -522,7 +522,7 @@ public class TestSpdxFileCollector
             FileSet fileSet2 = new FileSet();
             fileSet2.setDirectory( tempDir2.getPath() );
 
-            collector.collectFiles( new FileSet[] {fileSet2}, tempDir2.getAbsolutePath(), info2, new HashMap<>(),
+            collector.collectFiles( Arrays.asList( fileSet2 ), tempDir2.getAbsolutePath(), info2, new HashMap<>(),
                     spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
             result = collector.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[collector.getLicenseInfoFromFiles().size()] );
             assertEquals( 3, result.length );

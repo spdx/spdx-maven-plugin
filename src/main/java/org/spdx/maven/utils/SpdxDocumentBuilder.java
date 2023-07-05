@@ -188,9 +188,7 @@ public class SpdxDocumentBuilder
     /**
      * Build the SPDX document from the files and save the information to the SPDX file
      *
-     * @param includedSourceDirectories   Source directories to be included in the document
-     * @param includedResourceDirectories Test directories to be included in the document
-     * @param includedTestDirectories     Resource directories to be included in the document
+     * @param sources                     Source directories to be included in the document
      * @param baseDir                     Base directory used to create the relative file paths for the SPDX file names
      * @param projectInformation          Project level SPDX information
      * @param defaultFileInformation      Default SPDX file information
@@ -200,9 +198,7 @@ public class SpdxDocumentBuilder
      * @param algorithms                  algorithms to use to generate checksums
      * @throws SpdxBuilderException
      */
-    public void buildDocumentFromFiles( FileSet[] includedSourceDirectories, 
-                                        FileSet[] includedTestDirectories, 
-                                        FileSet[] includedResourceDirectories, 
+    public void buildDocumentFromFiles( List<FileSet> sources,
                                         String baseDir, SpdxProjectInformation projectInformation, 
                                         SpdxDefaultFileInformation defaultFileInformation, 
                                         Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
@@ -214,7 +210,7 @@ public class SpdxDocumentBuilder
         {
             LOG.debug( "Starting buid document from files" );
             fillSpdxDocumentInformation( projectInformation );
-            collectSpdxFileInformation( includedSourceDirectories, includedTestDirectories, includedResourceDirectories,
+            collectSpdxFileInformation( sources,
                     baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation, algorithms );
             addDependencyInformation( dependencyInformation );
             modelStore.serialize( spdxDocumentNamespace, spdxOut );
@@ -519,9 +515,7 @@ public class SpdxDocumentBuilder
     /**
      * Collect information at the file level, fill in the SPDX document
      *
-     * @param includedSourceDirectories   Source directories to be included in the document
-     * @param includedResourceDirectories Test directories to be included in the document
-     * @param includedTestDirectories     Resource directories to be included in the document
+     * @param sources                     Source directories to be included in the document
      * @param baseDir                     project base directory used to construct the relative paths for the SPDX
      *                                    files
      * @param projectInformation          Project level SPDX information
@@ -532,7 +526,7 @@ public class SpdxDocumentBuilder
      * @throws InvalidSPDXAnalysisException
      * @throws SpdxBuilderException
      */
-    private void collectSpdxFileInformation( FileSet[] includedSourceDirectories, FileSet[] includedTestDirectories, FileSet[] includedResourceDirectories, 
+    private void collectSpdxFileInformation( List<FileSet> sources, 
                                              String baseDir, SpdxDefaultFileInformation defaultFileInformation, String spdxFileName, 
                                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                                              Set<ChecksumAlgorithm> algorithms ) throws InvalidSPDXAnalysisException, SpdxBuilderException
@@ -540,12 +534,8 @@ public class SpdxDocumentBuilder
         SpdxFileCollector fileCollector = new SpdxFileCollector();
         try
         {
-            fileCollector.collectFiles( includedSourceDirectories, baseDir, defaultFileInformation,
+            fileCollector.collectFiles( sources, baseDir, defaultFileInformation,
                     pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc, algorithms );
-            fileCollector.collectFiles( includedTestDirectories, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.TEST_CASE_OF, spdxDoc, algorithms );
-            fileCollector.collectFiles( includedResourceDirectories, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.CONTAINED_BY, spdxDoc, algorithms );
         }
         catch ( SpdxCollectionException e )
         {
