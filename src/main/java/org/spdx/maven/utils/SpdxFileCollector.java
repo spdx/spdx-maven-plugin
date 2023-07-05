@@ -161,7 +161,7 @@ public class SpdxFileCollector
      *
      * @throws SpdxCollectionException
      */
-    public void collectFiles( FileSet[] fileSets, String baseDir, 
+    public void collectFiles( List<FileSet> fileSets, String baseDir, 
                               SpdxDefaultFileInformation defaultFileInformation, 
                               Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                               SpdxPackage projectPackage, RelationshipType relationshipType, 
