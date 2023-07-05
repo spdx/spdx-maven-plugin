@@ -59,10 +59,10 @@
             <version>2.12.7.1</version>
         </dependency>
         <dependency>
-        <!-- Force the dependency version to 1.18 for Jena - resolves vulnerability -->
+        <!-- Force the dependency version to 1.21 for Jena - resolves vulnerability -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.18</version>
+            <version>1.21</version>
         </dependency>
         <dependency>
            <groupId>org.apache.jena</groupId>
