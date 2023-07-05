@@ -40,7 +40,6 @@ import org.spdx.library.ModelCopyManager;
 import org.spdx.library.SpdxConstants;
 import org.spdx.library.SpdxVerificationHelper;
 import org.spdx.library.model.Annotation;
-import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.Relationship;
 import org.spdx.library.model.SpdxCreatorInformation;
 import org.spdx.library.model.SpdxDocument;
@@ -202,8 +201,7 @@ public class SpdxDocumentBuilder
                                         SpdxDefaultFileInformation defaultFileInformation, 
                                         Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                                         SpdxDependencyInformation dependencyInformation, 
-                                        Set<ChecksumAlgorithm> algorithms,
-                                        String spdxDocumentNamespace ) throws SpdxBuilderException
+                                        Set<ChecksumAlgorithm> algorithms ) throws SpdxBuilderException
     {
         try (FileOutputStream spdxOut = new FileOutputStream( spdxFile ))
         {
@@ -212,7 +210,7 @@ public class SpdxDocumentBuilder
             collectSpdxFileInformation( sources,
                     baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation, algorithms );
             addDependencyInformation( dependencyInformation );
-            modelStore.serialize( spdxDocumentNamespace, spdxOut );
+            modelStore.serialize( spdxDoc.getDocumentUri(), spdxOut );
             LOG.debug( "Completed build document from files" );
         }
         catch ( FileNotFoundException e )
@@ -314,9 +312,9 @@ public class SpdxDocumentBuilder
     private Collection<Annotation> toSpdxAnnotations( org.spdx.maven.Annotation[] annotations ) throws MojoExecutionException
     {
         List<Annotation> retval = new ArrayList<>();
-        for ( int i = 0; i < annotations.length; i++ )
+        for ( org.spdx.maven.Annotation annotation: annotations )
         {
-            retval.add( annotations[i].toSpdxAnnotation( spdxDoc ) );
+            retval.add( annotation.toSpdxAnnotation( spdxDoc ) );
         }
         return retval;
     }
@@ -383,7 +381,7 @@ public class SpdxDocumentBuilder
         }
         try
         {
-         // description
+            // description
             if ( projectInformation.getDescription() != null )
             {
                 pkg.setDescription( projectInformation.getDescription() );
@@ -464,8 +462,7 @@ public class SpdxDocumentBuilder
         ExternalReference[] externalRefs = projectInformation.getExternalRefs();
         if ( externalRefs != null && externalRefs.length > 0 )
         {
-            ExternalRef[] externalRefAr = new ExternalRef[externalRefs.length];
-            for ( ExternalReference externalRef: externalRefs )
+            for ( ExternalReference externalRef : externalRefs )
             {
                 try
                 {

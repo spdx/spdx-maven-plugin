@@ -44,7 +44,6 @@ import org.spdx.library.model.license.InvalidLicenseStringException;
 import org.spdx.library.model.license.LicenseInfoFactory;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 
-import org.spdx.maven.utils.LicenseManager;
 import org.spdx.maven.utils.LicenseManagerException;
 import org.spdx.maven.utils.LicenseMapperException;
 import org.spdx.maven.utils.SpdxBuilderException;
@@ -80,12 +79,16 @@ import java.util.Set;
  * used.  If no SPDX standard license is available, a nonStandardLicense must be declared as a parameter including a
  * unique license ID and the verbatim license text.
  * <p>
- * The following SPDX fields are populated from the POM project information: - package name: project name or artifactId
- * if the project name is not provided - package description: project description - package shortDescription: project
- * description - package downloadUrl: distributionManager url - package homePage: project url - package supplier:
- * project organization - package versionInfo: project version - files for analysis: build source files + project
- * resource files
- * <p>
+ * The following SPDX fields are populated from the POM project information:<ul>
+ * <li>package name: project name or artifactId if the project name is not provided</li>
+ * <li>package description: project description</li>
+ * <li>package shortDescription: project description</li>
+ * <li>package downloadUrl: distributionManager url</li>
+ * <li>package homePage: project url</li>
+ * <li>package supplier: project organization</li>
+ * <li>package versionInfo: project version</li>
+ * <li>files for analysis: build source files + project resource files</li>
+ * </ul><p>
  * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
 @Mojo( name = "createSPDX",
@@ -105,8 +108,8 @@ public class CreateSpdxMojo extends AbstractMojo
 
     public static final String RDF_OUTPUT_FORMAT = "RDF/XML";
 
-    @Parameter( defaultValue = "${project}", readonly = true )
-    MavenProject mavenProject;
+    @Component
+    private MavenProject mavenProject;
 
     @Component
     private MavenProjectHelper projectHelper;
@@ -114,7 +117,7 @@ public class CreateSpdxMojo extends AbstractMojo
     @Component
     private ProjectBuilder mavenProjectBuilder;
 
-    @Parameter( defaultValue = "${session}", readonly = true )
+    @Component
     private MavenSession session;
 
     // Parameters for the plugin
@@ -122,20 +125,16 @@ public class CreateSpdxMojo extends AbstractMojo
      * SPDX File name
      */
     @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx",
-                property = "spdxFileName",
-                required = true )
+                property = "spdxFileName" )
     private File spdxFile;
 
     /**
      * Document namespace - must be unique for the artifact and SPDX file
      */
-    @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}",
-                property = "spdxDocumentNamespace",
-                required = true )
+    @Parameter( defaultValue = "http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}" )
     private String spdxDocumentNamespace;
 
-    @Parameter( defaultValue = "${project.basedir}",
-                property = "componentName" )
+    @Parameter( defaultValue = "${project.basedir}" )
     private String componentName;
 
     /**
@@ -338,10 +337,10 @@ public class CreateSpdxMojo extends AbstractMojo
      * Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default
      * project level fields NOT the higher level PathSpecificSpdxInfo.
      */
-    @Parameter( required = false )
+    @Parameter
     private PathSpecificSpdxInfo[] pathsWithSpecificSpdxInfo;
 
-    @Parameter( required = false )
+    @Parameter
     private ExternalReference[] externalReferences;
 
     /**
@@ -349,7 +348,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * - JSON - JSON SPDX format
      * - RDF/XML - RDF/XML format
      */
-    @Parameter( required = false )
+    @Parameter( defaultValue = "JSON" )
     private String outputFormat;
 
     /**
@@ -367,7 +366,6 @@ public class CreateSpdxMojo extends AbstractMojo
     @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
-    @SuppressWarnings( "deprecation" )
     public void execute() throws MojoExecutionException
     {
         OutputFormat outputFormatEnum = prepareOutput();
@@ -384,7 +382,7 @@ public class CreateSpdxMojo extends AbstractMojo
         SpdxProjectInformation projectInformation;
         try
         {
-            projectInformation = getSpdxProjectInfoFromParameters( builder.getLicenseManager(), spdxDoc );
+            projectInformation = getSpdxProjectInfoFromParameters( builder );
         }
         catch ( InvalidSPDXAnalysisException e2 )
         {
@@ -394,6 +392,7 @@ public class CreateSpdxMojo extends AbstractMojo
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters( spdxDoc );
         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation, spdxDoc );
 
+        @SuppressWarnings("deprecation")
         Set<Artifact> dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
 
         if ( getLog().isDebugEnabled() )
@@ -409,7 +408,7 @@ public class CreateSpdxMojo extends AbstractMojo
         SpdxDependencyInformation dependencyInformation = null;
         try
         {
-            dependencyInformation = getSpdxDependencyInformation( dependencies, builder.getLicenseManager(), spdxDoc );
+            dependencyInformation = getSpdxDependencyInformation( dependencies, builder );
         }
         catch ( LicenseMapperException e1 )
         {
@@ -423,8 +422,7 @@ public class CreateSpdxMojo extends AbstractMojo
         try
         {
             builder.buildDocumentFromFiles( sources, mavenProject.getBasedir().getAbsolutePath(), projectInformation,
-                    defaultFileInformation, pathSpecificInformation, dependencyInformation, getChecksumAlgorithms(),
-                    spdxDoc.getDocumentUri() );
+                    defaultFileInformation, pathSpecificInformation, dependencyInformation, getChecksumAlgorithms() );
         }
         catch ( SpdxBuilderException e )
         {
@@ -522,17 +520,15 @@ public class CreateSpdxMojo extends AbstractMojo
      * Collect dependency information from Maven dependencies
      *
      * @param dependencies Maven dependencies
-     * @param licenseManager
-     * @param spdxDoc SPDX document to contain the dependencies
+     * @param builder SPDX document builder
      * @return information collected from Maven dependencies
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
     private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies, 
-                                                                    LicenseManager licenseManager,
-                                                                    SpdxDocument spdxDoc ) throws LicenseMapperException, InvalidSPDXAnalysisException
+                                                                    SpdxDocumentBuilder builder ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation( licenseManager, spdxDoc, createExternalRefs );
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( builder.getLicenseManager(), builder.getSpdxDoc(), createExternalRefs );
         if ( dependencies != null )
         {
             for ( Artifact dependency : dependencies )
@@ -735,14 +731,13 @@ public class CreateSpdxMojo extends AbstractMojo
      * description and SPDX package summary supplier - the project organization is used for the supplier. "ORGANIZATION:
      * " is prepended
      *
-     * @param licenseManager maps the Maven licenses to SPDX licenses
-     * @param spdxDoc      SPDX document containing any extracted license infos
+     * @param builder      SPDX document builder
      * @return
      * @throws MojoExecutionException
      */
-    private SpdxProjectInformation getSpdxProjectInfoFromParameters( LicenseManager licenseManager, 
-                                                                     SpdxDocument spdxDoc ) throws MojoExecutionException, InvalidSPDXAnalysisException
+    private SpdxProjectInformation getSpdxProjectInfoFromParameters( SpdxDocumentBuilder builder ) throws MojoExecutionException, InvalidSPDXAnalysisException
     {
+        SpdxDocument spdxDoc = builder.getSpdxDoc();
         SpdxProjectInformation retval = new SpdxProjectInformation();
         if ( this.documentComment != null )
         {
@@ -754,7 +749,7 @@ public class CreateSpdxMojo extends AbstractMojo
             List<License> mavenLicenses = mavenProject.getLicenses();
             try
             {
-                declaredLicense = licenseManager.mavenLicenseListToSpdxLicense( mavenLicenses );
+                declaredLicense = builder.getLicenseManager().mavenLicenseListToSpdxLicense( mavenLicenses );
             }
             catch ( LicenseManagerException e )
             {
