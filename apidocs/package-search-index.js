@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.spdx.maven"},{"l":"org.spdx.maven.utils"},{"l":"org.spdx.spdx_maven_plugin"}]
