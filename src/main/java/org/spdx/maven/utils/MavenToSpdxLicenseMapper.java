@@ -195,10 +195,9 @@ public class MavenToSpdxLicenseMapper
      * mapped SPDX licenses.
      *
      * @param licenseList list of licenses
-     * @param spdxDocument SPDX document which will hold the licenses
+     * @param spdxDoc     SPDX document which will hold the licenses
      * @return
      * @throws InvalidSPDXAnalysisException 
-     * @throws LicenseManagerException
      */
     public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList, SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
     {

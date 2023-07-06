@@ -40,7 +40,14 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         if [[ $SONAR_TOKEN != "" ]]; then
-           mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+           mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar site
         else
-           mvn --batch-mode --update-snapshots verify
+           mvn --batch-mode --update-snapshots verify site
         fi
+    - name: Deploy documentation
+      if: ${{ github.ref == 'refs/heads/master' }}
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: target/site
