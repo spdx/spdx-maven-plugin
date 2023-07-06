@@ -92,7 +92,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.utils.LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument)}.
+     * Test method for {@link org.spdx.maven.utils.LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument,boolean)}.
      *
      * @throws LicenseMapperException
      */
@@ -260,7 +260,6 @@ public class TestLicenseManager
     /**
      * Test method for {@link org.spdx.maven.utils.LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.AnyLicenseInfo)}.
      *
-     * @throws InvalidLicenseStringException
      * @throws LicenseManagerException
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 

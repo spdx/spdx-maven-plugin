@@ -28,6 +28,7 @@
         <item name="spdx:createSPDX" href="createSPDX-mojo.html"/>
         <item name="spdx:help" href="help-mojo.html"/>
       </item>
+      <item name="Javadoc" href="apidocs/"/>
     </menu>
 
     <menu ref="reports" />

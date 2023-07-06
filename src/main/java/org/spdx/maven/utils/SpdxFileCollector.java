@@ -152,7 +152,6 @@ public class SpdxFileCollector
      *
      * @param fileSets                FileSets containing the description of the directory to be scanned
      * @param baseDir                 project base directory used to construct the relative paths for the SPDX files
-     * @param pathPrefix              Path string which should be removed when creating the SPDX file name
      * @param defaultFileInformation  Information on default SPDX field data for the files
      * @param pathSpecificInformation Map of path to file information used to override the default file information
      * @param relationshipType        Type of relationship to the project package

@@ -158,7 +158,7 @@ public class SpdxDocumentBuilder
     /**
      * Add non-standard licenses to the SPDX document.
      *
-     * @param spdxDoc
+     * @param nonStandardLicenses
      * @throws SpdxBuilderException
      */
     public void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses ) throws SpdxBuilderException
