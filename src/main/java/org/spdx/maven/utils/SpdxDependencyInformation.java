@@ -493,7 +493,7 @@ public class SpdxDependencyInformation
             }
         }
         if ( itemDescribed == null ) {
-            throw ( new InvalidSPDXAnalysisException( "SPDX document does not contain any described items." ) );
+            throw new InvalidSPDXAnalysisException( "SPDX document does not contain any described items." );
         }
         return (SpdxPackage)itemDescribed;
     }

@@ -106,7 +106,7 @@ public class SpdxDocumentBuilder
 
         if ( spdxDocumentNamespace == null )
         {
-            throw ( new SpdxBuilderException( "Missing spdxDocumentNamespace" ) );
+            throw new SpdxBuilderException( "Missing spdxDocumentNamespace" );
         }
 
         // Handle the SPDX file
@@ -117,7 +117,7 @@ public class SpdxDocumentBuilder
             {
                 if ( !parentDir.mkdirs() )
                 {
-                    throw ( new SpdxBuilderException( "Unable to create directories for SPDX file" ) );
+                    throw new SpdxBuilderException( "Unable to create directories for SPDX file" );
                 }
             }
 
@@ -125,18 +125,17 @@ public class SpdxDocumentBuilder
             {
                 if ( !spdxFile.createNewFile() )
                 {
-                    throw ( new SpdxBuilderException( "Unable to create the SPDX file" ) );
+                    throw new SpdxBuilderException( "Unable to create the SPDX file" );
                 }
             }
             catch ( IOException e )
             {
-                throw ( new SpdxBuilderException( "IO error creating the SPDX file", e ) );
+                throw new SpdxBuilderException( "IO error creating the SPDX file", e );
             }
         }
         if ( !spdxFile.canWrite() )
         {
-            throw ( new SpdxBuilderException(
-                    "Unable to write to SPDX file - check permissions: " + spdxFile.getPath() ) );
+            throw new SpdxBuilderException( "Unable to write to SPDX file - check permissions: " + spdxFile.getPath() );
         }
 
         // create the SPDX document
@@ -148,7 +147,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new SpdxBuilderException( "Error creating SPDX document", e ) );
+            throw new SpdxBuilderException( "Error creating SPDX document", e );
         }
 
         // process the licenses
@@ -174,7 +173,7 @@ public class SpdxDocumentBuilder
                 }
                 catch ( LicenseManagerException e )
                 {
-                    throw ( new SpdxBuilderException( "Error adding non standard license", e ) );
+                    throw new SpdxBuilderException( "Error adding non standard license", e );
                 }
             }
         }
@@ -218,15 +217,15 @@ public class SpdxDocumentBuilder
         }
         catch ( FileNotFoundException e )
         {
-            throw ( new SpdxBuilderException( "Error saving SPDX data to file", e ) );
+            throw new SpdxBuilderException( "Error saving SPDX data to file", e );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new SpdxBuilderException( "Error collecting SPDX file data", e ) );
+            throw new SpdxBuilderException( "Error collecting SPDX file data", e );
         }
         catch ( IOException e )
         {
-            throw ( new SpdxBuilderException( "I/O Error saving SPDX data to file", e ) );
+            throw new SpdxBuilderException( "I/O Error saving SPDX data to file", e );
         }
     }
 
@@ -308,7 +307,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException | MojoExecutionException e )
         {
-            throw ( new SpdxBuilderException( "Error adding package information to SPDX document", e ) );
+            throw new SpdxBuilderException( "Error adding package information to SPDX document", e );
         }
     }
 
@@ -353,7 +352,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new SpdxBuilderException( "Error creating null package verification code", e ) );
+            throw new SpdxBuilderException( "Error creating null package verification code", e );
         }
         SpdxPackage pkg;
         try
@@ -368,7 +367,7 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new SpdxBuilderException( "Error creating initial package", e ) );
+            throw new SpdxBuilderException( "Error creating initial package", e );
         }
         // Annotations
         if ( projectInformation.getPackageAnnotations() != null && projectInformation.getPackageAnnotations().length > 0 )
@@ -379,7 +378,7 @@ public class SpdxDocumentBuilder
             }
             catch ( InvalidSPDXAnalysisException | MojoExecutionException e )
             {
-                throw ( new SpdxBuilderException( "Error adding package annotations to SPDX document", e ) );
+                throw new SpdxBuilderException( "Error adding package annotations to SPDX document", e );
             }
         }
         try
@@ -445,9 +444,9 @@ public class SpdxDocumentBuilder
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new SpdxBuilderException( "Error adding package properties", e ) );
+            throw new SpdxBuilderException( "Error adding package properties", e );
         }
-        
+
         // sha1 checksum
         if ( projectInformation.getChecksums() != null )
         {
@@ -457,8 +456,8 @@ public class SpdxDocumentBuilder
             }
             catch ( InvalidSPDXAnalysisException e )
             {
-                throw ( new SpdxBuilderException(
-                        "Error adding package information to SPDX document - Invalid checksum provided", e ) );
+                throw new SpdxBuilderException(
+                        "Error adding package information to SPDX document - Invalid checksum provided", e );
             }
         }
         // external references
@@ -474,8 +473,8 @@ public class SpdxDocumentBuilder
                 }
                 catch ( MojoExecutionException | InvalidSPDXAnalysisException e )
                 {
-                    throw ( new SpdxBuilderException(
-                            "Error adding package information to SPDX document - Invalid external refs provided", e ) );
+                    throw new SpdxBuilderException(
+                            "Error adding package information to SPDX document - Invalid external refs provided", e );
                 }
             }
         }
@@ -538,7 +537,7 @@ public class SpdxDocumentBuilder
         }
         catch ( SpdxCollectionException e )
         {
-            throw ( new SpdxBuilderException( "Error collecting SPDX file information", e ) );
+            throw new SpdxBuilderException( "Error collecting SPDX file information", e );
         }
         projectPackage.getFiles().addAll( fileCollector.getFiles() );
         projectPackage.getLicenseInfoFromFiles().addAll( fileCollector.getLicenseInfoFromFiles() );
@@ -548,11 +547,11 @@ public class SpdxDocumentBuilder
         }
         catch ( NoSuchAlgorithmException e )
         {
-            throw ( new SpdxBuilderException( "Unable to calculate verification code", e ) );
+            throw new SpdxBuilderException( "Unable to calculate verification code", e );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new SpdxBuilderException( "Unable to update verification code", e ) );
+            throw new SpdxBuilderException( "Unable to update verification code", e );
         }
     }
 

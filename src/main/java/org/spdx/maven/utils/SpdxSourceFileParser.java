@@ -97,7 +97,7 @@ public class SpdxSourceFileParser
                 }
                 if ( parenCount > 0 )
                 {
-                    throw ( new SpdxSourceParserException( "Miss-matched parenthesis for expression" ) );
+                    throw new SpdxSourceParserException( "Miss-matched parenthesis for expression" );
                 }
                 matchingLine = sb.toString();
             }

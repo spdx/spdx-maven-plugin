@@ -744,7 +744,6 @@ public class CreateSpdxMojo extends AbstractMojo
                                                                      SpdxDocument spdxDoc ) throws MojoExecutionException, InvalidSPDXAnalysisException
     {
         SpdxProjectInformation retval = new SpdxProjectInformation();
-
         if ( this.documentComment != null )
         {
             retval.setDocumentComment( this.documentComment );
@@ -774,7 +773,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             catch ( InvalidLicenseStringException e )
             {
-                throw new MojoExecutionException( "Invalid declared license: " + e.getMessage() );
+                throw new MojoExecutionException( "Invalid declared license: " + licenseDeclared.trim(), e );
             }
         }
         AnyLicenseInfo concludedLicense = null;
@@ -793,7 +792,7 @@ public class CreateSpdxMojo extends AbstractMojo
             }
             catch ( InvalidLicenseStringException e )
             {
-                throw new MojoExecutionException( "Invalid concluded license: " + e.getMessage() );
+                throw new MojoExecutionException( "Invalid concluded license: " + licenseConcluded.trim(), e );
             }
         }
         retval.setConcludedLicense( concludedLicense );
