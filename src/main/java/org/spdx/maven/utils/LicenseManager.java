@@ -119,8 +119,7 @@ public class LicenseManager
             {
                 licenseId = "[NullLicenseId]";
             }
-            throw ( new LicenseManagerException(
-                    "Unable to add non listed license " + licenseId, e ) );
+            throw new LicenseManagerException( "Unable to add non listed license " + licenseId, e );
         }
         // add to URL mapping
         String[] urls = license.getCrossReference();
@@ -192,14 +191,14 @@ public class LicenseManager
     {
         if ( mavenLicense.getUrl() == null )
         {
-            throw ( new LicenseManagerException(
-                    "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" ) );
+            throw new LicenseManagerException(
+                    "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" );
         }
         String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl() );
         if ( licenseId == null )
         {
-            throw ( new LicenseManagerException(
-                    "Can not map maven license " + mavenLicense.getName() + "  No listed or extracted license matches the URL " + mavenLicense.getUrl() ) );
+            throw new LicenseManagerException(
+                    "Can not map maven license " + mavenLicense.getName() + "  No listed or extracted license matches the URL " + mavenLicense.getUrl() );
         }
         AnyLicenseInfo retval = extractedLicenses.get( licenseId );
         if ( retval == null )
@@ -212,8 +211,8 @@ public class LicenseManager
             }
             catch ( InvalidLicenseStringException e )
             {
-                throw ( new LicenseManagerException(
-                        "Can not map maven license " + mavenLicense.getName() + "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() ) );
+                throw new LicenseManagerException(
+                        "Can not map maven license " + mavenLicense.getName() + "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() );
             }
         }
         return retval;
@@ -238,8 +237,8 @@ public class LicenseManager
         }
         else
         {
-            throw ( new LicenseManagerException(
-                    "Can not create a Maven license from this SPDX license type.  " + "Must be an ExtractedLicenseInfo or an SpdxListedLicense " ) );
+            throw new LicenseManagerException(
+                    "Can not create a Maven license from this SPDX license type.  " + "Must be an ExtractedLicenseInfo or an SpdxListedLicense " );
         }
     }
 

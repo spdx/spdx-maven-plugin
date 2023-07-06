@@ -48,7 +48,7 @@ public class ExternalReference
         }
         catch ( Exception ex )
         {
-            throw ( new MojoExecutionException("External reference category " + category + " is not recognized as a valid, standard category." ) );
+            throw new MojoExecutionException("External reference category " + category + " is not recognized as a valid, standard category." );
         }
         ReferenceType refType = null;
         try
@@ -57,11 +57,11 @@ public class ExternalReference
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new MojoExecutionException( "Error getting listed reference type for " + type, e ) );
+            throw new MojoExecutionException( "Error getting listed reference type for " + type, e );
         }
         if ( refType == null )
         {
-            throw ( new MojoExecutionException( "Listed reference type not found for " + type ) );
+            throw new MojoExecutionException( "Listed reference type not found for " + type );
         }
         try
         {
@@ -69,7 +69,7 @@ public class ExternalReference
         }
         catch ( InvalidSPDXAnalysisException e )
         {
-            throw ( new MojoExecutionException( "Error creating External Reference: "+e.getMessage()));
+            throw new MojoExecutionException( "Error creating External Reference", e );
         }
     }
 }

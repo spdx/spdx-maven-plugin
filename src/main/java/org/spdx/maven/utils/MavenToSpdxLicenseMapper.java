@@ -95,7 +95,7 @@ public class MavenToSpdxLicenseMapper
         }
         catch ( IOException e )
         {
-            LOG.warn( "IO error closing listed license reader: " + e.getMessage() );
+            LOG.warn( "IO error closing listed license reader", e );
         }
     }
 
@@ -138,9 +138,9 @@ public class MavenToSpdxLicenseMapper
         }
         catch ( IOException e1 )
         {
-            throw ( new LicenseMapperException( "I/O Error parsing listed licenses", e1 ) );
+            throw new LicenseMapperException( "I/O Error parsing listed licenses", e1 );
         }
-        
+
         urlStringToSpdxLicenseId = new HashMap<>();
         List<String> urlsWithMultipleIds = new ArrayList<>();
         for ( LicenseJsonTOC.LicenseJson licenseJson:jsonToc.getLicenses() )

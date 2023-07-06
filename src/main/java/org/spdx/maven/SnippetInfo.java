@@ -121,13 +121,13 @@ public class SnippetInfo
     {
         return this.licenseComment;
     }
-    
+
     public int getByteRangeStart() throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher( byteRange.trim() );
         if ( !matcher.find() )
         {
-            throw ( new SpdxBuilderException( "Invalid snippet byte range: " + byteRange ) );
+            throw new SpdxBuilderException( "Invalid snippet byte range: " + byteRange );
         }
         try
         {
@@ -138,13 +138,13 @@ public class SnippetInfo
             throw new SpdxBuilderException( "Non integer start to snippet byte offset: " + byteRange );
         }
     }
-    
+
     public int getByteRangeEnd() throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher( byteRange.trim() );
         if ( !matcher.find() )
         {
-            throw ( new SpdxBuilderException( "Invalid snippet byte range: " + byteRange ) );
+            throw new SpdxBuilderException( "Invalid snippet byte range: " + byteRange );
         }
         try
         {
@@ -155,13 +155,13 @@ public class SnippetInfo
             throw new SpdxBuilderException( "Non integer end to snippet byte offset: " + byteRange );
         }
     }
-    
+
     public int getLineRangeStart() throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher( lineRange );
         if ( !matcher.find() )
         {
-            throw ( new SpdxBuilderException( "Invalid snippet line range: " + lineRange ) );
+            throw new SpdxBuilderException( "Invalid snippet line range: " + lineRange );
         }
         try
         {
@@ -172,13 +172,13 @@ public class SnippetInfo
             throw new SpdxBuilderException( "Non integer end to snippet line offset: " + lineRange );
         }
     }
-    
+
     public int getLineRangeEnd() throws SpdxBuilderException
     {
         Matcher matcher = NUMBER_RANGE_PATTERN.matcher( lineRange );
         if ( !matcher.find() )
         {
-            throw ( new SpdxBuilderException( "Invalid snippet line range: " + lineRange ) );
+            throw new SpdxBuilderException( "Invalid snippet line range: " + lineRange );
         }
         try
         {
