@@ -140,6 +140,22 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All
      * non-standard licenses must be configured containing the required license ID and license text.
+     * <pre>
+     * &lt;configuration&gt;
+     *   &lt;nonStandardLicenses&gt;
+     *     &lt;nonStandardLicense&gt;
+     *       &lt;licenseId&gt;LicenseRef-[idString]&lt;/licenseId&gt; &lt;!-- Required --&gt;
+     *       &lt;extractedText&gt;   &lt;/extractedText&gt; &lt;!-- Required --&gt;
+     *       &lt;name&gt;   &lt;/name&gt;
+     *       &lt;comment&gt;   &lt;/comment&gt;
+     *       &lt;crossReference&gt;
+     *         &lt;crossReference&gt;https://...&lt;/crossReference&gt;
+     *       &lt;/crossReference&gt;
+     *     &lt;/nonStandardLicense&gt;
+     *     &lt;!-- ... more ... --&gt;
+     *   &lt;/nonStandardLicenses&gt;
+     * &lt;/configuration&gt;
+     * </pre>
      */
     @Parameter
     private NonStandardLicense[] nonStandardLicenses;
@@ -162,12 +178,38 @@ public class CreateSpdxMojo extends AbstractMojo
 
     /**
      * Optional annotations for the SPDX document
+     * <pre>
+     * &lt;configuration&gt;
+     *   &lt;documentAnnotations&gt;
+     *     &lt;documentAnnotation&gt;
+     *       &lt;annotationComment&gt;   &lt;/annotationComment&gt;
+     *       &lt;annotationType&gt;   &lt;/annotationType&gt;
+     *       &lt;annotationDate&gt;2023-06-29T18:30:22Z&lt;/annotationDate&gt;
+     *       &lt;annotator&gt;Person: ...&lt;/annotator&gt;
+     *     &lt;/documentAnnotation&gt;
+     *     &lt;!-- ... more ... --&gt;
+     *   &lt;/documentAnnotations&gt;
+     * &lt;/configuration&gt;
+     * </pre>
      */
     @Parameter
     private Annotation[] documentAnnotations;
 
     /**
      * Optional annotations for the package
+     * <pre>
+     * &lt;configuration&gt;
+     *   &lt;packageAnnotations&gt;
+     *     &lt;packageAnnotation&gt;
+     *       &lt;annotationComment&gt;   &lt;/annotationComment&gt;
+     *       &lt;annotationType&gt;   &lt;/annotationType&gt;
+     *       &lt;annotationDate&gt;2023-06-29T18:30:22Z&lt;/annotationDate&gt;
+     *       &lt;annotator&gt;Person: ...&lt;/annotator&gt;
+     *     &lt;/packageAnnotation&gt;
+     *     &lt;!-- ... more ... --&gt;
+     *   &lt;/packageAnnotations&gt;
+     * &lt;/configuration&gt;
+     * </pre>
      */
     @Parameter
     private Annotation[] packageAnnotations;
@@ -336,10 +378,58 @@ public class CreateSpdxMojo extends AbstractMojo
      * If a file or directory is nested within another pathsWithSpecificSpdxInfo, the lowest level values will be used.
      * Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default
      * project level fields NOT the higher level PathSpecificSpdxInfo.
+     * <pre>
+     * &lt;configuration&gt;
+     *   &lt;pathsWithSpecificSpdxInfo&gt;
+     *     &lt;pathsWithSpecificSpdxInfo&gt;
+     *       &lt;directoryOrFile&gt;src/main/java/CommonCode.java&lt;/directoryOrFile&gt;
+     *       &lt;fileComment&gt;Comment for CommonCode&lt;/fileComment&gt;
+     *       &lt;fileContributors&gt;
+     *         &lt;fileContributor&gt;Contributor to CommonCode&lt;/fileContributor&gt;
+     *         &lt;!-- ... more ... --&gt;
+     *       &lt;/fileContributors&gt;
+     *       &lt;fileCopyright&gt;Common Code Copyright&lt;/fileCopyright&gt;
+     *       &lt;fileLicenseComment&gt;License Comment for Common Code&lt;/fileLicenseComment&gt;
+     *       &lt;fileNotice&gt;Notice for Commmon Code&lt;/fileNotice&gt;
+     *       &lt;fileConcludedLicense&gt;EPL-1.0&lt;/fileConcludedLicense&gt;
+     *       &lt;licenseInformationInFile&gt;ISC&lt;/licenseInformationInFile&gt;
+     *       &lt;snippets&gt;
+     *         &lt;snippet&gt;
+     *           &lt;name&gt;SnippetName&lt;/name&gt;
+     *           &lt;comment&gt;Snippet Comment&lt;/comment&gt;
+     *           &lt;concludedLicense&gt;BSD-2-Clause&lt;/concludedLicense&gt;
+     *           &lt;lineRange&gt;44:55&lt;/lineRange&gt;
+     *           &lt;byteRange&gt;1231:3442&lt;/byteRange&gt;
+     *           &lt;licenseComment&gt;Snippet License Comment&lt;/licenseComment&gt;
+     *           &lt;copyrightText&gt;Snippet Copyright Text&lt;/copyrightText&gt;
+     *           &lt;licenseInfoInSnippet&gt;BSD-2-Clause-FreeBSD&lt;/licenseInfoInSnippet&gt;
+     *         &lt;!-- ... more ... --&gt;
+     *         &lt;/snippet&gt;
+     *       &lt;/snippets&gt;
+     *     &lt;/pathsWithSpecificSpdxInfo&gt;
+     *     &lt;!-- ... more ... --&gt;
+     *   &lt;/pathsWithSpecificSpdxInfo&gt;
+     * &lt;/configuration&gt;
+     * </pre>
      */
     @Parameter
     private PathSpecificSpdxInfo[] pathsWithSpecificSpdxInfo;
 
+    /**
+     * <pre>
+     * &lt;configuration&gt;
+     *   &lt;externalReferences&gt;
+     *     &lt;externalReference&gt;
+     *       &lt;category&gt;   &lt;/category&gt;
+     *       &lt;type&gt;   &lt;/type&gt;
+     *       &lt;locator&gt;   &lt;/locator&gt;
+     *       &lt;comment&gt;   &lt;/comment&gt;
+     *     &lt;/externalReference&gt;
+     *     &lt;!-- ... more ... --&gt;
+     *   &lt;/externalReferences&gt;
+     * &lt;/configuration&gt;
+     * </pre>
+     */
     @Parameter
     private ExternalReference[] externalReferences;
 
