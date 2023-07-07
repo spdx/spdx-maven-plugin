@@ -86,7 +86,26 @@
 
 <p>The treatment of licenses for Maven is somewhat involved. Where possible, SPDX standard licenses ID's should be used. If no SPDX standard license is available, a nonStandardLicense must be declared as a parameter including a unique license ID and the verbatim license text.</p>
 
-<p>The following SPDX fields are populated from the POM project information: - package name: project name or artifactId if the project name is not provided - package description: project description - package shortDescription: project description - package downloadUrl: distributionManager url - package homePage: project url - package supplier: project organization - package versionInfo: project version - files for analysis: build source files + project resource files</p>
+<p>The following SPDX fields are populated from the POM project information:</p>
+
+<ul>
+ 
+<li>package name: project name or artifactId if the project name is not provided</li>
+ 
+<li>package description: project description</li>
+ 
+<li>package shortDescription: project description</li>
+ 
+<li>package downloadUrl: distributionManager url</li>
+ 
+<li>package homePage: project url</li>
+ 
+<li>package supplier: project organization</li>
+ 
+<li>package versionInfo: project version</li>
+ 
+<li>files for analysis: build source files + project resource files</li>
+</ul>
 
 <p>Additional SPDX fields are supplied as configuration parameters to this plugin.</p></div>
       
@@ -102,45 +121,6 @@
         
 <li>Binds by default to the <a class="externalLink" href="http://maven.apache.org/ref/current/maven-core/lifecycles.html">lifecycle phase</a>: <code>verify</code>.</li>
       </ul>
-      <section>
-<h3><a name="Required_Parameters"></a>Required Parameters</h3>
-        
-<table border="0" class="table table-striped">
-          
-<tr class="a">
-            
-<th>Name</th>
-            
-<th>Type</th>
-            
-<th>Since</th>
-            
-<th>Description</th>
-          </tr>
-          
-<tr class="b">
-            
-<td align="left"><code><a href="#spdxDocumentNamespace">&lt;spdxDocumentNamespace&gt;</a></code></td>
-            
-<td><code>String</code></td>
-            
-<td><code>-</code></td>
-            
-<td>Document namespace - must be unique for the artifact and SPDX file<br /><b>Default value is</b>: <code>http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}</code>.<br /><b>User property is</b>: <code>spdxDocumentNamespace</code>.<br /></td>
-          </tr>
-          
-<tr class="a">
-            
-<td align="left"><code><a href="#spdxFile">&lt;spdxFile&gt;</a></code></td>
-            
-<td><code>File</code></td>
-            
-<td><code>-</code></td>
-            
-<td>SPDX File name<br /><b>Default value is</b>: <code>${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx</code>.<br /><b>User property is</b>: <code>spdxFileName</code>.<br /></td>
-          </tr>
-        </table>
-      </section>
       <section>
 <h3><a name="Optional_Parameters"></a>Optional Parameters</h3>
         
@@ -176,7 +156,7 @@
             
 <td><code>-</code></td>
             
-<td>(no description)<br /><b>Default value is</b>: <code>${project.basedir}</code>.<br /><b>User property is</b>: <code>componentName</code>.<br /></td>
+<td>(no description)<br /><b>Default value is</b>: <code>${project.basedir}</code>.<br /></td>
           </tr>
           
 <tr class="b">
@@ -433,7 +413,7 @@
             
 <td><code>-</code></td>
             
-<td>Output file format for the SPDX file. One of: - JSON - JSON SPDX format - RDF/XML - RDF/XML format<br /></td>
+<td>Output file format for the SPDX file. One of: - JSON - JSON SPDX format - RDF/XML - RDF/XML format<br /><b>Default value is</b>: <code>JSON</code>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -470,6 +450,28 @@
             
 <td>This field provides a place for the SPDX file creator to record any relevant background information or additional comments about the origin of the package. For example, this field might include comments indicating whether the package been was pulled from a source code management system or has been repackaged.<br /></td>
           </tr>
+          
+<tr class="b">
+            
+<td align="left"><code><a href="#spdxDocumentNamespace">&lt;spdxDocumentNamespace&gt;</a></code></td>
+            
+<td><code>String</code></td>
+            
+<td><code>-</code></td>
+            
+<td>Document namespace - must be unique for the artifact and SPDX file<br /><b>Default value is</b>: <code>http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}</code>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td align="left"><code><a href="#spdxFile">&lt;spdxFile&gt;</a></code></td>
+            
+<td><code>File</code></td>
+            
+<td><code>-</code></td>
+            
+<td>SPDX File name<br /><b>Default value is</b>: <code>${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx</code>.<br /><b>User property is</b>: <code>spdxFileName</code>.<br /></td>
+          </tr>
         </table>
       </section>
       <section>
@@ -494,8 +496,6 @@
 <li><b>Type</b>: <code>java.lang.String</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
-          
-<li><b>User Property</b>: <code>componentName</code></li>
           
 <li><b>Default</b>: <code>${project.basedir}</code></li>
         </ul><hr /></section><section>
@@ -744,6 +744,8 @@
 <li><b>Type</b>: <code>java.lang.String</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
+          
+<li><b>Default</b>: <code>JSON</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CpackageAnnotations.3E"></a><b><a name="packageAnnotations">&lt;packageAnnotations&gt;</a></b></h4>
         
@@ -785,9 +787,7 @@
           
 <li><b>Type</b>: <code>java.lang.String</code></li>
           
-<li><b>Required</b>: <code>Yes</code></li>
-          
-<li><b>User Property</b>: <code>spdxDocumentNamespace</code></li>
+<li><b>Required</b>: <code>No</code></li>
           
 <li><b>Default</b>: <code>http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}</code></li>
         </ul><hr /></section><section>
@@ -799,7 +799,7 @@
           
 <li><b>Type</b>: <code>java.io.File</code></li>
           
-<li><b>Required</b>: <code>Yes</code></li>
+<li><b>Required</b>: <code>No</code></li>
           
 <li><b>User Property</b>: <code>spdxFileName</code></li>
           

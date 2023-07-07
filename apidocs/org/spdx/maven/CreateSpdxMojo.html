@@ -159,12 +159,16 @@ extends org.apache.maven.plugin.AbstractMojo</pre>
  used.  If no SPDX standard license is available, a nonStandardLicense must be declared as a parameter including a
  unique license ID and the verbatim license text.
  <p>
- The following SPDX fields are populated from the POM project information: - package name: project name or artifactId
- if the project name is not provided - package description: project description - package shortDescription: project
- description - package downloadUrl: distributionManager url - package homePage: project url - package supplier:
- project organization - package versionInfo: project version - files for analysis: build source files + project
- resource files
- <p>
+ The following SPDX fields are populated from the POM project information:<ul>
+ <li>package name: project name or artifactId if the project name is not provided</li>
+ <li>package description: project description</li>
+ <li>package shortDescription: project description</li>
+ <li>package downloadUrl: distributionManager url</li>
+ <li>package homePage: project url</li>
+ <li>package supplier: project organization</li>
+ <li>package versionInfo: project version</li>
+ <li>files for analysis: build source files + project resource files</li>
+ </ul><p>
  Additional SPDX fields are supplied as configuration parameters to this plugin.</div>
 </li>
 </ul>

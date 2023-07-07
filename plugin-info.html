@@ -83,7 +83,17 @@
 <p>All SPDX document and SPDX package properties are supported as parameters to the plugin.</p>
 <p>File level data supports default parameters which are applied to all files. Future versions of this plugin will support file specific parameters.</p>
 <p>The treatment of licenses for Maven is somewhat involved. Where possible, SPDX standard licenses ID's should be used. If no SPDX standard license is available, a nonStandardLicense must be declared as a parameter including a unique license ID and the verbatim license text.</p>
-<p>The following SPDX fields are populated from the POM project information: - package name: project name or artifactId if the project name is not provided - package description: project description - package shortDescription: project description - package downloadUrl: distributionManager url - package homePage: project url - package supplier: project organization - package versionInfo: project version - files for analysis: build source files + project resource files</p>
+<p>The following SPDX fields are populated from the POM project information:</p>
+<ul>
+ <li>package name: project name or artifactId if the project name is not provided</li>
+ <li>package description: project description</li>
+ <li>package shortDescription: project description</li>
+ <li>package downloadUrl: distributionManager url</li>
+ <li>package homePage: project url</li>
+ <li>package supplier: project organization</li>
+ <li>package versionInfo: project version</li>
+ <li>files for analysis: build source files + project resource files</li>
+</ul>
 <p>Additional SPDX fields are supplied as configuration parameters to this plugin.</p></td></tr>
 <tr class="a">
 <td align="left"><a href="./help-mojo.html">spdx:help</a></td>
