@@ -374,41 +374,48 @@ public class CreateSpdxMojo extends AbstractMojo
         getLog().info( "Creating SPDX File " + spdxFile.getPath() );
 
         SpdxDocumentBuilder builder = initSpdxDocumentBuilder( outputFormatEnum );
-
-        List<FileSet> sources = toFileSet( mavenProject.getCompileSourceRoots(), mavenProject.getResources() );
-        sources.addAll( toFileSet( mavenProject.getTestCompileSourceRoots(), null ) ); // TODO: why not test resources given source resources are taken into account?
-
         SpdxDocument spdxDoc = builder.getSpdxDoc();
-        SpdxProjectInformation projectInformation;
+
+        // fill project information
         try
         {
-            projectInformation = getSpdxProjectInfoFromParameters( builder );
+            SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder );
+            projectInformation.logInfo( spdxDoc );
+            builder.fillSpdxDocumentInformation( projectInformation );
         }
         catch ( InvalidSPDXAnalysisException e2 )
         {
             throw new MojoExecutionException( "Error getting project information from parameters", e2 );
         }
 
+        // collect file-level information
         SpdxDefaultFileInformation defaultFileInformation = getDefaultFileInfoFromParameters( spdxDoc );
         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation = getPathSpecificInfoFromParameters( defaultFileInformation, spdxDoc );
 
-        @SuppressWarnings("deprecation")
-        Set<Artifact> dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
+        List<FileSet> sources = toFileSet( mavenProject.getCompileSourceRoots(), mavenProject.getResources() );
+        sources.addAll( toFileSet( mavenProject.getTestCompileSourceRoots(), null ) ); // TODO: why not test resources given source resources are taken into account?
 
         if ( getLog().isDebugEnabled() )
         {
             logIncludedDirectories( sources );
             logNonStandardLicenses( this.nonStandardLicenses );
-            projectInformation.logInfo( spdxDoc );
             defaultFileInformation.logInfo();
             logFileSpecificInfo( pathSpecificInformation );
-            logDependencies( dependencies );
         }
 
-        SpdxDependencyInformation dependencyInformation = null;
+        builder.collectSpdxFileInformation( sources, mavenProject.getBasedir().getAbsolutePath(), defaultFileInformation, pathSpecificInformation, getChecksumAlgorithms() );
+
+        // add dependencies information
         try
         {
-            dependencyInformation = getSpdxDependencyInformation( dependencies, builder );
+            @SuppressWarnings("deprecation")
+            Set<Artifact> dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
+
+            logDependencies( dependencies );
+
+            SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( dependencies, builder );
+
+            builder.addDependencyInformation( dependencyInformation );
         }
         catch ( LicenseMapperException e1 )
         {
@@ -419,22 +426,16 @@ public class CreateSpdxMojo extends AbstractMojo
             throw new MojoExecutionException( "SPDX analysis error processing dependencies", e );
         }
 
-        try
-        {
-            builder.buildDocumentFromFiles( sources, mavenProject.getBasedir().getAbsolutePath(), projectInformation,
-                    defaultFileInformation, pathSpecificInformation, dependencyInformation, getChecksumAlgorithms() );
-        }
-        catch ( SpdxBuilderException e )
-        {
-            throw new MojoExecutionException( "Error building SPDX document from project files", e );
-        }
+        // save result to SPDX file
+        builder.saveSpdxDocumentToFile();
 
+        // attach
         projectHelper.attachArtifact( mavenProject, artifactType, spdxFile );
 
+        // check errors
         List<String> spdxErrors = builder.getSpdxDoc().verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 )
         {
-            // report error
             getLog().warn( "The following errors were found in the SPDX file:\n " + String.join( "\n ", spdxErrors ) );
         }
     }
