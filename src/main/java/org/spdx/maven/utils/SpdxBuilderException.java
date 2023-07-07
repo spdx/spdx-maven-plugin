@@ -15,12 +15,14 @@
  */
 package org.spdx.maven.utils;
 
+import org.apache.maven.plugin.MojoExecutionException;
+
 /**
  * Exceptions relating to the building of SPDX Documents
  *
  * @author Gary O'Neall
  */
-public class SpdxBuilderException extends Exception
+public class SpdxBuilderException extends MojoExecutionException
 {
 
     /**
@@ -29,27 +31,11 @@ public class SpdxBuilderException extends Exception
     private static final long serialVersionUID = 1L;
 
     /**
-     *
-     */
-    public SpdxBuilderException()
-    {
-        super();
-    }
-
-    /**
      * @param message
      */
     public SpdxBuilderException( String message )
     {
         super( message );
-    }
-
-    /**
-     * @param cause
-     */
-    public SpdxBuilderException( Throwable cause )
-    {
-        super( cause );
     }
 
     /**

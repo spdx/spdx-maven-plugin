@@ -183,35 +183,11 @@ public class SpdxDocumentBuilder
         return this.spdxDoc;
     }
 
-    /**
-     * Build the SPDX document from the files and save the information to the SPDX file
-     *
-     * @param sources                     Source directories to be included in the document
-     * @param baseDir                     Base directory used to create the relative file paths for the SPDX file names
-     * @param projectInformation          Project level SPDX information
-     * @param defaultFileInformation      Default SPDX file information
-     * @param pathSpecificInformation     Map of path to file information used to override the default file information
-     * @param dependencyInformation       Dependencies to add to the SPDX file (typically based on project dependencies
-     *                                    in the POM file)
-     * @param algorithms                  algorithms to use to generate checksums
-     * @throws SpdxBuilderException
-     */
-    public void buildDocumentFromFiles( List<FileSet> sources,
-                                        String baseDir, SpdxProjectInformation projectInformation, 
-                                        SpdxDefaultFileInformation defaultFileInformation, 
-                                        Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
-                                        SpdxDependencyInformation dependencyInformation, 
-                                        Set<ChecksumAlgorithm> algorithms ) throws SpdxBuilderException
+    public void saveSpdxDocumentToFile() throws SpdxBuilderException
     {
-        try (FileOutputStream spdxOut = new FileOutputStream( spdxFile ))
+        try ( FileOutputStream spdxOut = new FileOutputStream( spdxFile ) )
         {
-            LOG.debug( "Starting buid document from files" );
-            fillSpdxDocumentInformation( projectInformation );
-            collectSpdxFileInformation( sources,
-                    baseDir, defaultFileInformation, spdxFile.getPath().replace( "\\", "/" ), pathSpecificInformation, algorithms );
-            addDependencyInformation( dependencyInformation );
             modelStore.serialize( spdxDoc.getDocumentUri(), spdxOut );
-            LOG.debug( "Completed build document from files" );
         }
         catch ( FileNotFoundException e )
         {
@@ -227,14 +203,13 @@ public class SpdxDocumentBuilder
         }
     }
 
-
     /**
      * Add dependency information to the SPDX file
      *
      * @param dependencyInformation dependency information collected from the project POM file
      * @throws SpdxBuilderException
      */
-    private void addDependencyInformation( SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
+    public void addDependencyInformation( SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
     {
         List<Relationship> packageRelationships = dependencyInformation.getToRelationships();
         if ( packageRelationships != null )
@@ -276,7 +251,7 @@ public class SpdxDocumentBuilder
      * @param projectInformation project information to be used
      * @throws SpdxBuilderException
      */
-    private void fillSpdxDocumentInformation( SpdxProjectInformation projectInformation ) throws SpdxBuilderException
+    public void fillSpdxDocumentInformation( SpdxProjectInformation projectInformation ) throws SpdxBuilderException
     {
         try
         {
@@ -513,33 +488,30 @@ public class SpdxDocumentBuilder
      * @param sources                     Source directories to be included in the document
      * @param baseDir                     project base directory used to construct the relative paths for the SPDX
      *                                    files
-     * @param projectInformation          Project level SPDX information
-     * @param spdxFileName                SPDX file name - will be used for the skipped file names in the verification
-     *                                    code
      * @param pathSpecificInformation     Map of path to file information used to override the default file information
      * @param algorithms                  algorithms to use to generate checksums
-     * @throws InvalidSPDXAnalysisException
      * @throws SpdxBuilderException
      */
-    private void collectSpdxFileInformation( List<FileSet> sources, 
-                                             String baseDir, SpdxDefaultFileInformation defaultFileInformation, String spdxFileName, 
-                                             Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
-                                             Set<ChecksumAlgorithm> algorithms ) throws InvalidSPDXAnalysisException, SpdxBuilderException
+    public void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
+                                            SpdxDefaultFileInformation defaultFileInformation,
+                                            Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
+                                            Set<ChecksumAlgorithm> algorithms ) throws SpdxBuilderException
     {
         SpdxFileCollector fileCollector = new SpdxFileCollector();
         try
         {
             fileCollector.collectFiles( sources, baseDir, defaultFileInformation,
                     pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc, algorithms );
+            projectPackage.getFiles().addAll( fileCollector.getFiles() );
+            projectPackage.getLicenseInfoFromFiles().addAll( fileCollector.getLicenseInfoFromFiles() );
         }
-        catch ( SpdxCollectionException e )
+        catch ( SpdxCollectionException|InvalidSPDXAnalysisException e )
         {
             throw new SpdxBuilderException( "Error collecting SPDX file information", e );
         }
-        projectPackage.getFiles().addAll( fileCollector.getFiles() );
-        projectPackage.getLicenseInfoFromFiles().addAll( fileCollector.getLicenseInfoFromFiles() );
         try
         {
+            String spdxFileName = spdxFile.getPath().replace( "\\", "/" );
             projectPackage.setPackageVerificationCode( fileCollector.getVerificationCode( spdxFileName, spdxDoc ) );
         }
         catch ( NoSuchAlgorithmException e )
