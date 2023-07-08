@@ -290,7 +290,21 @@
             
 <td><code>-</code></td>
             
-<td>Optional annotations for the SPDX document<br /></td>
+<td>Optional annotations for the SPDX document 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;documentAnnotations&gt;
+    &lt;documentAnnotation&gt;
+      &lt;annotationComment&gt;   &lt;/annotationComment&gt;
+      &lt;annotationType&gt;   &lt;/annotationType&gt;
+      &lt;annotationDate&gt;2023-06-29T18:30:22Z&lt;/annotationDate&gt;
+      &lt;annotator&gt;Person: ...&lt;/annotator&gt;
+    &lt;/documentAnnotation&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/documentAnnotations&gt;
+&lt;/configuration&gt;
+</pre></div><br /></td>
           </tr>
           
 <tr class="b">
@@ -312,7 +326,20 @@
             
 <td><code>-</code></td>
             
-<td>(no description)<br /></td>
+<td>
+<div>
+<pre>&lt;configuration&gt;
+  &lt;externalReferences&gt;
+    &lt;externalReference&gt;
+      &lt;category&gt;   &lt;/category&gt;
+      &lt;type&gt;   &lt;/type&gt;
+      &lt;locator&gt;   &lt;/locator&gt;
+      &lt;comment&gt;   &lt;/comment&gt;
+    &lt;/externalReference&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/externalReferences&gt;
+&lt;/configuration&gt;
+</pre></div><br /></td>
           </tr>
           
 <tr class="b">
@@ -378,7 +405,24 @@
             
 <td><code>-</code></td>
             
-<td>Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All non-standard licenses must be configured containing the required license ID and license text.<br /></td>
+<td>Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All non-standard licenses must be configured containing the required license ID and license text. 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;nonStandardLicenses&gt;
+    &lt;nonStandardLicense&gt;
+      &lt;licenseId&gt;LicenseRef-[idString]&lt;/licenseId&gt; &lt;!-- Required --&gt;
+      &lt;extractedText&gt;   &lt;/extractedText&gt; &lt;!-- Required --&gt;
+      &lt;name&gt;   &lt;/name&gt;
+      &lt;comment&gt;   &lt;/comment&gt;
+      &lt;crossReference&gt;
+        &lt;crossReference&gt;https://...&lt;/crossReference&gt;
+      &lt;/crossReference&gt;
+    &lt;/nonStandardLicense&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/nonStandardLicenses&gt;
+&lt;/configuration&gt;
+</pre></div><br /></td>
           </tr>
           
 <tr class="b">
@@ -424,7 +468,21 @@
             
 <td><code>-</code></td>
             
-<td>Optional annotations for the package<br /></td>
+<td>Optional annotations for the package 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;packageAnnotations&gt;
+    &lt;packageAnnotation&gt;
+      &lt;annotationComment&gt;   &lt;/annotationComment&gt;
+      &lt;annotationType&gt;   &lt;/annotationType&gt;
+      &lt;annotationDate&gt;2023-06-29T18:30:22Z&lt;/annotationDate&gt;
+      &lt;annotator&gt;Person: ...&lt;/annotator&gt;
+    &lt;/packageAnnotation&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/packageAnnotations&gt;
+&lt;/configuration&gt;
+</pre></div><br /></td>
           </tr>
           
 <tr class="b">
@@ -437,7 +495,41 @@
             
 <td>File or directories which have SPDX information different from the project defaults. The fileOrDirectory field of the PathSpecificSpdxInfo is required. All files within the directory (or just the specific file) will use the SPDX data specified in the PathSpecificSpdxInfo parameters. All of the SPDX data parameters are optional. If any SPDX field is not specified, the project level default data will be used. 
 
-<p>If a file or directory is nested within another pathsWithSpecificSpdxInfo, the lowest level values will be used. Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default project level fields NOT the higher level PathSpecificSpdxInfo.</p><br /></td>
+<p>If a file or directory is nested within another pathsWithSpecificSpdxInfo, the lowest level values will be used. Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default project level fields NOT the higher level PathSpecificSpdxInfo.</p>
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;pathsWithSpecificSpdxInfo&gt;
+    &lt;pathsWithSpecificSpdxInfo&gt;
+      &lt;directoryOrFile&gt;src/main/java/CommonCode.java&lt;/directoryOrFile&gt;
+      &lt;fileComment&gt;Comment for CommonCode&lt;/fileComment&gt;
+      &lt;fileContributors&gt;
+        &lt;fileContributor&gt;Contributor to CommonCode&lt;/fileContributor&gt;
+        &lt;!-- ... more ... --&gt;
+      &lt;/fileContributors&gt;
+      &lt;fileCopyright&gt;Common Code Copyright&lt;/fileCopyright&gt;
+      &lt;fileLicenseComment&gt;License Comment for Common Code&lt;/fileLicenseComment&gt;
+      &lt;fileNotice&gt;Notice for Commmon Code&lt;/fileNotice&gt;
+      &lt;fileConcludedLicense&gt;EPL-1.0&lt;/fileConcludedLicense&gt;
+      &lt;licenseInformationInFile&gt;ISC&lt;/licenseInformationInFile&gt;
+      &lt;snippets&gt;
+        &lt;snippet&gt;
+          &lt;name&gt;SnippetName&lt;/name&gt;
+          &lt;comment&gt;Snippet Comment&lt;/comment&gt;
+          &lt;concludedLicense&gt;BSD-2-Clause&lt;/concludedLicense&gt;
+          &lt;lineRange&gt;44:55&lt;/lineRange&gt;
+          &lt;byteRange&gt;1231:3442&lt;/byteRange&gt;
+          &lt;licenseComment&gt;Snippet License Comment&lt;/licenseComment&gt;
+          &lt;copyrightText&gt;Snippet Copyright Text&lt;/copyrightText&gt;
+          &lt;licenseInfoInSnippet&gt;BSD-2-Clause-FreeBSD&lt;/licenseInfoInSnippet&gt;
+        &lt;!-- ... more ... --&gt;
+        &lt;/snippet&gt;
+      &lt;/snippets&gt;
+    &lt;/pathsWithSpecificSpdxInfo&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/pathsWithSpecificSpdxInfo&gt;
+&lt;/configuration&gt;
+</pre></div><br /></td>
           </tr>
           
 <tr class="a">
@@ -621,7 +713,21 @@
         </ul><hr /></section><section>
 <h4><a name="a.3CdocumentAnnotations.3E"></a><b><a name="documentAnnotations">&lt;documentAnnotations&gt;</a></b></h4>
         
-<div>Optional annotations for the SPDX document</div>
+<div>Optional annotations for the SPDX document 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;documentAnnotations&gt;
+    &lt;documentAnnotation&gt;
+      &lt;annotationComment&gt;   &lt;/annotationComment&gt;
+      &lt;annotationType&gt;   &lt;/annotationType&gt;
+      &lt;annotationDate&gt;2023-06-29T18:30:22Z&lt;/annotationDate&gt;
+      &lt;annotator&gt;Person: ...&lt;/annotator&gt;
+    &lt;/documentAnnotation&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/documentAnnotations&gt;
+&lt;/configuration&gt;
+</pre></div></div>
         
 <ul>
           
@@ -641,7 +747,20 @@
         </ul><hr /></section><section>
 <h4><a name="a.3CexternalReferences.3E"></a><b><a name="externalReferences">&lt;externalReferences&gt;</a></b></h4>
         
-<div>(no description)</div>
+<div>
+<div>
+<pre>&lt;configuration&gt;
+  &lt;externalReferences&gt;
+    &lt;externalReference&gt;
+      &lt;category&gt;   &lt;/category&gt;
+      &lt;type&gt;   &lt;/type&gt;
+      &lt;locator&gt;   &lt;/locator&gt;
+      &lt;comment&gt;   &lt;/comment&gt;
+    &lt;/externalReference&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/externalReferences&gt;
+&lt;/configuration&gt;
+</pre></div></div>
         
 <ul>
           
@@ -705,7 +824,24 @@
         </ul><hr /></section><section>
 <h4><a name="a.3CnonStandardLicenses.3E"></a><b><a name="nonStandardLicenses">&lt;nonStandardLicenses&gt;</a></b></h4>
         
-<div>Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All non-standard licenses must be configured containing the required license ID and license text.</div>
+<div>Licenses which are not SPDX listed licenses referenced within the Maven SPDX plugin configuration. All non-standard licenses must be configured containing the required license ID and license text. 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;nonStandardLicenses&gt;
+    &lt;nonStandardLicense&gt;
+      &lt;licenseId&gt;LicenseRef-[idString]&lt;/licenseId&gt; &lt;!-- Required --&gt;
+      &lt;extractedText&gt;   &lt;/extractedText&gt; &lt;!-- Required --&gt;
+      &lt;name&gt;   &lt;/name&gt;
+      &lt;comment&gt;   &lt;/comment&gt;
+      &lt;crossReference&gt;
+        &lt;crossReference&gt;https://...&lt;/crossReference&gt;
+      &lt;/crossReference&gt;
+    &lt;/nonStandardLicense&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/nonStandardLicenses&gt;
+&lt;/configuration&gt;
+</pre></div></div>
         
 <ul>
           
@@ -749,7 +885,21 @@
         </ul><hr /></section><section>
 <h4><a name="a.3CpackageAnnotations.3E"></a><b><a name="packageAnnotations">&lt;packageAnnotations&gt;</a></b></h4>
         
-<div>Optional annotations for the package</div>
+<div>Optional annotations for the package 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;packageAnnotations&gt;
+    &lt;packageAnnotation&gt;
+      &lt;annotationComment&gt;   &lt;/annotationComment&gt;
+      &lt;annotationType&gt;   &lt;/annotationType&gt;
+      &lt;annotationDate&gt;2023-06-29T18:30:22Z&lt;/annotationDate&gt;
+      &lt;annotator&gt;Person: ...&lt;/annotator&gt;
+    &lt;/packageAnnotation&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/packageAnnotations&gt;
+&lt;/configuration&gt;
+</pre></div></div>
         
 <ul>
           
@@ -761,7 +911,41 @@
         
 <div>File or directories which have SPDX information different from the project defaults. The fileOrDirectory field of the PathSpecificSpdxInfo is required. All files within the directory (or just the specific file) will use the SPDX data specified in the PathSpecificSpdxInfo parameters. All of the SPDX data parameters are optional. If any SPDX field is not specified, the project level default data will be used. 
 
-<p>If a file or directory is nested within another pathsWithSpecificSpdxInfo, the lowest level values will be used. Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default project level fields NOT the higher level PathSpecificSpdxInfo.</p></div>
+<p>If a file or directory is nested within another pathsWithSpecificSpdxInfo, the lowest level values will be used. Note: in this case the non-specified SPDX fields for the lowest level PathSpecificSpdxInfo will use the default project level fields NOT the higher level PathSpecificSpdxInfo.</p>
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;pathsWithSpecificSpdxInfo&gt;
+    &lt;pathsWithSpecificSpdxInfo&gt;
+      &lt;directoryOrFile&gt;src/main/java/CommonCode.java&lt;/directoryOrFile&gt;
+      &lt;fileComment&gt;Comment for CommonCode&lt;/fileComment&gt;
+      &lt;fileContributors&gt;
+        &lt;fileContributor&gt;Contributor to CommonCode&lt;/fileContributor&gt;
+        &lt;!-- ... more ... --&gt;
+      &lt;/fileContributors&gt;
+      &lt;fileCopyright&gt;Common Code Copyright&lt;/fileCopyright&gt;
+      &lt;fileLicenseComment&gt;License Comment for Common Code&lt;/fileLicenseComment&gt;
+      &lt;fileNotice&gt;Notice for Commmon Code&lt;/fileNotice&gt;
+      &lt;fileConcludedLicense&gt;EPL-1.0&lt;/fileConcludedLicense&gt;
+      &lt;licenseInformationInFile&gt;ISC&lt;/licenseInformationInFile&gt;
+      &lt;snippets&gt;
+        &lt;snippet&gt;
+          &lt;name&gt;SnippetName&lt;/name&gt;
+          &lt;comment&gt;Snippet Comment&lt;/comment&gt;
+          &lt;concludedLicense&gt;BSD-2-Clause&lt;/concludedLicense&gt;
+          &lt;lineRange&gt;44:55&lt;/lineRange&gt;
+          &lt;byteRange&gt;1231:3442&lt;/byteRange&gt;
+          &lt;licenseComment&gt;Snippet License Comment&lt;/licenseComment&gt;
+          &lt;copyrightText&gt;Snippet Copyright Text&lt;/copyrightText&gt;
+          &lt;licenseInfoInSnippet&gt;BSD-2-Clause-FreeBSD&lt;/licenseInfoInSnippet&gt;
+        &lt;!-- ... more ... --&gt;
+        &lt;/snippet&gt;
+      &lt;/snippets&gt;
+    &lt;/pathsWithSpecificSpdxInfo&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/pathsWithSpecificSpdxInfo&gt;
+&lt;/configuration&gt;
+</pre></div></div>
         
 <ul>
           
