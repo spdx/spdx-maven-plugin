@@ -93,11 +93,15 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </nav>
 </header>
 <main role="main">
-<div class="contentContainer"><a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes</a>&nbsp;<a href="allpackages-index.html">All&nbsp;Packages</a><a id="I:A">
+<div class="contentContainer"><a href="#I:A">A</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes</a>&nbsp;<a href="allpackages-index.html">All&nbsp;Packages</a><a id="I:A">
 <!--   -->
 </a>
 <h2 class="title">A</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#addDependencyInformation(org.spdx.maven.utils.SpdxDependencyInformation)">addDependencyInformation(SpdxDependencyInformation)</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
+<dd>
+<div class="block">Add dependency information to the SPDX file</div>
+</dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/utils/LicenseManager.html#addExtractedLicense(org.spdx.maven.NonStandardLicense)">addExtractedLicense(NonStandardLicense)</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/LicenseManager.html" title="class in org.spdx.maven.utils">LicenseManager</a></dt>
 <dd>
 <div class="block">Add a non-listed license to the SPDX document.</div>
@@ -119,16 +123,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Create a default (empty) annotation</div>
 </dd>
 </dl>
-<a id="I:B">
-<!--   -->
-</a>
-<h2 class="title">B</h2>
-<dl>
-<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#buildDocumentFromFiles(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxProjectInformation,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,org.spdx.maven.utils.SpdxDependencyInformation,java.util.Set)">buildDocumentFromFiles(List&lt;FileSet&gt;, String, SpdxProjectInformation, SpdxDefaultFileInformation, Map&lt;String, SpdxDefaultFileInformation&gt;, SpdxDependencyInformation, Set&lt;ChecksumAlgorithm&gt;)</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
-<dd>
-<div class="block">Build the SPDX document from the files and save the information to the SPDX file</div>
-</dd>
-</dl>
 <a id="I:C">
 <!--   -->
 </a>
@@ -137,6 +131,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxFileCollector.html#collectFiles(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,org.spdx.library.model.SpdxPackage,org.spdx.library.model.enumerations.RelationshipType,org.spdx.library.model.SpdxDocument,java.util.Set)">collectFiles(List&lt;FileSet&gt;, String, SpdxDefaultFileInformation, Map&lt;String, SpdxDefaultFileInformation&gt;, SpdxPackage, RelationshipType, SpdxDocument, Set&lt;ChecksumAlgorithm&gt;)</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxFileCollector.html" title="class in org.spdx.maven.utils">SpdxFileCollector</a></dt>
 <dd>
 <div class="block">Collect file information in the directory (including subdirectories).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,java.util.Set)">collectSpdxFileInformation(List&lt;FileSet&gt;, String, SpdxDefaultFileInformation, Map&lt;String, SpdxDefaultFileInformation&gt;, Set&lt;ChecksumAlgorithm&gt;)</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
+<dd>
+<div class="block">Collect information at the file level, fill in the SPDX document</div>
 </dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxFileCollector.html#convertChecksumToString(byte%5B%5D)">convertChecksumToString(byte[])</a></span> - Static method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxFileCollector.html" title="class in org.spdx.maven.utils">SpdxFileCollector</a></dt>
 <dd>
@@ -176,6 +174,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/ExternalReference.html#%3Cinit%3E()">ExternalReference()</a></span> - Constructor for class org.spdx.maven.<a href="org/spdx/maven/ExternalReference.html" title="class in org.spdx.maven">ExternalReference</a></dt>
 <dd>&nbsp;</dd>
+</dl>
+<a id="I:F">
+<!--   -->
+</a>
+<h2 class="title">F</h2>
+<dl>
+<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#fillSpdxDocumentInformation(org.spdx.maven.utils.SpdxProjectInformation)">fillSpdxDocumentInformation(SpdxProjectInformation)</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
+<dd>
+<div class="block">Fill in the document level information for SPDX</div>
+</dd>
 </dl>
 <a id="I:G">
 <!--   -->
@@ -531,6 +539,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </a>
 <h2 class="title">S</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#saveSpdxDocumentToFile()">saveSpdxDocumentToFile()</a></span> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/Annotation.html#setAnnotationComment(java.lang.String)">setAnnotationComment(String)</a></span> - Method in class org.spdx.maven.<a href="org/spdx/maven/Annotation.html" title="class in org.spdx.maven">Annotation</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/Annotation.html#setAnnotationDate(java.lang.String)">setAnnotationDate(String)</a></span> - Method in class org.spdx.maven.<a href="org/spdx/maven/Annotation.html" title="class in org.spdx.maven">Annotation</a></dt>
@@ -641,13 +651,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Exceptions relating to the building of SPDX Documents</div>
 </dd>
-<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxBuilderException.html#%3Cinit%3E()">SpdxBuilderException()</a></span> - Constructor for exception org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxBuilderException.html#%3Cinit%3E(java.lang.String)">SpdxBuilderException(String)</a></span> - Constructor for exception org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxBuilderException.html#%3Cinit%3E(java.lang.String,java.lang.Throwable)">SpdxBuilderException(String, Throwable)</a></span> - Constructor for exception org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="org/spdx/maven/utils/SpdxBuilderException.html#%3Cinit%3E(java.lang.Throwable)">SpdxBuilderException(Throwable)</a></span> - Constructor for exception org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxCollectionException.html" title="class in org.spdx.maven.utils"><span class="typeNameLink">SpdxCollectionException</span></a> - Exception in <a href="org/spdx/maven/utils/package-summary.html">org.spdx.maven.utils</a></dt>
 <dd>
@@ -766,7 +772,7 @@ the order they are declared.</div>
 <dt><span class="memberNameLink"><a href="org/spdx/maven/Packaging.html#WAR">WAR</a></span> - org.spdx.maven.<a href="org/spdx/maven/Packaging.html" title="enum in org.spdx.maven">Packaging</a></dt>
 <dd>&nbsp;</dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes</a>&nbsp;<a href="allpackages-index.html">All&nbsp;Packages</a></div>
+<a href="#I:A">A</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes</a>&nbsp;<a href="allpackages-index.html">All&nbsp;Packages</a></div>
 </main>
 <footer role="contentinfo">
 <nav role="navigation">

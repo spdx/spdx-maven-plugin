@@ -84,7 +84,7 @@ loadScripts(document, 'script');</script>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
@@ -124,7 +124,17 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Exception.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Exception</a></li>
 <li>
 <ul class="inheritance">
+<li>org.apache.maven.plugin.AbstractMojoExecutionException</li>
+<li>
+<ul class="inheritance">
+<li>org.apache.maven.plugin.MojoExecutionException</li>
+<li>
+<ul class="inheritance">
 <li>org.spdx.maven.utils.SpdxBuilderException</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -141,7 +151,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dl>
 <hr>
 <pre>public class <span class="typeNameLabel">SpdxBuilderException</span>
-extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Exception.html?is-external=true" title="class or interface in java.lang" class="externalLink">Exception</a></pre>
+extends org.apache.maven.plugin.MojoExecutionException</pre>
 <div class="block">Exceptions relating to the building of SPDX Documents</div>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
@@ -155,6 +165,23 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<section>
+<ul class="blockList">
+<li class="blockList"><a id="field.summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a id="fields.inherited.from.class.org.apache.maven.plugin.AbstractMojoExecutionException">
+<!--   -->
+</a>
+<h3>Fields inherited from class&nbsp;org.apache.maven.plugin.AbstractMojoExecutionException</h3>
+<code>longMessage, source</code></li>
+</ul>
+</li>
+</ul>
+</section>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <section>
 <ul class="blockList">
@@ -169,20 +196,12 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E()">SpdxBuilderException</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String)">SpdxBuilderException</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;message)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.Throwable)">SpdxBuilderException</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;message,
                     <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a>&nbsp;cause)</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.Throwable)">SpdxBuilderException</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a>&nbsp;cause)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -196,6 +215,13 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <!--   -->
 </a>
 <h3>Method Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a id="methods.inherited.from.class.org.apache.maven.plugin.AbstractMojoExecutionException">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;org.apache.maven.plugin.AbstractMojoExecutionException</h3>
+<code>getLongMessage, getSource</code></li>
+</ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Throwable">
 <!--   -->
@@ -226,15 +252,6 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>SpdxBuilderException</h4>
-<pre>public&nbsp;SpdxBuilderException()</pre>
-</li>
-</ul>
 <a id="&lt;init&gt;(java.lang.String)">
 <!--   -->
 </a>
@@ -245,19 +262,6 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>message</code> - </dd>
-</dl>
-</li>
-</ul>
-<a id="&lt;init&gt;(java.lang.Throwable)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>SpdxBuilderException</h4>
-<pre>public&nbsp;SpdxBuilderException&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a>&nbsp;cause)</pre>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>cause</code> - </dd>
 </dl>
 </li>
 </ul>
@@ -329,7 +333,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>

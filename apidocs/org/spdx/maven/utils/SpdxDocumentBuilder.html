@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -209,32 +209,49 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addDependencyInformation(org.spdx.maven.utils.SpdxDependencyInformation)">addDependencyInformation</a></span>&#8203;(<a href="SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a>&nbsp;dependencyInformation)</code></th>
+<td class="colLast">
+<div class="block">Add dependency information to the SPDX file</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addNonStandardLicenses(org.spdx.maven.NonStandardLicense%5B%5D)">addNonStandardLicenses</a></span>&#8203;(<a href="../NonStandardLicense.html" title="class in org.spdx.maven">NonStandardLicense</a>[]&nbsp;nonStandardLicenses)</code></th>
 <td class="colLast">
 <div class="block">Add non-standard licenses to the SPDX document.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildDocumentFromFiles(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxProjectInformation,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,org.spdx.maven.utils.SpdxDependencyInformation,java.util.Set)">buildDocumentFromFiles</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
-                      <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseDir,
-                      <a href="SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a>&nbsp;projectInformation,
-                      <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
-                      <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
-                      <a href="SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a>&nbsp;dependencyInformation,
-                      <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,java.util.Set)">collectSpdxFileInformation</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
+                          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseDir,
+                          <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
+                          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
+                          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms)</code></th>
 <td class="colLast">
-<div class="block">Build the SPDX document from the files and save the information to the SPDX file</div>
+<div class="block">Collect information at the file level, fill in the SPDX document</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fillSpdxDocumentInformation(org.spdx.maven.utils.SpdxProjectInformation)">fillSpdxDocumentInformation</a></span>&#8203;(<a href="SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a>&nbsp;projectInformation)</code></th>
+<td class="colLast">
+<div class="block">Fill in the document level information for SPDX</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="LicenseManager.html" title="class in org.spdx.maven.utils">LicenseManager</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLicenseManager()">getLicenseManager</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>org.spdx.library.model.SpdxDocument</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSpdxDoc()">getSpdxDoc</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveSpdxDocumentToFile()">saveSpdxDocumentToFile</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -345,30 +362,73 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <pre class="methodSignature">public&nbsp;org.spdx.library.model.SpdxDocument&nbsp;getSpdxDoc()</pre>
 </li>
 </ul>
-<a id="buildDocumentFromFiles(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxProjectInformation,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,org.spdx.maven.utils.SpdxDependencyInformation,java.util.Set)">
+<a id="saveSpdxDocumentToFile()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>buildDocumentFromFiles</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;buildDocumentFromFiles&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
-                                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseDir,
-                                   <a href="SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a>&nbsp;projectInformation,
-                                   <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
-                                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
-                                   <a href="SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a>&nbsp;dependencyInformation,
-                                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms)
+<h4>saveSpdxDocumentToFile</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;saveSpdxDocumentToFile()
                             throws <a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></pre>
-<div class="block">Build the SPDX document from the files and save the information to the SPDX file</div>
+<dl>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></code></dd>
+</dl>
+</li>
+</ul>
+<a id="addDependencyInformation(org.spdx.maven.utils.SpdxDependencyInformation)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addDependencyInformation</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;addDependencyInformation&#8203;(<a href="SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a>&nbsp;dependencyInformation)
+                              throws <a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></pre>
+<div class="block">Add dependency information to the SPDX file</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>dependencyInformation</code> - dependency information collected from the project POM file</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></code></dd>
+</dl>
+</li>
+</ul>
+<a id="fillSpdxDocumentInformation(org.spdx.maven.utils.SpdxProjectInformation)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>fillSpdxDocumentInformation</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;fillSpdxDocumentInformation&#8203;(<a href="SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a>&nbsp;projectInformation)
+                                 throws <a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></pre>
+<div class="block">Fill in the document level information for SPDX</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>projectInformation</code> - project information to be used</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></code></dd>
+</dl>
+</li>
+</ul>
+<a id="collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.Map,java.util.Set)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>collectSpdxFileInformation</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;collectSpdxFileInformation&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
+                                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseDir,
+                                       <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
+                                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
+                                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms)
+                                throws <a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></pre>
+<div class="block">Collect information at the file level, fill in the SPDX document</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>sources</code> - Source directories to be included in the document</dd>
-<dd><code>baseDir</code> - Base directory used to create the relative file paths for the SPDX file names</dd>
-<dd><code>projectInformation</code> - Project level SPDX information</dd>
-<dd><code>defaultFileInformation</code> - Default SPDX file information</dd>
+<dd><code>baseDir</code> - project base directory used to construct the relative paths for the SPDX
+                                    files</dd>
 <dd><code>pathSpecificInformation</code> - Map of path to file information used to override the default file information</dd>
-<dd><code>dependencyInformation</code> - Dependencies to add to the SPDX file (typically based on project dependencies
-                                    in the POM file)</dd>
 <dd><code>algorithms</code> - algorithms to use to generate checksums</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></code></dd>
