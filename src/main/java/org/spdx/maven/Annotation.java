@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
  * Simple class to hold an SPDX Annotation.
  *
  * @author Gary O'Neall
+ * @see org.spdx.library.model.Annotation
+ * @see AnnotationType
  */
 public class Annotation
 {
