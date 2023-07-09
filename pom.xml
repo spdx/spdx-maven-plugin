@@ -272,6 +272,9 @@
         <version>3.5.0</version>
         <configuration>
           <notimestamp>true</notimestamp>
+          <links>
+            <link>https://spdx.github.io/Spdx-Java-Library/</link>
+          </links>
         </configuration>
         <reportSets>
           <reportSet>

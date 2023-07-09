@@ -28,6 +28,9 @@ import org.spdx.library.referencetype.ListedReferenceTypes;
  * enumerations, asset identifiers, or downloadable content believed to be relevant to the Package.
  *
  * @author Gary O'Neall
+ * @see ExternalRef
+ * @see ReferenceType
+ * @see ReferenceCategory
  */
 public class ExternalReference
 {
