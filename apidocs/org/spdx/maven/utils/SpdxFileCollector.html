@@ -191,10 +191,10 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
             <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseDir,
             <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
             <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
-            org.spdx.library.model.SpdxPackage&nbsp;projectPackage,
-            org.spdx.library.model.enumerations.RelationshipType&nbsp;relationshipType,
-            org.spdx.library.model.SpdxDocument&nbsp;spdxDoc,
-            <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms)</code></th>
+            <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxPackage.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxPackage</a>&nbsp;projectPackage,
+            <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/RelationshipType.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">RelationshipType</a>&nbsp;relationshipType,
+            <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc,
+            <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/ChecksumAlgorithm.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">ChecksumAlgorithm</a>&gt;&nbsp;algorithms)</code></th>
 <td class="colLast">
 <div class="block">Collect file information in the directory (including subdirectories).</div>
 </td>
@@ -214,15 +214,15 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>protected static org.spdx.library.model.enumerations.FileType</code></td>
+<td class="colFirst"><code>protected static <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/FileType.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">FileType</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#extensionToFileType(java.lang.String)">extensionToFileType</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;fileExtension)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>static <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.Checksum&gt;</code></td>
+<td class="colFirst"><code>static <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Checksum.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">Checksum</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#generateChecksum(java.io.File,java.util.Set,org.spdx.library.model.SpdxDocument)">generateChecksum</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;file,
-                <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms,
-                org.spdx.library.model.SpdxDocument&nbsp;spdxDoc)</code></th>
+                <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/ChecksumAlgorithm.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">ChecksumAlgorithm</a>&gt;&nbsp;algorithms,
+                <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc)</code></th>
 <td class="colLast">
 <div class="block">Generate checksums for a given file using each algorithm supplied.</div>
 </td>
@@ -230,7 +230,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>static <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#generateSha1(java.io.File,org.spdx.library.model.SpdxDocument)">generateSha1</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;file,
-            org.spdx.library.model.SpdxDocument&nbsp;spdxDoc)</code></th>
+            <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc)</code></th>
 <td class="colLast">
 <div class="block">Generate the Sha1 for a given file.</div>
 </td>
@@ -241,31 +241,31 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;org.spdx.library.model.SpdxFile&gt;</code></td>
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxFile.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxFile</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFiles()">getFiles</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;org.spdx.library.model.license.AnyLicenseInfo&gt;</code></td>
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLicenseInfoFromFiles()">getLicenseInfoFromFiles</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.spdx.library.model.SpdxSnippet&gt;</code></td>
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxSnippet.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxSnippet</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSnippets()">getSnippets</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
-<td class="colFirst"><code>org.spdx.library.model.SpdxPackageVerificationCode</code></td>
+<td class="colFirst"><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxPackageVerificationCode.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxPackageVerificationCode</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getVerificationCode(java.lang.String,org.spdx.library.model.SpdxDocument)">getVerificationCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;spdxFilePath,
-                   org.spdx.library.model.SpdxDocument&nbsp;spdxDoc)</code></th>
+                   <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc)</code></th>
 <td class="colLast">
 <div class="block">Create a verification code from all SPDX files collected</div>
 </td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>protected boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isSourceFile(java.util.Collection)">isSourceFile</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;org.spdx.library.model.enumerations.FileType&gt;&nbsp;fileTypes)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isSourceFile(java.util.Collection)">isSourceFile</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/FileType.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">FileType</a>&gt;&nbsp;fileTypes)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -322,10 +322,10 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
                          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseDir,
                          <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
                          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
-                         org.spdx.library.model.SpdxPackage&nbsp;projectPackage,
-                         org.spdx.library.model.enumerations.RelationshipType&nbsp;relationshipType,
-                         org.spdx.library.model.SpdxDocument&nbsp;spdxDoc,
-                         <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms)
+                         <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxPackage.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxPackage</a>&nbsp;projectPackage,
+                         <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/RelationshipType.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">RelationshipType</a>&nbsp;relationshipType,
+                         <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc,
+                         <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/ChecksumAlgorithm.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">ChecksumAlgorithm</a>&gt;&nbsp;algorithms)
                   throws <a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a></pre>
 <div class="block">Collect file information in the directory (including subdirectories).</div>
 <dl>
@@ -348,7 +348,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>isSourceFile</h4>
-<pre class="methodSignature">protected&nbsp;boolean&nbsp;isSourceFile&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;org.spdx.library.model.enumerations.FileType&gt;&nbsp;fileTypes)</pre>
+<pre class="methodSignature">protected&nbsp;boolean&nbsp;isSourceFile&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/FileType.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">FileType</a>&gt;&nbsp;fileTypes)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>fileTypes</code> - </dd>
@@ -388,7 +388,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>extensionToFileType</h4>
-<pre class="methodSignature">protected static&nbsp;org.spdx.library.model.enumerations.FileType&nbsp;extensionToFileType&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;fileExtension)</pre>
+<pre class="methodSignature">protected static&nbsp;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/FileType.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">FileType</a>&nbsp;extensionToFileType&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;fileExtension)</pre>
 </li>
 </ul>
 <a id="getFiles()">
@@ -397,7 +397,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>getFiles</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;org.spdx.library.model.SpdxFile&gt;&nbsp;getFiles()</pre>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxFile.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxFile</a>&gt;&nbsp;getFiles()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SPDX Files which have been acquired through the collectFilesInDirectory method</dd>
@@ -410,7 +410,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>getSnippets</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.spdx.library.model.SpdxSnippet&gt;&nbsp;getSnippets()</pre>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxSnippet.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxSnippet</a>&gt;&nbsp;getSnippets()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SPDX Snippets collected through the collectFilesInDirectory method</dd>
@@ -423,7 +423,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>getLicenseInfoFromFiles</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;org.spdx.library.model.license.AnyLicenseInfo&gt;&nbsp;getLicenseInfoFromFiles()</pre>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a>&gt;&nbsp;getLicenseInfoFromFiles()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>all license information used in the SPDX files</dd>
@@ -436,10 +436,10 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>getVerificationCode</h4>
-<pre class="methodSignature">public&nbsp;org.spdx.library.model.SpdxPackageVerificationCode&nbsp;getVerificationCode&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;spdxFilePath,
-                                                                              org.spdx.library.model.SpdxDocument&nbsp;spdxDoc)
-                                                                       throws <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/NoSuchAlgorithmException.html?is-external=true" title="class or interface in java.security" class="externalLink">NoSuchAlgorithmException</a>,
-                                                                              org.spdx.library.InvalidSPDXAnalysisException</pre>
+<pre class="methodSignature">public&nbsp;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxPackageVerificationCode.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxPackageVerificationCode</a>&nbsp;getVerificationCode&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;spdxFilePath,
+                                                       <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc)
+                                                throws <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/NoSuchAlgorithmException.html?is-external=true" title="class or interface in java.security" class="externalLink">NoSuchAlgorithmException</a>,
+                                                       <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html?is-external=true" title="class or interface in org.spdx.library" class="externalLink">InvalidSPDXAnalysisException</a></pre>
 <div class="block">Create a verification code from all SPDX files collected</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -448,7 +448,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <dt><span class="returnLabel">Returns:</span></dt>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/NoSuchAlgorithmException.html?is-external=true" title="class or interface in java.security" class="externalLink">NoSuchAlgorithmException</a></code></dd>
-<dd><code>org.spdx.library.InvalidSPDXAnalysisException</code></dd>
+<dd><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html?is-external=true" title="class or interface in org.spdx.library" class="externalLink">InvalidSPDXAnalysisException</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -474,9 +474,9 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <li class="blockList">
 <h4>generateSha1</h4>
 <pre class="methodSignature">public static&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;generateSha1&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;file,
-                                  org.spdx.library.model.SpdxDocument&nbsp;spdxDoc)
+                                  <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc)
                            throws <a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a>,
-                                  org.spdx.library.InvalidSPDXAnalysisException</pre>
+                                  <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html?is-external=true" title="class or interface in org.spdx.library" class="externalLink">InvalidSPDXAnalysisException</a></pre>
 <div class="block">Generate the Sha1 for a given file.  Must have read access to the file. This method is equivalent to calling
  <code>SpdxFileCollector.generateChecksum(file, "SHA-1")</code>.</div>
 <dl>
@@ -487,7 +487,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <dd>SHA1 checksum of the input file</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a></code> - if the algorithm is unavailable or the file cannot be read</dd>
-<dd><code>org.spdx.library.InvalidSPDXAnalysisException</code></dd>
+<dd><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html?is-external=true" title="class or interface in org.spdx.library" class="externalLink">InvalidSPDXAnalysisException</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -497,11 +497,11 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockListLast">
 <li class="blockList">
 <h4>generateChecksum</h4>
-<pre class="methodSignature">public static&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.Checksum&gt;&nbsp;generateChecksum&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;file,
-                                                                    <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;org.spdx.library.model.enumerations.ChecksumAlgorithm&gt;&nbsp;algorithms,
-                                                                    org.spdx.library.model.SpdxDocument&nbsp;spdxDoc)
-                                                             throws <a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a>,
-                                                                    org.spdx.library.InvalidSPDXAnalysisException</pre>
+<pre class="methodSignature">public static&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Checksum.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">Checksum</a>&gt;&nbsp;generateChecksum&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;file,
+                                             <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/enumerations/ChecksumAlgorithm.html?is-external=true" title="class or interface in org.spdx.library.model.enumerations" class="externalLink">ChecksumAlgorithm</a>&gt;&nbsp;algorithms,
+                                             <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc)
+                                      throws <a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a>,
+                                             <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html?is-external=true" title="class or interface in org.spdx.library" class="externalLink">InvalidSPDXAnalysisException</a></pre>
 <div class="block">Generate checksums for a given file using each algorithm supplied. Must have read access to the file.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -512,7 +512,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <dd><code>Set</code> of checksums for file using each algorithm specified</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a></code> - if the input algorithm is invalid or unavailable or if the file cannot be read</dd>
-<dd><code>org.spdx.library.InvalidSPDXAnalysisException</code></dd>
+<dd><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html?is-external=true" title="class or interface in org.spdx.library" class="externalLink">InvalidSPDXAnalysisException</a></code></dd>
 </dl>
 </li>
 </ul>

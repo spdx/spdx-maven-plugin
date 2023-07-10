@@ -160,7 +160,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.spdx.library.model.SpdxDocument,boolean)">LicenseManager</a></span>&#8203;(org.spdx.library.model.SpdxDocument&nbsp;spdxDoc,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.spdx.library.model.SpdxDocument,boolean)">LicenseManager</a></span>&#8203;(<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc,
               boolean&nbsp;useStdLicenseSourceUrls)</code></th>
 <td class="colLast">
 <div class="block">License manager will track any extracted SPDX licenses and map between SPDX licenses and Maven licenses.</div>
@@ -192,14 +192,14 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>org.spdx.library.model.license.AnyLicenseInfo</code></td>
+<td class="colFirst"><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#mavenLicenseListToSpdxLicense(java.util.List)">mavenLicenseListToSpdxLicense</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.model.License&gt;&nbsp;licenseList)</code></th>
 <td class="colLast">
 <div class="block">Map a list of Maven licenses to an SPDX license.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>org.spdx.library.model.license.AnyLicenseInfo</code></td>
+<td class="colFirst"><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#mavenLicenseToSpdxLicense(org.apache.maven.model.License)">mavenLicenseToSpdxLicense</a></span>&#8203;(org.apache.maven.model.License&nbsp;mavenLicense)</code></th>
 <td class="colLast">
 <div class="block">Map a Maven license to an SPDX license based on the URL</div>
@@ -207,7 +207,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>org.apache.maven.model.License</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#spdxLicenseToMavenLicense(org.spdx.library.model.license.AnyLicenseInfo)">spdxLicenseToMavenLicense</a></span>&#8203;(org.spdx.library.model.license.AnyLicenseInfo&nbsp;spdxLicense)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#spdxLicenseToMavenLicense(org.spdx.library.model.license.AnyLicenseInfo)">spdxLicenseToMavenLicense</a></span>&#8203;(<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a>&nbsp;spdxLicense)</code></th>
 <td class="colLast">
 <div class="block">Create a Maven license from the SPDX license</div>
 </td>
@@ -242,7 +242,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockListLast">
 <li class="blockList">
 <h4>LicenseManager</h4>
-<pre>public&nbsp;LicenseManager&#8203;(org.spdx.library.model.SpdxDocument&nbsp;spdxDoc,
+<pre>public&nbsp;LicenseManager&#8203;(<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html?is-external=true" title="class or interface in org.spdx.library.model" class="externalLink">SpdxDocument</a>&nbsp;spdxDoc,
                       boolean&nbsp;useStdLicenseSourceUrls)
                throws <a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a></pre>
 <div class="block">License manager will track any extracted SPDX licenses and map between SPDX licenses and Maven licenses.  The
@@ -291,8 +291,8 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>mavenLicenseListToSpdxLicense</h4>
-<pre class="methodSignature">public&nbsp;org.spdx.library.model.license.AnyLicenseInfo&nbsp;mavenLicenseListToSpdxLicense&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.model.License&gt;&nbsp;licenseList)
-                                                                            throws <a href="LicenseManagerException.html" title="class in org.spdx.maven.utils">LicenseManagerException</a></pre>
+<pre class="methodSignature">public&nbsp;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a>&nbsp;mavenLicenseListToSpdxLicense&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;org.apache.maven.model.License&gt;&nbsp;licenseList)
+                                             throws <a href="LicenseManagerException.html" title="class in org.spdx.maven.utils">LicenseManagerException</a></pre>
 <div class="block">Map a list of Maven licenses to an SPDX license.  If no licenses are supplied, SpdxNoAssertion license is
  returned.  if a single license is supplied, the mapped SPDX license is returned.  If multiple licenses are
  supplied, a conjunctive license is returned containing all mapped SPDX licenses.</div>
@@ -309,8 +309,8 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>mavenLicenseToSpdxLicense</h4>
-<pre class="methodSignature">public&nbsp;org.spdx.library.model.license.AnyLicenseInfo&nbsp;mavenLicenseToSpdxLicense&#8203;(org.apache.maven.model.License&nbsp;mavenLicense)
-                                                                        throws <a href="LicenseManagerException.html" title="class in org.spdx.maven.utils">LicenseManagerException</a></pre>
+<pre class="methodSignature">public&nbsp;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a>&nbsp;mavenLicenseToSpdxLicense&#8203;(org.apache.maven.model.License&nbsp;mavenLicense)
+                                         throws <a href="LicenseManagerException.html" title="class in org.spdx.maven.utils">LicenseManagerException</a></pre>
 <div class="block">Map a Maven license to an SPDX license based on the URL</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -328,7 +328,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockListLast">
 <li class="blockList">
 <h4>spdxLicenseToMavenLicense</h4>
-<pre class="methodSignature">public&nbsp;org.apache.maven.model.License&nbsp;spdxLicenseToMavenLicense&#8203;(org.spdx.library.model.license.AnyLicenseInfo&nbsp;spdxLicense)
+<pre class="methodSignature">public&nbsp;org.apache.maven.model.License&nbsp;spdxLicenseToMavenLicense&#8203;(<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/license/AnyLicenseInfo.html?is-external=true" title="class or interface in org.spdx.library.model.license" class="externalLink">AnyLicenseInfo</a>&nbsp;spdxLicense)
                                                          throws <a href="LicenseManagerException.html" title="class in org.spdx.maven.utils">LicenseManagerException</a></pre>
 <div class="block">Create a Maven license from the SPDX license</div>
 <dl>
