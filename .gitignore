@@ -10,6 +10,7 @@ buildNumber.properties
 .project
 .classpath
 .settings/
+.vscode/
 src/test/resources/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
