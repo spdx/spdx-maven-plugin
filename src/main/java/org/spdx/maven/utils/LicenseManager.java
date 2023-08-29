@@ -194,7 +194,7 @@ public class LicenseManager
             throw new LicenseManagerException(
                     "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" );
         }
-        String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl() );
+        String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl().replaceAll("https", "http") );
         if ( licenseId == null )
         {
             throw new LicenseManagerException(
