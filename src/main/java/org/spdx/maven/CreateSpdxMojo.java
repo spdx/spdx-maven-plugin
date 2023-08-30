@@ -456,8 +456,20 @@ public class CreateSpdxMojo extends AbstractMojo
     @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
+     /**
+      * Skip goal execution.
+      */
+    @Parameter( property = "spdx.skip" )
+    private boolean skip = false;
+
     public void execute() throws MojoExecutionException
     {
+        if ( skip )
+        {
+            getLog().info("Skipping SPDX");
+            return;
+        }
+
         OutputFormat outputFormatEnum = prepareOutput();
         String artifactType = outputFormatEnum.getArtifactType();
 
