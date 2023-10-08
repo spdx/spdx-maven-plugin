@@ -971,7 +971,7 @@ public class CreateSpdxMojo extends AbstractMojo
         }
         else
         {
-            getLog().warn( packageFile == null ? "Null package file" : "Package file " + packageFile.getAbsolutePath() + "does not exit" );
+            getLog().warn( packageFile == null ? "Null package file" : "Package file " + packageFile.getAbsolutePath() + " does not exist" );
             packageFileName = "NOASSERTION";
         }
         retval.setPackageArchiveFileName( packageFileName );
