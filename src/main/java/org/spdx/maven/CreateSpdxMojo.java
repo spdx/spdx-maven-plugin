@@ -191,6 +191,8 @@ public class CreateSpdxMojo extends AbstractMojo
      *   &lt;/documentAnnotations&gt;
      * &lt;/configuration&gt;
      * </pre>
+     *
+     * @since 0.5.1
      */
     @Parameter
     private Annotation[] documentAnnotations;
@@ -210,6 +212,8 @@ public class CreateSpdxMojo extends AbstractMojo
      *   &lt;/packageAnnotations&gt;
      * &lt;/configuration&gt;
      * </pre>
+     *
+     * @since 0.5.1
      */
     @Parameter
     private Annotation[] packageAnnotations;
@@ -437,6 +441,8 @@ public class CreateSpdxMojo extends AbstractMojo
      * Output file format for the SPDX file.  One of:
      * - JSON - JSON SPDX format
      * - RDF/XML - RDF/XML format
+     *
+     * @since 0.6.0
      */
     @Parameter( defaultValue = "JSON" )
     private String outputFormat;
@@ -445,6 +451,8 @@ public class CreateSpdxMojo extends AbstractMojo
      * If true, external document references will be created for any dependencies which
      * contain SPDX documents.  If false, the dependent package information will be copied
      * from the SPDX document into the generated SPDX document.
+     *
+     * @since 0.6.3
      */
     @Parameter( defaultValue = "true" )
     private boolean createExternalRefs;
@@ -452,12 +460,16 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * If true, all transitive dependencies will be included in the SPDX document.  If false,
      * only direct dependencies will be included.
+     *
+     * @since 0.6.3
      */
     @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
      /**
       * Skip goal execution.
+      *
+      * @since 0.7.1
       */
     @Parameter( property = "spdx.skip" )
     private boolean skip = false;
