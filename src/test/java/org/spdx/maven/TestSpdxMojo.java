@@ -308,6 +308,252 @@ public class TestSpdxMojo extends AbstractMojoTestCase
     }
     
     @Test
+    public void testExecuteUseArtfactId() throws Exception
+    {
+        File testPom = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/json-pom-use-artifact.xml" );
+        //        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
+        // if the below does not work due to a lookup error, run mvn test goal
+        CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
+        assertNotNull( mojo );
+        mojo.execute();
+        // Test SPDX filename parameter
+        File spdxFile = new File( getBasedir(), SPDX_JSON_FILE_NAME );
+        assertTrue( spdxFile.exists() );
+        // Test output artifact file is created
+        File artifactFile = getTestFile(
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.json" );
+        assertTrue( artifactFile.exists() );
+        ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
+        ModelCopyManager copyManager = new ModelCopyManager();
+        SpdxDocument result;
+        String documentUri;
+        try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
+        {
+            documentUri = modelStore.deSerialize( is, false );
+            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+        }
+        List<String> warnings = result.verify();
+        assertEquals( 0, warnings.size() );
+        // Test configuration parameters found in the test resources pom.xml file
+        // Document namespace
+        assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
+        // Non-standard licenses
+        ExtractedLicenseInfo[] licenseInfos = result.getExtractedLicenseInfos().toArray( new ExtractedLicenseInfo[result.getExtractedLicenseInfos().size()] );
+        assertEquals( 2, licenseInfos.length );
+        ExtractedLicenseInfo testLicense1 = null;
+        ExtractedLicenseInfo testLicense2 = null;
+        for ( ExtractedLicenseInfo li : licenseInfos )
+        {
+            if ( li.getLicenseId().equals( "LicenseRef-testLicense" ) )
+            {
+                testLicense1 = li;
+            }
+            else if ( li.getLicenseId().equals( "LicenseRef-testLicense2" ) )
+            {
+                testLicense2 = li;
+            }
+        }
+        assertTrue( testLicense1 != null );
+        assertEquals( "Test License", testLicense1.getName() );
+        assertEquals( "Test license text", testLicense1.getExtractedText() );
+        assertEquals( 1, testLicense1.getSeeAlso().size() );
+        assertEquals( "http://www.test.url/testLicense.html", testLicense1.getSeeAlso().toArray( new String[testLicense1.getSeeAlso().size()]  )[0] );
+        assertEquals( "Test license comment", testLicense1.getComment() );
+
+        assertTrue( testLicense2 != null );
+        assertEquals( "Second Test License", testLicense2.getName() );
+        assertEquals( "Second est license text", testLicense2.getExtractedText() );
+        assertEquals( 2, testLicense2.getSeeAlso().size() );
+        boolean foundSeeAlso1 = false;
+        boolean foundSeeAlso2 = false;
+        for ( String seeAlso : testLicense2.getSeeAlso() )
+        {
+            if ( seeAlso.equals( "http://www.test.url/testLicense2.html" ) )
+            {
+                foundSeeAlso1 = true;
+            }
+            else if ( seeAlso.equals( "http://www.test.url/testLicense2-alt.html" ) )
+            {
+                foundSeeAlso2 = true;
+            }
+        }
+        assertTrue( foundSeeAlso1 );
+        assertTrue( foundSeeAlso2 );
+        assertEquals( "Second Test license comment", testLicense2.getComment() );
+        // documentComment
+        assertEquals( "Document Comment", result.getComment().get() );
+        // documentAnnotations
+        assertEquals( 2, result.getAnnotations().size() );
+        org.spdx.library.model.Annotation annotation1 = null;
+        org.spdx.library.model.Annotation annotation2 = null;
+        for ( org.spdx.library.model.Annotation annotation : result.getAnnotations() )
+        {
+            if ( annotation.getComment().equals( "Annotation1" ) )
+            {
+                annotation1 = annotation;
+            }
+            else if ( annotation.getComment().equals( "Annotation2" ) )
+            {
+                annotation2 = annotation;
+            }
+        }
+        assertTrue( annotation1 != null );
+        assertEquals( "2010-01-29T18:30:22Z", annotation1.getAnnotationDate() );
+        assertEquals( "Person:Test Person", annotation1.getAnnotator() );
+        assertEquals( AnnotationType.REVIEW, annotation1.getAnnotationType() );
+
+        assertTrue( annotation2 != null );
+        assertEquals( "2012-11-29T18:30:22Z", annotation2.getAnnotationDate() );
+        assertEquals( "Organization:Test Organization", annotation2.getAnnotator() );
+        assertEquals( AnnotationType.OTHER, annotation2.getAnnotationType() );
+        //creatorComment
+        assertEquals( "Creator comment", result.getCreationInfo().getComment().get() );
+        // creators
+        assertEquals( 3, result.getCreationInfo().getCreators().size() );
+        boolean foundCreator1 = false;
+        boolean foundCreator2 = false;
+        for ( String creator : result.getCreationInfo().getCreators() )
+        {
+            if ( creator.equals( "Person: Creator1" ) )
+            {
+                foundCreator1 = true;
+            }
+            else if ( creator.equals( "Person: Creator2" ) )
+            {
+                foundCreator2 = true;
+            }
+        }
+        assertTrue( foundCreator1 );
+        assertTrue( foundCreator2 );
+        // package parameters
+        assertEquals( 1, result.getDocumentDescribes().size() );
+        SpdxElement described = result.getDocumentDescribes().toArray( new SpdxElement[result.getDocumentDescribes().size()] )[0];
+        assertTrue( described instanceof SpdxPackage );
+        SpdxPackage pkg = (SpdxPackage) described;
+        // name
+        assertEquals( "org.spdx:spdx maven plugin test", pkg.getName().get() );
+        // packageAnnotations
+        assertEquals( 1, pkg.getAnnotations().size() );
+        org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
+        assertEquals( "PackageAnnotation", annotation.getComment() );
+        assertEquals( "2015-01-29T18:30:22Z", annotation.getAnnotationDate() );
+        assertEquals( "Person:Test Package Person", annotation.getAnnotator() );
+        assertEquals( AnnotationType.REVIEW, annotation.getAnnotationType() );
+        //licenseDeclared
+        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseById( "BSD-2-Clause" );
+        assertEquals( licenseDeclared, pkg.getLicenseDeclared() );
+        //licenseConcluded
+        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseById( "BSD-3-Clause" );
+        assertEquals( licenseConcluded, pkg.getLicenseConcluded() );
+        //licenseComments
+        assertEquals( "License comments", pkg.getLicenseComments().get() );
+        //originator
+        assertEquals( "Organization: Originating org.", pkg.getOriginator().get() );
+        // sourceInfo
+        assertEquals( "Source info", pkg.getSourceInfo().get() );
+        //copyrightText
+        assertEquals( "Copyright Text for Package", pkg.getCopyrightText() );
+        //external Refs
+        ExternalRef[] externalRefs = pkg.getExternalRefs().toArray( new ExternalRef[pkg.getExternalRefs().size()] );
+        assertEquals( 2, externalRefs.length );
+        if ( externalRefs[0].getReferenceCategory().equals( ReferenceCategory.SECURITY ) )
+        {
+            assertEquals( "extref comment1", externalRefs[0].getComment().get() );
+            assertEquals( "example-locator-CPE22Type", externalRefs[0].getReferenceLocator() );
+            assertEquals( "cpe22Type", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
+                    new URI( externalRefs[0].getReferenceType().getIndividualURI() ) ) );
+            assertEquals( "extref comment2", externalRefs[1].getComment().get() );
+            assertEquals( "org.apache.tomcat:tomcat:9.0.0.M4", externalRefs[1].getReferenceLocator() );
+            assertEquals( "maven-central", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
+                    new URI( externalRefs[1].getReferenceType().getIndividualURI() ) ) );
+        }
+        else if ( externalRefs[0].getReferenceCategory().equals(
+                ReferenceCategory.PACKAGE_MANAGER ) )
+        {
+            assertEquals( "extref comment1", externalRefs[1].getComment().get() );
+            assertEquals( "example-locator-CPE22Type", externalRefs[1].getReferenceLocator() );
+            assertEquals( "cpe22Type", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
+                    new URI(externalRefs[1].getReferenceType().getIndividualURI() ) ) );
+            assertEquals( "extref comment2", externalRefs[0].getComment().get() );
+            assertEquals( "org.apache.tomcat:tomcat:9.0.0.M4", externalRefs[0].getReferenceLocator() );
+            assertEquals( "maven-central", ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
+                    new URI( externalRefs[0].getReferenceType().getIndividualURI() ) ) );
+        }
+        else
+        {
+            fail( "Unexpected reference category" );
+        }
+        // Test all files are included
+        List<String> filePaths = new ArrayList<>();
+        File sourceDir = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/src/main" );
+        addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, sourceDir, filePaths );
+        File testDir = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/src/test" );
+        addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, testDir, filePaths );
+        @SuppressWarnings( "unused" )
+        File resourceDir = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/src/resources" );
+        //TODO: Add resource to project stub and uncomment the line below
+        //        addFilePaths( getBasedir() + UNIT_TEST_RESOURCE_DIR, resourceDir, filePaths );
+        Collection<SpdxFile> pkgFiles = pkg.getFiles();
+        assertEquals( filePaths.size(), pkgFiles.size() );
+        String fileWithSnippet = null;
+        for ( SpdxFile sFile : pkgFiles )
+        {
+            if ( sFile.getName().get().equals( "./src/main/java/CommonCode.java" ) )
+            {
+                fileWithSnippet = sFile.getId();
+                assertEquals( "Comment for CommonCode", sFile.getComment().get() );
+                assertEquals( "Common Code Copyright", sFile.getCopyrightText() );
+                assertEquals( "License Comment for Common Code", sFile.getLicenseComments().get() );
+                assertEquals( "Notice for Commmon Code", sFile.getNoticeText().get() );
+                assertEquals( "EPL-1.0", sFile.getLicenseConcluded().toString() );
+                assertEquals( "Contributor to CommonCode", sFile.getFileContributors().toArray( new String[sFile.getFileContributors().size()] )[0] );
+                assertEquals( "ISC", sFile.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[sFile.getLicenseInfoFromFiles().size()]  )[0].toString() );
+            }
+            else
+            {
+                assertEquals( "Default file comment", sFile.getComment().get() );
+                assertEquals( "Copyright (c) 2012, 2013, 2014 Source Auditor Inc.", sFile.getCopyrightText() );
+                assertEquals( "Default file license comment", sFile.getLicenseComments().get() );
+                assertEquals( "Default file notice", sFile.getNoticeText().get() );
+                assertEquals( "Apache-2.0", sFile.getLicenseConcluded().toString() );
+                assertEquals( 2, sFile.getFileContributors().size() );
+                assertEquals( "Apache-1.1", sFile.getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[sFile.getLicenseInfoFromFiles().size()] )[0].toString() );
+            }
+            filePaths.remove( sFile.getName().get() );
+        }
+        assertEquals( 0, filePaths.size() );
+        List<SpdxSnippet> snippets = new ArrayList<>();
+        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxSnippet.class ).forEach( (snippet) -> {
+            snippets.add( (SpdxSnippet)snippet );
+        });
+        assertEquals( 2, snippets.size() );
+        Collections.sort( snippets );
+        assertEquals( "Snippet Comment", snippets.get( 0 ).getComment().get() );
+        assertEquals( "Snippet Copyright Text", snippets.get( 0 ).getCopyrightText() );
+        assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments().get() );
+        assertEquals( "SnippetName", snippets.get( 0 ).getName().get() );
+        assertEquals( "1231:3442",
+                TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
+        assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
+        assertEquals( "BSD-2-Clause-FreeBSD", snippets.get( 0 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 0 ).getLicenseInfoFromFiles().size()] )[0].toString() );
+        assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
+        assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
+
+        assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment().get() );
+        assertEquals( "Snippet2 Copyright Text", snippets.get( 1 ).getCopyrightText() );
+        assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments().get() );
+        assertEquals( "SnippetName2", snippets.get( 1 ).getName().get() );
+        assertEquals( "31231:33442",
+                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
+        assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );
+        assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 1 ).getLicenseInfoFromFiles().size()] )[0].toString() );
+        assertEquals( "444:554",
+                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
+        assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
+        //TODO Test dependencies
+    }
+
+    @Test
     public void testExecuteJson() throws Exception
     {
         File testPom = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/json-pom.xml" );
@@ -430,6 +676,8 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         SpdxElement described = result.getDocumentDescribes().toArray( new SpdxElement[result.getDocumentDescribes().size()] )[0];
         assertTrue( described instanceof SpdxPackage );
         SpdxPackage pkg = (SpdxPackage) described;
+        // name
+        assertEquals( "Test SPDX Plugin", pkg.getName().get() );
         // packageAnnotations
         assertEquals( 1, pkg.getAnnotations().size() );
         org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
@@ -550,7 +798,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
     }
-
+    
     /**
      * Add relative file paths to the filePaths list
      *
