@@ -17,7 +17,6 @@ package org.spdx.maven.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;

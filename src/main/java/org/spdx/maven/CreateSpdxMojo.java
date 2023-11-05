@@ -461,6 +461,13 @@ public class CreateSpdxMojo extends AbstractMojo
       */
     @Parameter( property = "spdx.skip" )
     private boolean skip = false;
+    
+    /**
+     * If true, use ${project.groupId}:${artifactId} as the SPDX package name.
+     * Otherwise, ${project.name} will be used
+     */
+    @Parameter
+    private boolean useArtifactID;
 
     public void execute() throws MojoExecutionException
     {
@@ -905,7 +912,7 @@ public class CreateSpdxMojo extends AbstractMojo
         retval.setCopyrightText( this.copyrightText );
         retval.setDeclaredLicense( declaredLicense );
         String projectName = mavenProject.getName();
-        if ( projectName == null || projectName.isEmpty() )
+        if ( projectName == null || projectName.isEmpty() || useArtifactID )
         {
             projectName = getDefaultProjectName();
         }
@@ -992,7 +999,7 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     private String getDefaultProjectName()
     {
-        return this.mavenProject.getArtifactId();
+        return this.mavenProject.getGroupId() + ":" + this.mavenProject.getArtifactId();
     }
 
     /**
