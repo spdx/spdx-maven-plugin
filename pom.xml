@@ -37,8 +37,8 @@
 
   <scm>
     <url>https://github.com/spdx/spdx-maven-plugin</url>
-    <connection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
+    <connection>scm:git:git@github.com:spdx/spdx-maven-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
     <tag>master</tag>
   </scm>
 
