@@ -113,10 +113,11 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject)" class="member-name-link">addMavenDependency</a><wbr>(org.apache.maven.artifact.Artifact&nbsp;dependency,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,boolean)" class="member-name-link">addMavenDependency</a><wbr>(org.apache.maven.artifact.Artifact&nbsp;dependency,
  org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
  org.apache.maven.execution.MavenSession&nbsp;session,
- org.apache.maven.project.MavenProject&nbsp;mavenProject)</code></div>
+ org.apache.maven.project.MavenProject&nbsp;mavenProject,
+ boolean&nbsp;useArtifactID)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Add information about a Maven dependency to the list of SPDX Dependencies</div>
 </div>
@@ -175,12 +176,13 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject)">
+<section class="detail" id="addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,boolean)">
 <h3>addMavenDependency</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMavenDependency</span><wbr><span class="parameters">(org.apache.maven.artifact.Artifact&nbsp;dependency,
  org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
  org.apache.maven.execution.MavenSession&nbsp;session,
- org.apache.maven.project.MavenProject&nbsp;mavenProject)</span>
+ org.apache.maven.project.MavenProject&nbsp;mavenProject,
+ boolean&nbsp;useArtifactID)</span>
                         throws <span class="exceptions"><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a>,
 <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html" title="class or interface in org.spdx.library" class="external-link">InvalidSPDXAnalysisException</a></span></div>
 <div class="block">Add information about a Maven dependency to the list of SPDX Dependencies</div>
@@ -190,6 +192,7 @@ loadScripts(document, 'script');</script>
 <dd><code>mavenProjectBuilder</code> - project builder for the repo containing the POM file</dd>
 <dd><code>session</code> - Maven session for building the project</dd>
 <dd><code>mavenProject</code> - Maven project</dd>
+<dd><code>useArtifactID</code> - If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used</dd>
 <dt>Throws:</dt>
 <dd><code><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a></code></dd>
 <dd><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html" title="class or interface in org.spdx.library" class="external-link">InvalidSPDXAnalysisException</a></code></dd>
