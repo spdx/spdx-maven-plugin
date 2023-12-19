@@ -534,7 +534,7 @@ public class CreateSpdxMojo extends AbstractMojo
 
             logDependencies( dependencies );
 
-            SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( dependencies, builder );
+            SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( dependencies, builder, useArtifactID );
 
             builder.addDependencyInformation( dependencyInformation );
         }
@@ -643,19 +643,21 @@ public class CreateSpdxMojo extends AbstractMojo
      *
      * @param dependencies Maven dependencies
      * @param builder SPDX document builder
+     * @param useArtifactID If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used
      * @return information collected from Maven dependencies
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
     private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies, 
-                                                                    SpdxDocumentBuilder builder ) throws LicenseMapperException, InvalidSPDXAnalysisException
+                                                                    SpdxDocumentBuilder builder,
+                                                                    boolean useArtifactID ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         SpdxDependencyInformation retval = new SpdxDependencyInformation( builder.getLicenseManager(), builder.getSpdxDoc(), createExternalRefs );
         if ( dependencies != null )
         {
             for ( Artifact dependency : dependencies )
             {
-                retval.addMavenDependency( dependency, mavenProjectBuilder, session, mavenProject );
+                retval.addMavenDependency( dependency, mavenProjectBuilder, session, mavenProject, useArtifactID );
             }
         }
         return retval;

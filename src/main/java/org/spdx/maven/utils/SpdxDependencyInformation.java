@@ -172,11 +172,13 @@ public class SpdxDependencyInformation
      * @param mavenProjectBuilder project builder for the repo containing the POM file
      * @param session Maven session for building the project
      * @param  mavenProject Maven project
+     * @param useArtifactID If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
     public void addMavenDependency( Artifact dependency, ProjectBuilder mavenProjectBuilder, 
-                                    MavenSession session, MavenProject mavenProject ) throws LicenseMapperException, InvalidSPDXAnalysisException
+                                    MavenSession session, MavenProject mavenProject, 
+                                    boolean useArtifactID ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         String scope = dependency.getScope();
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
@@ -185,7 +187,7 @@ public class SpdxDependencyInformation
             LOG.warn(
                     "Could not determine the SPDX relationship type for dependency artifact ID " + dependency.getArtifactId() + " scope " + scope );
         }
-        SpdxElement dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session, mavenProject );
+        SpdxElement dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session, mavenProject, useArtifactID );
         if ( relType.toString().endsWith( "_OF" ))
         {
             if ( dependencyPackage instanceof SpdxPackage)
@@ -245,13 +247,14 @@ public class SpdxDependencyInformation
      * @param mavenProjectBuilder project builder for the repo containing the POM file
      * @param session Maven session for building the project
      * @param mavenProject Maven project
+     * @param useArtifactID If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used
      * @return SPDX Package build from the MavenProject metadata
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
     private SpdxElement createSpdxPackage( Artifact artifact, 
                                            ProjectBuilder mavenProjectBuilder, MavenSession session,
-                                           MavenProject mavenProject ) throws LicenseMapperException, InvalidSPDXAnalysisException
+                                           MavenProject mavenProject, boolean useArtifactID ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         LOG.debug( "Creating SPDX package for artifact " + artifact.getArtifactId() );
         if ( artifact.getFile() == null )
@@ -328,7 +331,7 @@ public class SpdxDependencyInformation
             MavenProject depProject = build.getProject();
             LOG.debug(
                       "Dependency " + artifact.getArtifactId() + "Collecting information from project metadata for " + depProject.getArtifactId() );
-            return createSpdxPackage( depProject );
+            return createSpdxPackage( depProject, useArtifactID );
         }
         catch ( SpdxCollectionException e )
         {
@@ -621,6 +624,7 @@ public class SpdxDependencyInformation
      * Create an SPDX package from the information in a Maven Project
      *
      * @param project Maven project
+     * @param useArtifactID If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used
      * @return SPDX Package generated from the metadata in the Maven Project
      * @throws XmlPullParserException
      * @throws IOException
@@ -629,15 +633,15 @@ public class SpdxDependencyInformation
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
-    private SpdxPackage createSpdxPackage( MavenProject project ) throws SpdxCollectionException, NoSuchAlgorithmException, LicenseMapperException, InvalidSPDXAnalysisException
+    private SpdxPackage createSpdxPackage( MavenProject project, boolean useArtifactID ) throws SpdxCollectionException, NoSuchAlgorithmException, LicenseMapperException, InvalidSPDXAnalysisException
     {
         SpdxDefaultFileInformation fileInfo = new SpdxDefaultFileInformation();
 
         // initialize the SPDX information from the project
         String packageName = project.getName();
-        if ( packageName == null || packageName.isEmpty() )
+        if ( packageName == null || packageName.isEmpty() || useArtifactID )
         {
-            packageName = project.getArtifactId();
+            packageName = project.getGroupId() + ":" + project.getArtifactId();
         }
         List<Contributor> contributors = project.getContributors();
         ArrayList<String> fileContributorList = new ArrayList<>();
