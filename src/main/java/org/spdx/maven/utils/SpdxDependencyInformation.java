@@ -552,41 +552,48 @@ public class SpdxDependencyInformation
      * @throws SpdxCollectionException
      * @throws InvalidSPDXAnalysisException
      */
-    private SpdxElement createExternalSpdxPackageReference( SpdxDocument externalSpdxDoc, 
-                                                            File spdxFile, 
+    private SpdxElement createExternalSpdxPackageReference( SpdxDocument externalSpdxDoc,
+                                                            File spdxFile,
                                                             String groupId,
                                                             String artifactId,
-                                                            @Nullable String version ) throws SpdxCollectionException, InvalidSPDXAnalysisException
-    {
-        String externalDocNamespace = externalSpdxDoc.getDocumentUri();
-        ExternalDocumentRef externalRef = this.externalDocuments.get( externalDocNamespace );
-        StringBuilder sb = new StringBuilder( groupId ).append( artifactId );
-        if ( Objects.nonNull( version )) {
-            sb.append( version );
+                                                            @Nullable String version ) throws SpdxCollectionException, InvalidSPDXAnalysisException {
+    String externalDocNamespace = externalSpdxDoc.getDocumentUri();
+    ExternalDocumentRef externalRef = this.externalDocuments.get(externalDocNamespace);
+    StringBuilder sb = new StringBuilder(groupId).append(artifactId);
+    if (Objects.nonNull(version)) {
+        sb.append(version);
+    }
+    String fullArtifactId = sb.toString();
+    if (externalRef == null) {
+        String externalRefDocId = SpdxConstants.EXTERNAL_DOC_REF_PRENUM + fixExternalRefId(fullArtifactId);
+        LOG.debug("Creating external document ref " + externalDocNamespace);
+        // Check if the file is a JSON file
+        if (spdxFile.getName().endsWith(".json")) {
+            // Handle JSON files differently
+            String sha1 = SpdxFileCollector.generateSha1(spdxFile, spdxDoc);
+            Checksum cksum = externalSpdxDoc.createChecksum(ChecksumAlgorithm.SHA1, sha1);
+            externalRef = spdxDoc.createExternalDocumentRef(externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum);
+        } else {
+            // Assume it's an XML file (or handle other formats accordingly)
+            String sha1 = SpdxFileCollector.generateSha1(spdxFile, spdxDoc);
+            Checksum cksum = externalSpdxDoc.createChecksum(ChecksumAlgorithm.SHA1, sha1);
+            externalRef = spdxDoc.createExternalDocumentRef(externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum);
         }
-        String fullArtifactId = sb.toString();
-        if ( externalRef == null )
-        {
-            String externalRefDocId = SpdxConstants.EXTERNAL_DOC_REF_PRENUM + fixExternalRefId( fullArtifactId );
-            LOG.debug( "Creating external document ref " + externalDocNamespace );
-            String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
-            Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
-            externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
-            spdxDoc.getExternalDocumentRefs().add( externalRef );
-            org.spdx.library.model.Annotation docRefAddedAnnotation = spdxDoc.createAnnotation( "Tool: spdx-maven-plugin", 
-                                                                         AnnotationType.OTHER, 
-                                                                         format.format( new Date() ), 
-                                                                         "External document ref '"+externalRefDocId+"' created for artifact "+fullArtifactId );
-            spdxDoc.getAnnotations().add( docRefAddedAnnotation );
-            this.documentAnnotations.add( docRefAddedAnnotation );
-            this.externalDocuments.put( externalDocNamespace, externalRef );
-            LOG.debug( "Created external document ref " + externalRefDocId );
+            spdxDoc.getExternalDocumentRefs().add(externalRef);
+            org.spdx.library.model.Annotation docRefAddedAnnotation = spdxDoc.createAnnotation( "Tool: spdx-maven-plugin",
+                                                                                            AnnotationType.OTHER,
+                                                                                            format.format(new Date()),
+                                                                                            "External document ref '" + externalRefDocId + "' created for artifact " + fullArtifactId );
+            spdxDoc.getAnnotations().add(docRefAddedAnnotation);
+            this.documentAnnotations.add(docRefAddedAnnotation);
+            this.externalDocuments.put(externalDocNamespace, externalRef);
+            LOG.debug("Created external document ref " + externalRefDocId);
         }
-        SpdxPackage pkg = findMatchingDescribedPackage( externalSpdxDoc, artifactId );
-        return new ExternalSpdxElement( spdxDoc.getModelStore(), spdxDoc.getDocumentUri(),  
+        SpdxPackage pkg = findMatchingDescribedPackage(externalSpdxDoc, artifactId);
+        return new ExternalSpdxElement( spdxDoc.getModelStore(), spdxDoc.getDocumentUri(),
                                         externalRef.getId() + ":" + pkg.getId(), spdxDoc.getCopyManager(), true );
     }
-
+    
     /**
      * Make an external document reference ID valid by replacing any invalid characters with dashes
      *
