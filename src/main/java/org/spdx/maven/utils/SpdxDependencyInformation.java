@@ -360,6 +360,7 @@ public class SpdxDependencyInformation
                         .setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." )
                         .setVersionInfo( artifact.getBaseVersion() )
                         .setFilesAnalyzed( false )
+                        .setDownloadLocation( "NOASSERTION" )
                         .build();
         return pkg;
     }
