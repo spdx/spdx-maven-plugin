@@ -478,8 +478,15 @@ public class CreateSpdxMojo extends AbstractMojo
      * If true, use ${project.groupId}:${artifactId} as the SPDX package name.
      * Otherwise, ${project.name} will be used
      */
-    @Parameter
+    @Parameter( property = "spdx.useArtifactID" )
     private boolean useArtifactID;
+
+    /**
+     * If true, adds an external reference to every package with category "PACKAGE-MANAGER", type "purl"
+     * and locator "pkg:maven/${project.groupId}/${project.artifactId}@${project.version}".
+     */
+    @Parameter( property = "spdx.generatePurls" )
+    private boolean generatePurls;
 
     public void execute() throws MojoExecutionException
     {
@@ -608,7 +615,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 spdxDocumentNamespace = spdxDocumentNamespace.replace( " ", "%20" );
             }
             URI namespaceUri = new URI( spdxDocumentNamespace );
-            builder = new SpdxDocumentBuilder( spdxFile, namespaceUri,
+            builder = new SpdxDocumentBuilder( mavenProject, generatePurls, spdxFile, namespaceUri,
                     this.matchLicensesOnCrossReferenceUrls, outputFormatEnum );
         }
         catch ( SpdxBuilderException e )
@@ -652,7 +659,7 @@ public class CreateSpdxMojo extends AbstractMojo
                                                                     SpdxDocumentBuilder builder,
                                                                     boolean useArtifactID ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation( builder.getLicenseManager(), builder.getSpdxDoc(), createExternalRefs );
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( builder.getLicenseManager(), builder.getSpdxDoc(), createExternalRefs, generatePurls );
         if ( dependencies != null )
         {
             for ( Artifact dependency : dependencies )
@@ -798,7 +805,7 @@ public class CreateSpdxMojo extends AbstractMojo
     }
 
     /**
-     * @param container SPDX Document containing any extracted license infos
+     * @param spdxDoc SPDX Document containing any extracted license infos
      * @return default file information from the plugin parameters
      * @throws MojoExecutionException
      */

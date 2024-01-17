@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 
 import org.spdx.jacksonstore.MultiFormatStore;
@@ -80,6 +81,8 @@ public class SpdxDocumentBuilder
     //TODO: Map the SPDX document to the Maven build artifacts
     DateFormat format = new SimpleDateFormat( SpdxConstants.SPDX_DATE_FORMAT );
 
+    private MavenProject project;
+    private boolean generatePurls;
     private SpdxDocument spdxDoc;
     private SpdxPackage projectPackage;
     private LicenseManager licenseManager;
@@ -98,9 +101,11 @@ public class SpdxDocumentBuilder
      * @throws SpdxBuilderException
      * @throws LicenseMapperException
      */
-    public SpdxDocumentBuilder( File spdxFile, URI spdxDocumentNamespace, 
+    public SpdxDocumentBuilder( MavenProject project, boolean generatePurls, File spdxFile, URI spdxDocumentNamespace,
                                 boolean useStdLicenseSourceUrls, OutputFormat outputFormat ) throws SpdxBuilderException, LicenseMapperException
     {
+        this.project = project;
+        this.generatePurls = generatePurls;
         this.spdxFile = spdxFile;
 
         if ( spdxDocumentNamespace == null )
@@ -336,6 +341,7 @@ public class SpdxDocumentBuilder
                             .setDownloadLocation( downloadUrl )
                             .setPackageVerificationCode( nullPackageVerificationCode )
                             .setPrimaryPurpose( projectInformation.getPrimaryPurpose() )
+                            .setExternalRefs( SpdxExternalRefBuilder.getDefaultExternalRefs( spdxDoc, generatePurls, project ) )
                             .build();
         }
         catch ( InvalidSPDXAnalysisException e )

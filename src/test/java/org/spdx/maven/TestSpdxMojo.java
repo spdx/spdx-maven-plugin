@@ -14,11 +14,13 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.spdx.jacksonstore.MultiFormatStore;
 import org.spdx.jacksonstore.MultiFormatStore.Format;
 import org.spdx.library.ModelCopyManager;
 import org.spdx.library.model.ExternalRef;
+import org.spdx.library.model.ReferenceType;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.SpdxElement;
 import org.spdx.library.model.SpdxFile;
@@ -77,7 +79,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertTrue( spdxFile.exists() );
         // Test output artifact file is created
         File artifactFile = getTestFile(
-                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml" );
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx.rdf.xml" );
         assertTrue( artifactFile.exists() );
         ISerializableModelStore modelStore = new RdfStore();
         ModelCopyManager copyManager = new ModelCopyManager();
@@ -321,7 +323,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertTrue( spdxFile.exists() );
         // Test output artifact file is created
         File artifactFile = getTestFile(
-                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.json" );
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx.json" );
         assertTrue( artifactFile.exists() );
         ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
         ModelCopyManager copyManager = new ModelCopyManager();
@@ -431,7 +433,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertTrue( described instanceof SpdxPackage );
         SpdxPackage pkg = (SpdxPackage) described;
         // name
-        assertEquals( "org.spdx:spdx maven plugin test", pkg.getName().get() );
+        assertEquals( "org.spdx:spdx-maven-plugin-test", pkg.getName().get() );
         // packageAnnotations
         assertEquals( 1, pkg.getAnnotations().size() );
         org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
@@ -567,7 +569,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertTrue( spdxFile.exists() );
         // Test output artifact file is created
         File artifactFile = getTestFile(
-                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.json" );
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx.json" );
         assertTrue( artifactFile.exists() );
         ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
         ModelCopyManager copyManager = new ModelCopyManager();
@@ -850,7 +852,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertTrue( spdxFile.exists() );
         // Test output artifact file is created
         File artifactFile = getTestFile(
-                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml" );
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx.rdf.xml" );
         assertTrue( artifactFile.exists() );
         ISerializableModelStore modelStore = new RdfStore();
         ModelCopyManager copyManager = new ModelCopyManager();
@@ -883,7 +885,7 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertTrue( spdxFile.exists() );
         // Test output artifact file is created
         File artifactFile = getTestFile(
-                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml" );
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx.rdf.xml" );
         assertTrue( artifactFile.exists() );
         ISerializableModelStore modelStore = new RdfStore();
         ModelCopyManager copyManager = new ModelCopyManager();
@@ -1109,5 +1111,52 @@ public class TestSpdxMojo extends AbstractMojoTestCase
                 TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
+    }
+
+    @Test
+    public void testExecuteUseGeneratePurls() throws Exception
+    {
+        File testPom = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/json-pom-generate-purl.xml" );
+        //        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
+        // if the below does not work due to a lookup error, run mvn test goal
+        CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
+        assertNotNull( mojo );
+        mojo.execute();
+        // Test SPDX filename parameter
+        File spdxFile = new File( getBasedir(), SPDX_JSON_FILE_NAME );
+        assertTrue( spdxFile.exists() );
+        // Test output artifact file is created
+        File artifactFile = getTestFile(
+            "target/test-classes/unit/spdx-maven-plugin-test/spdx-maven-plugin-test.spdx.json" );
+        assertTrue( artifactFile.exists() );
+        ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
+        ModelCopyManager copyManager = new ModelCopyManager();
+        SpdxDocument result;
+        String documentUri;
+        try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
+        {
+            documentUri = modelStore.deSerialize( is, false );
+            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+        }
+        List<String> warnings = result.verify();
+        assertEquals( 0, warnings.size() );
+        // Test configuration parameters found in the test resources pom.xml file
+        // Document namespace
+        assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
+        // purls
+        List<SpdxPackage> packages = new ArrayList<>();
+        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxPackage.class ).forEach( (pkg) -> {
+            packages.add( (SpdxPackage)pkg );
+        });
+        for ( SpdxPackage pkg : packages ) {
+            Collection<ExternalRef> externalRefs = pkg.getExternalRefs();
+            assertNotNull( externalRefs );
+            assertFalse( externalRefs.isEmpty() );
+            ExternalRef externalRef = pkg.getExternalRefs().stream().findFirst().get();
+            assertEquals( externalRef.getReferenceCategory(), ReferenceCategory.PACKAGE_MANAGER );
+            assertEquals( externalRef.getReferenceType().getIndividualURI(), "http://spdx.org/rdf/references/purl");
+            assertEquals( externalRef.getReferenceLocator(),
+                          "pkg:maven/" + pkg.getName().get().replace(":", "/") + "@" + pkg.getVersionInfo().get() );
+        }
     }
 }
