@@ -58,7 +58,9 @@ import org.spdx.library.SpdxConstants;
 import org.spdx.library.SpdxInvalidIdException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.ExternalDocumentRef;
+import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.ExternalSpdxElement;
+import org.spdx.library.model.ReferenceType;
 import org.spdx.library.model.Relationship;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.SpdxElement;
@@ -66,6 +68,7 @@ import org.spdx.library.model.SpdxPackage;
 import org.spdx.library.model.enumerations.AnnotationType;
 import org.spdx.library.model.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.enumerations.Purpose;
+import org.spdx.library.model.enumerations.ReferenceCategory;
 import org.spdx.library.model.enumerations.RelationshipType;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
@@ -153,16 +156,18 @@ public class SpdxDependencyInformation
     private LicenseManager licenseManager;
     private SpdxDocument spdxDoc;
     private boolean createExternalRefs = false;
+    private boolean generatePurls = false;
     DateFormat format = new SimpleDateFormat( SpdxConstants.SPDX_DATE_FORMAT );
 
     /**
      */
     public SpdxDependencyInformation( LicenseManager licenseManager, 
-                                      SpdxDocument spdxDoc, boolean createExternalRefs )
+                                      SpdxDocument spdxDoc, boolean createExternalRefs, boolean generatePurls )
     {
         this.licenseManager = licenseManager;
         this.spdxDoc = spdxDoc;
         this.createExternalRefs = createExternalRefs;
+        this.generatePurls = generatePurls;
     }
 
     /**
@@ -361,6 +366,7 @@ public class SpdxDependencyInformation
                         .setVersionInfo( artifact.getBaseVersion() )
                         .setFilesAnalyzed( false )
                         .setDownloadLocation( "NOASSERTION" )
+                        .setExternalRefs( SpdxExternalRefBuilder.getDefaultExternalRefs( spdxDoc, generatePurls, mavenProject ) )
                         .build();
         return pkg;
     }
@@ -669,6 +675,7 @@ public class SpdxDependencyInformation
                                                     packageName, new SpdxNoAssertionLicense(), copyright, declaredLicense )
                         .setDownloadLocation( downloadLocation )
                         .setFilesAnalyzed( false )
+                        .setExternalRefs( SpdxExternalRefBuilder.getDefaultExternalRefs( spdxDoc, generatePurls, project ) )
                         .build();
         if ( project.getVersion() != null )
         {
