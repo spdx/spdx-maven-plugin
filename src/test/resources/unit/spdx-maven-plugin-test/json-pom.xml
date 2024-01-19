@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.spdx</groupId>
-  <artifactId>spdx-maven-plugin-test</artifactId>
+  <artifactId>spdx maven plugin test</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Test SPDX Plugin</name>
@@ -230,6 +230,7 @@
                             </snippets>
                         </PathSpecificSpdxInfo>
                     </pathsWithSpecificSpdxInfo>
+                    <generatePurls>false</generatePurls>
                 </configuration>
                 </plugin>
         </plugins>
