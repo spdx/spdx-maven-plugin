@@ -110,7 +110,9 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.io.File,java.net.URI,boolean,org.spdx.maven.OutputFormat)" class="member-name-link">SpdxDocumentBuilder</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;spdxFile,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.apache.maven.project.MavenProject,boolean,java.io.File,java.net.URI,boolean,org.spdx.maven.OutputFormat)" class="member-name-link">SpdxDocumentBuilder</a><wbr>(org.apache.maven.project.MavenProject&nbsp;project,
+ boolean&nbsp;generatePurls,
+ <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;spdxFile,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;spdxDocumentNamespace,
  boolean&nbsp;useStdLicenseSourceUrls,
  <a href="../OutputFormat.html" title="enum in org.spdx.maven">OutputFormat</a>&nbsp;outputFormat)</code></div>
@@ -202,9 +204,11 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(java.io.File,java.net.URI,boolean,org.spdx.maven.OutputFormat)">
+<section class="detail" id="&lt;init&gt;(org.apache.maven.project.MavenProject,boolean,java.io.File,java.net.URI,boolean,org.spdx.maven.OutputFormat)">
 <h3>SpdxDocumentBuilder</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SpdxDocumentBuilder</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;spdxFile,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SpdxDocumentBuilder</span><wbr><span class="parameters">(org.apache.maven.project.MavenProject&nbsp;project,
+ boolean&nbsp;generatePurls,
+ <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;spdxFile,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;spdxDocumentNamespace,
  boolean&nbsp;useStdLicenseSourceUrls,
  <a href="../OutputFormat.html" title="enum in org.spdx.maven">OutputFormat</a>&nbsp;outputFormat)</span>
