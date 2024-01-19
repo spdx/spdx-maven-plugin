@@ -486,7 +486,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * and locator "pkg:maven/${project.groupId}/${project.artifactId}@${project.version}".
      */
     @Parameter( property = "spdx.generatePurls" )
-    private boolean generatePurls;
+    private boolean generatePurls = true;
 
     public void execute() throws MojoExecutionException
     {

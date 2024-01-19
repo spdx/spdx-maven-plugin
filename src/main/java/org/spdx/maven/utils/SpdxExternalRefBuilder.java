@@ -1,5 +1,7 @@
 package org.spdx.maven.utils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
@@ -26,15 +28,21 @@ public class SpdxExternalRefBuilder
   {
     try
     {
-      String purl = "pkg:maven/" + project.getGroupId() + "/" + project.getArtifactId() + "@" + project.getVersion();
       return spdxDoc.createExternalRef( ReferenceCategory.PACKAGE_MANAGER, new ReferenceType("http://spdx.org/rdf/references/purl"),
-                                        purl, null );
+                                        generatePurl( project ), null );
     }
     catch ( InvalidSPDXAnalysisException e )
     {
       LOG.warn( "Invalid reference type \"purl\" for generated purl external ref");
       return null;
     }
+  }
+
+  private static String generatePurl( MavenProject project )
+  {
+    return "pkg:maven/" + project.getGroupId() + "/"
+        + URLEncoder.encode( project.getArtifactId(), StandardCharsets.UTF_8 )
+        + "@" + project.getVersion();
   }
 
 }
