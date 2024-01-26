@@ -44,6 +44,7 @@ import org.spdx.library.model.Annotation;
 import org.spdx.library.model.Relationship;
 import org.spdx.library.model.SpdxCreatorInformation;
 import org.spdx.library.model.SpdxDocument;
+import org.spdx.library.model.SpdxElement;
 import org.spdx.library.model.SpdxModelFactory;
 import org.spdx.library.model.SpdxPackage;
 import org.spdx.library.model.SpdxPackageVerificationCode;
@@ -216,35 +217,24 @@ public class SpdxDocumentBuilder
      */
     public void addDependencyInformation( SpdxDependencyInformation dependencyInformation ) throws SpdxBuilderException
     {
-        List<Relationship> packageRelationships = dependencyInformation.getToRelationships();
+        Map<SpdxElement, List<Relationship>> packageRelationships = dependencyInformation.getRelationships();
         if ( packageRelationships != null )
         {
-            for ( Relationship relationship : packageRelationships )
+            for ( Map.Entry<SpdxElement, List<Relationship>> entry : packageRelationships.entrySet() )
             {
-                try
+                SpdxElement parentElement = entry.getKey();
+                List<Relationship> relationships = entry.getValue();
+
+                for ( Relationship relationship : relationships )
                 {
-                    this.projectPackage.addRelationship( relationship );
-                }
-                catch ( InvalidSPDXAnalysisException e )
-                {
-                    throw new SpdxBuilderException( "Unable to set package dependencies", e );
-                }
-            }
-        }
-        List<SpdxDependencyInformation.FromRelationship> fromRelationships = dependencyInformation.getFromRelationships();
-        if ( fromRelationships != null )
-        {
-            for ( SpdxDependencyInformation.FromRelationship fromRelationship : fromRelationships )
-            {
-                try
-                {
-                    Relationship rel =fromRelationship.createAndAddRelationship( projectPackage );
-                    LOG.debug( "Created relationship of type " + rel.getRelationshipType().toString() +  
-                               " from " + fromRelationship.getFromPackage().getName() );
-                }
-                catch ( InvalidSPDXAnalysisException e )
-                {
-                    throw new SpdxBuilderException( "Unable to set dependency to package", e );
+                    try
+                    {
+                        parentElement.addRelationship( relationship );
+                    }
+                    catch ( InvalidSPDXAnalysisException e )
+                    {
+                        throw new SpdxBuilderException("Unable to set package dependencies", e);
+                    }
                 }
             }
         }
@@ -533,6 +523,11 @@ public class SpdxDocumentBuilder
     public LicenseManager getLicenseManager()
     {
         return this.licenseManager;
+    }
+
+    public SpdxPackage getProjectPackage()
+    {
+        return projectPackage;
     }
 
 }

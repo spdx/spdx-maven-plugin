@@ -31,9 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -47,9 +45,9 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import org.spdx.jacksonstore.MultiFormatStore;
 import org.spdx.jacksonstore.MultiFormatStore.Format;
 import org.spdx.jacksonstore.MultiFormatStore.Verbose;
@@ -58,9 +56,7 @@ import org.spdx.library.SpdxConstants;
 import org.spdx.library.SpdxInvalidIdException;
 import org.spdx.library.model.Checksum;
 import org.spdx.library.model.ExternalDocumentRef;
-import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.ExternalSpdxElement;
-import org.spdx.library.model.ReferenceType;
 import org.spdx.library.model.Relationship;
 import org.spdx.library.model.SpdxDocument;
 import org.spdx.library.model.SpdxElement;
@@ -68,7 +64,6 @@ import org.spdx.library.model.SpdxPackage;
 import org.spdx.library.model.enumerations.AnnotationType;
 import org.spdx.library.model.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.enumerations.Purpose;
-import org.spdx.library.model.enumerations.ReferenceCategory;
 import org.spdx.library.model.enumerations.RelationshipType;
 import org.spdx.library.model.license.AnyLicenseInfo;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
@@ -92,61 +87,9 @@ public class SpdxDependencyInformation
     private static final Logger LOG = LoggerFactory.getLogger( SpdxDependencyInformation.class );
 
     /**
-     * Store information about a relationship which will be from a package to 
-     * a package yet to be determined.
-     */
-    static class FromRelationship {
-        private SpdxPackage fromPackage;
-        private RelationshipType relationshipType;
-        
-        /**
-         * @param fromPackage Package which is to be related TO the relatedPackage
-         * @param relationshipType type of relationship
-         */
-        FromRelationship( SpdxPackage fromPackage, RelationshipType relationshipType ) {
-            this.fromPackage = fromPackage;
-            this.relationshipType = relationshipType;
-        }
-        
-        /**
-         * Creates a relationship to the toPackage and adds that relationship to the fromPackage
-         * @param toPackage Package which is related to the dependency
-         * @return the created relationship
-         * @throws InvalidSPDXAnalysisException
-         */
-        Relationship createAndAddRelationship(SpdxPackage toPackage) throws InvalidSPDXAnalysisException {
-            Relationship retval = fromPackage.createRelationship( toPackage, relationshipType, 
-                                                                  "Relationship created based on Maven POM information" );
-            fromPackage.addRelationship( retval );
-            return retval;
-        }
-
-        /**
-         * @return the fromPackage
-         */
-        public SpdxPackage getFromPackage()
-        {
-            return fromPackage;
-        }
-
-        /**
-         * @return the relationshipType
-         */
-        public RelationshipType getRelationshipType()
-        {
-            return relationshipType;
-        }
-    }
-
-    /**
      * List of all Relationships added for dependances To a related element
      */
-    private List<Relationship> toRelationships = new ArrayList<>();
-    
-    /**
-     * List of relationships from a package to a TBD package
-     */
-    private List<FromRelationship> fromRelationships = new ArrayList<>();
+    private Map<SpdxElement, List<Relationship>> relationships = new HashMap<>();
     
     /**
      * Map of namespaces to ExternalDocumentRefs
@@ -157,34 +100,49 @@ public class SpdxDependencyInformation
     private SpdxDocument spdxDoc;
     private boolean createExternalRefs = false;
     private boolean generatePurls = false;
+    private boolean useArtifactID = false;
+    private boolean includeTransitiveDependencies = false;
     DateFormat format = new SimpleDateFormat( SpdxConstants.SPDX_DATE_FORMAT );
 
     /**
      */
     public SpdxDependencyInformation( LicenseManager licenseManager, 
-                                      SpdxDocument spdxDoc, boolean createExternalRefs, boolean generatePurls )
+                                      SpdxDocument spdxDoc, boolean createExternalRefs, boolean generatePurls, boolean useArtifactID,
+                                      boolean includeTransitiveDependencies )
     {
         this.licenseManager = licenseManager;
         this.spdxDoc = spdxDoc;
         this.createExternalRefs = createExternalRefs;
         this.generatePurls = generatePurls;
+        this.useArtifactID = useArtifactID;
+        this.includeTransitiveDependencies = includeTransitiveDependencies;
     }
 
     /**
-     * Add information about a Maven dependency to the list of SPDX Dependencies
+     * Adds information about Maven dependencies to the list of SPDX Dependencies
      *
-     * @param dependency
      * @param mavenProjectBuilder project builder for the repo containing the POM file
      * @param session Maven session for building the project
-     * @param  mavenProject Maven project
-     * @param useArtifactID If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used
-     * @throws LicenseMapperException
-     * @throws InvalidSPDXAnalysisException 
+     * @param mavenProject Maven project
      */
-    public void addMavenDependency( Artifact dependency, ProjectBuilder mavenProjectBuilder, 
-                                    MavenSession session, MavenProject mavenProject, 
-                                    boolean useArtifactID ) throws LicenseMapperException, InvalidSPDXAnalysisException
+    public void addMavenDependencies( ProjectBuilder mavenProjectBuilder, MavenSession session, MavenProject mavenProject,
+        DependencyNode node, SpdxElement pkg ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
+        List<DependencyNode> children = node.getChildren();
+
+        logDependencies( children );
+
+        for ( DependencyNode childNode : children )
+        {
+            addMavenDependency( pkg, childNode, mavenProjectBuilder, session, mavenProject );
+        }
+    }
+
+    private void addMavenDependency( SpdxElement parentPackage, DependencyNode dependencyNode, ProjectBuilder mavenProjectBuilder,
+                                    MavenSession session, MavenProject mavenProject )
+        throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        Artifact dependency = dependencyNode.getArtifact();
         String scope = dependency.getScope();
         RelationshipType relType = scopeToRelationshipType( scope, dependency.isOptional() );
         if ( relType == RelationshipType.OTHER )
@@ -192,25 +150,62 @@ public class SpdxDependencyInformation
             LOG.warn(
                     "Could not determine the SPDX relationship type for dependency artifact ID " + dependency.getArtifactId() + " scope " + scope );
         }
+
         SpdxElement dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session, mavenProject, useArtifactID );
-        if ( relType.toString().endsWith( "_OF" ))
+
+        if ( relType.toString().endsWith( "_OF" ) )
         {
-            if ( dependencyPackage instanceof SpdxPackage)
+            if ( dependencyPackage instanceof SpdxPackage )
             {
-                this.fromRelationships.add( new FromRelationship( (SpdxPackage)dependencyPackage, relType ) );
-                LOG.debug( "Added relationship of type "+relType.toString() + " for "+dependencyPackage.getName() );
+                this.relationships.computeIfAbsent( parentPackage, key -> new ArrayList<>() )
+                    .add( spdxDoc.createRelationship( dependencyPackage, relType,
+                        "Relationship created based on Maven POM information" ) );
+                LOG.debug( "Added relationship of type " + relType + " for " + dependencyPackage.getName() );
             }
             else
             {
-                this.toRelationships.add( spdxDoc.createRelationship( dependencyPackage, RelationshipType.OTHER, 
-                                "This relationship is the inverse of "+relType.toString()+" to an external document reference." ) );
-                LOG.debug( "Could not create proper to relationships for external element "+dependencyPackage.getId() );
+                this.relationships.computeIfAbsent( dependencyPackage, key -> new ArrayList<>() )
+                    .add( spdxDoc.createRelationship( parentPackage, RelationshipType.OTHER,
+                        "This relationship is the inverse of " + relType + " to an external document reference." ) );
+                LOG.debug( "Could not create proper to relationships for external element " + dependencyPackage.getId() );
             }
         } 
         else
         {
-            this.toRelationships.add( spdxDoc.createRelationship( dependencyPackage, relType, 
-                            "Relationship based on Maven POM file dependency information" ) );
+            this.relationships.computeIfAbsent( parentPackage, key -> new ArrayList<>() )
+                .add( spdxDoc.createRelationship( dependencyPackage, relType,
+                    "Relationship based on Maven POM file dependency information" ) );
+        }
+
+        if ( includeTransitiveDependencies ) {
+            addMavenDependencies( mavenProjectBuilder, session, mavenProject, dependencyNode, dependencyPackage );
+        }
+    }
+
+    private void logDependencies( List<DependencyNode> dependencies )
+    {
+        if ( !LOG.isDebugEnabled() )
+        {
+            return;
+        }
+        LOG.debug( "Dependencies:" );
+        if ( dependencies == null )
+        {
+            LOG.debug( "\tNull dependencies" );
+            return;
+        }
+        if ( dependencies.isEmpty() )
+        {
+            LOG.debug( "\tZero dependencies" );
+            return;
+        }
+        for ( DependencyNode node : dependencies )
+        {
+            Artifact dependency = node.getArtifact();
+            String filePath = dependency.getFile() != null ? dependency.getFile().getAbsolutePath() : "[NONE]";
+            String scope = dependency.getScope() != null ? dependency.getScope() : "[NONE]";
+            LOG.debug(
+                "ArtifactId: " + dependency.getArtifactId() + ", file path: " + filePath + ", Scope: " + scope );
         }
     }
 
@@ -326,10 +321,10 @@ public class SpdxDependencyInformation
         {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
             request.setRemoteRepositories( mavenProject.getRemoteArtifactRepositories() );
-            for (ArtifactRepository ar:request.getRemoteRepositories()) {
+            for ( ArtifactRepository ar : request.getRemoteRepositories() ) {
                 LOG.debug( "request Remote repository ID: " + ar.getId() );
             }
-            for (ArtifactRepository ar:mavenProject.getRemoteArtifactRepositories()) {
+            for ( ArtifactRepository ar : mavenProject.getRemoteArtifactRepositories() ) {
                 LOG.debug( "Project Remote repository ID: " + ar.getId() );
             }
             ProjectBuildingResult build = mavenProjectBuilder.build( artifact, request );
@@ -813,16 +808,11 @@ public class SpdxDependencyInformation
     }
 
     /**
-     * @return the toRelationships
+     * @return the relationships
      */
-    public List<Relationship> getToRelationships()
+    public Map<SpdxElement, List<Relationship>> getRelationships()
     {
-        return toRelationships;
-    }
-    
-    public List<FromRelationship> getFromRelationships()
-    {
-        return fromRelationships;
+        return relationships;
     }
 
     /**

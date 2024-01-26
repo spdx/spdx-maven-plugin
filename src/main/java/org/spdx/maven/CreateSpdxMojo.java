@@ -29,9 +29,14 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.model.fileset.FileSet;
 
 import org.spdx.library.InvalidSPDXAnalysisException;
@@ -120,12 +125,15 @@ public class CreateSpdxMojo extends AbstractMojo
     @Component
     private MavenSession session;
 
+    @Component(hint = "default")
+    private DependencyGraphBuilder dependencyGraphBuilder;
+
     // Parameters for the plugin
     /**
      * SPDX File name
      */
     @Parameter( defaultValue = "${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx",
-                property = "spdxFileName" )
+        property = "spdxFileName" )
     private File spdxFile;
 
     /**
@@ -536,12 +544,7 @@ public class CreateSpdxMojo extends AbstractMojo
         // add dependencies information
         try
         {
-            @SuppressWarnings("deprecation")
-            Set<Artifact> dependencies = includeTransitiveDependencies ? mavenProject.getArtifacts() : mavenProject.getDependencyArtifacts();
-
-            logDependencies( dependencies );
-
-            SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( dependencies, builder, useArtifactID );
+            SpdxDependencyInformation dependencyInformation = getSpdxDependencyInformation( builder );
 
             builder.addDependencyInformation( dependencyInformation );
         }
@@ -552,6 +555,10 @@ public class CreateSpdxMojo extends AbstractMojo
         catch ( InvalidSPDXAnalysisException e )
         {
             throw new MojoExecutionException( "SPDX analysis error processing dependencies", e );
+        }
+        catch ( DependencyGraphBuilderException e )
+        {
+            throw new MojoExecutionException( "SPDX analysis error getting the dependencies", e );
         }
 
         // save result to SPDX file
@@ -648,52 +655,27 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Collect dependency information from Maven dependencies
      *
-     * @param dependencies Maven dependencies
      * @param builder SPDX document builder
-     * @param useArtifactID If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used
-     * @return information collected from Maven dependencies
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
-    private SpdxDependencyInformation getSpdxDependencyInformation( Set<Artifact> dependencies, 
-                                                                    SpdxDocumentBuilder builder,
-                                                                    boolean useArtifactID ) throws LicenseMapperException, InvalidSPDXAnalysisException
+    private SpdxDependencyInformation getSpdxDependencyInformation( SpdxDocumentBuilder builder )
+        throws LicenseMapperException, InvalidSPDXAnalysisException, DependencyGraphBuilderException
     {
-        SpdxDependencyInformation retval = new SpdxDependencyInformation( builder.getLicenseManager(), builder.getSpdxDoc(), createExternalRefs, generatePurls );
-        if ( dependencies != null )
-        {
-            for ( Artifact dependency : dependencies )
-            {
-                retval.addMavenDependency( dependency, mavenProjectBuilder, session, mavenProject, useArtifactID );
-            }
-        }
-        return retval;
-    }
+        SpdxDependencyInformation retval = new SpdxDependencyInformation( builder.getLicenseManager(), builder.getSpdxDoc(),
+            createExternalRefs, generatePurls, useArtifactID,
+            includeTransitiveDependencies );
 
-    private void logDependencies( Set<Artifact> dependencies )
-    {
-        if ( !getLog().isDebugEnabled() )
+        if ( session != null )
         {
-            return;
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+            request.setProject( mavenProject );
+            DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, null );
+
+            retval.addMavenDependencies( mavenProjectBuilder, session, mavenProject, parentNode, builder.getProjectPackage() );
         }
-        getLog().debug( "Dependencies:" );
-        if ( dependencies == null )
-        {
-            getLog().debug( "\tNull dependencies" );
-            return;
-        }
-        if ( dependencies.isEmpty() )
-        {
-            getLog().debug( "\tZero dependencies" );
-            return;
-        }
-        for ( Artifact dependency : dependencies )
-        {
-            String filePath = dependency.getFile() != null ? dependency.getFile().getAbsolutePath() : "[NONE]";
-            String scope = dependency.getScope() != null ? dependency.getScope() : "[NONE]";
-            getLog().debug(
-                    "ArtifactId: " + dependency.getArtifactId() + ", file path: " + filePath + ", Scope: " + scope );
-        }
+
+        return retval;
     }
 
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )

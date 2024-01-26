@@ -1,0 +1,107 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.spdx</groupId>
+    <artifactId>spdx-maven-plugin-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Test SPDX Plugin</name>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <url>http://spdx.org/tools</url>
+    <organization>
+        <name>Linux Foundation</name>
+        <url>http://www.linuxfoundation.org</url>
+    </organization>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>Test</testSourceDirectory>
+        <resources>
+            <resource>
+                <targetPath>resources</targetPath>
+                <filtering>false</filtering>
+                <directory>resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <targetPath>META-INF</targetPath>
+                <filtering>false</filtering>
+                <directory>.</directory>
+                <includes>
+                    <include>NOTICE</include>
+                    <include>LICENSE</include>
+                    <include>README.txt</include>
+                    <include>changelog</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>Test</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>TestFiles</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.spdx</groupId>
+                <artifactId>spdx-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>build-spdx</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>createSPDX</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <spdxFile>target/test-classes/unit/spdx-maven-plugin-test/test.spdx.json</spdxFile>
+                    <useArtifactID>true</useArtifactID>
+                    <outputFormat>JSON</outputFormat>
+                    <spdxDocumentNamespace>http://spdx.org/documents/spdx%20toolsv2.0%20rc1</spdxDocumentNamespace>
+                    <defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
+                    <generatePurls>true</generatePurls>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
