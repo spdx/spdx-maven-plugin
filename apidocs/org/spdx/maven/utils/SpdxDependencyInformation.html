@@ -94,10 +94,12 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.spdx.maven.utils.LicenseManager,org.spdx.library.model.SpdxDocument,boolean,boolean)" class="member-name-link">SpdxDependencyInformation</a><wbr>(<a href="LicenseManager.html" title="class in org.spdx.maven.utils">LicenseManager</a>&nbsp;licenseManager,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.spdx.maven.utils.LicenseManager,org.spdx.library.model.SpdxDocument,boolean,boolean,boolean,boolean)" class="member-name-link">SpdxDependencyInformation</a><wbr>(<a href="LicenseManager.html" title="class in org.spdx.maven.utils">LicenseManager</a>&nbsp;licenseManager,
  <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxDocument</a>&nbsp;spdxDoc,
  boolean&nbsp;createExternalRefs,
- boolean&nbsp;generatePurls)</code></div>
+ boolean&nbsp;generatePurls,
+ boolean&nbsp;useArtifactID,
+ boolean&nbsp;includeTransitiveDependencies)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -114,13 +116,13 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,boolean)" class="member-name-link">addMavenDependency</a><wbr>(org.apache.maven.artifact.Artifact&nbsp;dependency,
- org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependencies(org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,org.apache.maven.shared.dependency.graph.DependencyNode,org.spdx.library.model.SpdxElement)" class="member-name-link">addMavenDependencies</a><wbr>(org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
  org.apache.maven.execution.MavenSession&nbsp;session,
  org.apache.maven.project.MavenProject&nbsp;mavenProject,
- boolean&nbsp;useArtifactID)</code></div>
+ org.apache.maven.shared.dependency.graph.DependencyNode&nbsp;node,
+ <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxElement.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxElement</a>&nbsp;pkg)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Add information about a Maven dependency to the list of SPDX Dependencies</div>
+<div class="block">Adds information about Maven dependencies to the list of SPDX Dependencies</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Annotation.html" title="class or interface in org.spdx.library.model" class="external-link">Annotation</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDocumentAnnotations()" class="member-name-link">getDocumentAnnotations</a>()</code></div>
@@ -131,18 +133,15 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/ExternalDocumentRef.html" title="class or interface in org.spdx.library.model" class="external-link">ExternalDocumentRef</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExternalDocuments()" class="member-name-link">getExternalDocuments</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.spdx.maven.utils.SpdxDependencyInformation.FromRelationship&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getFromRelationships()" class="member-name-link">getFromRelationships</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxElement.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxElement</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Relationship.html" title="class or interface in org.spdx.library.model" class="external-link">Relationship</a>&gt;&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRelationships()" class="member-name-link">getRelationships</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxDocument</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSpdxDoc()" class="member-name-link">getSpdxDoc</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Relationship.html" title="class or interface in org.spdx.library.model" class="external-link">Relationship</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getToRelationships()" class="member-name-link">getToRelationships</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCreateExternalRefs()" class="member-name-link">isCreateExternalRefs</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCreateExternalRefs()" class="member-name-link">isCreateExternalRefs</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -161,12 +160,14 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(org.spdx.maven.utils.LicenseManager,org.spdx.library.model.SpdxDocument,boolean,boolean)">
+<section class="detail" id="&lt;init&gt;(org.spdx.maven.utils.LicenseManager,org.spdx.library.model.SpdxDocument,boolean,boolean,boolean,boolean)">
 <h3>SpdxDependencyInformation</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SpdxDependencyInformation</span><wbr><span class="parameters">(<a href="LicenseManager.html" title="class in org.spdx.maven.utils">LicenseManager</a>&nbsp;licenseManager,
  <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxDocument.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxDocument</a>&nbsp;spdxDoc,
  boolean&nbsp;createExternalRefs,
- boolean&nbsp;generatePurls)</span></div>
+ boolean&nbsp;generatePurls,
+ boolean&nbsp;useArtifactID,
+ boolean&nbsp;includeTransitiveDependencies)</span></div>
 </section>
 </li>
 </ul>
@@ -178,23 +179,21 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,boolean)">
-<h3>addMavenDependency</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMavenDependency</span><wbr><span class="parameters">(org.apache.maven.artifact.Artifact&nbsp;dependency,
- org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
+<section class="detail" id="addMavenDependencies(org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,org.apache.maven.shared.dependency.graph.DependencyNode,org.spdx.library.model.SpdxElement)">
+<h3>addMavenDependencies</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMavenDependencies</span><wbr><span class="parameters">(org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
  org.apache.maven.execution.MavenSession&nbsp;session,
  org.apache.maven.project.MavenProject&nbsp;mavenProject,
- boolean&nbsp;useArtifactID)</span>
-                        throws <span class="exceptions"><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a>,
+ org.apache.maven.shared.dependency.graph.DependencyNode&nbsp;node,
+ <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxElement.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxElement</a>&nbsp;pkg)</span>
+                          throws <span class="exceptions"><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a>,
 <a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html" title="class or interface in org.spdx.library" class="external-link">InvalidSPDXAnalysisException</a></span></div>
-<div class="block">Add information about a Maven dependency to the list of SPDX Dependencies</div>
+<div class="block">Adds information about Maven dependencies to the list of SPDX Dependencies</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>dependency</code> - </dd>
 <dd><code>mavenProjectBuilder</code> - project builder for the repo containing the POM file</dd>
 <dd><code>session</code> - Maven session for building the project</dd>
 <dd><code>mavenProject</code> - Maven project</dd>
-<dd><code>useArtifactID</code> - If true, use ${project.groupId}:${artifactId} as the SPDX package name, otherwise, ${project.name} will be used</dd>
 <dt>Throws:</dt>
 <dd><code><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a></code></dd>
 <dd><code><a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/InvalidSPDXAnalysisException.html" title="class or interface in org.spdx.library" class="external-link">InvalidSPDXAnalysisException</a></code></dd>
@@ -212,19 +211,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getToRelationships()">
-<h3>getToRelationships</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Relationship.html" title="class or interface in org.spdx.library.model" class="external-link">Relationship</a>&gt;</span>&nbsp;<span class="element-name">getToRelationships</span>()</div>
+<section class="detail" id="getRelationships()">
+<h3>getRelationships</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/SpdxElement.html" title="class or interface in org.spdx.library.model" class="external-link">SpdxElement</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://spdx.github.io/Spdx-Java-Library/org/spdx/library/model/Relationship.html" title="class or interface in org.spdx.library.model" class="external-link">Relationship</a>&gt;&gt;</span>&nbsp;<span class="element-name">getRelationships</span>()</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the toRelationships</dd>
+<dd>the relationships</dd>
 </dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getFromRelationships()">
-<h3>getFromRelationships</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.spdx.maven.utils.SpdxDependencyInformation.FromRelationship&gt;</span>&nbsp;<span class="element-name">getFromRelationships</span>()</div>
 </section>
 </li>
 <li>

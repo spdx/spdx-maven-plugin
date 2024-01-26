@@ -61,9 +61,9 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Add a non-listed license to the SPDX document.</div>
 </dd>
-<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#addMavenDependency(org.apache.maven.artifact.Artifact,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,boolean)" class="member-name-link">addMavenDependency(Artifact, ProjectBuilder, MavenSession, MavenProject, boolean)</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
+<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#addMavenDependencies(org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject,org.apache.maven.shared.dependency.graph.DependencyNode,org.spdx.library.model.SpdxElement)" class="member-name-link">addMavenDependencies(ProjectBuilder, MavenSession, MavenProject, DependencyNode, SpdxElement)</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
 <dd>
-<div class="block">Add information about a Maven dependency to the list of SPDX Dependencies</div>
+<div class="block">Adds information about Maven dependencies to the list of SPDX Dependencies</div>
 </dd>
 <dt><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#addNonStandardLicenses(org.spdx.maven.NonStandardLicense%5B%5D)" class="member-name-link">addNonStandardLicenses(NonStandardLicense[])</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
 <dd>
@@ -219,8 +219,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/OutputFormat.html#getFileType()" class="member-name-link">getFileType()</a> - Method in enum org.spdx.maven.<a href="org/spdx/maven/OutputFormat.html" title="enum in org.spdx.maven">OutputFormat</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#getFromRelationships()" class="member-name-link">getFromRelationships()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxProjectInformation.html#getHomePage()" class="member-name-link">getHomePage()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/MavenToSpdxLicenseMapper.html#getInstance()" class="member-name-link">getInstance()</a> - Static method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/MavenToSpdxLicenseMapper.html" title="class in org.spdx.maven.utils">MavenToSpdxLicenseMapper</a></dt>
@@ -273,7 +271,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxProjectInformation.html#getPrimaryPurpose()" class="member-name-link">getPrimaryPurpose()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#getProjectPackage()" class="member-name-link">getProjectPackage()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/Packaging.html#getPurpose()" class="member-name-link">getPurpose()</a> - Method in enum org.spdx.maven.<a href="org/spdx/maven/Packaging.html" title="enum in org.spdx.maven">Packaging</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#getRelationships()" class="member-name-link">getRelationships()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxProjectInformation.html#getShortDescription()" class="member-name-link">getShortDescription()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a></dt>
 <dd>&nbsp;</dd>
@@ -288,8 +290,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html#getSpdxDoc()" class="member-name-link">getSpdxDoc()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxProjectInformation.html#getSupplier()" class="member-name-link">getSupplier()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxProjectInformation.html" title="class in org.spdx.maven.utils">SpdxProjectInformation</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#getToRelationships()" class="member-name-link">getToRelationships()</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxFileCollector.html#getVerificationCode(java.lang.String,org.spdx.library.model.SpdxDocument)" class="member-name-link">getVerificationCode(String, SpdxDocument)</a> - Method in class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxFileCollector.html" title="class in org.spdx.maven.utils">SpdxFileCollector</a></dt>
 <dd>
@@ -592,7 +592,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Contains information about package dependencies collected from the Maven dependencies.</div>
 </dd>
-<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#%3Cinit%3E(org.spdx.maven.utils.LicenseManager,org.spdx.library.model.SpdxDocument,boolean,boolean)" class="member-name-link">SpdxDependencyInformation(LicenseManager, SpdxDocument, boolean, boolean)</a> - Constructor for class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
+<dt><a href="org/spdx/maven/utils/SpdxDependencyInformation.html#%3Cinit%3E(org.spdx.maven.utils.LicenseManager,org.spdx.library.model.SpdxDocument,boolean,boolean,boolean,boolean)" class="member-name-link">SpdxDependencyInformation(LicenseManager, SpdxDocument, boolean, boolean, boolean, boolean)</a> - Constructor for class org.spdx.maven.utils.<a href="org/spdx/maven/utils/SpdxDependencyInformation.html" title="class in org.spdx.maven.utils">SpdxDependencyInformation</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/spdx/maven/utils/SpdxDocumentBuilder.html" class="type-name-link" title="class in org.spdx.maven.utils">SpdxDocumentBuilder</a> - Class in <a href="org/spdx/maven/utils/package-summary.html">org.spdx.maven.utils</a></dt>
 <dd>
