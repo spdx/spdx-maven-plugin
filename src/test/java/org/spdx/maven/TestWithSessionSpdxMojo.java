@@ -75,9 +75,9 @@ public class TestWithSessionSpdxMojo extends AbstractMojoTestCase
 
     assertTrue( packages.contains( "org.spdx:spdx-maven-plugin-test" ) );
     assertTrue( packages.contains( "junit" ) );
-    assertTrue( packages.contains( "hamcrest-core" ) );
+    assertTrue( packages.contains( "hamcrest-core" ) || packages.contains( "org.hamcrest:hamcrest-core" ) );
     assertTrue( relationships.contains( "org.spdx:spdx-maven-plugin-test->junit" ) );
-    assertTrue( relationships.contains( "junit->hamcrest-core" ) );
+    assertTrue( relationships.contains( "junit->hamcrest-core" ) || relationships.contains( "junit->org.hamcrest:hamcrest-core" ) );
   }
 
   // -- Configure mojo loader
