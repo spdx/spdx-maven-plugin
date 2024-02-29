@@ -571,9 +571,15 @@ public class SpdxDependencyInformation
         {
             String externalRefDocId = SpdxConstants.EXTERNAL_DOC_REF_PRENUM + fixExternalRefId( fullArtifactId );
             LOG.debug( "Creating external document ref " + externalDocNamespace );
-            String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
-            Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
-            externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
+            if (spdxFile.getName().endsWith(".json")) {
+                String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
+                Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
+                externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
+            } else {
+                String sha1 = SpdxFileCollector.generateSha1( spdxFile, spdxDoc );
+                Checksum cksum = externalSpdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1 );
+                externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
+            }    
             spdxDoc.getExternalDocumentRefs().add( externalRef );
             org.spdx.library.model.Annotation docRefAddedAnnotation = spdxDoc.createAnnotation( "Tool: spdx-maven-plugin", 
                                                                          AnnotationType.OTHER, 
