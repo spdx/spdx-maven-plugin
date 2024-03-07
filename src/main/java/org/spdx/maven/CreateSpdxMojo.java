@@ -98,7 +98,7 @@ import java.util.Set;
  */
 @Mojo( name = "createSPDX",
        defaultPhase = LifecyclePhase.VERIFY,
-       requiresDependencyResolution = ResolutionScope.TEST )
+        requiresOnline = true )
 public class CreateSpdxMojo extends AbstractMojo
 {
     public static final String INCLUDE_ALL = "**/*";
