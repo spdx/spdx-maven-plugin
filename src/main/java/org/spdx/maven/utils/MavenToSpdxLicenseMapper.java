@@ -61,7 +61,8 @@ public class MavenToSpdxLicenseMapper
     private static final String LISTED_LICENSE_JSON_URL = SPDX_LICENSE_URL_PREFIX + "licenses.json";
     private static final String LISTED_LICENSE_JSON_PATH = "resources/licenses.json";
 
-    static MavenToSpdxLicenseMapper instance;
+    static volatile MavenToSpdxLicenseMapper instance;
+    private static Object instanceMutex = new Object();
     private Map<String, String> urlStringToSpdxLicenseId;
 
     private MavenToSpdxLicenseMapper() throws LicenseMapperException
@@ -101,11 +102,19 @@ public class MavenToSpdxLicenseMapper
 
     public static MavenToSpdxLicenseMapper getInstance() throws LicenseMapperException
     {
-        if ( instance == null )
+        MavenToSpdxLicenseMapper result = instance;
+        if ( result == null )
         {
-            instance = new MavenToSpdxLicenseMapper();
+            synchronized ( instanceMutex )
+            {
+                result = instance;
+                if ( result == null )
+                {
+                    instance = result = new MavenToSpdxLicenseMapper();
+                }
+            }
         }
-        return instance;
+        return result;
     }
 
     /**
