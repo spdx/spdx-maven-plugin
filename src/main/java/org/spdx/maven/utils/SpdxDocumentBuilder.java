@@ -86,7 +86,7 @@ public class SpdxDocumentBuilder
     private boolean generatePurls;
     private SpdxDocument spdxDoc;
     private SpdxPackage projectPackage;
-    private LicenseManager licenseManager;
+    private SpdxV2LicenseManager licenseManager;
     private File spdxFile;
 
     private ISerializableModelStore modelStore;
@@ -156,7 +156,7 @@ public class SpdxDocumentBuilder
         }
 
         // process the licenses
-        licenseManager = new LicenseManager( spdxDoc, useStdLicenseSourceUrls );
+        licenseManager = new SpdxV2LicenseManager( spdxDoc, useStdLicenseSourceUrls );
     }
 
     /**
@@ -520,7 +520,7 @@ public class SpdxDocumentBuilder
         }
     }
 
-    public LicenseManager getLicenseManager()
+    public SpdxV2LicenseManager getLicenseManager()
     {
         return this.licenseManager;
     }

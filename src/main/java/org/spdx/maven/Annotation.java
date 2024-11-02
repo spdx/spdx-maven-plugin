@@ -16,9 +16,6 @@
 package org.spdx.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.enumerations.AnnotationType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

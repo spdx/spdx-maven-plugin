@@ -87,7 +87,7 @@ public class MavenToSpdxLicenseMapper
         if ( is == null )
         {
             // use the cached version
-            is = LicenseManager.class.getClassLoader().getResourceAsStream( LISTED_LICENSE_JSON_PATH );
+            is = SpdxV2LicenseManager.class.getClassLoader().getResourceAsStream( LISTED_LICENSE_JSON_PATH );
         }
 
         try (BufferedReader reader = new BufferedReader( new InputStreamReader( is, Charset.defaultCharset() ) ))

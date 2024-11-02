@@ -15,36 +15,37 @@
  */
 package org.spdx.maven.utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.License;
-
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.ExtractedLicenseInfo;
-import org.spdx.library.model.license.InvalidLicenseStringException;
-import org.spdx.library.model.license.LicenseInfoFactory;
-import org.spdx.library.model.license.SpdxListedLicense;
-import org.spdx.library.model.license.SpdxNoAssertionLicense;
-
+import org.spdx.core.DefaultStoreNotInitialized;
+import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.library.LicenseInfoFactory;
+import org.spdx.library.model.v2.license.InvalidLicenseStringException;
+import org.spdx.library.model.v3_0_1.core.SpdxDocument;
+import org.spdx.library.model.v3_0_1.expandedlicensing.CustomLicense;
+import org.spdx.library.model.v3_0_1.expandedlicensing.ListedLicense;
+import org.spdx.library.model.v3_0_1.expandedlicensing.NoAssertionLicense;
+import org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo;
 import org.spdx.maven.NonStandardLicense;
-
+import org.spdx.storage.IModelStore.IdType;
+import org.spdx.storage.listedlicense.SpdxListedLicenseModelStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages the SPDX licenses for the Spdx plugin. Keeps track of any extracted licenses (added as configuration
+ * Manages the SPDX Spec Version 3 licenses for the Spdx plugin. Keeps track of any extracted licenses (added as configuration
  * parameters to the plugin).  Maps Maven licenses to SPDX licenses. Creates a Maven license from an SPDX license.
  *
  * @author Gary O'Neall
  */
-public class LicenseManager
+public class SpdxV3LicenseManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( LicenseManager.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxV3LicenseManager.class );
 
     /**
      * SPDX document containing the license information collected.  All extracted licenses are added to the SPDX
@@ -60,7 +61,7 @@ public class LicenseManager
     /**
      * Map of extracted license ID's to the SPDX license
      */
-    Map<String, ExtractedLicenseInfo> extractedLicenses = new HashMap<>();
+    Map<String, CustomLicense> extractedLicenses = new HashMap<>();
 
     /**
      * License manager will track any extracted SPDX licenses and map between SPDX licenses and Maven licenses.  The
@@ -71,7 +72,7 @@ public class LicenseManager
      *                                performance degradation
      * @throws LicenseMapperException
      */
-    public LicenseManager( SpdxDocument spdxDoc, boolean useStdLicenseSourceUrls ) throws LicenseMapperException
+    public SpdxV3LicenseManager( SpdxDocument spdxDoc, boolean useStdLicenseSourceUrls ) throws LicenseMapperException
     {
         this.spdxDoc = spdxDoc;
         initializeUrlMap();
@@ -96,21 +97,18 @@ public class LicenseManager
      */
     public void addExtractedLicense( NonStandardLicense license ) throws LicenseManagerException
     {
-        ExtractedLicenseInfo spdxLicense;
+        CustomLicense spdxLicense;
         try
         {
-            spdxLicense = new ExtractedLicenseInfo( spdxDoc.getModelStore(),
-                                                     spdxDoc.getDocumentUri(),
-                                                     license.getLicenseId(),
-                                                     spdxDoc.getCopyManager(),
-                                                     true );
-            spdxLicense.setExtractedText( license.getExtractedText() );
-            spdxLicense.setName( license.getName() );
+            spdxLicense = spdxDoc.createCustomLicense( spdxDoc.getIdPrefix() + "/" + license.getLicenseId() )
+                            .setLicenseText( license.getExtractedText() )
+                            .setName( license.getName() )
+                            .setComment( license.getComment() )
+                            .build();
             for (String crossRef:license.getCrossReference()) {
-                spdxLicense.getSeeAlso().add( crossRef );
+                spdxLicense.getSeeAlsos().add( crossRef );
             }
-            spdxLicense.setComment( license.getComment() );
-            spdxDoc.addExtractedLicenseInfos( spdxLicense );
+            spdxDoc.getElements().add( spdxLicense );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
@@ -134,12 +132,12 @@ public class LicenseManager
                             "Duplicate URL for SPDX extracted license.  Replacing " + oldLicenseId + " with "
                                     + license.getLicenseId() + " for " + url );
                 }
-                LOG.debug( "Adding URL mapping for non-standard license " + spdxLicense.getLicenseId() );
-                this.urlStringToSpdxLicenseId.put( url, spdxLicense.getLicenseId() );
+                LOG.debug( "Adding URL mapping for non-standard license " + license.getLicenseId() );
+                this.urlStringToSpdxLicenseId.put( url, license.getLicenseId() );
             }
         }
         // add to extracted license cache
-        extractedLicenses.put( spdxLicense.getLicenseId(), spdxLicense );
+        extractedLicenses.put( license.getLicenseId(), spdxLicense );
     }
 
     /**
@@ -153,26 +151,24 @@ public class LicenseManager
     public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList ) throws LicenseManagerException
     {
         try {
-            if ( licenseList == null )
+            if ( licenseList == null || licenseList.isEmpty() )
             {
-                return new SpdxNoAssertionLicense();
-            }
-            List<AnyLicenseInfo> spdxLicenses = new ArrayList<>();
-            for ( License license : licenseList )
+                return new NoAssertionLicense();
+            } 
+            else if ( licenseList.size() == 1 )
             {
-                spdxLicenses.add( mavenLicenseToSpdxLicense( license ) );
-            }
-            if ( spdxLicenses.size() < 1 )
-            {
-                return new SpdxNoAssertionLicense();
-            }
-            else if ( spdxLicenses.size() == 1 )
-            {
-                return spdxLicenses.get( 0 );
-            }
+                return mavenLicenseToSpdxLicense( licenseList.get( 0 ) );
+            } 
             else
             {
-                return spdxDoc.createConjunctiveLicenseSet( spdxLicenses );
+                Set<AnyLicenseInfo> spdxLicenses = new HashSet<>();
+                for ( License license : licenseList )
+                {
+                    spdxLicenses.add( mavenLicenseToSpdxLicense( license ) );
+                }
+                return spdxDoc.createConjunctiveLicenseSet( spdxDoc.getModelStore().getNextId( IdType.Anonymous ) )
+                                .addAllMember( spdxLicenses )
+                                .build();
             }
         } catch ( InvalidSPDXAnalysisException e )
         {
@@ -206,13 +202,17 @@ public class LicenseManager
             try
             {
                 retval = LicenseInfoFactory.parseSPDXLicenseString( licenseId, spdxDoc.getModelStore(),
-                                                                    spdxDoc.getDocumentUri(),
-                                                                    spdxDoc.getCopyManager() );
+                                                                    spdxDoc.getIdPrefix(),
+                                                                    spdxDoc.getCopyManager(), null );
             }
             catch ( InvalidLicenseStringException e )
             {
                 throw new LicenseManagerException(
                         "Can not map maven license " + mavenLicense.getName() + "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() );
+            }
+            catch ( DefaultStoreNotInitialized e )
+            {
+                throw new LicenseManagerException( "Default model store not initialized" );
             }
         }
         return retval;
@@ -227,13 +227,13 @@ public class LicenseManager
      */
     public License spdxLicenseToMavenLicense( AnyLicenseInfo spdxLicense ) throws LicenseManagerException
     {
-        if ( spdxLicense instanceof ExtractedLicenseInfo )
+        if ( spdxLicense instanceof CustomLicense )
         {
-            return spdxNonStdLicenseToMavenLicense( (ExtractedLicenseInfo) spdxLicense );
+            return spdxNonStdLicenseToMavenLicense( (CustomLicense) spdxLicense );
         }
-        else if ( spdxLicense instanceof SpdxListedLicense )
+        else if ( spdxLicense instanceof ListedLicense )
         {
-            return spdxStdLicenseToMavenLicense( (SpdxListedLicense) spdxLicense );
+            return spdxStdLicenseToMavenLicense( (ListedLicense) spdxLicense );
         }
         else
         {
@@ -242,33 +242,33 @@ public class LicenseManager
         }
     }
 
-    private License spdxStdLicenseToMavenLicense( SpdxListedLicense spdxLicense ) throws LicenseManagerException
+    private License spdxStdLicenseToMavenLicense( ListedLicense spdxLicense ) throws LicenseManagerException
     {
         try 
         {
             License retval = new License();
             // name
-            if ( spdxLicense.getName() != null && !spdxLicense.getName().isEmpty() )
+            if ( spdxLicense.getName().isPresent() && !spdxLicense.getName().get().isEmpty() )
             {
-                retval.setName( spdxLicense.getName() );
+                retval.setName( spdxLicense.getName().get() );
             }
             else
             {
-                retval.setName( spdxLicense.getLicenseId() );
+                retval.setName( SpdxListedLicenseModelStore.objectUriToLicenseOrExceptionId( spdxLicense.getObjectUri() ) );
             }
             // comment
-            if ( spdxLicense.getComment() != null && !spdxLicense.getComment().isEmpty() )
+            if ( spdxLicense.getComment().isPresent() && !spdxLicense.getComment().get().isEmpty() )
             {
-                retval.setComments( spdxLicense.getComment() );
+                retval.setComments( spdxLicense.getComment().get() );
             }
             // url
-            for (String url:spdxLicense.getSeeAlso()) {
+            for (String url:spdxLicense.getSeeAlsos()) {
                 retval.setUrl( url );
             }
-            if ( spdxLicense.getSeeAlso().size() > 1 )
+            if ( spdxLicense.getSeeAlsos().size() > 1 )
             {
                 LOG.warn(
-                        "SPDX license " + spdxLicense.getLicenseId()
+                        "SPDX license " + SpdxListedLicenseModelStore.objectUriToLicenseOrExceptionId( spdxLicense.getObjectUri() )
                                 + " contains multiple URLs.  Only the first URL will be preserved in the Maven license created." );
             }
             return retval; 
@@ -278,33 +278,35 @@ public class LicenseManager
         }
     }
 
-    private License spdxNonStdLicenseToMavenLicense( ExtractedLicenseInfo spdxLicense ) throws LicenseManagerException
+    private License spdxNonStdLicenseToMavenLicense( CustomLicense spdxLicense ) throws LicenseManagerException
     {
         try
         {
             License retval = new License();
+            // license ID
+            String licenseId = spdxLicense.getObjectUri().substring( spdxLicense.getIdPrefix().length() );
             // name
-            if ( spdxLicense.getName() != null && !spdxLicense.getName().isEmpty() )
+            if ( spdxLicense.getName().isPresent() && !spdxLicense.getName().get().isEmpty() )
             {
-                retval.setName( spdxLicense.getName() );
+                retval.setName( spdxLicense.getName().get() );
             }
             else
             {
-                retval.setName( spdxLicense.getLicenseId() );
+                retval.setName( licenseId );
             }
             // comment
-            if ( spdxLicense.getComment() != null && !spdxLicense.getComment().isEmpty() )
+            if ( spdxLicense.getComment().isPresent() && !spdxLicense.getComment().get().isEmpty() )
             {
-                retval.setComments( spdxLicense.getComment() );
+                retval.setComments( spdxLicense.getComment().get() );
             }
             // url
-            for (String url:spdxLicense.getSeeAlso()) {
+            for (String url:spdxLicense.getSeeAlsos()) {
                 retval.setUrl( url );
             }
-            if ( spdxLicense.getSeeAlso().size() > 1 )
+            if ( spdxLicense.getSeeAlsos().size() > 1 )
             {
                 LOG.warn(
-                        "SPDX license " + spdxLicense.getLicenseId()
+                        "SPDX license " + licenseId
                                 + " contains multiple URLs.  Only the first URL will be preserved in the Maven license created." );
             }
             return retval;

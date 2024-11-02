@@ -16,7 +16,7 @@
 package org.spdx.maven.utils;
 
 /**
- * Exceptions related to the LicenseManager
+ * Exceptions related to the SpdxV2LicenseManager
  *
  * @author Gary O'Neall
  */

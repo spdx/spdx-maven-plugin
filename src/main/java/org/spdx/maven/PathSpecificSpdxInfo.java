@@ -16,12 +16,6 @@
 package org.spdx.maven;
 
 import java.util.List;
-
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.LicenseInfoFactory;
-
 import org.spdx.maven.utils.SpdxDefaultFileInformation;
 
 /**
@@ -112,8 +106,7 @@ public class PathSpecificSpdxInfo
      * @return default file information to be used with this file path
      * @throws InvalidSPDXAnalysisException 
      */
-    public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults,
-                                                                 SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
+    public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults )
     {
         SpdxDefaultFileInformation retval = new SpdxDefaultFileInformation();
         if ( this.fileComment != null )
@@ -126,12 +119,7 @@ public class PathSpecificSpdxInfo
         }
         if ( this.fileConcludedLicense != null )
         {
-            AnyLicenseInfo concludedLicense = null;
-            concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( fileConcludedLicense.trim(),
-                                                                          spdxDoc.getModelStore(), 
-                                                                          spdxDoc.getDocumentUri(),
-                                                                          spdxDoc.getCopyManager() );
-            retval.setConcludedLicense( concludedLicense );
+            retval.setConcludedLicense( this.fileConcludedLicense );
         }
         else
         {
@@ -171,12 +159,7 @@ public class PathSpecificSpdxInfo
         }
         if ( this.licenseInformationInFile != null )
         {
-            AnyLicenseInfo declaredLicense = null;
-            declaredLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseInformationInFile.trim(), 
-                                                                         spdxDoc.getModelStore(), 
-                                                                         spdxDoc.getDocumentUri(),
-                                                                         spdxDoc.getCopyManager() );
-            retval.setDeclaredLicense( declaredLicense );
+            retval.setDeclaredLicense( licenseInformationInFile.trim() );
         }
         else
         {
