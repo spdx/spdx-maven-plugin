@@ -96,7 +96,7 @@ public class SpdxDependencyInformation
      */
     private Map<String, ExternalDocumentRef> externalDocuments = new HashMap<>();
     private List<org.spdx.library.model.Annotation> documentAnnotations = new ArrayList<>();
-    private LicenseManager licenseManager;
+    private SpdxV2LicenseManager licenseManager;
     private SpdxDocument spdxDoc;
     private boolean createExternalRefs = false;
     private boolean generatePurls = false;
@@ -106,7 +106,7 @@ public class SpdxDependencyInformation
 
     /**
      */
-    public SpdxDependencyInformation( LicenseManager licenseManager, 
+    public SpdxDependencyInformation( SpdxV2LicenseManager licenseManager, 
                                       SpdxDocument spdxDoc, boolean createExternalRefs, boolean generatePurls, boolean useArtifactID,
                                       boolean includeTransitiveDependencies )
     {

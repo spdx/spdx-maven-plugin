@@ -19,20 +19,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
 
+import org.apache.jena.query.ModelStore;
 import org.apache.maven.plugin.MojoExecutionException;
-
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.Checksum;
-import org.spdx.library.model.ExternalRef;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.enumerations.Purpose;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.core.CoreModelObject;
 import org.spdx.library.referencetype.ListedReferenceTypes;
 
 import org.spdx.maven.Annotation;
 import org.spdx.maven.ExternalReference;
-
+import org.spdx.maven.Packaging;
+import org.spdx.storage.IModelStore;
+import org.spdx.storage.PropertyDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +43,8 @@ public class SpdxProjectInformation
 
     private String[] creators = new String[0];
     private String creatorComment = "";
-    private AnyLicenseInfo concludedLicense;
-    private AnyLicenseInfo declaredLicense;
+    private String concludedLicense;
+    private String declaredLicense;
     private String description;
     private String downloadUrl;
     private String homePage;
@@ -65,29 +61,31 @@ public class SpdxProjectInformation
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
     private ExternalReference[] externalRefs;
-    private Set<Checksum> checksums;
-    private Purpose primaryPurpose;
+    private Set<CoreModelObject> checksums;
+    private Packaging packaging;
     
+    
+
     /**
-     * @return the primaryPurpose
+     * @return the packaging
      */
-    public Purpose getPrimaryPurpose()
+    public Packaging getPackaging()
     {
-        return primaryPurpose;
+        return packaging;
     }
 
     /**
-     * @param primaryPurpose the primaryPurpose to set
+     * @param packaging the packaging to set
      */
-    public void setPrimaryPurpose( Purpose primaryPurpose )
+    public void setPackaging( Packaging packaging )
     {
-        this.primaryPurpose = primaryPurpose;
+        this.packaging = packaging;
     }
 
-    public SpdxProjectInformation () throws InvalidSPDXAnalysisException
+    public SpdxProjectInformation ()
     {
-        this.concludedLicense = new SpdxNoAssertionLicense();
-        this.declaredLicense = new SpdxNoAssertionLicense();
+        this.concludedLicense = "NOASSERTION";
+        this.declaredLicense = "NOASSERTION";
     }
 
     /**
@@ -109,7 +107,7 @@ public class SpdxProjectInformation
     /**
      * @return checksums for the project
      */
-    public Set<Checksum> getChecksums()
+    public Set<CoreModelObject> getChecksums()
     {
         return checksums;
     }
@@ -117,7 +115,7 @@ public class SpdxProjectInformation
     /**
      * @param checksums the checksums to set for the project
      */
-    public void setChecksums( Set<Checksum> checksums )
+    public void setChecksums( Set<CoreModelObject> checksums )
     {
         this.checksums = checksums;
     }
@@ -125,7 +123,7 @@ public class SpdxProjectInformation
     /**
      * @return the concludedLicense
      */
-    public AnyLicenseInfo getConcludedLicense()
+    public String getConcludedLicense()
     {
         return concludedLicense;
     }
@@ -133,7 +131,7 @@ public class SpdxProjectInformation
     /**
      * @param concludedLicense the concludedLicense to set
      */
-    public void setConcludedLicense( AnyLicenseInfo concludedLicense )
+    public void setConcludedLicense( String concludedLicense )
     {
         this.concludedLicense = concludedLicense;
     }
@@ -141,7 +139,7 @@ public class SpdxProjectInformation
     /**
      * @return the declaredLicense
      */
-    public AnyLicenseInfo getDeclaredLicense()
+    public String getDeclaredLicense()
     {
         return declaredLicense;
     }
@@ -149,7 +147,7 @@ public class SpdxProjectInformation
     /**
      * @param declaredLicense the declaredLicense to set
      */
-    public void setDeclaredLicense( AnyLicenseInfo declaredLicense )
+    public void setDeclaredLicense( String declaredLicense )
     {
         this.declaredLicense = declaredLicense;
     }
@@ -338,6 +336,28 @@ public class SpdxProjectInformation
     public void setName( String name )
     {
         this.name = name;
+    }
+    
+    /**
+     * Log information on all fields - typically used for debugging
+     */
+    public void logInfo( CoreModelObject modelObject )
+    {
+        if ( !LOG.isDebugEnabled() ) {
+            return;
+        }
+        IModelStore store = modelObject.getModelStore();
+        String objectUri = modelObject.getObjectUri();
+        for ( PropertyDescriptor desc : store.getPropertyValueDescriptors( objectUri ) ) {
+            if (store.isCollectionProperty( objectUri, desc )) {
+                //TODO Implement
+            }
+            else 
+            {
+                //TODO Implement
+            }
+        }
+        //TODO for SPDX V3 - log al relationships from this object
     }
 
     /**

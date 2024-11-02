@@ -25,7 +25,8 @@ import java.io.File;
 public enum OutputFormat
 {
     RDF_XML("RDF/XML", "spdx.rdf.xml", ".rdf.xml"),
-    JSON("JSON", "spdx.json", ".json");
+    JSON("JSON", "spdx.json", ".json"),
+    JSON_LD("JSON-LD", "spdx.json-ld.json", ".json-ld.json");
 
     private final String value;
     private final String artifactType;
@@ -45,7 +46,12 @@ public enum OutputFormat
         {
             if (file != null)
             {
-                return file.getName().toLowerCase().endsWith(".rdf.xml") ? RDF_XML : JSON;
+                String fileName = file.getName().toLowerCase();
+                if (fileName.endsWith(".rdf.xml"))
+                {
+                    return RDF_XML;
+                }
+                return file.getName().toLowerCase().endsWith(".json-ld.json") ? JSON_LD : JSON;
             }
             throw new IllegalArgumentException("Could not determine output file");
         }
@@ -57,6 +63,10 @@ public enum OutputFormat
         else if (JSON.value.equals(upperCaseFormat))
         {
             return JSON;
+        }
+        else if (JSON_LD.value.equals(upperCaseFormat))
+        {
+            return JSON_LD;
         }
         throw new IllegalArgumentException("Invalid SPDX output format: " + format);
     }

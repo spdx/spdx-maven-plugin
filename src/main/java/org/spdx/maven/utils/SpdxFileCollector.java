@@ -27,20 +27,8 @@ import java.util.Map.Entry;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
-
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.Checksum;
-import org.spdx.library.model.Relationship;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.SpdxFile;
-import org.spdx.library.model.SpdxPackage;
-import org.spdx.library.model.SpdxPackageVerificationCode;
-import org.spdx.library.model.SpdxSnippet;
-import org.spdx.library.model.enumerations.ChecksumAlgorithm;
-import org.spdx.library.model.enumerations.FileType;
-import org.spdx.library.model.enumerations.RelationshipType;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.InvalidLicenseStringException;
+import org.spdx.core.CoreModelObject;
+import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.maven.SnippetInfo;
 import org.spdx.storage.IModelStore.IdType;
 
@@ -70,7 +58,7 @@ public class SpdxFileCollector
         loadFileExtensionConstants();
     }
 
-    static final Map<ChecksumAlgorithm, String> checksumAlgorithms = new HashMap<>();
+    static final Map<String, String> checksumAlgorithms = new HashMap<>();
 
     static
     {
@@ -649,8 +637,8 @@ public class SpdxFileCollector
      * @throws SpdxCollectionException if the input algorithm is invalid or unavailable or if the file cannot be read
      * @throws InvalidSPDXAnalysisException 
      */
-    public static Set<Checksum> generateChecksum( File file, Set<ChecksumAlgorithm> algorithms,
-                                                  SpdxDocument spdxDoc ) throws SpdxCollectionException, InvalidSPDXAnalysisException
+    public static Set<CoreModelObject> generateChecksum( File file, Set<String> algorithms,
+                                                  AbstractDocumentBuilder builder ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
         Set<Checksum> checksums = new HashSet<>();
 
@@ -664,7 +652,7 @@ public class SpdxFileCollector
             throw new SpdxCollectionException( "IO error while calculating checksums.", e );
         }
 
-        for ( ChecksumAlgorithm algorithm : algorithms )
+        for ( String algorithm : algorithms )
         {
             String checksumAlgorithm = checksumAlgorithms.get( algorithm );
 
@@ -680,7 +668,7 @@ public class SpdxFileCollector
 
             digest.update( buffer );
             String checksum = convertChecksumToString( digest.digest() );
-            checksums.add( spdxDoc.createChecksum( algorithm, checksum ) );
+            checksums.add( builder.createChecksum( algorithm, checksum ) );
         }
 
         return checksums;
