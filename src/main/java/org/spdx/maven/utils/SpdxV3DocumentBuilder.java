@@ -5,6 +5,9 @@
 package org.spdx.maven.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -89,11 +92,12 @@ public class SpdxV3DocumentBuilder
         licenseManager = new SpdxV3LicenseManager( spdxDoc, useStdLicenseSourceUrls );
     }
 
-    @Override
-    public CoreModelObject getSpdxDoc()
+    /**
+     * @return the SPDX Document
+     */
+    public SpdxDocument getSpdxDoc()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.spdxDoc;
     }
 
     @Override
@@ -104,7 +108,7 @@ public class SpdxV3DocumentBuilder
     }
 
     @Override
-    public void collectSpdxFileInformation( List<FileSet> sources, String absolutePath,
+    public void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                             SpdxDefaultFileInformation defaultFileInformation,
                                             HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
                                             Set<String> checksumAlgorithms )
@@ -114,35 +118,54 @@ public class SpdxV3DocumentBuilder
     }
 
     @Override
-    public void addDependencyInformation( AbstractDependencyInformation dependencyInformation )
+    public void saveSpdxDocumentToFile() throws SpdxBuilderException
     {
-        // TODO Auto-generated method stub
-
+        try ( FileOutputStream spdxOut = new FileOutputStream( spdxFile ) )
+        {
+            modelStore.serialize( spdxOut );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new SpdxBuilderException( "Error saving SPDX data to file", e );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            throw new SpdxBuilderException( "Error collecting SPDX file data", e );
+        }
+        catch ( IOException e )
+        {
+            throw new SpdxBuilderException( "I/O Error saving SPDX data to file", e );
+        }
     }
 
     @Override
-    public void saveSpdxDocumentToFile()
+    public void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses ) throws SpdxBuilderException
     {
-        // TODO Auto-generated method stub
-
+        if ( nonStandardLicenses != null )
+        {
+            for ( NonStandardLicense nonStandardLicense : nonStandardLicenses )
+            {
+                try
+                {
+                    // the following will add the non-standard license to the document container
+                    licenseManager.addExtractedLicense( nonStandardLicense );
+                }
+                catch ( LicenseManagerException e )
+                {
+                    throw new SpdxBuilderException( "Error adding non standard license", e );
+                }
+            }
+        }
     }
 
     @Override
-    public void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Object getProjectPackage()
+    public CoreModelObject getProjectPackage()
     {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    public Object createChecksum( String algorithm, String checksum )
+    public CoreModelObject convertChecksum( String algorithm, String checksum )
     {
         // TODO Auto-generated method stub
         return null;
@@ -153,6 +176,20 @@ public class SpdxV3DocumentBuilder
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    /**
+     * @return the licenseManager
+     */
+    public SpdxV3LicenseManager getLicenseManager()
+    {
+        return licenseManager;
+    }
+
+    @Override
+    public List<String> verify()
+    {
+        return spdxDoc.verify();
     }
 
 }

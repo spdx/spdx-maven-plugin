@@ -437,7 +437,7 @@ public class SpdxDocumentBuilder
             {
                 try
                 {
-                    pkg.getExternalRefs().add( externalRef.getExternalRef( spdxDoc ) );
+                    pkg.getExternalRefs().add( externalRef.convertExternalRef( spdxDoc ) );
                 }
                 catch ( MojoExecutionException | InvalidSPDXAnalysisException e )
                 {

@@ -15,8 +15,6 @@
  */
 package org.spdx.maven;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,35 +118,6 @@ public class Annotation
     public void setAnnotationComment( String annotationComment )
     {
         this.annotationComment = annotationComment;
-    }
-
-
-    /**
-     * @param spdxDoc SPDX document which will contain the annotation
-     * @return an SPDX model version of the annotation
-     */
-    public org.spdx.library.model.Annotation toSpdxAnnotation( SpdxDocument spdxDoc ) throws MojoExecutionException
-    {
-        AnnotationType annotationType = AnnotationType.OTHER;
-        try
-        {
-            annotationType = AnnotationType.valueOf( this.annotationType );
-        }
-        catch ( Exception ex )
-        {
-            throw new MojoExecutionException( "Invalid annotation type "+this.annotationType );
-        }
-        try
-        {
-            return spdxDoc.createAnnotation( this.annotator, 
-                                             annotationType,
-                                             annotationDate,
-                                             annotationComment );
-        }
-        catch ( InvalidSPDXAnalysisException e )
-        {
-            throw new MojoExecutionException( "Error creating annotation.", e );
-        }
     }
 
     public void logInfo()

@@ -15,16 +15,13 @@
  */
 package org.spdx.maven.utils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Set;
 
-import org.apache.jena.query.ModelStore;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.spdx.core.CoreModelObject;
-import org.spdx.library.referencetype.ListedReferenceTypes;
+import org.spdx.core.InvalidSPDXAnalysisException;
 
 import org.spdx.maven.Annotation;
+import org.spdx.maven.Checksum;
 import org.spdx.maven.ExternalReference;
 import org.spdx.maven.Packaging;
 import org.spdx.storage.IModelStore;
@@ -61,7 +58,7 @@ public class SpdxProjectInformation
     private Annotation[] packageAnnotations;
     private Annotation[] documentAnnotations;
     private ExternalReference[] externalRefs;
-    private Set<CoreModelObject> checksums;
+    private Set<Checksum> checksums;
     private Packaging packaging;
     
     
@@ -107,7 +104,7 @@ public class SpdxProjectInformation
     /**
      * @return checksums for the project
      */
-    public Set<CoreModelObject> getChecksums()
+    public Set<Checksum> getChecksums()
     {
         return checksums;
     }
@@ -115,7 +112,7 @@ public class SpdxProjectInformation
     /**
      * @param checksums the checksums to set for the project
      */
-    public void setChecksums( Set<CoreModelObject> checksums )
+    public void setChecksums( Set<Checksum> checksums )
     {
         this.checksums = checksums;
     }
@@ -340,8 +337,9 @@ public class SpdxProjectInformation
     
     /**
      * Log information on all fields - typically used for debugging
+     * @throws InvalidSPDXAnalysisException 
      */
-    public void logInfo( CoreModelObject modelObject )
+    public static void logInfo( CoreModelObject modelObject ) throws InvalidSPDXAnalysisException
     {
         if ( !LOG.isDebugEnabled() ) {
             return;
@@ -363,7 +361,7 @@ public class SpdxProjectInformation
     /**
      * Log information on all fields - typically used for debugging
      */
-    public void logInfo( SpdxDocument spdxDoc )
+    public void logInfo()
     {
         if ( !LOG.isDebugEnabled() ) {
             return;
@@ -410,59 +408,15 @@ public class SpdxProjectInformation
         {
             for ( ExternalReference externalReference : externalRefs )
             {
-                ExternalRef externalRef;
-                try
-                {
-                    externalRef = externalReference.getExternalRef( spdxDoc );
-                    StringBuilder externalRefString = new StringBuilder();
-                    try
-                    {
-                        externalRefString.append( externalRef.getReferenceCategory().toString() );
-                    }
-                    catch ( InvalidSPDXAnalysisException e1 )
-                    {
-                        externalRefString.append( "Invalid Reference Category" );
-                    }
-                    externalRefString.append( ' ' );
-                    try
-                    {
-                        externalRefString.append( ListedReferenceTypes.getListedReferenceTypes().getListedReferenceName(
-                                new URI( externalRef.getReferenceType().getIndividualURI() ) ) );
-                    }
-                    catch ( InvalidSPDXAnalysisException | URISyntaxException e )
-                    {
-                        externalRefString.append( "Invalid Reference Type" );
-                    }
-                    externalRefString.append( ' ' );
-                    try
-                    {
-                        externalRefString.append( externalRef.getReferenceLocator() );
-                    }
-                    catch ( InvalidSPDXAnalysisException e )
-                    {
-                        externalRefString.append( "Invalid Reference Locator" );
-                    }
-                    LOG.debug( "External Ref: " + externalRefString.toString() );
-                }
-                catch ( MojoExecutionException e1 )
-                {
-                    LOG.error( "Invalid external reference", e1 );
-                }
-
+                LOG.debug( String.format( "External Ref: %s %s %s", externalReference.getCategory(), 
+                                          externalReference.getType(), externalReference.getLocator()) );
             }
         }
         if ( checksums != null && checksums.size() > 0 )
         {
             for ( Checksum checksum : checksums )
             {
-                try 
-                {
-                    String algorithm = SpdxFileCollector.checksumAlgorithms.get( checksum.getAlgorithm() );
-                    LOG.debug( "SPDX " +  algorithm + ": " + checksum.getValue() );
-                } catch ( InvalidSPDXAnalysisException e )
-                {
-                    LOG.debug( "Invalid SPDX checksum" );
-                }
+                LOG.debug( "SPDX " +  checksum.getAlgorithm() + ": " + checksum.getValue() );
             }
         }
     }

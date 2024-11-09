@@ -23,9 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.InvalidLicenseStringException;
-import org.spdx.library.model.license.LicenseInfoFactory;
 
 /**
  * Helper class with static methods to parse SPDX source files
@@ -44,7 +41,7 @@ public class SpdxSourceFileParser
      * @param file Text file to parse
      * @return list of all license expressions found following SPDX-License-Identifier:
      */
-    public static List<AnyLicenseInfo> parseFileForSpdxLicenses( File file ) throws SpdxSourceParserException
+    public static List<String> parseFileForSpdxLicenses( File file ) throws SpdxSourceParserException
     {
         try
         {
@@ -60,9 +57,9 @@ public class SpdxSourceFileParser
         }
     }
 
-    public static List<AnyLicenseInfo> parseTextForSpdxLicenses( String text ) throws SpdxSourceParserException
+    public static List<String> parseTextForSpdxLicenses( String text ) throws SpdxSourceParserException
     {
-        List<AnyLicenseInfo> retval = new ArrayList<>();
+        List<String> retval = new ArrayList<>();
         Matcher match = SPDX_LICENSE_PATTERN.matcher( text );
         int pos = 0;
         while ( pos < text.length() && match.find( pos ) )
@@ -105,14 +102,7 @@ public class SpdxSourceFileParser
             {
                 pos = match.end() + 1;
             }
-            try
-            {
-                retval.add( LicenseInfoFactory.parseSPDXLicenseString( matchingLine ) );
-            }
-            catch ( InvalidLicenseStringException e )
-            {
-                throw new SpdxSourceParserException( "Invalid SPDX license string '" + matchingLine + "'." );
-            }
+            retval.add( matchingLine );
         }
         return retval;
     }

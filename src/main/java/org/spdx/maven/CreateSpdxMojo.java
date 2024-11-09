@@ -37,19 +37,19 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.model.fileset.FileSet;
-import org.spdx.core.CoreModelObject;
 import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.core.SpdxCoreConstants.SpdxMajorVersion;
 import org.spdx.maven.utils.LicenseMapperException;
 import org.spdx.maven.utils.SpdxBuilderException;
 import org.spdx.maven.utils.SpdxCollectionException;
 import org.spdx.maven.utils.SpdxDefaultFileInformation;
-import org.spdx.maven.utils.AbstractDependencyInformation;
+import org.spdx.maven.utils.AbstractDependencyBuilder;
 import org.spdx.maven.utils.AbstractDocumentBuilder;
 import org.spdx.maven.utils.SpdxFileCollector;
 import org.spdx.maven.utils.SpdxProjectInformation;
-import org.spdx.maven.utils.SpdxV2DependencyInformation;
+import org.spdx.maven.utils.SpdxV2DependencyBuilder;
 import org.spdx.maven.utils.SpdxV2DocumentBuilder;
-import org.spdx.maven.utils.SpdxV3DependencyInformation;
+import org.spdx.maven.utils.SpdxV3DependencyBuilder;
 import org.spdx.maven.utils.SpdxV3DocumentBuilder;
 
 import java.io.File;
@@ -504,13 +504,12 @@ public class CreateSpdxMojo extends AbstractMojo
         getLog().info( "Creating SPDX File " + spdxFile.getPath() );
 
         AbstractDocumentBuilder builder = initSpdxDocumentBuilder( outputFormatEnum );
-        CoreModelObject spdxDoc = builder.getSpdxDoc();
 
         // fill project information
         try
         {
             SpdxProjectInformation projectInformation = getSpdxProjectInfoFromParameters( builder );
-            projectInformation.logInfo( spdxDoc );
+            projectInformation.logInfo();
             builder.fillSpdxDocumentInformation( projectInformation );
         }
         catch ( InvalidSPDXAnalysisException e2 )
@@ -538,9 +537,7 @@ public class CreateSpdxMojo extends AbstractMojo
         // add dependencies information
         try
         {
-            AbstractDependencyInformation dependencyInformation = getSpdxDependencyInformation( builder, outputFormatEnum );
-
-            builder.addDependencyInformation( dependencyInformation );
+            buildSpdxDependencyInformation( builder, outputFormatEnum );
         }
         catch ( LicenseMapperException e1 )
         {
@@ -562,7 +559,7 @@ public class CreateSpdxMojo extends AbstractMojo
         projectHelper.attachArtifact( mavenProject, artifactType, spdxFile );
 
         // check errors
-        List<String> spdxErrors = builder.getSpdxDoc().verify();
+        List<String> spdxErrors = builder.verify();
         if ( spdxErrors != null && spdxErrors.size() > 0 )
         {
             getLog().warn( "The following errors were found in the SPDX file:\n " + String.join( "\n ", spdxErrors ) );
@@ -616,7 +613,7 @@ public class CreateSpdxMojo extends AbstractMojo
                 spdxDocumentNamespace = spdxDocumentNamespace.replace( " ", "%20" );
             }
             URI namespaceUri = new URI( spdxDocumentNamespace );
-            if ( OutputFormat.JSON_LD.equals( outputFormatEnum ) ) {
+            if ( SpdxMajorVersion.VERSION_3.equals( outputFormatEnum.getSpecVersion() ) ) {
                 builder = new SpdxV3DocumentBuilder( mavenProject, generatePurls, spdxFile, namespaceUri,
                                 this.matchLicensesOnCrossReferenceUrls, outputFormatEnum );
             }
@@ -655,25 +652,25 @@ public class CreateSpdxMojo extends AbstractMojo
     }
 
     /**
-     * Collect dependency information from Maven dependencies
+     * Collect dependency information from Maven dependencies and adds it to the builder SPDX document
      *
      * @param builder SPDX document builder
      * @throws LicenseMapperException
      * @throws InvalidSPDXAnalysisException 
      */
-    private AbstractDependencyInformation getSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
+    private void buildSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
         throws LicenseMapperException, InvalidSPDXAnalysisException, DependencyGraphBuilderException
     {
-        AbstractDependencyInformation retval;
+        AbstractDependencyBuilder dependencyBuilder;
         if ( builder instanceof SpdxV3DocumentBuilder )
         {
-            retval = new SpdxV3DependencyInformation( (SpdxV3DocumentBuilder)builder, createExternalRefs,
+            dependencyBuilder = new SpdxV3DependencyBuilder( (SpdxV3DocumentBuilder)builder, createExternalRefs,
                                                       generatePurls, useArtifactID,
                                                       includeTransitiveDependencies );
         }
         else
         {
-            retval = new SpdxV2DependencyInformation( (SpdxV2DocumentBuilder)builder,
+            dependencyBuilder = new SpdxV2DependencyBuilder( (SpdxV2DocumentBuilder)builder,
                                                       createExternalRefs, generatePurls, useArtifactID,
                                                       includeTransitiveDependencies );
         }
@@ -684,10 +681,8 @@ public class CreateSpdxMojo extends AbstractMojo
             request.setProject( mavenProject );
             DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, null );
 
-            retval.addMavenDependencies( mavenProjectBuilder, session, mavenProject, parentNode, builder.getProjectPackage() );
+            dependencyBuilder.addMavenDependencies( mavenProjectBuilder, session, mavenProject, parentNode, builder.getProjectPackage() );
         }
-
-        return retval;
     }
 
     private void logFileSpecificInfo( HashMap<String, SpdxDefaultFileInformation> fileSpecificInformation )
@@ -899,7 +894,7 @@ public class CreateSpdxMojo extends AbstractMojo
             packageFile = new File(mainArtifact.getFile().getParent() + File.separator + packageFileName);
         }
 
-        Set<CoreModelObject> checksums = null;
+        Set<Checksum> checksums = null;
         if ( packageFile != null && packageFile.exists() )
         {
             try

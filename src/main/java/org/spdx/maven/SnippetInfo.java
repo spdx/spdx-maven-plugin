@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.InvalidLicenseStringException;
-import org.spdx.library.model.license.LicenseInfoFactory;
-
+import org.spdx.core.DefaultStoreNotInitialized;
+import org.spdx.library.LicenseInfoFactory;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.InvalidLicenseStringException;
 import org.spdx.maven.utils.SpdxBuilderException;
 
 import org.slf4j.Logger;
@@ -98,16 +98,16 @@ public class SnippetInfo
         return this.comment;
     }
 
-    public AnyLicenseInfo getLicenseConcluded( SpdxDocument spdxDoc ) throws InvalidLicenseStringException
+    public AnyLicenseInfo getLicenseConcluded( SpdxDocument spdxDoc ) throws InvalidLicenseStringException, DefaultStoreNotInitialized
     {
-        return LicenseInfoFactory.parseSPDXLicenseString( this.concludedLicense, spdxDoc.getModelStore(), 
+        return LicenseInfoFactory.parseSPDXLicenseStringCompatV2( this.concludedLicense, spdxDoc.getModelStore(), 
                                                           spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
     }
 
-    public Collection<AnyLicenseInfo> getLicenseInfoInSnippet( SpdxDocument spdxDoc ) throws InvalidLicenseStringException
+    public Collection<AnyLicenseInfo> getLicenseInfoInSnippet( SpdxDocument spdxDoc ) throws InvalidLicenseStringException, DefaultStoreNotInitialized
     {
         List<AnyLicenseInfo> retval = new ArrayList<>();
-        retval.add( LicenseInfoFactory.parseSPDXLicenseString( this.licenseInfoInSnippet, spdxDoc.getModelStore(), 
+        retval.add( LicenseInfoFactory.parseSPDXLicenseStringCompatV2( this.licenseInfoInSnippet, spdxDoc.getModelStore(), 
                                                                                 spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() ));
         return retval;                                                                    
     }
