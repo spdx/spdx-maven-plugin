@@ -16,6 +16,7 @@
 package org.spdx.maven;
 
 import java.io.File;
+import org.spdx.core.SpdxCoreConstants.SpdxMajorVersion;
 
 /**
  * OutputFormat utility enum
@@ -24,19 +25,23 @@ import java.io.File;
  */
 public enum OutputFormat
 {
-    RDF_XML("RDF/XML", "spdx.rdf.xml", ".rdf.xml"),
-    JSON("JSON", "spdx.json", ".json"),
-    JSON_LD("JSON-LD", "spdx.json-ld.json", ".json-ld.json");
+    
+    RDF_XML("RDF/XML", "spdx.rdf.xml", ".rdf.xml", SpdxMajorVersion.VERSION_2),
+    JSON("JSON", "spdx.json", ".json", SpdxMajorVersion.VERSION_2),
+    JSON_LD("JSON-LD", "spdx.json-ld.json", ".json-ld.json", SpdxMajorVersion.VERSION_3);
 
     private final String value;
     private final String artifactType;
     private final String fileType;
+    private final SpdxMajorVersion specVersion;
 
-    private OutputFormat(final String value, final String artifactType, final String fileType)
+    private OutputFormat(final String value, final String artifactType, final String fileType,
+                         final SpdxMajorVersion specVersion)
     {
         this.value = value;
         this.artifactType = artifactType;
         this.fileType = fileType;
+        this.specVersion = specVersion;
     }
 
     public static OutputFormat getOutputFormat(final String format, final File file)
@@ -79,5 +84,10 @@ public enum OutputFormat
     public String getFileType()
     {
         return fileType;
+    }
+    
+    public SpdxMajorVersion getSpecVersion()
+    {
+        return specVersion;
     }
 }

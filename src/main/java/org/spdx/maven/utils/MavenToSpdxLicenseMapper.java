@@ -24,17 +24,21 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.License;
-
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.LicenseInfoFactory;
-import org.spdx.library.model.license.SpdxListedLicense;
-import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.library.LicenseInfoFactory;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.SpdxListedLicense;
+import org.spdx.library.model.v2.license.SpdxNoAssertionLicense;
+import org.spdx.library.model.v3_0_1.core.Element;
+import org.spdx.library.model.v3_0_1.expandedlicensing.ListedLicense;
+import org.spdx.library.model.v3_0_1.expandedlicensing.NoAssertionLicense;
+import org.spdx.storage.IModelStore.IdType;
 import org.spdx.storage.listedlicense.LicenseJsonTOC;
 
 import org.slf4j.Logger;
@@ -197,7 +201,7 @@ public class MavenToSpdxLicenseMapper
     }
 
     /**
-     * Map a list of Maven licenses to an SPDX license.  If no licenses are supplied, SpdxNoAssertion license is
+     * Map a list of Maven licenses to an SPDX Spec version 2 license.  If no licenses are supplied, SpdxNoAssertion license is
      * returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
      * is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
      * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
@@ -208,7 +212,7 @@ public class MavenToSpdxLicenseMapper
      * @return
      * @throws InvalidSPDXAnalysisException 
      */
-    public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList, SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
+    public AnyLicenseInfo mavenLicenseListToSpdxV2License( List<License> licenseList, SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
     {
         if ( licenseList == null )
         {
@@ -217,7 +221,7 @@ public class MavenToSpdxLicenseMapper
         List<AnyLicenseInfo> spdxLicenses = new ArrayList<>();
         for ( License license : licenseList )
         {
-            SpdxListedLicense listedLicense = mavenLicenseToSpdxListedLicense( license );
+            SpdxListedLicense listedLicense = mavenLicenseToSpdxV2ListedLicense( license );
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
@@ -238,7 +242,76 @@ public class MavenToSpdxLicenseMapper
         }
     }
 
-    private SpdxListedLicense mavenLicenseToSpdxListedLicense( License license )
+    private SpdxListedLicense mavenLicenseToSpdxV2ListedLicense( License license )
+    {
+        if ( license == null )
+        {
+            return null;
+        }
+        if ( license.getUrl() == null || license.getUrl().isEmpty() )
+        {
+            return null;
+        }
+        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll( "https", "http" ) );
+        if ( spdxId == null )
+        {
+            return null;
+        }
+        try
+        {
+            return LicenseInfoFactory.getListedLicenseByIdCompatV2( spdxId );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            return null;
+        }
+    }
+    
+    /**
+     * Map a list of Maven licenses to an SPDX Spec version 2 license.  If no licenses are supplied, SpdxNoAssertion license is
+     * returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
+     * is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
+     * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
+     * mapped SPDX licenses.
+     *
+     * @param licenseList list of licenses
+     * @param spdxDoc     SPDX document which will hold the licenses
+     * @return
+     * @throws InvalidSPDXAnalysisException 
+     */
+    public org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo mavenLicenseListToSpdxV3License( List<License> licenseList, 
+                                                                                                         Element spdxDoc ) throws InvalidSPDXAnalysisException
+    {
+        if ( licenseList == null )
+        {
+            return new NoAssertionLicense();
+        }
+        List<org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo> spdxLicenses = new ArrayList<>();
+        for ( License license : licenseList )
+        {
+            ListedLicense listedLicense = mavenLicenseToSpdxV3ListedLicense( license );
+            if ( listedLicense != null )
+            {
+                spdxLicenses.add( listedLicense );
+            }
+        }
+        if ( spdxLicenses.size() < 1 )
+        {
+            return new NoAssertionLicense();
+        }
+        else if ( spdxLicenses.size() == 1 )
+        {
+            return spdxLicenses.get( 0 );
+        }
+        else
+        {
+            return spdxDoc.createConjunctiveLicenseSet( spdxDoc.getModelStore().getNextId( IdType.Anonymous ) )
+                            .addAllMember( new HashSet<>( spdxLicenses ) )
+                            .build();
+        }
+    }
+
+    private ListedLicense mavenLicenseToSpdxV3ListedLicense( License license )
     {
         if ( license == null )
         {

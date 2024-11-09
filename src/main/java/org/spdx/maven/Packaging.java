@@ -15,7 +15,8 @@
  */
 package org.spdx.maven;
 
-import org.spdx.library.model.enumerations.Purpose;
+import org.spdx.library.model.v2.enumerations.Purpose;
+import org.spdx.library.model.v3_0_1.software.SoftwarePurpose;
 
 /**
  * Packaging utility enum
@@ -24,21 +25,23 @@ import org.spdx.library.model.enumerations.Purpose;
  */
 public enum Packaging
 {
-    POM("pom", Purpose.INSTALL),
-    EJB("ejb", Purpose.LIBRARY),
-    JAR("jar", Purpose.LIBRARY),
-    MAVEN_PLUGIN("maven-plugin", Purpose.LIBRARY),
-    WAR("war", Purpose.APPLICATION),
-    EAR("ear", Purpose.APPLICATION),
-    RAR("rar", Purpose.OTHER);
+    POM("pom", Purpose.INSTALL, SoftwarePurpose.INSTALL),
+    EJB("ejb", Purpose.LIBRARY, SoftwarePurpose.LIBRARY),
+    JAR("jar", Purpose.LIBRARY, SoftwarePurpose.LIBRARY),
+    MAVEN_PLUGIN("maven-plugin", Purpose.LIBRARY, SoftwarePurpose.LIBRARY),
+    WAR("war", Purpose.APPLICATION, SoftwarePurpose.APPLICATION),
+    EAR("ear", Purpose.APPLICATION, SoftwarePurpose.APPLICATION),
+    RAR("rar", Purpose.OTHER, SoftwarePurpose.ARCHIVE);
 
     private final String name;
-    private final Purpose purpose;
+    private final Purpose v2Purpose;
+    private final SoftwarePurpose softwarePurpose;
 
-    private Packaging(final String name, final Purpose purpose)
+    private Packaging(final String name, final Purpose v2purpose, final SoftwarePurpose v3softwarePurpose)
     {
         this.name = name;
-        this.purpose = purpose;
+        this.v2Purpose = v2purpose;
+        this.softwarePurpose = v3softwarePurpose;
     }
 
     public static Packaging valueOfPackaging(String packagingValue)
@@ -61,8 +64,16 @@ public enum Packaging
         return name;
     }
 
-    public Purpose getPurpose()
+    public Purpose getV2Purpose()
     {
-        return purpose;
+        return v2Purpose;
+    }
+
+    /**
+     * @return the softwarePurpose
+     */
+    public SoftwarePurpose getSoftwarePurpose()
+    {
+        return softwarePurpose;
     }
 }

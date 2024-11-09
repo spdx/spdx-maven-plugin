@@ -27,8 +27,19 @@ import java.util.Map.Entry;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
-import org.spdx.core.CoreModelObject;
 import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.library.LicenseInfoFactory;
+import org.spdx.library.model.v2.Relationship;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.SpdxFile;
+import org.spdx.library.model.v2.SpdxPackage;
+import org.spdx.library.model.v2.SpdxPackageVerificationCode;
+import org.spdx.library.model.v2.SpdxSnippet;
+import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
+import org.spdx.library.model.v2.enumerations.FileType;
+import org.spdx.library.model.v2.enumerations.RelationshipType;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.InvalidLicenseStringException;
 import org.spdx.maven.Checksum;
 import org.spdx.maven.SnippetInfo;
 import org.spdx.storage.IModelStore.IdType;
@@ -45,9 +56,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Gary O'Neall
  */
-public class SpdxFileCollector
+public class SpdxV2FileCollector
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SpdxFileCollector.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SpdxV2FileCollector.class );
 
     // constants for mapping extensions to types.
     static final String SPDX_FILE_TYPE_CONSTANTS_PROP_PATH = "resources/SpdxFileTypeConstants.prop";
@@ -63,15 +74,15 @@ public class SpdxFileCollector
 
     static
     {
-        checksumAlgorithms.put( ChecksumAlgorithm.SHA1, "SHA-1" );
-        checksumAlgorithms.put( ChecksumAlgorithm.SHA224, "SHA-224" );
-        checksumAlgorithms.put( ChecksumAlgorithm.SHA256, "SHA-256" );
-        checksumAlgorithms.put( ChecksumAlgorithm.SHA384, "SHA-384" );
-        checksumAlgorithms.put( ChecksumAlgorithm.SHA3_384, "SHA-512" );
-        checksumAlgorithms.put( ChecksumAlgorithm.MD2, "MD2" );
-        checksumAlgorithms.put( ChecksumAlgorithm.MD4, "MD4" );
-        checksumAlgorithms.put( ChecksumAlgorithm.MD5, "MD5" );
-        checksumAlgorithms.put( ChecksumAlgorithm.MD6, "MD6" );
+        checksumAlgorithms.put( ChecksumAlgorithm.SHA1.toString(), "SHA-1" );
+        checksumAlgorithms.put( ChecksumAlgorithm.SHA224.toString(), "SHA-224" );
+        checksumAlgorithms.put( ChecksumAlgorithm.SHA256.toString(), "SHA-256" );
+        checksumAlgorithms.put( ChecksumAlgorithm.SHA384.toString(), "SHA-384" );
+        checksumAlgorithms.put( ChecksumAlgorithm.SHA3_384.toString(), "SHA-512" );
+        checksumAlgorithms.put( ChecksumAlgorithm.MD2.toString(), "MD2" );
+        checksumAlgorithms.put( ChecksumAlgorithm.MD4.toString(), "MD4" );
+        checksumAlgorithms.put( ChecksumAlgorithm.MD5.toString(), "MD5" );
+        checksumAlgorithms.put( ChecksumAlgorithm.MD6.toString(), "MD6" );
     }
 
     Set<AnyLicenseInfo> licensesFromFiles = new HashSet<>();
@@ -86,7 +97,7 @@ public class SpdxFileCollector
     /**
      * SpdxFileCollector collects SPDX file information for files
      */
-    public SpdxFileCollector()
+    public SpdxV2FileCollector()
     {
     }
 
@@ -96,7 +107,7 @@ public class SpdxFileCollector
     private static void loadFileExtensionConstants()
     {
         Properties prop = new Properties();
-        try ( InputStream is = SpdxFileCollector.class.getClassLoader().getResourceAsStream(
+        try ( InputStream is = SpdxV2FileCollector.class.getClassLoader().getResourceAsStream(
                 SPDX_FILE_TYPE_CONSTANTS_PROP_PATH ) )
         {
             if ( is == null )
@@ -153,7 +164,7 @@ public class SpdxFileCollector
                               SpdxDefaultFileInformation defaultFileInformation, 
                               Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                               SpdxPackage projectPackage, RelationshipType relationshipType, 
-                              SpdxDocument spdxDoc, Set<ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
+                              SpdxDocument spdxDoc, Set<String> algorithms ) throws SpdxCollectionException
     {
         for ( FileSet fileSet : fileSets )
         {
@@ -230,7 +241,9 @@ public class SpdxFileCollector
      * @param algorithms       algorithms to use to generate checksums
      * @throws SpdxCollectionException
      */
-    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, RelationshipType relationshipType, SpdxPackage projectPackage, SpdxDocument spdxDoc, Set<ChecksumAlgorithm> algorithms ) throws SpdxCollectionException
+    private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, 
+                              RelationshipType relationshipType, SpdxPackage projectPackage, 
+                              SpdxDocument spdxDoc, Set<String> algorithms ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() ) )
         {
@@ -299,7 +312,7 @@ public class SpdxFileCollector
     private SpdxSnippet convertToSpdxSnippet( SnippetInfo snippet, SpdxFile spdxFile, SpdxDocument spdxDoc ) throws SpdxBuilderException, InvalidSPDXAnalysisException
     {
         //TODO: Add annotations to snippet
-        return spdxDoc.createSpdxSnippet( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri() ),
+        return spdxDoc.createSpdxSnippet( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
                                                         snippet.getName(), snippet.getLicenseConcluded( spdxDoc ),
                                                         snippet.getLicenseInfoInSnippet( spdxDoc ),
                                                         snippet.getCopyrightText(), spdxFile, 
@@ -321,7 +334,7 @@ public class SpdxFileCollector
      */
     private SpdxFile convertToSpdxFile( File file, String outputFileName, 
                                         SpdxDefaultFileInformation defaultFileInformation, 
-                                        Set<ChecksumAlgorithm> algorithms,
+                                        Set<String> algorithms,
                                         SpdxDocument spdxDoc ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
@@ -330,7 +343,7 @@ public class SpdxFileCollector
         Set<Checksum> checksums;
         try
         {
-            checksums = generateChecksum( file, algorithms, spdxDoc );
+            checksums = generateChecksum( file, algorithms );
         }
         catch ( SpdxCollectionException | InvalidSPDXAnalysisException e1 )
         {
@@ -341,7 +354,7 @@ public class SpdxFileCollector
         String licenseComment = defaultFileInformation.getLicenseComment();
         if ( isSourceFile( fileTypes ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH )
         {
-            List<AnyLicenseInfo> fileSpdxLicenses = null;
+            List<String> fileSpdxLicenses = null;
             try
             {
                 fileSpdxLicenses = SpdxSourceFileParser.parseFileForSpdxLicenses( file );
@@ -353,20 +366,25 @@ public class SpdxFileCollector
             if ( fileSpdxLicenses != null && fileSpdxLicenses.size() > 0 )
             {
                 // The file has declared licenses of the form SPDX-License-Identifier: licenseId
-                if ( fileSpdxLicenses.size() == 1 )
+                try
                 {
-                    license = fileSpdxLicenses.get( 0 );
+                    if ( fileSpdxLicenses.size() == 1 )
+                    {
+                        license = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( fileSpdxLicenses.get( 0 ) );
+                    }
+                    else
+                    {
+                        Set<AnyLicenseInfo> licenseSet = new HashSet<>();
+                        for ( String licenseExpression : fileSpdxLicenses )
+                        {
+                            licenseSet.add( LicenseInfoFactory.parseSPDXLicenseStringCompatV2( licenseExpression ) );
+                        }
+                        license = spdxDoc.createConjunctiveLicenseSet( licenseSet );
+                    }
                 }
-                else
+                catch ( InvalidSPDXAnalysisException e )
                 {
-                    try
-                    {
-                        license = spdxDoc.createConjunctiveLicenseSet( fileSpdxLicenses );
-                    }
-                    catch ( InvalidSPDXAnalysisException e )
-                    {
-                        throw new SpdxCollectionException( "Error creating SPDX file - unable to create a license set", e );
-                    }
+                    throw new SpdxCollectionException( "Error creating SPDX file - unable to create a license set", e );
                 }
                 if ( licenseComment == null )
                 {
@@ -382,8 +400,15 @@ public class SpdxFileCollector
         }
         if ( license == null )
         {
-            license = defaultFileInformation.getDeclaredLicense();
-            concludedLicense = defaultFileInformation.getConcludedLicense();
+            try
+            {
+                license = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( defaultFileInformation.getDeclaredLicense() );
+                concludedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( defaultFileInformation.getConcludedLicense() );
+            }
+            catch ( InvalidSPDXAnalysisException e )
+            {
+                throw new SpdxCollectionException( "Error creating SPDX file - unable create default file license", e );
+            }
         }
         else
         {
@@ -410,14 +435,15 @@ public class SpdxFileCollector
             Checksum sha1 = null;
             for ( Checksum checksum:checksums )
             {
-                if (ChecksumAlgorithm.SHA1.equals( checksum.getAlgorithm() )) {
+                if (ChecksumAlgorithm.SHA1.toString().equals( checksum.getAlgorithm() )) {
                     sha1 = checksum;
                     break;
                 }
             }
-            retval = spdxDoc.createSpdxFile( spdxDoc.getModelStore().getNextId( IdType.SpdxId, spdxDoc.getDocumentUri() ),
+            retval = spdxDoc.createSpdxFile( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
                                              relativePath, concludedLicense, seenLicenses, 
-                                             copyright, sha1 )
+                                             copyright, 
+                                             spdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1.getValue() ) )
                             .setComment( comment )
                             .setLicenseComments( licenseComment )
                             .setFileTypes( fileTypes )
@@ -519,11 +545,11 @@ public class SpdxFileCollector
     /**
      * Create a verification code from all SPDX files collected
      *
-     * @param spdxFilePath Complete file path for the SPDX file - this will be excluded from the verification code
-     * @param spdxDoc SPDX document which will contain the package verification code.
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidSPDXAnalysisException 
+     * @param spdxFilePath               Complete file path for the SPDX file - this will be excluded from the verification code
+     * @param spdxDoc                    SPDX document which will contain the package verification code.
+     * @return                           package verification code
+     * @throws NoSuchAlgorithmException  on error generating checksum
+     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
     public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath, SpdxDocument spdxDoc ) throws NoSuchAlgorithmException, InvalidSPDXAnalysisException
     {
@@ -620,11 +646,11 @@ public class SpdxFileCollector
      * @throws SpdxCollectionException if the algorithm is unavailable or the file cannot be read
      * @throws InvalidSPDXAnalysisException 
      */
-    public static CoreModelObject generateSha1( File file, AbstractDocumentBuilder builder ) throws SpdxCollectionException, InvalidSPDXAnalysisException
+    public static Checksum generateSha1( File file ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
         Set<String> sha1 = new HashSet<>();
         sha1.add( "SHA-1" );
-        return generateChecksum( file, sha1, builder ).iterator().next();
+        return generateChecksum( file, sha1 ).iterator().next();
     }
 
     /**
@@ -632,13 +658,11 @@ public class SpdxFileCollector
      *
      * @param file       file whose checksum is to be generated
      * @param algorithms algorithms to generate the checksums
-     * @param spdxDoc    SPDX document which will contain the checksum
      * @return {@code Set} of checksums for file using each algorithm specified
      * @throws SpdxCollectionException if the input algorithm is invalid or unavailable or if the file cannot be read
      * @throws InvalidSPDXAnalysisException 
      */
-    public static Set<Checksum> generateChecksum( File file, Set<String> algorithms,
-                                                  AbstractDocumentBuilder builder ) throws SpdxCollectionException, InvalidSPDXAnalysisException
+    public static Set<Checksum> generateChecksum( File file, Set<String> algorithms ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
         Set<Checksum> checksums = new HashSet<>();
 
