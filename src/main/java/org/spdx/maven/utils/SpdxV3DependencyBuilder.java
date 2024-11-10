@@ -38,6 +38,7 @@ import org.spdx.library.SpdxModelFactory;
 import org.spdx.library.conversion.Spdx2to3Converter;
 import org.spdx.library.model.v2.Checksum;
 import org.spdx.library.model.v2.SpdxPackageVerificationCode;
+import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.v2.enumerations.Purpose;
 import org.spdx.library.model.v3_0_1.SpdxConstantsV3;
 import org.spdx.library.model.v3_0_1.core.Agent;
@@ -75,7 +76,6 @@ public class SpdxV3DependencyBuilder
 {   
     private SpdxDocument spdxDoc;
     private SpdxV3LicenseManager licenseManager;
-    private SpdxV3DocumentBuilder builder;
     
     /**
      * @param builder The document builder
@@ -89,7 +89,6 @@ public class SpdxV3DependencyBuilder
                                         boolean includeTransitiveDependencies )
     {
         super( createExternalRefs, generatePurls, useArtifactID, includeTransitiveDependencies );
-        this.builder = builder;
         this.spdxDoc = builder.getSpdxDoc();
         this.licenseManager = builder.getLicenseManager();
     }
@@ -505,11 +504,11 @@ public class SpdxV3DependencyBuilder
         {
             CreationInfo creationInfo = new CreationInfo.CreationInfoBuilder( dest.getModelStore(), 
                                                                               dest.getModelStore().getNextId(IdType.Anonymous), 
-                                                                              null)
-                            .setCreated(fromAnnotation.getAnnotationDate())
-                            .setSpecVersion(SpdxConstantsV3.MODEL_SPEC_VERSION)
+                                                                              null )
+                            .setCreated( fromAnnotation.getAnnotationDate() )
+                            .setSpecVersion( SpdxConstantsV3.MODEL_SPEC_VERSION )
                             .build();
-            creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent(fromAnnotation.getAnnotator(), creationInfo) );
+            creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent( fromAnnotation.getAnnotator(), creationInfo ) );
             dest.createAnnotation( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
                 .setAnnotationType( Spdx2to3Converter.ANNOTATION_TYPE_MAP.get( fromAnnotation.getAnnotationType() ) )
                 .setStatement( fromAnnotation.getComment() )
@@ -599,6 +598,7 @@ public class SpdxV3DependencyBuilder
                         .setFrom( dest )
                         .addTo( packageFile )
                         .setRelationshipType( RelationshipType.HAS_DISTRIBUTION_ARTIFACT )
+                        .setCompleteness( RelationshipCompleteness.COMPLETE )
                         .build();
         }
         Optional<Purpose> primaryPurpose = source.getPrimaryPurpose();
@@ -695,7 +695,13 @@ public class SpdxV3DependencyBuilder
                 return retval; // No need to create the external map
             }
         }
-        Hash hash = (Hash)SpdxFileCollector.generateSha1( spdxFile, builder );
+        org.spdx.maven.Checksum checksum = AbstractFileCollector.generateSha1( spdxFile );
+        final HashAlgorithm algorithm = Spdx2to3Converter.HASH_ALGORITH_MAP.get( ChecksumAlgorithm.valueOf( checksum.getAlgorithm() ) );
+        Hash hash = spdxDoc.createHash( spdxDoc.getModelStore().getNextId( IdType.Anonymous ) )
+                        .setAlgorithm( algorithm )
+                        .setHashValue( checksum.getValue() )
+                        .build();
+                        
         StringBuilder sb = new StringBuilder( groupId ).append( artifactId );
         if ( Objects.nonNull( version )) {
             sb.append( version );

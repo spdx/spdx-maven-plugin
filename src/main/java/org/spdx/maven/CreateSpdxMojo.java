@@ -45,7 +45,8 @@ import org.spdx.maven.utils.SpdxCollectionException;
 import org.spdx.maven.utils.SpdxDefaultFileInformation;
 import org.spdx.maven.utils.AbstractDependencyBuilder;
 import org.spdx.maven.utils.AbstractDocumentBuilder;
-import org.spdx.maven.utils.SpdxFileCollector;
+import org.spdx.maven.utils.AbstractFileCollector;
+import org.spdx.maven.utils.LicenseManagerException;
 import org.spdx.maven.utils.SpdxProjectInformation;
 import org.spdx.maven.utils.SpdxV2DependencyBuilder;
 import org.spdx.maven.utils.SpdxV2DocumentBuilder;
@@ -830,7 +831,15 @@ public class CreateSpdxMojo extends AbstractMojo
         if ( this.licenseDeclared == null )
         {
             List<License> mavenLicenses = mavenProject.getLicenses();
-            declaredLicense = builder.mavenLicenseListToSpdxLicenseExpression( mavenLicenses );
+            try
+            {
+                declaredLicense = builder.mavenLicenseListToSpdxLicenseExpression( mavenLicenses );
+            }
+            catch ( LicenseManagerException e )
+            {
+                getLog().warn( "Unable to map maven licenses to a declared license.  Using NOASSERTION" );
+                declaredLicense = "NOASSERTION";
+            }
         }
         else
         {
@@ -901,7 +910,7 @@ public class CreateSpdxMojo extends AbstractMojo
             {
                 getLog().debug( "Generating checksum for file "+packageFile.getAbsolutePath() );
                 Set<String> algorithms = getChecksumAlgorithms();
-                checksums = SpdxFileCollector.generateChecksum( packageFile, algorithms, builder );
+                checksums = AbstractFileCollector.generateChecksum( packageFile, algorithms );
             }
             catch ( SpdxCollectionException | InvalidSPDXAnalysisException e )
             {

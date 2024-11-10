@@ -495,15 +495,13 @@ public class SpdxV2DocumentBuilder
     @Override
     public CoreModelObject getProjectPackage()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return projectPackage;
     }
 
     @Override
-    public String mavenLicenseListToSpdxLicenseExpression( List<License> mavenLicenses )
+    public String mavenLicenseListToSpdxLicenseExpression( List<License> mavenLicenses ) throws LicenseManagerException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return licenseManager.mavenLicenseListToSpdxLicense( mavenLicenses ).toString();
     }
 
     @Override

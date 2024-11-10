@@ -132,8 +132,9 @@ public abstract class AbstractDocumentBuilder
     /**
      * @param  mavenLicenses list of licenses 
      * @return license expression representing the list of mavenLicenses
+     * @throws LicenseManagerException On error converting license
      */
-    public abstract String mavenLicenseListToSpdxLicenseExpression( List<License> mavenLicenses );
+    public abstract String mavenLicenseListToSpdxLicenseExpression( List<License> mavenLicenses ) throws LicenseManagerException;
 
     /**
      * Verifies the top level document

@@ -16,56 +16,92 @@
 package org.spdx.maven.utils;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.library.LicenseInfoFactory;
-import org.spdx.library.model.v2.Relationship;
-import org.spdx.library.model.v2.SpdxDocument;
-import org.spdx.library.model.v2.SpdxFile;
-import org.spdx.library.model.v2.SpdxPackage;
-import org.spdx.library.model.v2.SpdxPackageVerificationCode;
-import org.spdx.library.model.v2.SpdxSnippet;
+import org.spdx.library.conversion.Spdx2to3Converter;
 import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.v2.enumerations.FileType;
-import org.spdx.library.model.v2.enumerations.RelationshipType;
-import org.spdx.library.model.v2.license.AnyLicenseInfo;
-import org.spdx.library.model.v2.license.InvalidLicenseStringException;
+import org.spdx.library.model.v3_0_1.core.Agent;
+import org.spdx.library.model.v3_0_1.core.DictionaryEntry;
+import org.spdx.library.model.v3_0_1.core.HashAlgorithm;
+import org.spdx.library.model.v3_0_1.core.IntegrityMethod;
+import org.spdx.library.model.v3_0_1.core.PositiveIntegerRange;
+import org.spdx.library.model.v3_0_1.core.RelationshipCompleteness;
+import org.spdx.library.model.v3_0_1.core.RelationshipType;
+import org.spdx.library.model.v3_0_1.core.SpdxDocument;
+import org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo;
+import org.spdx.library.model.v3_0_1.software.Snippet;
+import org.spdx.library.model.v3_0_1.software.SoftwarePurpose;
+import org.spdx.library.model.v3_0_1.software.SpdxFile;
+import org.spdx.library.model.v3_0_1.software.SpdxPackage;
 import org.spdx.maven.Checksum;
 import org.spdx.maven.SnippetInfo;
 import org.spdx.storage.IModelStore.IdType;
 
 
 /**
- * Collects SPDX file information from directories in SPDX Spec version 2 format
+ * Collects SPDX file information from directories in SPDX Spec version 3 format
  * <p>
  * The method <code>collectFilesInDirectory(FileSet[] filesets)</code> will scan and create SPDX File information for
  * all files in the filesets.
  *
  * @author Gary O'Neall
  */
-public class SpdxV2FileCollector extends AbstractFileCollector
+public class SpdxV3FileCollector extends AbstractFileCollector
 {
-    Set<AnyLicenseInfo> licensesFromFiles = new HashSet<>();
+    static final Map<String, String> EXT_TO_MEDIA_TYPE = new HashMap<>();
+    static final Map<String, SoftwarePurpose> EXT_TO_PURPOSE = new HashMap<>();
+
+    static
+    {
+        for ( Entry<String, FileType> entry : SpdxV2FileCollector.EXT_TO_FILE_TYPE.entrySet() )
+        {
+            switch ( entry.getValue() )
+            {
+                case SOURCE:    EXT_TO_MEDIA_TYPE.put( entry.getKey(), "text/plain" );
+                                EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.SOURCE );
+                                break;
+                case BINARY:    EXT_TO_MEDIA_TYPE.put( entry.getKey(), "application/octet-stream" );
+                                EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.LIBRARY );
+                                break;
+                case ARCHIVE:   EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.ARCHIVE ); break;
+                case APPLICATION: EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.APPLICATION ); break;
+                case AUDIO:     EXT_TO_MEDIA_TYPE.put( entry.getKey(), "audio/*" ); break;
+                case IMAGE:     EXT_TO_MEDIA_TYPE.put( entry.getKey(), "image/*" ); break;
+                case TEXT:      EXT_TO_MEDIA_TYPE.put( entry.getKey(), "text/plain" ); break;
+                case VIDEO:     EXT_TO_MEDIA_TYPE.put( entry.getKey(), "video/*" ); break;
+                case DOCUMENTATION: EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.DOCUMENTATION ); break;
+                case SPDX:      EXT_TO_MEDIA_TYPE.put( entry.getKey(), "application/spdx" );
+                                EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.BOM ); break;
+                case OTHER:     EXT_TO_PURPOSE.put( entry.getKey(), SoftwarePurpose.OTHER ); break;
+            }
+        }
+    }
+
     /**
      * Map of fileName, SPDXFile for all files in the SPDX document
      */
     Map<String, SpdxFile> spdxFiles = new HashMap<>();
-    List<SpdxSnippet> spdxSnippets = new ArrayList<>();
+    List<Snippet> spdxSnippets = new ArrayList<>();
 
     FileSetManager fileSetManager = new FileSetManager();
 
+    private List<DictionaryEntry> customIdToUri;
+
     /**
      * SpdxFileCollector collects SPDX file information for files
+     * @param customIdToUri Holds a mapping of IDs to URIs for any custom licenses defined outside the spdxDoc
      */
-    public SpdxV2FileCollector()
+    public SpdxV3FileCollector( List<DictionaryEntry> customIdToUri)
     {
+        this.customIdToUri = customIdToUri;
     }
+
 
     /**
      * Collect file information in the directory (including subdirectories).
@@ -172,8 +208,11 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms, spdxDoc );
         try
         {
-            Relationship relationship = spdxDoc.createRelationship( projectPackage, relationshipType, "" );
-            spdxFile.addRelationship( relationship );
+            spdxDoc.createRelationship( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                                .setFrom( spdxFile )
+                                .addTo( projectPackage )
+                                .setRelationshipType( relationshipType )
+                                .build();
         }
         catch ( InvalidSPDXAnalysisException e )
         {
@@ -183,16 +222,10 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         {
             for ( SnippetInfo snippet : fileInfo.getSnippets() )
             {
-                SpdxSnippet spdxSnippet;
+                Snippet spdxSnippet;
                 try
                 {
-                    spdxSnippet = convertToSpdxSnippet( snippet, spdxFile, spdxDoc );
-                }
-                catch ( InvalidLicenseStringException e )
-                {
-                    throw new SpdxCollectionException(
-                            "Error processing SPDX snippet information.  Invalid license string specified in snippet.",
-                            e );
+                    spdxSnippet = convertToSpdxSnippet( snippet, spdxFile );
                 }
                 catch ( SpdxBuilderException e )
                 {
@@ -208,46 +241,66 @@ public class SpdxV2FileCollector extends AbstractFileCollector
             }
         }
         spdxFiles.put( file.getPath(), spdxFile );
-        Collection<AnyLicenseInfo> licenseInfoFromFiles;
-        try
-        {
-            licenseInfoFromFiles = spdxFile.getLicenseInfoFromFiles();
-            licensesFromFiles.addAll( licenseInfoFromFiles );
-        }
-        catch ( InvalidSPDXAnalysisException e )
-        {
-            throw new SpdxCollectionException( "Error getting license information from files.", e );
-        }
     }
 
     /**
      * Create an SpdxSnippet from the snippet information provided
-     * @param snippet
-     * @param spdxFile
-     * @param spdxDoc
-     * @return
-     * @throws SpdxBuilderException
-     * @throws InvalidSPDXAnalysisException 
+     * @param snippet    Information on the Snippet
+     * @param spdxFile   File containing the snippet
+     * @return           SPDX Snippet
+     * @throws SpdxBuilderException on Maven metadata related errors
+     * @throws InvalidSPDXAnalysisException on SPDX analysis errors
      */
-    private SpdxSnippet convertToSpdxSnippet( SnippetInfo snippet, SpdxFile spdxFile, SpdxDocument spdxDoc ) throws SpdxBuilderException, InvalidSPDXAnalysisException
+    private Snippet convertToSpdxSnippet( SnippetInfo snippet, SpdxFile spdxFile ) throws SpdxBuilderException, InvalidSPDXAnalysisException
     {
         //TODO: Add annotations to snippet
-        AnyLicenseInfo concludedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2(  snippet.getLicenseConcluded(), spdxDoc.getModelStore(), 
-                                                                                             spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
-        List<AnyLicenseInfo> licenseInfoInSnippet = new ArrayList<>();
-        licenseInfoInSnippet.add( LicenseInfoFactory.parseSPDXLicenseStringCompatV2( snippet.getLicenseInfoInSnippet(), 
-                                                                                     spdxDoc.getModelStore(), 
-                                                                                     spdxDoc.getDocumentUri(), 
-                                                                                     spdxDoc.getCopyManager() ) );
-        return spdxDoc.createSpdxSnippet( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
-                                                        snippet.getName(), concludedLicense,
-                                                        licenseInfoInSnippet,
-                                                        snippet.getCopyrightText(), spdxFile, 
-                                                        snippet.getByteRangeStart(), snippet.getByteRangeEnd() )
-                        .setComment( snippet.getComment() )
-                        .setLicenseComments( snippet.getLicensComment() )
-                        .setLineRange( snippet.getLineRangeStart(), snippet.getLineRangeEnd() )
+
+        PositiveIntegerRange byteRange = spdxFile.createPositiveIntegerRange( spdxFile.getModelStore().getNextId( IdType.Anonymous ) )
+                        .setBeginIntegerRange( snippet.getByteRangeStart() )
+                        .setEndIntegerRange( snippet.getByteRangeEnd() )
                         .build();
+        PositiveIntegerRange lineRange = spdxFile.createPositiveIntegerRange( spdxFile.getModelStore().getNextId( IdType.Anonymous ) )
+                        .setBeginIntegerRange( snippet.getLineRangeStart() )
+                        .setEndIntegerRange( snippet.getLineRangeEnd() )
+                        .build();
+        
+        Snippet retval =  spdxFile.createSnippet( spdxFile.getIdPrefix() + spdxFile.getModelStore().getNextId( IdType.SpdxId ) )
+                        .setName( snippet.getName() )
+                        .setCopyrightText( snippet.getCopyrightText() )
+                        .setSnippetFromFile( spdxFile )
+                        .setByteRange( byteRange )
+                        .setLineRange( lineRange )
+                        .build();
+
+        String comment = snippet.getComment();
+        if ( Objects.isNull( comment ) )
+        {
+            comment = "";
+        }
+        String licenseComment = snippet.getLicensComment();
+        if ( Objects.nonNull( licenseComment ) && !licenseComment.isBlank() )
+        {
+            comment = comment + "; License: " + licenseComment;
+        }
+        retval.setComment( comment );
+        final AnyLicenseInfo concludedLicense = LicenseInfoFactory
+                        .parseSPDXLicenseString( snippet.getConcludedLicense(), spdxFile.getModelStore(), 
+                                                 spdxFile.getIdPrefix(), spdxFile.getCopyManager(), customIdToUri );
+        retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+                        .setCompleteness( RelationshipCompleteness.COMPLETE )
+                        .setFrom( retval )
+                        .addTo( concludedLicense )
+                        .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
+        
+        final AnyLicenseInfo declaredLicense = LicenseInfoFactory
+                        .parseSPDXLicenseString( snippet.getLicenseInfoInSnippet(), spdxFile.getModelStore(), 
+                                                 spdxFile.getIdPrefix(), spdxFile.getCopyManager(), customIdToUri );
+        retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+                        .setCompleteness( RelationshipCompleteness.COMPLETE )
+                        .setFrom( retval )
+                        .addTo( declaredLicense )
+                        .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE );
+        return retval;
     }
 
     /**
@@ -265,12 +318,25 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                                         SpdxDocument spdxDoc ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
-        ArrayList<FileType> fileTypes = new ArrayList<>();
-        fileTypes.add( extensionToFileType( getExtension( file ) ) );
-        Set<Checksum> checksums;
+        String extension = getExtension( file ).trim().toUpperCase();
+        SoftwarePurpose purpose = EXT_TO_PURPOSE.getOrDefault( extension, SoftwarePurpose.OTHER );
+        Collection<IntegrityMethod> hashes = new ArrayList<>();
         try
         {
-            checksums = generateChecksum( file, algorithms );
+            Set<Checksum> checksums = generateChecksum( file, algorithms );
+            for ( Checksum checksum : checksums )
+            {
+                final HashAlgorithm algorithm = Spdx2to3Converter.HASH_ALGORITH_MAP.get( ChecksumAlgorithm.valueOf( checksum.getAlgorithm() ) );
+                if ( Objects.isNull( algorithm ) )
+                {
+                    throw new SpdxCollectionException( "Invalid checksum algorithm for file "+file.getName() );
+                }
+                hashes.add( spdxDoc.createHash( spdxDoc.getModelStore().getNextId( IdType.Anonymous ) )
+                            .setAlgorithm( algorithm )
+                            .setHashValue( checksum.getValue() )
+                            .build() );
+            }
+            
         }
         catch ( SpdxCollectionException | InvalidSPDXAnalysisException e1 )
         {
@@ -279,7 +345,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         AnyLicenseInfo concludedLicense = null;
         AnyLicenseInfo license = null;
         String licenseComment = defaultFileInformation.getLicenseComment();
-        if ( isSourceFile( fileTypes ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH )
+        if ( SoftwarePurpose.SOURCE.equals( purpose ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH )
         {
             List<String> fileSpdxLicenses = null;
             try
@@ -297,16 +363,18 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                 {
                     if ( fileSpdxLicenses.size() == 1 )
                     {
-                        license = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( fileSpdxLicenses.get( 0 ) );
+                        license = LicenseInfoFactory.parseSPDXLicenseString( fileSpdxLicenses.get( 0 ) );
                     }
                     else
                     {
                         Set<AnyLicenseInfo> licenseSet = new HashSet<>();
                         for ( String licenseExpression : fileSpdxLicenses )
                         {
-                            licenseSet.add( LicenseInfoFactory.parseSPDXLicenseStringCompatV2( licenseExpression ) );
+                            licenseSet.add( LicenseInfoFactory.parseSPDXLicenseString( licenseExpression ) );
                         }
-                        license = spdxDoc.createConjunctiveLicenseSet( licenseSet );
+                        license = spdxDoc.createConjunctiveLicenseSet( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                                        .addAllMember( licenseSet )
+                                        .build();
                     }
                 }
                 catch ( InvalidSPDXAnalysisException e )
@@ -329,8 +397,8 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         {
             try
             {
-                license = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( defaultFileInformation.getDeclaredLicense() );
-                concludedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( defaultFileInformation.getConcludedLicense() );
+                license = LicenseInfoFactory.parseSPDXLicenseString( defaultFileInformation.getDeclaredLicense() );
+                concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultFileInformation.getConcludedLicense() );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
@@ -345,10 +413,34 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         String copyright = defaultFileInformation.getCopyright();
         String notice = defaultFileInformation.getNotice();
         String comment = defaultFileInformation.getComment();
+        if ( Objects.isNull( comment ) )
+        {
+            comment = "";
+        }
+        if ( Objects.nonNull( licenseComment ) && !licenseComment.isBlank() )
+        {
+            comment = comment + " ;License: " + licenseComment;
+        }
         String[] defaultContributors = defaultFileInformation.getContributors();
-        List<String> contributors;
+        List<Agent> contributors = new ArrayList<>();
         if ( defaultContributors != null ) {
-            contributors = Arrays.asList( defaultFileInformation.getContributors() );
+            for ( String contributor : defaultFileInformation.getContributors() )
+            {
+                if ( Objects.nonNull( contributor ) && !contributor.isBlank() )
+                {
+                    try
+                    {
+                        contributors.add( spdxDoc.createPerson( spdxDoc.getModelStore().getNextId( IdType.Anonymous ) )
+                                          .setName( contributor )
+                                          .setDescription( "Contributor" )
+                                          .build() );
+                    }
+                    catch ( InvalidSPDXAnalysisException e )
+                    {
+                        LOG.warn( "Error creating contributor "+contributor+" for file "+file+".  Skipping." );
+                    }
+                }
+            }
         } else {
             contributors = new ArrayList<>();
         }
@@ -357,28 +449,30 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         //TODO: Add annotation
         try
         {
-            List<AnyLicenseInfo> seenLicenses = new ArrayList<>();
-            seenLicenses.add( license );
-            Checksum sha1 = null;
-            for ( Checksum checksum:checksums )
-            {
-                if (ChecksumAlgorithm.SHA1.toString().equals( checksum.getAlgorithm() )) {
-                    sha1 = checksum;
-                    break;
-                }
-            }
-            retval = spdxDoc.createSpdxFile( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
-                                             relativePath, concludedLicense, seenLicenses, 
-                                             copyright, 
-                                             spdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1.getValue() ) )
+            retval = spdxDoc.createSpdxFile( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                            .setName( relativePath )
+                            .setCopyrightText( copyright )
                             .setComment( comment )
-                            .setLicenseComments( licenseComment )
-                            .setFileTypes( fileTypes )
-                            .setFileContributors( contributors )
+                            .setPrimaryPurpose( purpose )
+                            .addAllVerifiedUsing( hashes )
+                            .addAttributionText( notice )
+                            .addAllOriginatedBy( contributors )
                             .build();
-                            
-
-            retval.setNoticeText( notice );
+            String mediaType = EXT_TO_MEDIA_TYPE.get( extension );
+            if ( Objects.nonNull( mediaType ) )
+            {
+                retval.setContentType( mediaType );
+            }
+            retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+                                        .setCompleteness( RelationshipCompleteness.COMPLETE )
+                                        .setFrom( retval )
+                                        .addTo( concludedLicense )
+                                        .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
+            retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+                                        .setCompleteness( RelationshipCompleteness.COMPLETE )
+                                        .setFrom( retval )
+                                        .addTo( concludedLicense )
+                                        .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE );
         }
         catch ( InvalidSPDXAnalysisException e )
         {
@@ -387,8 +481,6 @@ public class SpdxV2FileCollector extends AbstractFileCollector
 
         return retval;
     }
-
-    
 
     /**
      * @return SPDX Files which have been acquired through the collectFilesInDirectory method
@@ -401,89 +493,8 @@ public class SpdxV2FileCollector extends AbstractFileCollector
     /**
      * @return SPDX Snippets collected through the collectFilesInDirectory method
      */
-    public List<SpdxSnippet> getSnippets()
+    public List<Snippet> getSnippets()
     {
         return this.spdxSnippets;
-    }
-
-    /**
-     * @return all license information used in the SPDX files
-     */
-    public Collection<AnyLicenseInfo> getLicenseInfoFromFiles()
-    {
-        return licensesFromFiles;
-    }
-
-    /**
-     * Create a verification code from all SPDX files collected
-     *
-     * @param spdxFilePath               Complete file path for the SPDX file - this will be excluded from the verification code
-     * @param spdxDoc                    SPDX document which will contain the package verification code.
-     * @return                           package verification code
-     * @throws NoSuchAlgorithmException  on error generating checksum
-     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
-     */
-    public SpdxPackageVerificationCode getVerificationCode( String spdxFilePath, SpdxDocument spdxDoc ) throws NoSuchAlgorithmException, InvalidSPDXAnalysisException
-    {
-        List<String> excludedFileNamesFromVerificationCode = new ArrayList<>();
-
-        if ( spdxFilePath != null && spdxFiles.containsKey( spdxFilePath ) )
-        {
-            Optional<String> excludedFileName = spdxFiles.get( spdxFilePath ).getName();
-            if ( excludedFileName.isPresent() )
-            {
-                excludedFileNamesFromVerificationCode.add( excludedFileName.get() );
-            }
-        }
-        SpdxPackageVerificationCode verificationCode;
-        verificationCode = calculatePackageVerificationCode( spdxFiles.values(),
-                excludedFileNamesFromVerificationCode, spdxDoc );
-        return verificationCode;
-    }
-
-    /**
-     * Calculate the package verification code for a collection of SPDX files
-     *
-     * @param spdxFiles                             Files used to calculate the verification code
-     * @param excludedFileNamesFromVerificationCode List of file names to exclude
-     * @param spdxDoc SPDX document which will contain the Package Verification Code
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidSPDXAnalysisException 
-     */
-    private SpdxPackageVerificationCode calculatePackageVerificationCode( Collection<SpdxFile> spdxFiles, 
-                                                                          List<String> excludedFileNamesFromVerificationCode,
-                                                                          SpdxDocument spdxDoc ) throws NoSuchAlgorithmException, InvalidSPDXAnalysisException
-    {
-        List<String> fileChecksums = new ArrayList<>();
-        for ( SpdxFile file : spdxFiles )
-        {
-            Optional<String> filename = file.getName();
-            if ( filename.isPresent() && includeInVerificationCode( file.getName().get(), excludedFileNamesFromVerificationCode ) )
-            {
-                fileChecksums.add( file.getSha1() );
-            }
-        }
-        Collections.sort( fileChecksums );
-        MessageDigest verificationCodeDigest = MessageDigest.getInstance( "SHA-1" );
-        for ( String fileChecksum : fileChecksums )
-        {
-            byte[] hashInput = fileChecksum.getBytes( StandardCharsets.UTF_8 );
-            verificationCodeDigest.update( hashInput );
-        }
-        String value = convertChecksumToString( verificationCodeDigest.digest() );
-        return spdxDoc.createPackageVerificationCode( value, excludedFileNamesFromVerificationCode );
-    }
-
-    private boolean includeInVerificationCode( String name, List<String> excludedFileNamesFromVerificationCode )
-    {
-        for ( String s : excludedFileNamesFromVerificationCode )
-        {
-            if ( s.equals( name ) )
-            {
-                return false;
-            }
-        }
-        return true;
     }
 }

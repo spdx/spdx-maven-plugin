@@ -17,15 +17,10 @@ package org.spdx.maven.utils;
 
 import java.util.Set;
 
-import org.spdx.core.CoreModelObject;
-import org.spdx.core.InvalidSPDXAnalysisException;
-
 import org.spdx.maven.Annotation;
 import org.spdx.maven.Checksum;
 import org.spdx.maven.ExternalReference;
 import org.spdx.maven.Packaging;
-import org.spdx.storage.IModelStore;
-import org.spdx.storage.PropertyDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -333,29 +328,6 @@ public class SpdxProjectInformation
     public void setName( String name )
     {
         this.name = name;
-    }
-    
-    /**
-     * Log information on all fields - typically used for debugging
-     * @throws InvalidSPDXAnalysisException 
-     */
-    public static void logInfo( CoreModelObject modelObject ) throws InvalidSPDXAnalysisException
-    {
-        if ( !LOG.isDebugEnabled() ) {
-            return;
-        }
-        IModelStore store = modelObject.getModelStore();
-        String objectUri = modelObject.getObjectUri();
-        for ( PropertyDescriptor desc : store.getPropertyValueDescriptors( objectUri ) ) {
-            if (store.isCollectionProperty( objectUri, desc )) {
-                //TODO Implement
-            }
-            else 
-            {
-                //TODO Implement
-            }
-        }
-        //TODO for SPDX V3 - log al relationships from this object
     }
 
     /**
