@@ -47,6 +47,7 @@ import org.spdx.library.model.v2.SpdxDocument;
 import org.spdx.library.model.v2.SpdxElement;
 import org.spdx.library.model.v2.SpdxPackage;
 import org.spdx.library.model.v2.enumerations.AnnotationType;
+import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.v2.enumerations.Purpose;
 import org.spdx.library.model.v2.enumerations.RelationshipType;
 import org.spdx.library.model.v2.license.AnyLicenseInfo;
@@ -154,7 +155,6 @@ public class SpdxV2DependencyBuilder
     private List<org.spdx.library.model.v2.Annotation> documentAnnotations = new ArrayList<>();
     private SpdxDocument spdxDoc;
     private SpdxV2LicenseManager licenseManager;
-    private SpdxV2DocumentBuilder builder;
 
     /**
      * @param builder The document builder
@@ -168,7 +168,6 @@ public class SpdxV2DependencyBuilder
                                         boolean includeTransitiveDependencies )
     {
         super( createExternalRefs, generatePurls, useArtifactID, includeTransitiveDependencies );
-        this.builder = builder;
         this.spdxDoc = builder.getSpdxDoc();
         this.licenseManager = builder.getLicenseManager();
     }
@@ -482,7 +481,9 @@ public class SpdxV2DependencyBuilder
         {
             String externalRefDocId = SpdxConstantsCompatV2.EXTERNAL_DOC_REF_PRENUM + fixExternalRefId( fullArtifactId );
             LOG.debug( "Creating external document ref " + externalDocNamespace );
-            Checksum cksum = (Checksum)SpdxFileCollector.generateSha1( spdxFile, builder );
+            org.spdx.maven.Checksum mavenChecksum = AbstractFileCollector.generateSha1( spdxFile );
+            Checksum cksum = spdxDoc.createChecksum( ChecksumAlgorithm.valueOf( mavenChecksum.getAlgorithm() ),
+                                                     mavenChecksum.getValue() );
             externalRef = spdxDoc.createExternalDocumentRef( externalRefDocId, externalSpdxDoc.getDocumentUri(), cksum );
             spdxDoc.getExternalDocumentRefs().add( externalRef );
             org.spdx.library.model.v2.Annotation docRefAddedAnnotation = spdxDoc.createAnnotation( "Tool: spdx-maven-plugin", 

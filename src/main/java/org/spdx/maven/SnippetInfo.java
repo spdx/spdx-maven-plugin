@@ -15,17 +15,9 @@
  */
 package org.spdx.maven;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.spdx.core.DefaultStoreNotInitialized;
-import org.spdx.library.LicenseInfoFactory;
-import org.spdx.library.model.v2.SpdxDocument;
-import org.spdx.library.model.v2.license.AnyLicenseInfo;
-import org.spdx.library.model.v2.license.InvalidLicenseStringException;
 import org.spdx.maven.utils.SpdxBuilderException;
 
 import org.slf4j.Logger;
@@ -98,18 +90,9 @@ public class SnippetInfo
         return this.comment;
     }
 
-    public AnyLicenseInfo getLicenseConcluded( SpdxDocument spdxDoc ) throws InvalidLicenseStringException, DefaultStoreNotInitialized
+    public String getLicenseConcluded()
     {
-        return LicenseInfoFactory.parseSPDXLicenseStringCompatV2( this.concludedLicense, spdxDoc.getModelStore(), 
-                                                          spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
-    }
-
-    public Collection<AnyLicenseInfo> getLicenseInfoInSnippet( SpdxDocument spdxDoc ) throws InvalidLicenseStringException, DefaultStoreNotInitialized
-    {
-        List<AnyLicenseInfo> retval = new ArrayList<>();
-        retval.add( LicenseInfoFactory.parseSPDXLicenseStringCompatV2( this.licenseInfoInSnippet, spdxDoc.getModelStore(), 
-                                                                                spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() ));
-        return retval;                                                                    
+        return this.concludedLicense;
     }
 
     public String getCopyrightText()
