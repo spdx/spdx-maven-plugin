@@ -13,12 +13,13 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.core.DefaultModelStore;
+import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.ModelCopyManager;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.LicenseInfoFactory;
-import org.spdx.library.model.license.SpdxNoAssertionLicense;
+import org.spdx.library.SpdxModelFactory;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v3_0_1.core.Element;
 import org.spdx.storage.simple.InMemSpdxStore;
 
 public class TestMavenToSpdxLicenseMapper
@@ -31,6 +32,7 @@ public class TestMavenToSpdxLicenseMapper
     private static final String MIT_SPDX_ID = "MIT";
 
     SpdxDocument spdxDoc = null;
+    Element spdxV3Doc = null;
     Log log = null;
 
 
@@ -40,6 +42,7 @@ public class TestMavenToSpdxLicenseMapper
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
     {
+        SpdxModelFactory.init();
     }
 
     /**
@@ -56,7 +59,10 @@ public class TestMavenToSpdxLicenseMapper
     @Before
     public void setUp() throws Exception
     {
+        DefaultModelStore.initialize(new InMemSpdxStore(), "http://default/namespace", new ModelCopyManager());
         spdxDoc = new SpdxDocument( new InMemSpdxStore(), TEST_SPDX_DOCUMENT_URL, new ModelCopyManager(), true );
+        spdxV3Doc = new org.spdx.library.model.v3_0_1.software.SpdxPackage( new InMemSpdxStore(), TEST_SPDX_DOCUMENT_URL + "/v3doc", 
+                                                                            new ModelCopyManager(), true, TEST_SPDX_DOCUMENT_URL + "/");
     }
 
     /**
@@ -83,41 +89,75 @@ public class TestMavenToSpdxLicenseMapper
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseNone() throws LicenseMapperException, InvalidSPDXAnalysisException
+    public void testMavenLicenseListToSpdxLicenseNoneV2() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
+        org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList.subList( 0, 0 ), spdxDoc );
-        assertEquals( new SpdxNoAssertionLicense(), result );
+        assertEquals( new org.spdx.library.model.v2.license.SpdxNoAssertionLicense(), result );
+    }
+    
+    @Test
+    public void testMavenLicenseListToSpdxLicenseNoneV3() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License(
+                licenseList.subList( 0, 0 ), spdxV3Doc );
+        assertEquals( new org.spdx.library.model.v3_0_1.expandedlicensing.NoAssertionLicense(), result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseUnknown() throws LicenseMapperException, InvalidSPDXAnalysisException
+    public void testMavenLicenseListToSpdxLicenseUnknownV2() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( "http://not.a.known.url" );
         licenseList.add( license );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
+        org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList, spdxDoc );
-        assertEquals( new SpdxNoAssertionLicense(), result );
+        assertEquals( new org.spdx.library.model.v2.license.SpdxNoAssertionLicense(), result );
+    }
+    
+    @Test
+    public void testMavenLicenseListToSpdxLicenseUnknownV3() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setUrl( "http://not.a.known.url" );
+        licenseList.add( license );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License(
+                licenseList, spdxV3Doc );
+        assertEquals( new org.spdx.library.model.v3_0_1.expandedlicensing.NoAssertionLicense(), result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseSingle() throws LicenseMapperException, InvalidSPDXAnalysisException
+    public void testMavenLicenseListToSpdxLicenseSingleV2() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
         license.setUrl( APACHE2_URL );
         licenseList.add( license );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
+        org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList, spdxDoc );
-        AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
+        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_SPDX_ID );
+        assertEquals( expected, result );
+    }
+    
+    @Test
+    public void testMavenLicenseListToSpdxLicenseSingleV3() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setUrl( APACHE2_URL );
+        licenseList.add( license );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License(
+                licenseList, spdxV3Doc );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
         assertEquals( expected, result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseConjunctive() throws LicenseMapperException, InvalidSPDXAnalysisException
+    public void testMavenLicenseListToSpdxLicenseConjunctiveV2() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
@@ -126,14 +166,30 @@ public class TestMavenToSpdxLicenseMapper
         License licenseM = new License();
         licenseM.setUrl( MIT_URL );
         licenseList.add( licenseM );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
+        org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList, spdxDoc );
-        AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
+        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
+        assertEquals( expected, result );
+    }
+    
+    @Test
+    public void testMavenLicenseListToSpdxLicenseConjunctiveV3() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setUrl( APACHE2_URL );
+        licenseList.add( license );
+        License licenseM = new License();
+        licenseM.setUrl( MIT_URL );
+        licenseList.add( licenseM );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License(
+                licenseList, spdxV3Doc );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
         assertEquals( expected, result );
     }
 
     @Test
-    public void testMavenLicenseListToSpdxLicenseConunctiveUnknown() throws LicenseMapperException, InvalidSPDXAnalysisException
+    public void testMavenLicenseListToSpdxLicenseConunctiveUnknownV2() throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<License> licenseList = new ArrayList<>();
         License license = new License();
@@ -142,9 +198,25 @@ public class TestMavenToSpdxLicenseMapper
         License licenseM = new License();
         licenseM.setUrl( "http://unknown.url" );
         licenseList.add( licenseM );
-        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
+        org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList, spdxDoc );
-        AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
+        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_SPDX_ID );
+        assertEquals( expected, result );
+    }
+    
+    @Test
+    public void testMavenLicenseListToSpdxLicenseConunctiveUnknownV3() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setUrl( APACHE2_URL );
+        licenseList.add( license );
+        License licenseM = new License();
+        licenseM.setUrl( "http://unknown.url" );
+        licenseList.add( licenseM );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License(
+                licenseList, spdxV3Doc );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
         assertEquals( expected, result );
     }
 }

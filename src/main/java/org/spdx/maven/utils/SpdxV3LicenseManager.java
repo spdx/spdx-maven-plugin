@@ -100,7 +100,7 @@ public class SpdxV3LicenseManager
         CustomLicense spdxLicense;
         try
         {
-            spdxLicense = spdxDoc.createCustomLicense( spdxDoc.getIdPrefix() + "/" + license.getLicenseId() )
+            spdxLicense = spdxDoc.createCustomLicense( spdxDoc.getIdPrefix() + license.getLicenseId() )
                             .setLicenseText( license.getExtractedText() )
                             .setName( license.getName() )
                             .setComment( license.getComment() )

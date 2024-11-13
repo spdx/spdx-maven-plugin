@@ -311,7 +311,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    throw new SpdxCollectionException( "Error creating SPDX file - unable to create a license set", e );
+                    LOG.error( "Invalid license expressions found in source file "+file.getName(), e );
                 }
                 if ( licenseComment == null )
                 {
