@@ -150,7 +150,7 @@
     <dependency>
     	<groupId>org.spdx</groupId>
     	<artifactId>spdx-v3jsonld-store</artifactId>
-    	<version>0.1.0-Alpha</version>
+    	<version>0.1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

@@ -29,7 +29,6 @@ import org.spdx.library.model.v2.ReferenceType;
 import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.v2.enumerations.ReferenceCategory;
 import org.spdx.library.model.v3_0_1.SpdxConstantsV3;
-import org.spdx.library.model.v3_0_1.SpdxModelClassFactoryV3;
 import org.spdx.library.model.v3_0_1.core.AnnotationType;
 import org.spdx.library.model.v3_0_1.core.CreationInfo;
 import org.spdx.library.model.v3_0_1.core.DictionaryEntry;
@@ -39,6 +38,7 @@ import org.spdx.library.model.v3_0_1.core.Relationship;
 import org.spdx.library.model.v3_0_1.core.RelationshipCompleteness;
 import org.spdx.library.model.v3_0_1.core.RelationshipType;
 import org.spdx.library.model.v3_0_1.core.SpdxDocument;
+import org.spdx.library.model.v3_0_1.core.Tool;
 import org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo;
 import org.spdx.library.model.v3_0_1.software.Sbom;
 import org.spdx.library.model.v3_0_1.software.SoftwareArtifact;
@@ -103,16 +103,7 @@ public class SpdxV3DocumentBuilder
         try
         {
             modelStore = new JsonLDStore( new InMemSpdxStore() );
-            String supplier = ( mavenProject.getOrganization() != null && 
-                            mavenProject.getOrganization().getName() != null 
-                            && !mavenProject.getOrganization().getName().isEmpty() ) ? mavenProject.getOrganization().getName() : project.getName() ;
-
-            creationInfo = SpdxModelClassFactoryV3.createCreationInfo( modelStore, namespaceUri + "Agent/supplier", supplier,
-                                                                       copyManager);
-            creationInfo.getCreatedUsings().add( creationInfo.createTool( namespaceUri + "Agent/SpdxMavenPlugin" )
-                                                 .setName( "SPDX Maven Plugin" )
-                                                 .setCreationInfo( creationInfo )
-                                                 .build() );
+            creationInfo = new CreationInfo( modelStore, modelStore.getNextId( IdType.Anonymous ), copyManager, true, namespaceUri.toString() );
             sbom = creationInfo.createSbom( namespaceUri + "sbom" ).build();
             spdxDoc = sbom.createSpdxDocument( namespaceUri + "/Document" )
                             .addRootElement( sbom )
@@ -198,6 +189,7 @@ public class SpdxV3DocumentBuilder
                                 .setCreated( annotation.getAnnotationDate() )
                                 .setSpecVersion( SpdxConstantsV3.MODEL_SPEC_VERSION )
                                 .build();
+                creationInfo.setIdPrefix( element.getIdPrefix() );
                 creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent( annotation.getAnnotator(), creationInfo ) );
                 element.createAnnotation( element.getIdPrefix() + element.getModelStore().getNextId( IdType.SpdxId ) )
                        .setAnnotationType( annotationType )
@@ -227,7 +219,17 @@ public class SpdxV3DocumentBuilder
         {
             try
             {
-                creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent( parameterCreator,  creationInfo ) );
+                if ( parameterCreator.startsWith( "Tool:" ))
+                {
+                    Tool tool = spdxDoc.createTool( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                                    .setName( parameterCreator.substring( "Tool:".length() ).trim() )
+                                    .build();
+                    creationInfo.getCreatedUsings().add( tool );
+                }
+                else
+                {
+                    creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent( parameterCreator,  creationInfo ) );
+                }
             }
             catch (InvalidSPDXAnalysisException e)
             {
@@ -458,7 +460,8 @@ public class SpdxV3DocumentBuilder
             }
             try
             {
-                Spdx2to3Converter.addExternalRefToArtifact( cat, refType, externalRef.getLocator(), artifact, artifact.getModelStore() );
+                Spdx2to3Converter.addExternalRefToArtifact( cat, refType, externalRef.getLocator(), externalRef.getComment(),
+                                                            artifact, artifact.getModelStore() );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
