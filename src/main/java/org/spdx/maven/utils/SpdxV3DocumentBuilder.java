@@ -284,11 +284,11 @@ public class SpdxV3DocumentBuilder
                             .build();
             
             pkg.createRelationship( pkg.getIdPrefix() + pkg.getModelStore().getNextId( IdType.SpdxId ) )
-            .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
-            .setCompleteness( RelationshipCompleteness.COMPLETE )
-            .setFrom( pkg )
-            .addTo( concludedLicense )
-            .build();
+                            .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
+                            .setCompleteness( RelationshipCompleteness.COMPLETE )
+                            .setFrom( pkg )
+                            .addTo( concludedLicense )
+                            .build();
         }
         catch ( InvalidSPDXAnalysisException e )
         {

@@ -27,14 +27,16 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.core.DefaultModelStore;
+import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.ModelCopyManager;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.ConjunctiveLicenseSet;
-import org.spdx.library.model.license.ExtractedLicenseInfo;
-import org.spdx.library.model.license.LicenseInfoFactory;
-import org.spdx.library.model.license.SpdxListedLicense;
+import org.spdx.library.SpdxModelFactory;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.ConjunctiveLicenseSet;
+import org.spdx.library.model.v2.license.ExtractedLicenseInfo;
+import org.spdx.library.model.v2.license.SpdxListedLicense;
 import org.spdx.maven.NonStandardLicense;
 import org.spdx.storage.simple.InMemSpdxStore;
 import org.apache.maven.model.License;
@@ -44,7 +46,7 @@ import org.apache.maven.model.License;
  *
  * @author Gary O'Neall
  */
-public class TestLicenseManager
+public class TestSpdxV2LicenseManager
 {
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
     static final String APACHE_CROSS_REF_URL2 = "http://www.apache.org/licenses/LICENSE-2.0";
@@ -63,6 +65,7 @@ public class TestLicenseManager
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
     {
+        SpdxModelFactory.init();
     }
 
     /**
@@ -79,6 +82,7 @@ public class TestLicenseManager
     @Before
     public void setUp() throws Exception
     {
+        DefaultModelStore.initialize(new InMemSpdxStore(), "http://default/namespace", new ModelCopyManager());
         spdxDoc = new SpdxDocument( new InMemSpdxStore(), TEST_SPDX_DOCUMENT_URL, new ModelCopyManager(), true );
     }
 
@@ -269,7 +273,7 @@ public class TestLicenseManager
     {
         SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc, false );
         // standard license
-        AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseString( APACHE_LICENSE_ID );
+        AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_LICENSE_ID );
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );
         assertEquals( result.getName(), ( (SpdxListedLicense) licenseInfo ).getName() );
         String resultUrl = result.getUrl().replace( "https", "http" );

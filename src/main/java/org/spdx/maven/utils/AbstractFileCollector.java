@@ -155,7 +155,7 @@ public abstract class AbstractFileCollector
         return result;
     }
     
-    protected FileType extensionToFileType( String fileExtension )
+    protected static FileType extensionToFileType( String fileExtension )
     {
         return EXT_TO_FILE_TYPE.getOrDefault( fileExtension.trim().toUpperCase(), FileType.OTHER );
 

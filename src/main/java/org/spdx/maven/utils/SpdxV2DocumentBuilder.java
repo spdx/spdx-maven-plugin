@@ -96,7 +96,7 @@ public class SpdxV2DocumentBuilder
         // create the SPDX document
         try
         {
-            modelStore = outputFormatEnum == OutputFormat.RDF_XML ? new RdfStore() :  new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
+            modelStore = outputFormatEnum == OutputFormat.RDF_XML ? new RdfStore( spdxDocumentNamespace.toString() ) :  new MultiFormatStore( new InMemSpdxStore(), Format.JSON_PRETTY );
             copyManager = new ModelCopyManager();
             spdxDoc = SpdxModelFactoryCompatV2.createSpdxDocumentV2( modelStore, spdxDocumentNamespace.toString(), copyManager );
         }

@@ -39,6 +39,7 @@ import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.core.SpdxCoreConstants.SpdxMajorVersion;
+import org.spdx.library.SpdxModelFactory;
 import org.spdx.maven.utils.LicenseMapperException;
 import org.spdx.maven.utils.SpdxBuilderException;
 import org.spdx.maven.utils.SpdxCollectionException;
@@ -107,6 +108,11 @@ public class CreateSpdxMojo extends AbstractMojo
     public static final String JSON_OUTPUT_FORMAT = "JSON";
 
     public static final String RDF_OUTPUT_FORMAT = "RDF/XML";
+    
+    static
+    {
+        SpdxModelFactory.init();
+    }
 
     @Component
     private MavenProject mavenProject;

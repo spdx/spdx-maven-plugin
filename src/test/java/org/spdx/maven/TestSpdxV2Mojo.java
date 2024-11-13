@@ -15,28 +15,30 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.spdx.core.DefaultModelStore;
 import org.spdx.jacksonstore.MultiFormatStore;
 import org.spdx.jacksonstore.MultiFormatStore.Format;
+import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.ModelCopyManager;
-import org.spdx.library.model.ExternalRef;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.SpdxElement;
-import org.spdx.library.model.SpdxFile;
-import org.spdx.library.model.SpdxModelFactory;
-import org.spdx.library.model.SpdxPackage;
-import org.spdx.library.model.SpdxSnippet;
-import org.spdx.library.model.enumerations.AnnotationType;
-import org.spdx.library.model.enumerations.ReferenceCategory;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.ExtractedLicenseInfo;
-import org.spdx.library.model.license.LicenseInfoFactory;
+import org.spdx.library.SpdxModelFactory;
+import org.spdx.library.model.v2.ExternalRef;
+import org.spdx.library.model.v2.SpdxConstantsCompatV2;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.SpdxElement;
+import org.spdx.library.model.v2.SpdxFile;
+import org.spdx.library.model.v2.SpdxPackage;
+import org.spdx.library.model.v2.SpdxSnippet;
+import org.spdx.library.model.v2.enumerations.AnnotationType;
+import org.spdx.library.model.v2.enumerations.ReferenceCategory;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.ExtractedLicenseInfo;
 import org.spdx.library.referencetype.ListedReferenceTypes;
-import org.spdx.maven.utils.TestSpdxFileCollector;
+import org.spdx.maven.utils.TestSpdxV2FileCollector;
 import org.spdx.spdxRdfStore.RdfStore;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.simple.InMemSpdxStore;
 
-public class TestSpdxMojo extends AbstractMojoTestCase
+public class TestSpdxV2Mojo extends AbstractMojoTestCase
 {
 
     private static final String UNIT_TEST_RESOURCE_DIR = "target/test-classes/unit/spdx-maven-plugin-test";
@@ -55,6 +57,8 @@ public class TestSpdxMojo extends AbstractMojoTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        SpdxModelFactory.init();
+        DefaultModelStore.initialize(new InMemSpdxStore(), "http://default/namespace", new ModelCopyManager());
     }
 
     @After
@@ -82,11 +86,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         ISerializableModelStore modelStore = new RdfStore();
         ModelCopyManager copyManager = new ModelCopyManager();
         SpdxDocument result;
-        String documentUri;
         try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
         {
-            documentUri = modelStore.deSerialize( is, false );
-            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+            result = (SpdxDocument)modelStore.deSerialize( is, false );
         }
         List<String> warnings = result.verify();
         assertEquals( 0, warnings.size() );
@@ -140,9 +142,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Document Comment", result.getComment().get() );
         // documentAnnotations
         assertEquals( 2, result.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation1 = null;
-        org.spdx.library.model.Annotation annotation2 = null;
-        for ( org.spdx.library.model.Annotation annotation : result.getAnnotations() )
+        org.spdx.library.model.v2.Annotation annotation1 = null;
+        org.spdx.library.model.v2.Annotation annotation2 = null;
+        for ( org.spdx.library.model.v2.Annotation annotation : result.getAnnotations() )
         {
             if ( annotation.getComment().equals( "Annotation1" ) )
             {
@@ -188,16 +190,16 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         SpdxPackage pkg = (SpdxPackage) described;
         // packageAnnotations
         assertEquals( 1, pkg.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
+        org.spdx.library.model.v2.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.v2.Annotation [pkg.getAnnotations().size()] )[0];
         assertEquals( "PackageAnnotation", annotation.getComment() );
         assertEquals( "2015-01-29T18:30:22Z", annotation.getAnnotationDate() );
         assertEquals( "Person:Test Package Person", annotation.getAnnotator() );
         assertEquals( AnnotationType.REVIEW, annotation.getAnnotationType() );
         //licenseDeclared
-        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseById( "BSD-2-Clause" );
+        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-2-Clause" );
         assertEquals( licenseDeclared, pkg.getLicenseDeclared() );
         //licenseConcluded
-        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseById( "BSD-3-Clause" );
+        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-3-Clause" );
         assertEquals( licenseConcluded, pkg.getLicenseConcluded() );
         //licenseComments
         assertEquals( "License comments", pkg.getLicenseComments().get() );
@@ -277,7 +279,8 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         }
         assertEquals( 0, filePaths.size() );
         List<SpdxSnippet> snippets = new ArrayList<>();
-        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxSnippet.class ).forEach( (snippet) -> {
+        SpdxModelFactory.getSpdxObjects( modelStore, copyManager, SpdxConstantsCompatV2.CLASS_SPDX_SNIPPET, 
+                                         null, result.getIdPrefix() ).forEach( (snippet) -> {
             snippets.add( (SpdxSnippet)snippet );
         });
         assertEquals( 2, snippets.size() );
@@ -287,10 +290,10 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments().get() );
         assertEquals( "SnippetName", snippets.get( 0 ).getName().get() );
         assertEquals( "1231:3442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
         assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
         assertEquals( "BSD-2-Clause-FreeBSD", snippets.get( 0 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 0 ).getLicenseInfoFromFiles().size()] )[0].toString() );
-        assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
+        assertEquals( "44:55", TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
 
         assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment().get() );
@@ -298,11 +301,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments().get() );
         assertEquals( "SnippetName2", snippets.get( 1 ).getName().get() );
         assertEquals( "31231:33442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
         assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );
         assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 1 ).getLicenseInfoFromFiles().size()] )[0].toString() );
         assertEquals( "444:554",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
     }
@@ -326,11 +329,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
         ModelCopyManager copyManager = new ModelCopyManager();
         SpdxDocument result;
-        String documentUri;
         try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
         {
-            documentUri = modelStore.deSerialize( is, false );
-            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+            result = (SpdxDocument)modelStore.deSerialize( is, false );
         }
         List<String> warnings = result.verify();
         assertEquals( 0, warnings.size() );
@@ -384,9 +385,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Document Comment", result.getComment().get() );
         // documentAnnotations
         assertEquals( 2, result.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation1 = null;
-        org.spdx.library.model.Annotation annotation2 = null;
-        for ( org.spdx.library.model.Annotation annotation : result.getAnnotations() )
+        org.spdx.library.model.v2.Annotation annotation1 = null;
+        org.spdx.library.model.v2.Annotation annotation2 = null;
+        for ( org.spdx.library.model.v2.Annotation annotation : result.getAnnotations() )
         {
             if ( annotation.getComment().equals( "Annotation1" ) )
             {
@@ -434,16 +435,16 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "org.spdx:spdx maven plugin test", pkg.getName().get() );
         // packageAnnotations
         assertEquals( 1, pkg.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
+        org.spdx.library.model.v2.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.v2.Annotation [pkg.getAnnotations().size()] )[0];
         assertEquals( "PackageAnnotation", annotation.getComment() );
         assertEquals( "2015-01-29T18:30:22Z", annotation.getAnnotationDate() );
         assertEquals( "Person:Test Package Person", annotation.getAnnotator() );
         assertEquals( AnnotationType.REVIEW, annotation.getAnnotationType() );
         //licenseDeclared
-        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseById( "BSD-2-Clause" );
+        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-2-Clause" );
         assertEquals( licenseDeclared, pkg.getLicenseDeclared() );
         //licenseConcluded
-        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseById( "BSD-3-Clause" );
+        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-3-Clause" );
         assertEquals( licenseConcluded, pkg.getLicenseConcluded() );
         //licenseComments
         assertEquals( "License comments", pkg.getLicenseComments().get() );
@@ -523,7 +524,8 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         }
         assertEquals( 0, filePaths.size() );
         List<SpdxSnippet> snippets = new ArrayList<>();
-        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxSnippet.class ).forEach( (snippet) -> {
+        SpdxModelFactory.getSpdxObjects( modelStore, copyManager, SpdxConstantsCompatV2.CLASS_SPDX_SNIPPET, 
+                                         null, result.getIdPrefix() ).forEach( (snippet) -> {
             snippets.add( (SpdxSnippet)snippet );
         });
         assertEquals( 2, snippets.size() );
@@ -533,10 +535,10 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments().get() );
         assertEquals( "SnippetName", snippets.get( 0 ).getName().get() );
         assertEquals( "1231:3442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
         assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
         assertEquals( "BSD-2-Clause-FreeBSD", snippets.get( 0 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 0 ).getLicenseInfoFromFiles().size()] )[0].toString() );
-        assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
+        assertEquals( "44:55", TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
 
         assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment().get() );
@@ -544,11 +546,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments().get() );
         assertEquals( "SnippetName2", snippets.get( 1 ).getName().get() );
         assertEquals( "31231:33442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
         assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );
         assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 1 ).getLicenseInfoFromFiles().size()] )[0].toString() );
         assertEquals( "444:554",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
     }
@@ -572,11 +574,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
         ModelCopyManager copyManager = new ModelCopyManager();
         SpdxDocument result;
-        String documentUri;
         try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
         {
-            documentUri = modelStore.deSerialize( is, false );
-            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+            result = (SpdxDocument)modelStore.deSerialize( is, false );
         }
         List<String> warnings = result.verify();
         assertEquals( 0, warnings.size() );
@@ -630,9 +630,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Document Comment", result.getComment().get() );
         // documentAnnotations
         assertEquals( 2, result.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation1 = null;
-        org.spdx.library.model.Annotation annotation2 = null;
-        for ( org.spdx.library.model.Annotation annotation : result.getAnnotations() )
+        org.spdx.library.model.v2.Annotation annotation1 = null;
+        org.spdx.library.model.v2.Annotation annotation2 = null;
+        for ( org.spdx.library.model.v2.Annotation annotation : result.getAnnotations() )
         {
             if ( annotation.getComment().equals( "Annotation1" ) )
             {
@@ -680,16 +680,16 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Test SPDX Plugin", pkg.getName().get() );
         // packageAnnotations
         assertEquals( 1, pkg.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
+        org.spdx.library.model.v2.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.v2.Annotation [pkg.getAnnotations().size()] )[0];
         assertEquals( "PackageAnnotation", annotation.getComment() );
         assertEquals( "2015-01-29T18:30:22Z", annotation.getAnnotationDate() );
         assertEquals( "Person:Test Package Person", annotation.getAnnotator() );
         assertEquals( AnnotationType.REVIEW, annotation.getAnnotationType() );
         //licenseDeclared
-        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseById( "BSD-2-Clause" );
+        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-2-Clause" );
         assertEquals( licenseDeclared, pkg.getLicenseDeclared() );
         //licenseConcluded
-        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseById( "BSD-3-Clause" );
+        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-3-Clause" );
         assertEquals( licenseConcluded, pkg.getLicenseConcluded() );
         //licenseComments
         assertEquals( "License comments", pkg.getLicenseComments().get() );
@@ -769,7 +769,8 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         }
         assertEquals( 0, filePaths.size() );
         List<SpdxSnippet> snippets = new ArrayList<>();
-        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxSnippet.class ).forEach( (snippet) -> {
+        SpdxModelFactory.getSpdxObjects( modelStore, copyManager, SpdxConstantsCompatV2.CLASS_SPDX_SNIPPET, 
+                                         null, result.getIdPrefix() ).forEach( (snippet) -> {
             snippets.add( (SpdxSnippet)snippet );
         });
         assertEquals( 2, snippets.size() );
@@ -779,10 +780,10 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments().get() );
         assertEquals( "SnippetName", snippets.get( 0 ).getName().get() );
         assertEquals( "1231:3442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
         assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
         assertEquals( "BSD-2-Clause-FreeBSD", snippets.get( 0 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 0 ).getLicenseInfoFromFiles().size()] )[0].toString() );
-        assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
+        assertEquals( "44:55", TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
 
         assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment().get() );
@@ -790,11 +791,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments().get() );
         assertEquals( "SnippetName2", snippets.get( 1 ).getName().get() );
         assertEquals( "31231:33442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
         assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );
         assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 1 ).getLicenseInfoFromFiles().size()] )[0].toString() );
         assertEquals( "444:554",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
     }
@@ -852,20 +853,18 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         File artifactFile = getTestFile(
                 "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.rdf.xml" );
         assertTrue( artifactFile.exists() );
-        ISerializableModelStore modelStore = new RdfStore();
-        ModelCopyManager copyManager = new ModelCopyManager();
-        SpdxDocument result;
-        String documentUri;
-        try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
-        {
-            documentUri = modelStore.deSerialize( is, false );
-            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+        try ( ISerializableModelStore modelStore = new RdfStore() ) {
+            SpdxDocument result;
+            try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
+            {
+                result = (SpdxDocument)modelStore.deSerialize( is, false );
+            }
+            List<String> warnings = result.verify();
+            assertEquals( 0, warnings.size() );
+            // Test configuration parameters found in the test resources pom.xml file
+            // Document namespace
+            assertEquals( "spdx://sbom.foobar.dev/2.3/test-package-1.1.0", result.getDocumentUri() );
         }
-        List<String> warnings = result.verify();
-        assertEquals( 0, warnings.size() );
-        // Test configuration parameters found in the test resources pom.xml file
-        // Document namespace
-        assertEquals( "spdx://sbom.foobar.dev/2.3/test-package-1.1.0", result.getDocumentUri() );
     }
     
     @Test
@@ -888,11 +887,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         ISerializableModelStore modelStore = new RdfStore();
         ModelCopyManager copyManager = new ModelCopyManager();
         SpdxDocument result;
-        String documentUri;
         try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
         {
-            documentUri = modelStore.deSerialize( is, false );
-            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+            result = (SpdxDocument)modelStore.deSerialize( is, false );
         }
         List<String> warnings = result.verify();
         assertEquals( 0, warnings.size() );
@@ -946,9 +943,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Document Comment", result.getComment().get() );
         // documentAnnotations
         assertEquals( 2, result.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation1 = null;
-        org.spdx.library.model.Annotation annotation2 = null;
-        for ( org.spdx.library.model.Annotation annotation : result.getAnnotations() )
+        org.spdx.library.model.v2.Annotation annotation1 = null;
+        org.spdx.library.model.v2.Annotation annotation2 = null;
+        for ( org.spdx.library.model.v2.Annotation annotation : result.getAnnotations() )
         {
             if ( annotation.getComment().equals( "Annotation1" ) )
             {
@@ -994,16 +991,16 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         SpdxPackage pkg = (SpdxPackage) described;
         // packageAnnotations
         assertEquals( 1, pkg.getAnnotations().size() );
-        org.spdx.library.model.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.Annotation [pkg.getAnnotations().size()] )[0];
+        org.spdx.library.model.v2.Annotation annotation = pkg.getAnnotations().toArray( new org.spdx.library.model.v2.Annotation [pkg.getAnnotations().size()] )[0];
         assertEquals( "PackageAnnotation", annotation.getComment() );
         assertEquals( "2015-01-29T18:30:22Z", annotation.getAnnotationDate() );
         assertEquals( "Person:Test Package Person", annotation.getAnnotator() );
         assertEquals( AnnotationType.REVIEW, annotation.getAnnotationType() );
         //licenseDeclared
-        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseById( "BSD-2-Clause" );
+        AnyLicenseInfo licenseDeclared = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-2-Clause" );
         assertEquals( licenseDeclared, pkg.getLicenseDeclared() );
         //licenseConcluded
-        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseById( "BSD-3-Clause" );
+        AnyLicenseInfo licenseConcluded = LicenseInfoFactory.getListedLicenseByIdCompatV2( "BSD-3-Clause" );
         assertEquals( licenseConcluded, pkg.getLicenseConcluded() );
         //licenseComments
         assertEquals( "License comments", pkg.getLicenseComments().get() );
@@ -1081,7 +1078,8 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         }
         assertEquals( 0, filePaths.size() );
         List<SpdxSnippet> snippets = new ArrayList<>();
-        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxSnippet.class ).forEach( (snippet) -> {
+        SpdxModelFactory.getSpdxObjects( modelStore, copyManager, SpdxConstantsCompatV2.CLASS_SPDX_SNIPPET, 
+                                         null, result.getIdPrefix() ).forEach( (snippet) -> {
             snippets.add( (SpdxSnippet)snippet );
         });
         assertEquals( 2, snippets.size() );
@@ -1091,10 +1089,10 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet License Comment", snippets.get( 0 ).getLicenseComments().get() );
         assertEquals( "SnippetName", snippets.get( 0 ).getName().get() );
         assertEquals( "1231:3442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getByteRange() ) );
         assertEquals( "BSD-2-Clause", snippets.get( 0 ).getLicenseConcluded().toString() );
         assertEquals( "BSD-2-Clause-FreeBSD", snippets.get( 0 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 0 ).getLicenseInfoFromFiles().size()] )[0].toString() );
-        assertEquals( "44:55", TestSpdxFileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
+        assertEquals( "44:55", TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 0 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 0 ).getSnippetFromFile().getId() );
 
         assertEquals( "Snippet Comment2", snippets.get( 1 ).getComment().get() );
@@ -1102,11 +1100,11 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "Snippet2 License Comment", snippets.get( 1 ).getLicenseComments().get() );
         assertEquals( "SnippetName2", snippets.get( 1 ).getName().get() );
         assertEquals( "31231:33442",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getByteRange() ) );
         assertEquals( "MITNFA", snippets.get( 1 ).getLicenseConcluded().toString() );
         assertEquals( "LicenseRef-testLicense", snippets.get( 1 ).getLicenseInfoFromFiles().toArray( new AnyLicenseInfo[snippets.get( 1 ).getLicenseInfoFromFiles().size()] )[0].toString() );
         assertEquals( "444:554",
-                TestSpdxFileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
+                TestSpdxV2FileCollector.startEndPointerToString( snippets.get( 1 ).getLineRange().get() ) );
         assertEquals( fileWithSnippet, snippets.get( 1 ).getSnippetFromFile().getId() );
         //TODO Test dependencies
     }
@@ -1130,11 +1128,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         ISerializableModelStore modelStore = new MultiFormatStore( new InMemSpdxStore(), Format.JSON );
         ModelCopyManager copyManager = new ModelCopyManager();
         SpdxDocument result;
-        String documentUri;
         try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
         {
-            documentUri = modelStore.deSerialize( is, false );
-            result = new SpdxDocument( modelStore, documentUri, copyManager, false );
+            result = (SpdxDocument)modelStore.deSerialize( is, false );
         }
         List<String> warnings = result.verify();
         assertEquals( 0, warnings.size() );
@@ -1143,8 +1139,9 @@ public class TestSpdxMojo extends AbstractMojoTestCase
         assertEquals( "http://spdx.org/documents/spdx%20toolsv2.0%20rc1", result.getDocumentUri() );
         // purls
         List<SpdxPackage> packages = new ArrayList<>();
-        SpdxModelFactory.getElements( modelStore, documentUri, copyManager, SpdxPackage.class ).forEach( (pkg) -> {
-            packages.add( (SpdxPackage)pkg );
+        SpdxModelFactory.getSpdxObjects( modelStore, copyManager, SpdxConstantsCompatV2.CLASS_SPDX_PACKAGE, 
+                                         null, result.getIdPrefix() ).forEach( (pkg) -> {
+                                             packages.add( (SpdxPackage)pkg );
         });
         for ( SpdxPackage pkg : packages ) {
             Collection<ExternalRef> externalRefs = pkg.getExternalRefs();

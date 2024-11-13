@@ -290,7 +290,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                         .setFrom( retval )
                         .addTo( concludedLicense )
-                        .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
+                        .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
+                        .build();
         
         final AnyLicenseInfo declaredLicense = LicenseInfoFactory
                         .parseSPDXLicenseString( snippet.getLicenseInfoInSnippet(), spdxFile.getModelStore(), 
@@ -299,7 +300,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                         .setFrom( retval )
                         .addTo( declaredLicense )
-                        .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE );
+                        .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
+                        .build();
         return retval;
     }
 
@@ -379,7 +381,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    throw new SpdxCollectionException( "Error creating SPDX file - unable to create a license set", e );
+                    LOG.error( "Invalid license expressions found in source file "+file.getName(), e );
                 }
                 if ( licenseComment == null )
                 {
@@ -467,12 +469,14 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                                         .setFrom( retval )
                                         .addTo( concludedLicense )
-                                        .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
+                                        .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
+                                        .build();
             retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
                                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                                         .setFrom( retval )
-                                        .addTo( concludedLicense )
-                                        .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE );
+                                        .addTo( license )
+                                        .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
+                                        .build();
         }
         catch ( InvalidSPDXAnalysisException e )
         {
