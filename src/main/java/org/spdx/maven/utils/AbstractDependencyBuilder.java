@@ -8,6 +8,9 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -93,8 +96,12 @@ public abstract class AbstractDependencyBuilder
      * @param versionFilter Optional (nullable) version - if present, only return file formats that support the filter version
      * @return SPDX file using the SPDX naming conventions if it exists, otherwise return null
      */
-    protected File artifactFileToSpdxFile( File file, SpdxMajorVersion versionFilter )
+    protected @Nullable File artifactFileToSpdxFile( @Nullable File file, @Nullable SpdxMajorVersion versionFilter )
     {
+        if ( Objects.isNull( file ) )
+        {
+            return null;
+        }
         for ( OutputFormat of: OutputFormat.values() )
         {
             if ( versionFilter == null || versionFilter.equals( of.getSpecVersion() ))
