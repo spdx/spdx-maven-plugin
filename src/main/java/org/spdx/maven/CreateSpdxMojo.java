@@ -58,6 +58,9 @@ import org.spdx.maven.utils.SpdxDocumentBuilder;
 import org.spdx.maven.utils.SpdxFileCollector;
 import org.spdx.maven.utils.SpdxProjectInformation;
 
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -496,6 +499,41 @@ public class CreateSpdxMojo extends AbstractMojo
     @Parameter( property = "spdx.generatePurls" )
     private boolean generatePurls = true;
 
+    /**
+     * If true, include system scope in dependency graph
+     * @since 0.8.0
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean includeSystemScope;
+
+    /**
+     * If true, include test scope in dependency graph
+     * @since 0.8.0
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean includeTestScope;
+
+    /**
+     * If true, include runtime scope in dependency graph
+     * @since 0.8.0
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean includeRuntimeScope;
+
+    /**
+     * If true, include provided scope in dependency graph
+     * @since 0.8.0
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean includeProvidedScope;
+
+    /**
+     * If true, include compile scope in dependency graph
+     * @since 0.8.0
+     */
+    @Parameter( defaultValue = "true" )
+    private boolean includeCompileScope;
+
     public void execute() throws MojoExecutionException
     {
         if ( skip )
@@ -670,7 +708,8 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
             request.setProject( mavenProject );
-            DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, null );
+            ArtifactFilter artifactFilter = getArtifactFilter();
+            DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, artifactFilter );
 
             retval.addMavenDependencies( mavenProjectBuilder, session, mavenProject, parentNode, builder.getProjectPackage() );
         }
@@ -1067,5 +1106,22 @@ public class CreateSpdxMojo extends AbstractMojo
             }
         }
         return algorithms;
+    }
+
+    /**
+     * Create an ArtifactFilter based on the provided scopes
+     */
+    private ArtifactFilter getArtifactFilter()
+    {
+        getLog().debug( "Creating Artifact filter" );
+        List<String> scopes = new ArrayList<>();
+        if (includeCompileScope) scopes.add("compile");
+        if (includeProvidedScope) scopes.add("provided");
+        if (includeRuntimeScope) scopes.add("runtime");
+        if (includeSystemScope) scopes.add("system");
+        if (includeTestScope) scopes.add("test");
+        
+        getLog().debug( scopes.toString() );
+        return new CumulativeScopeArtifactFilter(scopes);
     }
 }
