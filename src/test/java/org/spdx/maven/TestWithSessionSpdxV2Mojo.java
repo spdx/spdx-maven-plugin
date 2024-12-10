@@ -98,6 +98,37 @@ public class TestWithSessionSpdxV2Mojo extends AbstractMojoTestCase
     assertTrue( relationships.contains( "junit->hamcrest-core" ) || relationships.contains( "junit->org.hamcrest:hamcrest-core" ) );
   }
 
+  @Test
+  public void testDependenciesExclTestScope() throws Exception
+  {
+    File pom = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/json-pom-dependencies-excl-test.xml" );
+    SpdxDocument result = runMojoWithPom( pom );
+
+    Set<String> packages = new HashSet<>();
+    Set<String> relationships = new HashSet<>();
+    SpdxModelFactory.getElements( result.getModelStore(), result.getDocumentUri(), result.getCopyManager(), SpdxPackage.class )
+        .forEach( ( element ) -> {
+          SpdxPackage pkg = (SpdxPackage) element;
+          try
+          {
+            packages.add( pkg.getName().get() );
+
+            for ( Relationship rel : pkg.getRelationships() )
+            {
+              relationships.add( pkg.getName().get() + "->" + rel.getRelatedSpdxElement().get().getName().get() );
+            }
+          }
+          catch ( InvalidSPDXAnalysisException e )
+          {
+            throw new RuntimeException( e );
+          }
+        });
+
+    assertTrue( packages.contains( "org.spdx:spdx-maven-plugin-test" ) );
+    assertFalse( packages.contains( "junit" ) );
+    assertFalse( packages.contains( "hamcrest-core" ) || packages.contains( "org.hamcrest:hamcrest-core" ) );
+  }
+
   // -- Configure mojo loader
 
   private SpdxDocument runMojoWithPom( File pom ) throws Exception
