@@ -57,26 +57,26 @@ public class SnippetInfo
         LOG.debug( "Snippet information follows:" );
         if ( this.name != null )
         {
-            LOG.debug( "Name: " + this.name );
+            LOG.debug( "Name: {}", this.name );
         }
-        LOG.debug( "Byte range: " + this.byteRange );
+        LOG.debug( "Byte range: {}", this.byteRange );
         if ( this.comment != null )
         {
-            LOG.debug( "Comment: " + this.comment );
+            LOG.debug( "Comment: {}", this.comment );
         }
-        LOG.debug( "Concluded license: " + this.concludedLicense );
+        LOG.debug( "Concluded license: {}", this.concludedLicense );
         if ( this.copyrightText != null )
         {
-            LOG.debug( "Copyright: " + this.copyrightText );
+            LOG.debug( "Copyright: {}", this.copyrightText );
         }
         if ( this.licenseComment != null )
         {
-            LOG.debug( "License comment: " + this.licenseComment );
+            LOG.debug( "License comment: {}", this.licenseComment );
         }
-        LOG.debug( "License info in Snippet: " + this.licenseInfoInSnippet );
+        LOG.debug( "License info in Snippet: {}", this.licenseInfoInSnippet );
         if ( this.lineRange != null )
         {
-            LOG.debug( "Line range: " + this.lineRange );
+            LOG.debug( "Line range: {}", this.lineRange );
         }
     }
 

@@ -338,21 +338,21 @@ public class SpdxProjectInformation
         if ( !LOG.isDebugEnabled() ) {
             return;
         }
-        LOG.debug( "SPDX Project Name: " + this.getName() );
-        LOG.debug( "SPDX Document comment: " + this.getDocumentComment() );
-        LOG.debug( "SPDX Creator comment: " + this.getCreatorComment() );
-        LOG.debug( "SPDX Description: " + this.getDescription() );
-        LOG.debug( "SPDX License comment: " + this.getLicenseComment() );
-        LOG.debug( "SPDX Originator: " + this.getOriginator() );
-        LOG.debug( "SPDX PackageArchiveFileName: " + this.getPackageArchiveFileName() );
-        LOG.debug( "SPDX Short description: " + this.getShortDescription() );
-        LOG.debug( "SPDX Supplier: " + this.getSupplier() );
-        LOG.debug( "SPDX Source Info:  " + this.getSourceInfo() );
-        LOG.debug( "SPDX Version info: " + this.getVersionInfo() );
-        LOG.debug( "SPDX Concluded license: " + this.getConcludedLicense().toString() );
-        LOG.debug( "SPDX Declared license: " + this.getDeclaredLicense().toString() );
-        LOG.debug( "SPDX Download URL: " + this.getDownloadUrl() );
-        LOG.debug( "SPDX Home page: " + this.getHomePage() );
+        LOG.debug("SPDX Project Name: {}", this.getName());
+        LOG.debug("SPDX Document comment: {}", this.getDocumentComment());
+        LOG.debug("SPDX Creator comment: {}", this.getCreatorComment());
+        LOG.debug("SPDX Description: {}", this.getDescription());
+        LOG.debug("SPDX License comment: {}", this.getLicenseComment());
+        LOG.debug("SPDX Originator: {}", this.getOriginator());
+        LOG.debug("SPDX PackageArchiveFileName: {}", this.getPackageArchiveFileName());
+        LOG.debug("SPDX Short description: {}", this.getShortDescription());
+        LOG.debug("SPDX Supplier: {}", this.getSupplier());
+        LOG.debug("SPDX Source Info:  {}", this.getSourceInfo());
+        LOG.debug("SPDX Version info: {}", this.getVersionInfo());
+        LOG.debug("SPDX Concluded license: {}", this.getConcludedLicense());
+        LOG.debug("SPDX Declared license: {}", this.getDeclaredLicense());
+        LOG.debug("SPDX Download URL: {}", this.getDownloadUrl());
+        LOG.debug("SPDX Home page: {}", this.getHomePage());
         if ( this.documentAnnotations != null && this.documentAnnotations.length > 0 )
         {
             LOG.debug( "Document annotations: " );
@@ -373,22 +373,21 @@ public class SpdxProjectInformation
         {
             for ( String creator : creators )
             {
-                LOG.debug( "SPDX Creator: " + creator );
+                LOG.debug("SPDX Creator: {}", creator);
             }
         }
         if ( this.externalRefs != null )
         {
             for ( ExternalReference externalReference : externalRefs )
             {
-                LOG.debug( String.format( "External Ref: %s %s %s", externalReference.getCategory(), 
-                                          externalReference.getType(), externalReference.getLocator()) );
+                LOG.debug("External Ref: {} {} {}", externalReference.getCategory(), externalReference.getType(), externalReference.getLocator());
             }
         }
-        if ( checksums != null && checksums.size() > 0 )
+        if ( checksums != null && !checksums.isEmpty())
         {
             for ( Checksum checksum : checksums )
             {
-                LOG.debug( "SPDX " +  checksum.getAlgorithm() + ": " + checksum.getValue() );
+                LOG.debug("SPDX {}: {}", checksum.getAlgorithm(), checksum.getValue());
             }
         }
     }

@@ -67,7 +67,7 @@ public class SpdxSourceFileParser
             String matchingLine = match.group( 1 ).trim();
             if ( matchingLine.startsWith( "(" ) )
             {
-                // This could be a multi-line expression, so we need to parse until we get to the last )
+                // This could be a multi-line expression, so we need to parse until we get to the last ")"
                 int parenCount = 1;
                 StringBuilder sb = new StringBuilder( "(" );
                 pos = match.start( 1 ) + 1;

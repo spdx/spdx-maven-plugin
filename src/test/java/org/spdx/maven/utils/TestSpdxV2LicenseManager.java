@@ -104,7 +104,7 @@ public class TestSpdxV2LicenseManager
     public void testLicenseManager() throws LicenseMapperException
     {
         @SuppressWarnings( "unused" )
-        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc, false );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
     }
 
     /**
@@ -118,7 +118,7 @@ public class TestSpdxV2LicenseManager
     @Test
     public void testAddNonStandardLicense() throws MalformedURLException, LicenseManagerException, InvalidSPDXAnalysisException, LicenseMapperException
     {
-        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc, false );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
         NonStandardLicense lic = new NonStandardLicense();
         final String COMMENT = "comment";
         final String[] CROSS_REF_STR = new String[] {"http://www.licenseRef1", "http://www.licenseref2"};
@@ -186,7 +186,7 @@ public class TestSpdxV2LicenseManager
         licenseList.add( apache );
         licenseList.add( apsl );
 
-        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc, true );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
 
         AnyLicenseInfo result = licenseManager.mavenLicenseListToSpdxLicense( licenseList );
         assertTrue( result instanceof ConjunctiveLicenseSet );
@@ -226,7 +226,7 @@ public class TestSpdxV2LicenseManager
         License apache = new License();
         apache.setName( LICENSE1_NAME );
         apache.setUrl( APACHE_CROSS_REF_URL2 );
-        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc, true );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
 
         AnyLicenseInfo result = licenseManager.mavenLicenseToSpdxLicense( apache );
         assertTrue( result instanceof SpdxListedLicense );
@@ -271,7 +271,7 @@ public class TestSpdxV2LicenseManager
     @Test
     public void testSpdxLicenseToMavenLicense() throws LicenseManagerException, LicenseMapperException, InvalidSPDXAnalysisException
     {
-        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc, false );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
         // standard license
         AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_LICENSE_ID );
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );

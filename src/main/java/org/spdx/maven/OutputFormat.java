@@ -35,8 +35,8 @@ public enum OutputFormat
     private final String fileType;
     private final SpdxMajorVersion specVersion;
 
-    private OutputFormat(final String value, final String artifactType, final String fileType,
-                         final SpdxMajorVersion specVersion)
+    OutputFormat( final String value, final String artifactType, final String fileType,
+                  final SpdxMajorVersion specVersion )
     {
         this.value = value;
         this.artifactType = artifactType;

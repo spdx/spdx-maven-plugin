@@ -27,7 +27,7 @@ import org.spdx.maven.OutputFormat;
 
 /**
  * Contains information about package dependencies collected from the Maven dependencies.
- * 
+ * <p>
  * Subclasses implement dependency information specific to SPDX spec major versions
  * 
  * @author Gary O'Neall
@@ -107,7 +107,7 @@ public abstract class AbstractDependencyBuilder
             if ( versionFilter == null || versionFilter.equals( of.getSpecVersion() ))
             {
                 File retval = getFileWithDifferentType( file, of.getFileType() );
-                if ( retval != null && retval.exists() )  {
+                if ( retval.exists() )  {
                     return retval;
                 }
             }
@@ -131,8 +131,7 @@ public abstract class AbstractDependencyBuilder
             filePath = filePath.substring( 0, indexOfDot + 1 );
         }
         filePath = filePath + type;
-        File retval = new File( filePath );
-        return retval;
+        return new File( filePath );
     }
     
     private void logDependencies( List<DependencyNode> dependencies )
@@ -157,15 +156,14 @@ public abstract class AbstractDependencyBuilder
             Artifact dependency = node.getArtifact();
             String filePath = dependency.getFile() != null ? dependency.getFile().getAbsolutePath() : "[NONE]";
             String scope = dependency.getScope() != null ? dependency.getScope() : "[NONE]";
-            LOG.debug(
-                "ArtifactId: " + dependency.getArtifactId() + ", file path: " + filePath + ", Scope: " + scope );
+            LOG.debug("ArtifactId: {}, file path: {}, Scope: {}", dependency.getArtifactId(), filePath, scope);
         }
     }
     
     /**
      * Make an external document reference ID valid by replacing any invalid characters with dashes
      *
-     * @param externalRefId
+     * @param externalRefId ID for external reference
      * @return valid external ref ID
      */
     protected String fixExternalRefId( String externalRefId )

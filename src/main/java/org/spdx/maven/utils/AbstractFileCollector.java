@@ -13,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -28,7 +27,7 @@ import org.spdx.maven.Checksum;
 
 /**
  * Collects SPDX file information from directories.
- * 
+ * <p>
  * Concrete subclasses implement specific SPDX spec specific formats
  *
  * @author Gary O'Neall
@@ -77,26 +76,19 @@ public abstract class AbstractFileCollector
                 return;
             }
             prop.load( is );
-            Iterator<Entry<Object, Object>> iter = prop.entrySet().iterator();
-            while ( iter.hasNext() ) 
-            {
-                Entry<Object, Object> entry = iter.next();
-                String fileTypeStr = (String)entry.getKey();
-                FileType fileType = FileType.valueOf( fileTypeStr );
-                String[] extensions = ((String)entry.getValue()).split( "," );
-                for ( String extension:extensions )
-                {
-                    try
-                    {
+            for (Entry<Object, Object> entry : prop.entrySet()) {
+                String fileTypeStr = (String) entry.getKey();
+                FileType fileType = FileType.valueOf(fileTypeStr);
+                String[] extensions = ((String) entry.getValue()).split(",");
+                for (String extension : extensions) {
+                    try {
                         String trimmedExtension = extension.toUpperCase().trim();
-                        if ( EXT_TO_FILE_TYPE.containsKey( trimmedExtension ) )
-                        {
-                            LOG.warn( "Duplicate file extension: "+trimmedExtension );
+                        if (EXT_TO_FILE_TYPE.containsKey(trimmedExtension)) {
+                            LOG.warn("Duplicate file extension: {}", trimmedExtension);
                         }
-                        EXT_TO_FILE_TYPE.put( trimmedExtension, fileType );
-                    }
-                    catch ( Exception ex ) {
-                        LOG.error( "Error adding file extensions to filetype map", ex );
+                        EXT_TO_FILE_TYPE.put(trimmedExtension, fileType);
+                    } catch (Exception ex) {
+                        LOG.error("Error adding file extensions to filetype map", ex);
                     }
                 }
             }
@@ -123,7 +115,7 @@ public abstract class AbstractFileCollector
     }
     
     /**
-     * @param fileTypes
+     * @param fileTypes list of file types for the file
      * @return true if the fileTypes contain a source file type
      */
     protected boolean isSourceFile( Collection<FileType> fileTypes )
@@ -143,7 +135,7 @@ public abstract class AbstractFileCollector
      *
      * @param filePath system specific file path relative to the top of the archive root to the top of the archive
      *                 directory where the file is stored.
-     * @return
+     * @return valid SPDX file name per the spec
      */
     public String convertFilePathToSpdxFileName( String filePath )
     {
@@ -164,8 +156,8 @@ public abstract class AbstractFileCollector
     /**
      * Converts an array of bytes to a string compliant with the SPDX sha1 representation
      *
-     * @param digestBytes
-     * @return
+     * @param digestBytes result of a checksum digest calculation
+     * @return string representation of the checksum per the SPDX specification
      */
     public static String convertChecksumToString( byte[] digestBytes )
     {
@@ -187,10 +179,9 @@ public abstract class AbstractFileCollector
      * {@code SpdxFileCollector.generateChecksum(file, "SHA-1")}.
      *
      * @param file file to generate checksum for
-     * @param builder Builder for the SPDX document that will contain the checksum
      * @return SHA1 checksum of the input file
      * @throws SpdxCollectionException if the algorithm is unavailable or the file cannot be read
-     * @throws InvalidSPDXAnalysisException 
+     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
     public static Checksum generateSha1( File file ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
@@ -206,7 +197,7 @@ public abstract class AbstractFileCollector
      * @param algorithms algorithms to generate the checksums
      * @return {@code Set} of checksums for file using each algorithm specified
      * @throws SpdxCollectionException if the input algorithm is invalid or unavailable or if the file cannot be read
-     * @throws InvalidSPDXAnalysisException 
+     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
     public static Set<Checksum> generateChecksum( File file, Set<String> algorithms ) throws SpdxCollectionException, InvalidSPDXAnalysisException
     {

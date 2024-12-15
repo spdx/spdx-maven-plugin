@@ -37,7 +37,7 @@ public class SpdxCollectionException extends Exception
     }
 
     /**
-     * @param message
+     * @param message message
      */
     public SpdxCollectionException( String message )
     {
@@ -45,7 +45,7 @@ public class SpdxCollectionException extends Exception
     }
 
     /**
-     * @param cause
+     * @param cause inner exception
      */
     public SpdxCollectionException( Throwable cause )
     {
@@ -53,8 +53,8 @@ public class SpdxCollectionException extends Exception
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message message
+     * @param cause   inner exception
      */
     public SpdxCollectionException( String message, Throwable cause )
     {

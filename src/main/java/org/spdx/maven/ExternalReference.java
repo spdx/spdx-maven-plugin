@@ -20,10 +20,9 @@ package org.spdx.maven;
  * enumerations, asset identifiers, or downloadable content believed to be relevant to the Package.
  *
  * @author Gary O'Neall
- * @see ExternalRef
- * @see ReferenceType
- * @see ReferenceCategory
+ *
  */
+@SuppressWarnings("unused")
 public class ExternalReference
 {
     private String category;

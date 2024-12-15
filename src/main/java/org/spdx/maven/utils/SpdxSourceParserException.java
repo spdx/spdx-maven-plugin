@@ -18,39 +18,28 @@ public class SpdxSourceParserException extends Exception
     private static final long serialVersionUID = 1L;
 
     /**
-     * @param arg0
+     * @param msg message
      */
-    public SpdxSourceParserException( String arg0 )
+    public SpdxSourceParserException( String msg )
     {
-        super( arg0 );
+        super( msg );
     }
 
     /**
-     * @param arg0
+     * @param cause inner exception
      */
-    public SpdxSourceParserException( Throwable arg0 )
+    public SpdxSourceParserException( Throwable cause )
     {
-        super( arg0 );
+        super( cause );
     }
 
     /**
-     * @param arg0
-     * @param arg1
+     * @param msg message
+     * @param cause inner exception
      */
-    public SpdxSourceParserException( String arg0, Throwable arg1 )
+    public SpdxSourceParserException( String msg, Throwable cause )
     {
-        super( arg0, arg1 );
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @param arg3
-     */
-    public SpdxSourceParserException( String arg0, Throwable arg1, boolean arg2, boolean arg3 )
-    {
-        super( arg0, arg1, arg2, arg3 );
+        super( msg, cause );
     }
 
 }

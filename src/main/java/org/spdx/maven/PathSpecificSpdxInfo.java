@@ -24,6 +24,7 @@ import org.spdx.maven.utils.SpdxDefaultFileInformation;
  *
  * @author Gary O'Neall
  */
+@SuppressWarnings("unused")
 public class PathSpecificSpdxInfo
 {
     /**
@@ -82,7 +83,7 @@ public class PathSpecificSpdxInfo
      * or (d) NOASSERTION, if the SPDX file creator has not examined the contents of the actual file or the SPDX file
      * creator has intentionally provided no information (no meaning should be implied by doing so). For a license set,
      * when there is a choice between licenses (“disjunctive license”), they should be separated with “or” and enclosed
-     * in brackets. Similarly when multiple licenses need to be applied (“conjunctive license”), they should be
+     * in brackets. Similarly, when multiple licenses need to be applied (“conjunctive license”), they should be
      * separated with “and” and enclosed in parentheses.
      */
     private String licenseInformationInFile;
@@ -101,10 +102,8 @@ public class PathSpecificSpdxInfo
      * Get the default file information to be used with this file path
      *
      * @param defaults  Default file information to use if the parameter was not specified for this file path
-     * @param spdxDoc SPDX document containing any extracted license infos that may be needed for concluded or declared
-     *                  licenses
+
      * @return default file information to be used with this file path
-     * @throws InvalidSPDXAnalysisException 
      */
     public SpdxDefaultFileInformation getDefaultFileInformation( SpdxDefaultFileInformation defaults )
     {

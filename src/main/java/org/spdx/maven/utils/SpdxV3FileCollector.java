@@ -91,7 +91,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
 
     FileSetManager fileSetManager = new FileSetManager();
 
-    private List<DictionaryEntry> customIdToUri;
+    private final List<DictionaryEntry> customIdToUri;
 
     /**
      * SpdxFileCollector collects SPDX file information for files
@@ -114,7 +114,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
      * @param projectPackage          Package to which the files belong
      * @param spdxDoc                 SPDX document which contains the extracted license infos that may be needed for license parsing
      *
-     * @throws SpdxCollectionException
+     * @throws SpdxCollectionException on incompatible types in an SPDX collection
      */
     public void collectFiles( List<FileSet> fileSets, String baseDir, 
                               SpdxDefaultFileInformation defaultFileInformation, 
@@ -154,13 +154,13 @@ public class SpdxV3FileCollector extends AbstractFileCollector
     /**
      * Find the most appropriate file information based on the lowest level match (closed to file)
      *
-     * @param filePath
-     * @param pathSpecificInformation
-     * @return
+     * @param filePath                file path for possible file path specific information
+     * @param pathSpecificInformation information to be applied to the file path
+     * @return                        default SPDX parameters for a given file path or null if package level defaults are to be used
      */
     private SpdxDefaultFileInformation findDefaultFileInformation( String filePath, Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
     {
-        LOG.debug( "Checking for file path " + filePath );
+        LOG.debug( "Checking for file path {}", filePath );
         SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
         if ( retval != null )
         {
@@ -169,7 +169,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         }
         // see if any of the parent directories contain default information which should be used
         String parentPath = filePath;
-        int parentPathIndex = 0;
+        int parentPathIndex;
         do
         {
             parentPathIndex = parentPath.lastIndexOf( "/" );
@@ -181,7 +181,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         } while ( retval == null && parentPathIndex > 0 );
         if ( retval != null )
         {
-            LOG.debug( "Found directory containing file path for path specific information.  File path: " + parentPath );
+            LOG.debug( "Found directory containing file path for path specific information.  File path: {}", parentPath );
         }
         return retval;
     }
@@ -189,13 +189,13 @@ public class SpdxV3FileCollector extends AbstractFileCollector
     /**
      * Collect SPDX information for a specific file
      *
-     * @param file
+     * @param file             File to collect SPDX information for
      * @param outputFileName   Path to the output file name relative to the root of the output archive file
      * @param relationshipType Type of relationship to the project package
      * @param projectPackage   Package to which the files belong
      * @param spdxDoc          SPDX Document which will contain the files
      * @param algorithms       algorithms to use to generate checksums
-     * @throws SpdxCollectionException
+     * @throws SpdxCollectionException on incompatible types in an SPDX collection
      */
     private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, 
                               RelationshipType relationshipType, SpdxPackage projectPackage, 
@@ -306,13 +306,13 @@ public class SpdxV3FileCollector extends AbstractFileCollector
     }
 
     /**
-     * @param file
+     * @param file                   File to convert to an SPDX file from
      * @param outputFileName         Path to the output file name relative to the root of the output archive file
      * @param defaultFileInformation Information on default SPDX field data for the files
      * @param algorithms             algorithms to use to generate checksums
      * @param spdxDoc                SPDX document which will contain the SPDX file
-     * @return
-     * @throws SpdxCollectionException
+     * @return                       SPDX file based on file and default file information
+     * @throws SpdxCollectionException on incompatible class types in an SPDX collection
      */
     private SpdxFile convertToSpdxFile( File file, String outputFileName, 
                                         SpdxDefaultFileInformation defaultFileInformation, 
@@ -344,7 +344,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         {
             throw new SpdxCollectionException( "Unable to generate checksum for file "+file.getName() );
         }
-        AnyLicenseInfo concludedLicense = null;
+        AnyLicenseInfo concludedLicense;
         AnyLicenseInfo license = null;
         String licenseComment = defaultFileInformation.getLicenseComment();
         if ( SoftwarePurpose.SOURCE.equals( purpose ) && file.length() < SpdxSourceFileParser.MAXIMUM_SOURCE_FILE_LENGTH )
@@ -358,7 +358,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
             {
                 LOG.error( "Error parsing for SPDX license ID's", ex );
             }
-            if ( fileSpdxLicenses != null && fileSpdxLicenses.size() > 0 )
+            if ( fileSpdxLicenses != null && !fileSpdxLicenses.isEmpty() )
             {
                 // The file has declared licenses of the form SPDX-License-Identifier: licenseId
                 try
@@ -381,18 +381,21 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    LOG.error( "Invalid license expressions found in source file "+file.getName(), e );
+                    LOG.error( "Invalid license expressions found in source file {}", file.getName(), e );
                 }
                 if ( licenseComment == null )
                 {
                     licenseComment = "";
                 }
-                else if ( licenseComment.length() > 0 )
+                else if ( !licenseComment.isEmpty() )
                 {
                     licenseComment = licenseComment.concat( ";  " );
                 }
                 licenseComment = licenseComment.concat( "This file contains SPDX-License-Identifiers for " );
-                licenseComment = licenseComment.concat( license.toString() );
+                if ( license != null )
+                {
+                    licenseComment = licenseComment.concat( license.toString() );
+                }
             }
         }
         if ( license == null )
@@ -439,7 +442,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                     }
                     catch ( InvalidSPDXAnalysisException e )
                     {
-                        LOG.warn( "Error creating contributor "+contributor+" for file "+file+".  Skipping." );
+                        LOG.warn( "Error creating contributor {} for file {}.  Skipping.", contributor, file );
                     }
                 }
             }
@@ -447,7 +450,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
             contributors = new ArrayList<>();
         }
 
-        SpdxFile retval = null;
+        SpdxFile retval;
         //TODO: Add annotation
         try
         {

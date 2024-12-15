@@ -24,7 +24,7 @@ import org.spdx.storage.ISerializableModelStore;
 
 /**
  * Abstract class to create SPDX documents.
- * 
+ * <p>
  * Subclasses of this class implement specific SPDX specification versions of the document
  * 
  * @author Gary O'Neall
@@ -38,7 +38,6 @@ public abstract class AbstractDocumentBuilder
     protected boolean generatePurls;
     protected File spdxFile;
     protected OutputFormat outputFormatEnum;
-    protected boolean matchLicensesOnCrossReferenceUrls;
     protected ISerializableModelStore modelStore;
     protected ModelCopyManager copyManager;
     protected DateFormat format = new SimpleDateFormat( SpdxConstantsCompatV2.SPDX_DATE_FORMAT );
@@ -104,7 +103,7 @@ public abstract class AbstractDocumentBuilder
      * @param baseDir                     project base directory used to construct the relative paths for the SPDX
      *                                    files
      * @param pathSpecificInformation     Map of path to file information used to override the default file information
-     * @param algorithms                  algorithms to use to generate checksums
+     * @param checksumAlgorithms          algorithms to use to generate checksums
      * @throws SpdxBuilderException       on errors collecting files
      */
     public abstract void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
@@ -120,7 +119,7 @@ public abstract class AbstractDocumentBuilder
     public abstract void saveSpdxDocumentToFile() throws SpdxBuilderException;
 
     /**
-     * @param nonStandardLicenses
+     * @param nonStandardLicenses non standard licenses to add
      */
     public abstract void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses ) throws SpdxBuilderException;
 
