@@ -365,14 +365,16 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                 {
                     if ( fileSpdxLicenses.size() == 1 )
                     {
-                        license = LicenseInfoFactory.parseSPDXLicenseString( fileSpdxLicenses.get( 0 ) );
+                        license = LicenseInfoFactory.parseSPDXLicenseString( fileSpdxLicenses.get( 0 ),
+                                spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), customIdToUri );
                     }
                     else
                     {
                         Set<AnyLicenseInfo> licenseSet = new HashSet<>();
                         for ( String licenseExpression : fileSpdxLicenses )
                         {
-                            licenseSet.add( LicenseInfoFactory.parseSPDXLicenseString( licenseExpression ) );
+                            licenseSet.add( LicenseInfoFactory.parseSPDXLicenseString( licenseExpression,
+                                    spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), customIdToUri ) );
                         }
                         license = spdxDoc.createConjunctiveLicenseSet( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
                                         .addAllMember( licenseSet )
@@ -402,8 +404,10 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         {
             try
             {
-                license = LicenseInfoFactory.parseSPDXLicenseString( defaultFileInformation.getDeclaredLicense() );
-                concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultFileInformation.getConcludedLicense() );
+                license = LicenseInfoFactory.parseSPDXLicenseString( defaultFileInformation.getDeclaredLicense(),
+                        spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), customIdToUri );
+                concludedLicense = LicenseInfoFactory.parseSPDXLicenseString( defaultFileInformation.getConcludedLicense(),
+                        spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), customIdToUri );
             }
             catch ( InvalidSPDXAnalysisException e )
             {
