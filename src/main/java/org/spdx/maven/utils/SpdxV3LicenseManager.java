@@ -51,7 +51,7 @@ public class SpdxV3LicenseManager
      * SPDX document containing the license information collected.  All extracted licenses are added to the SPDX
      * document
      */
-    SpdxDocument spdxDoc = null;
+    SpdxDocument spdxDoc;
 
     /**
      * Maps URLs to SPDX license ID's.  The SPDX licenses could be an SPDX listed license or an extracted license.
@@ -68,11 +68,9 @@ public class SpdxV3LicenseManager
      * mapping uses the license URL to uniquely identify the licenses.
      *
      * @param spdxDoc                 SPDX document to add any extracted licenses
-     * @param useStdLicenseSourceUrls if true, map any SPDX listed license source URL to license ID.  Note: significant
-     *                                performance degradation
-     * @throws LicenseMapperException
+     * @throws LicenseMapperException on errors accessing SPDX listed or local licenses
      */
-    public SpdxV3LicenseManager( SpdxDocument spdxDoc, boolean useStdLicenseSourceUrls ) throws LicenseMapperException
+    public SpdxV3LicenseManager( SpdxDocument spdxDoc ) throws LicenseMapperException
     {
         this.spdxDoc = spdxDoc;
         initializeUrlMap();
@@ -81,7 +79,7 @@ public class SpdxV3LicenseManager
     /**
      * Initialize the URL map from the SPDX listed licenses
      *
-     * @throws LicenseMapperException
+     * @throws LicenseMapperException on errors accessing SPDX listed or local licenses
      */
     private void initializeUrlMap() throws LicenseMapperException
     {
@@ -92,8 +90,8 @@ public class SpdxV3LicenseManager
      * Add a non-listed license to the SPDX document.  Once added, the non-listed license can be referenced by the
      * license ID
      *
-     * @param license
-     * @throws LicenseManagerException
+     * @param license license to add to extracted license map
+     * @throws LicenseManagerException on errors accessing SPDX listed or local licenses
      */
     public void addExtractedLicense( NonStandardLicense license ) throws LicenseManagerException
     {
@@ -128,11 +126,9 @@ public class SpdxV3LicenseManager
                 if ( this.urlStringToSpdxLicenseId.containsKey( url ) )
                 {
                     String oldLicenseId = urlStringToSpdxLicenseId.get( url );
-                    LOG.warn(
-                            "Duplicate URL for SPDX extracted license.  Replacing " + oldLicenseId + " with "
-                                    + license.getLicenseId() + " for " + url );
+                    LOG.warn( "Duplicate URL for SPDX extracted license.  Replacing {} with {} for {}", oldLicenseId, license.getLicenseId(), url );
                 }
-                LOG.debug( "Adding URL mapping for non-standard license " + license.getLicenseId() );
+                LOG.debug( "Adding URL mapping for non-standard license {}", license.getLicenseId() );
                 this.urlStringToSpdxLicenseId.put( url, license.getLicenseId() );
             }
         }
@@ -145,8 +141,11 @@ public class SpdxV3LicenseManager
      * returned.  if a single license is supplied, the mapped SPDX license is returned.  If multiple licenses are
      * supplied, a conjunctive license is returned containing all mapped SPDX licenses.
      *
-     * @return
-     * @throws LicenseManagerException
+     * @return If no licenses are supplied, SpdxNoAssertion license is
+     *         returned.  if a single license is supplied, the mapped SPDX license is returned.
+     *         If multiple licenses are supplied, a conjunctive license is returned containing
+     *         all mapped SPDX licenses.
+     * @throws LicenseManagerException on errors accessing SPDX listed or local licenses
      */
     public AnyLicenseInfo mavenLicenseListToSpdxLicense( List<License> licenseList ) throws LicenseManagerException
     {
@@ -221,9 +220,9 @@ public class SpdxV3LicenseManager
     /**
      * Create a Maven license from the SPDX license
      *
-     * @param spdxLicense
-     * @return
-     * @throws LicenseManagerException
+     * @param spdxLicense source SPDX license to convert
+     * @return a Maven license from the SPDX license
+     * @throws LicenseManagerException thrown if no SPDX listed or extracted license exists with the same UR
      */
     public License spdxLicenseToMavenLicense( AnyLicenseInfo spdxLicense ) throws LicenseManagerException
     {
@@ -267,9 +266,7 @@ public class SpdxV3LicenseManager
             }
             if ( spdxLicense.getSeeAlsos().size() > 1 )
             {
-                LOG.warn(
-                        "SPDX license " + SpdxListedLicenseModelStore.objectUriToLicenseOrExceptionId( spdxLicense.getObjectUri() )
-                                + " contains multiple URLs.  Only the first URL will be preserved in the Maven license created." );
+                LOG.warn( "SPDX license {} contains multiple URLs.  Only the first URL will be preserved in the Maven license created.", SpdxListedLicenseModelStore.objectUriToLicenseOrExceptionId( spdxLicense.getObjectUri() ) );
             }
             return retval; 
         } catch ( InvalidSPDXAnalysisException e )
@@ -284,7 +281,8 @@ public class SpdxV3LicenseManager
         {
             License retval = new License();
             // license ID
-            String licenseId = spdxLicense.getObjectUri().substring( spdxLicense.getIdPrefix().length() );
+            int prefixLen = spdxLicense.getIdPrefix() == null ? 0 : spdxLicense.getIdPrefix().length();
+            String licenseId = spdxLicense.getObjectUri().substring( prefixLen );
             // name
             if ( spdxLicense.getName().isPresent() && !spdxLicense.getName().get().isEmpty() )
             {
@@ -305,9 +303,7 @@ public class SpdxV3LicenseManager
             }
             if ( spdxLicense.getSeeAlsos().size() > 1 )
             {
-                LOG.warn(
-                        "SPDX license " + licenseId
-                                + " contains multiple URLs.  Only the first URL will be preserved in the Maven license created." );
+                LOG.warn( "SPDX license {} contains multiple URLs.  Only the first URL will be preserved in the Maven license created.", licenseId );
             }
             return retval;
         } 

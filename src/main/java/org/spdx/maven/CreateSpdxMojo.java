@@ -57,13 +57,8 @@ import org.spdx.maven.utils.SpdxV3DocumentBuilder;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * NOTE: Currently this is a prototype plugin for supporting SPDX in a Maven build.
@@ -91,6 +86,7 @@ import java.util.Set;
  * </ul><p>
  * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
+@SuppressWarnings({"unused", "DefaultAnnotationParam"})
 @Mojo( name = "createSPDX",
        defaultPhase = LifecyclePhase.VERIFY,
         requiresOnline = true,
@@ -567,7 +563,7 @@ public class CreateSpdxMojo extends AbstractMojo
 
         // check errors
         List<String> spdxErrors = builder.verify();
-        if ( spdxErrors != null && spdxErrors.size() > 0 )
+        if ( spdxErrors != null && !spdxErrors.isEmpty() )
         {
             getLog().warn( "The following errors were found in the SPDX file:\n " + String.join( "\n ", spdxErrors ) );
         }
@@ -597,6 +593,7 @@ public class CreateSpdxMojo extends AbstractMojo
             throw new MojoExecutionException(
                     "Invalid path for SPDX output file.  " + "Specify a configuration parameter spdxFile with a valid directory path to resolve." );
         }
+        //noinspection ResultOfMethodCallIgnored
         outputDir.mkdirs();
         return outputFormatEnum;
     }
@@ -622,12 +619,12 @@ public class CreateSpdxMojo extends AbstractMojo
             URI namespaceUri = new URI( spdxDocumentNamespace );
             if ( SpdxMajorVersion.VERSION_3.equals( outputFormatEnum.getSpecVersion() ) ) {
                 builder = new SpdxV3DocumentBuilder( mavenProject, generatePurls, spdxFile, namespaceUri,
-                                this.matchLicensesOnCrossReferenceUrls, outputFormatEnum );
+                        outputFormatEnum );
             }
             else 
             {
                 builder = new SpdxV2DocumentBuilder( mavenProject, generatePurls, spdxFile, namespaceUri,
-                                                   this.matchLicensesOnCrossReferenceUrls, outputFormatEnum );
+                        outputFormatEnum );
             }
             
         }
@@ -662,8 +659,8 @@ public class CreateSpdxMojo extends AbstractMojo
      * Collect dependency information from Maven dependencies and adds it to the builder SPDX document
      *
      * @param builder SPDX document builder
-     * @throws LicenseMapperException
-     * @throws InvalidSPDXAnalysisException 
+     * @throws LicenseMapperException on errors related to mapping Maven licenses to SPDX licenses
+     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
     private void buildSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
         throws LicenseMapperException, InvalidSPDXAnalysisException, DependencyGraphBuilderException
@@ -708,19 +705,16 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Get the patch specific information
      *
-     * @param projectDefault
-     * @param spdxDoc      SPDX document containing any extracted license infos
-     * @return
-     * @throws MojoExecutionException
+     * @param projectDefault default file information if no path specific overrides are present
+     * @return map path to project specific SPDX parameters
      */
-    private HashMap<String, SpdxDefaultFileInformation> getPathSpecificInfoFromParameters( SpdxDefaultFileInformation projectDefault ) throws MojoExecutionException
-    {
+    private HashMap<String, SpdxDefaultFileInformation> getPathSpecificInfoFromParameters( SpdxDefaultFileInformation projectDefault ) {
         HashMap<String, SpdxDefaultFileInformation> retval = new HashMap<>();
         if ( this.pathsWithSpecificSpdxInfo != null )
         {
             for ( PathSpecificSpdxInfo spdxInfo : this.pathsWithSpecificSpdxInfo )
             {
-                SpdxDefaultFileInformation value = null;
+                SpdxDefaultFileInformation value;
                 value = spdxInfo.getDefaultFileInformation( projectDefault );
                 if ( retval.containsKey( spdxInfo.getPath() ) )
                 {
@@ -735,7 +729,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Primarily for debugging purposes - logs nonStandardLicenses as info
      *
-     * @param nonStandardLicenses
+     * @param nonStandardLicenses non standard licenses to log
      */
     private void logNonStandardLicenses( NonStandardLicense[] nonStandardLicenses )
     {
@@ -763,7 +757,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Primarily for debugging purposes - logs includedDirectories as info
      *
-     * @param includedDirectories
+     * @param includedDirectories included directory fileSet to log
      */
     private void logIncludedDirectories( List<FileSet> includedDirectories )
     {
@@ -792,12 +786,9 @@ public class CreateSpdxMojo extends AbstractMojo
     }
 
     /**
-     * @param spdxDoc SPDX Document containing any extracted license infos
      * @return default file information from the plugin parameters
-     * @throws MojoExecutionException
      */
-    private SpdxDefaultFileInformation getDefaultFileInfoFromParameters() throws MojoExecutionException
-    {
+    private SpdxDefaultFileInformation getDefaultFileInfoFromParameters() {
         SpdxDefaultFileInformation retval;
         retval = new SpdxDefaultFileInformation();
         retval.setComment( defaultFileComment );
@@ -823,17 +814,16 @@ public class CreateSpdxMojo extends AbstractMojo
      * " is prepended
      *
      * @param builder      SPDX document builder
-     * @return
-     * @throws MojoExecutionException
+     * @return             SPDX project level information
      */
-    private SpdxProjectInformation getSpdxProjectInfoFromParameters( AbstractDocumentBuilder builder ) throws MojoExecutionException, InvalidSPDXAnalysisException
+    private SpdxProjectInformation getSpdxProjectInfoFromParameters( AbstractDocumentBuilder builder ) throws InvalidSPDXAnalysisException
     {
         SpdxProjectInformation retval = new SpdxProjectInformation();
         if ( this.documentComment != null )
         {
             retval.setDocumentComment( this.documentComment );
         }
-        String declaredLicense = null;
+        String declaredLicense;
         if ( this.licenseDeclared == null )
         {
             List<License> mavenLicenses = mavenProject.getLicenses();
@@ -851,7 +841,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             declaredLicense = this.licenseDeclared.trim();
         }
-        String concludedLicense = null;
+        String concludedLicense;
         if ( this.licenseConcluded == null )
         {
             concludedLicense = declaredLicense;
@@ -866,7 +856,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             this.creators = new String[0];
         }
-        String[] allCreators = (String[]) Arrays.copyOf( creators, creators.length + 1 );
+        String[] allCreators = Arrays.copyOf( creators, creators.length + 1 );
         allCreators[allCreators.length - 1] = CREATOR_TOOL_MAVEN_PLUGIN;
         retval.setCreators( allCreators );
         retval.setCopyrightText( this.copyrightText );
@@ -955,7 +945,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Get the default project name if no project name is specified in the POM
      *
-     * @return
+     * @return the default project name if no project name is specified in the POM
      */
     private String getDefaultProjectName()
     {
@@ -1010,10 +1000,7 @@ public class CreateSpdxMojo extends AbstractMojo
         algorithms.add( "SHA1" );
         if ( checksumAlgorithms != null )
         {
-            for ( String checksumAlgorithm : checksumAlgorithms )
-            {
-                algorithms.add( checksumAlgorithm );
-            }
+            Collections.addAll( algorithms, checksumAlgorithms );
         }
         return algorithms;
     }

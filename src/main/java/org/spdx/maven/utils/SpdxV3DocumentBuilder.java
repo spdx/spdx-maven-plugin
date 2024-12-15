@@ -55,6 +55,8 @@ import org.spdx.storage.IModelStore.IdType;
 import org.spdx.storage.simple.InMemSpdxStore;
 import org.spdx.v3jsonldstore.JsonLDStore;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Builder for SPDX Spec version 3 SBOMs
  * 
@@ -80,13 +82,10 @@ public class SpdxV3DocumentBuilder
      * @param mavenProject             Maven project
      * @param generatePurls            If true, generated Package URLs for all package references
      * @param spdxFile                 File to store the SPDX document results
-     * @param namespaceUri             Namspace prefix for generated SPDX URIs document - must be unique
-     * @param useStdLicenseSourceUrls  if true, map any SPDX standard license source URL to license ID.  Note:
-     *                                 significant performance degradation 
-     * @param outputFormatEnum
+     * @param namespaceUri             Namespace prefix for generated SPDX URIs document - must be unique
+     * @param outputFormatEnum         format for the SPDX document
      */
     public SpdxV3DocumentBuilder( MavenProject mavenProject, boolean generatePurls, File spdxFile, URI namespaceUri,
-                                  boolean useStdLicenseSourceUrls, 
                                   OutputFormat outputFormatEnum ) throws SpdxBuilderException, LicenseMapperException
     {
         super( mavenProject, generatePurls, spdxFile, outputFormatEnum );
@@ -115,7 +114,7 @@ public class SpdxV3DocumentBuilder
         }
 
         // process the licenses
-        licenseManager = new SpdxV3LicenseManager( spdxDoc, useStdLicenseSourceUrls );
+        licenseManager = new SpdxV3LicenseManager( spdxDoc );
         // TODO: if we want to support external custom licenses, we will need to add dictionary entries
         // to the customIdToUri
     }
@@ -170,7 +169,7 @@ public class SpdxV3DocumentBuilder
         for ( org.spdx.maven.Annotation annotation: annotations )
         {
             
-            AnnotationType annotationType = AnnotationType.OTHER;
+            AnnotationType annotationType;
             try
             {
                 annotationType = Spdx2to3Converter.ANNOTATION_TYPE_MAP.get( 
@@ -209,11 +208,12 @@ public class SpdxV3DocumentBuilder
      * Fill in the creator information to the SPDX document
      *
      * @param projectInformation project level information including the creators
-     * @throws InvalidSPDXAnalysisException
+     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
     private void fillCreatorInfo( SpdxProjectInformation projectInformation ) throws InvalidSPDXAnalysisException
     {
         CreationInfo creationInfo = spdxDoc.getCreationInfo();
+        requireNonNull( creationInfo, "CreationInfo for the SPDX document must not be null" );
         String[] parameterCreators = projectInformation.getCreators();
         for ( String parameterCreator : parameterCreators )
         {
@@ -233,8 +233,7 @@ public class SpdxV3DocumentBuilder
             }
             catch (InvalidSPDXAnalysisException e)
             {
-                LOG.warn(
-                         "Invalid creator string, " + parameterCreator + " will be skipped." );
+                LOG.warn( "Invalid creator string, {} will be skipped.", parameterCreator );
             }
             
         }
@@ -336,7 +335,7 @@ public class SpdxV3DocumentBuilder
                             final HashAlgorithm algorithm = Spdx2to3Converter.HASH_ALGORITH_MAP.get( ChecksumAlgorithm.valueOf( checksum.getAlgorithm() ) );
                             if ( Objects.isNull( algorithm ))
                             {
-                                LOG.error( String.format( "Invalid checksum algorithm %s", checksum.getAlgorithm() ) );
+                                LOG.error( "Invalid checksum algorithm {}", checksum.getAlgorithm() );
                             }
                             else
                             {
@@ -370,7 +369,7 @@ public class SpdxV3DocumentBuilder
                 }
                 catch( InvalidSPDXAnalysisException ex ) 
                 {
-                    LOG.warn( "Invalid URL in project POM file: "+projectInformation.getHomePage() );
+                    LOG.warn( "Invalid URL in project POM file: {}", projectInformation.getHomePage() );
                 }
                 
             }
@@ -387,6 +386,8 @@ public class SpdxV3DocumentBuilder
             // originator
             if ( projectInformation.getOriginator() != null )
             {
+                // creationInfo can not be null due to the builder implementation in the SPDX core package
+                //noinspection DataFlowIssue
                 pkg.getOriginatedBys().add( Spdx2to3Converter.stringToAgent( projectInformation.getOriginator(), pkg.getCreationInfo() ) );
             }
             // short description
@@ -397,6 +398,8 @@ public class SpdxV3DocumentBuilder
             // supplier
             if ( projectInformation.getSupplier() != null )
             {
+                // creationInfo can not be null due to the builder implementation in the SPDX core package
+                //noinspection DataFlowIssue
                 pkg.setSuppliedBy( Spdx2to3Converter.stringToAgent( projectInformation.getSupplier(), pkg.getCreationInfo() ) );
             }
             // version info
@@ -436,7 +439,7 @@ public class SpdxV3DocumentBuilder
         }
         for ( ExternalReference externalRef : externalRefs )
         {
-            ReferenceCategory cat = null;
+            ReferenceCategory cat;
             
             try {
                 cat = ReferenceCategory.valueOf( externalRef.getCategory().replaceAll( "-", "_" ) );
@@ -445,7 +448,7 @@ public class SpdxV3DocumentBuilder
             {
                 throw new MojoExecutionException("External reference category " + externalRef.getCategory() + " is not recognized as a valid, standard category." );
             }
-            ReferenceType refType = null;
+            ReferenceType refType;
             try
             {
                 refType = ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName( externalRef.getType() );

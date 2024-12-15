@@ -37,7 +37,7 @@ public enum Packaging
     private final Purpose v2Purpose;
     private final SoftwarePurpose softwarePurpose;
 
-    private Packaging(final String name, final Purpose v2purpose, final SoftwarePurpose v3softwarePurpose)
+    Packaging( final String name, final Purpose v2purpose, final SoftwarePurpose v3softwarePurpose )
     {
         this.name = name;
         this.v2Purpose = v2purpose;

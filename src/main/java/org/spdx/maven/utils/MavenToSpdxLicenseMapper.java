@@ -66,7 +66,7 @@ public class MavenToSpdxLicenseMapper
     private static final String LISTED_LICENSE_JSON_PATH = "resources/licenses.json";
 
     static volatile MavenToSpdxLicenseMapper instance;
-    private static Object instanceMutex = new Object();
+    private static final Object instanceMutex = new Object();
     private Map<String, String> urlStringToSpdxLicenseId;
 
     private MavenToSpdxLicenseMapper() throws LicenseMapperException
@@ -92,6 +92,12 @@ public class MavenToSpdxLicenseMapper
         {
             // use the cached version
             is = SpdxV2LicenseManager.class.getClassLoader().getResourceAsStream( LISTED_LICENSE_JSON_PATH );
+        }
+
+        if ( is == null )
+        {
+            LOG.error( "Could not load the resource {}", LISTED_LICENSE_JSON_PATH);
+            throw new LicenseMapperException( "Unable to load the listed licenses file" );
         }
 
         try (BufferedReader reader = new BufferedReader( new InputStreamReader( is, Charset.defaultCharset() ) ))
@@ -134,7 +140,7 @@ public class MavenToSpdxLicenseMapper
      * Initialize the urlStringToSpdxLicense map with the SPDX listed licenses
      *
      * @param jsonReader Reader for the JSON input file containing the listed licenses
-     * @throws LicenseMapperException
+     * @throws LicenseMapperException on errors accessing the listed license or parsing errors
      */
     private void initializeUrlMap( BufferedReader jsonReader ) throws LicenseMapperException
     {
@@ -209,8 +215,8 @@ public class MavenToSpdxLicenseMapper
      *
      * @param licenseList list of licenses
      * @param spdxDoc     SPDX document which will hold the licenses
-     * @return
-     * @throws InvalidSPDXAnalysisException 
+     * @return            SPDX license which matches the list of maven licenses
+     * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
     public AnyLicenseInfo mavenLicenseListToSpdxV2License( List<License> licenseList, SpdxDocument spdxDoc ) throws InvalidSPDXAnalysisException
     {
@@ -227,7 +233,7 @@ public class MavenToSpdxLicenseMapper
                 spdxLicenses.add( listedLicense );
             }
         }
-        if ( spdxLicenses.size() < 1 )
+        if (spdxLicenses.isEmpty())
         {
             return new SpdxNoAssertionLicense();
         }
@@ -237,8 +243,7 @@ public class MavenToSpdxLicenseMapper
         }
         else
         {
-            AnyLicenseInfo conjunctiveLicense = spdxDoc.createConjunctiveLicenseSet( spdxLicenses );
-            return conjunctiveLicense;
+            return spdxDoc.createConjunctiveLicenseSet( spdxLicenses );
         }
     }
 
@@ -274,10 +279,10 @@ public class MavenToSpdxLicenseMapper
      * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
      * mapped SPDX licenses.
      *
-     * @param licenseList list of licenses
+     * @param licenseList list of Maven licenses
      * @param spdxDoc     SPDX document which will hold the licenses
-     * @return
-     * @throws InvalidSPDXAnalysisException 
+     * @return            SPDX version 3 license equivalent to the list of Maven licenses
+     * @throws InvalidSPDXAnalysisException On SPDX parsing errors
      */
     public org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo mavenLicenseListToSpdxV3License( List<License> licenseList, 
                                                                                                          Element spdxDoc ) throws InvalidSPDXAnalysisException
@@ -295,7 +300,7 @@ public class MavenToSpdxLicenseMapper
                 spdxLicenses.add( listedLicense );
             }
         }
-        if ( spdxLicenses.size() < 1 )
+        if (spdxLicenses.isEmpty())
         {
             return new NoAssertionLicense();
         }

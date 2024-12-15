@@ -55,6 +55,7 @@ public class Checksum
     /**
      * @param algorithm the algorithm to set
      */
+    @SuppressWarnings("unused")
     public void setAlgorithm( String algorithm )
     {
         this.algorithm = algorithm;

@@ -23,9 +23,8 @@ import org.slf4j.LoggerFactory;
  * Simple class to hold an SPDX Annotation.
  *
  * @author Gary O'Neall
- * @see org.spdx.library.model.Annotation
- * @see AnnotationType
  */
+@SuppressWarnings("unused")
 public class Annotation
 {
     private static final Logger LOG = LoggerFactory.getLogger( Annotation.class );
@@ -122,7 +121,6 @@ public class Annotation
 
     public void logInfo()
     {
-        LOG.debug(
-                "Annotator: " + this.annotator + ", Date: " + this.annotationDate + ", Type: " + this.annotationType );
+        LOG.debug( "Annotator: {}, Date: {}, Type: {}", this.annotator, this.annotationDate, this.annotationType );
     }
 }

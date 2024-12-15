@@ -29,28 +29,28 @@ public class LicenseManagerException extends Exception
     private static final long serialVersionUID = 1672757028355331818L;
 
     /**
-     * @param arg0
+     * @param msg message
      */
-    public LicenseManagerException( String arg0 )
+    public LicenseManagerException( String msg )
     {
-        super( arg0 );
+        super( msg );
     }
 
     /**
-     * @param arg0
+     * @param inner inner exception
      */
-    public LicenseManagerException( Throwable arg0 )
+    public LicenseManagerException( Throwable inner )
     {
-        super( arg0 );
+        super( inner );
     }
 
     /**
-     * @param arg0
-     * @param arg1
+     * @param msg message
+     * @param inner inner exception
      */
-    public LicenseManagerException( String arg0, Throwable arg1 )
+    public LicenseManagerException( String msg, Throwable inner )
     {
-        super( arg0, arg1 );
+        super( msg, inner );
     }
 
 }

@@ -37,7 +37,7 @@ public class LicenseMapperException extends Exception
     }
 
     /**
-     * @param message
+     * @param message message
      */
     public LicenseMapperException( String message )
     {
@@ -45,7 +45,7 @@ public class LicenseMapperException extends Exception
     }
 
     /**
-     * @param cause
+     * @param cause inner exception
      */
     public LicenseMapperException( Throwable cause )
     {
@@ -53,8 +53,8 @@ public class LicenseMapperException extends Exception
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message message
+     * @param cause inner exception
      */
     public LicenseMapperException( String message, Throwable cause )
     {
