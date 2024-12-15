@@ -31,7 +31,7 @@ public class SpdxExternalRefBuilder
     try
     {
       return spdxDoc.createExternalRef( ReferenceCategory.PACKAGE_MANAGER, 
-                                        new ReferenceType("http://spdx.org/rdf/references/purl"),
+                                        new ReferenceType( "http://spdx.org/rdf/references/purl" ),
                                         generatePurl( project ), null );
     }
     catch ( InvalidSPDXAnalysisException e )

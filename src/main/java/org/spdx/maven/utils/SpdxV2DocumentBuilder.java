@@ -194,7 +194,7 @@ public class SpdxV2DocumentBuilder
             }
             else
             {
-                LOG.warn("Invalid creator string ( {} ), {} will be skipped.", verify, parameterCreator);
+                LOG.warn( "Invalid creator string ( {} ), {} will be skipped.", verify, parameterCreator );
             }
         }
         SpdxCreatorInformation spdxCreator = spdxDoc.createCreationInfo( creators, format.format( new Date() ) );
@@ -218,7 +218,7 @@ public class SpdxV2DocumentBuilder
         }
         else
         {
-            LOG.warn("Invalid download location in POM file: {}", projectInformation.getDownloadUrl());
+            LOG.warn( "Invalid download location in POM file: {}", projectInformation.getDownloadUrl() );
         }
         if ( downloadUrl == null )
         {
@@ -295,7 +295,7 @@ public class SpdxV2DocumentBuilder
                 }
                 catch( InvalidSPDXAnalysisException ex ) 
                 {
-                    LOG.warn("Invalid URL in project POM file: {}", projectInformation.getHomePage());
+                    LOG.warn( "Invalid URL in project POM file: {}", projectInformation.getHomePage() );
                 }
                 
             }
@@ -349,7 +349,7 @@ public class SpdxV2DocumentBuilder
                     }
                     catch ( IllegalArgumentException | NullPointerException e1 )
                     {
-                        LOG.error("Invalid checksum algorithm {}", checksum.getAlgorithm());
+                        LOG.error( "Invalid checksum algorithm {}", checksum.getAlgorithm() );
                     }
                 }
             }
@@ -462,7 +462,7 @@ public class SpdxV2DocumentBuilder
         }
         catch ( Exception ex )
         {
-            throw new MojoExecutionException("External reference category " + externalReference.getCategory() + " is not recognized as a valid, standard category." );
+            throw new MojoExecutionException( "External reference category " + externalReference.getCategory() + " is not recognized as a valid, standard category." );
         }
         ReferenceType refType;
         try
