@@ -446,7 +446,8 @@ public class SpdxV3DocumentBuilder
             }
             catch ( Exception ex )
             {
-                throw new MojoExecutionException("External reference category " + externalRef.getCategory() + " is not recognized as a valid, standard category." );
+                throw new MojoExecutionException( "External reference category " + externalRef.getCategory() +
+                        " is not recognized as a valid, standard category." );
             }
             ReferenceType refType;
             try

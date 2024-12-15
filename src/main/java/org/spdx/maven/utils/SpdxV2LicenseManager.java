@@ -127,9 +127,10 @@ public class SpdxV2LicenseManager
                 if ( this.urlStringToSpdxLicenseId.containsKey( url ) )
                 {
                     String oldLicenseId = urlStringToSpdxLicenseId.get( url );
-                    LOG.warn("Duplicate URL for SPDX extracted license.  Replacing {} with {} for {}", oldLicenseId, license.getLicenseId(), url);
+                    LOG.warn( "Duplicate URL for SPDX extracted license.  Replacing {} with {} for {}",
+                            oldLicenseId, license.getLicenseId(), url );
                 }
-                LOG.debug("Adding URL mapping for non-standard license {}", spdxLicense.getLicenseId());
+                LOG.debug( "Adding URL mapping for non-standard license {}", spdxLicense.getLicenseId() );
                 this.urlStringToSpdxLicenseId.put( url, spdxLicense.getLicenseId() );
             }
         }
@@ -192,7 +193,7 @@ public class SpdxV2LicenseManager
             throw new LicenseManagerException(
                     "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" );
         }
-        String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl().replaceAll("https:", "http:") );
+        String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl().replaceAll( "https:", "http:" ) );
         if ( licenseId == null )
         {
             throw new LicenseManagerException(
@@ -270,7 +271,8 @@ public class SpdxV2LicenseManager
             if ( spdxLicense.getSeeAlso().size() > 1 )
             {
                 //noinspection LoggingSimilarMessage
-                LOG.warn("SPDX license {} contains multiple URLs.  Only the first URL will be preserved in the Maven license created.", spdxLicense.getLicenseId());
+                LOG.warn( "SPDX license {} contains multiple URLs.  Only the first URL will be preserved in the Maven license created.",
+                        spdxLicense.getLicenseId() );
             }
             return retval; 
         } catch ( InvalidSPDXAnalysisException e )
@@ -305,7 +307,8 @@ public class SpdxV2LicenseManager
             if ( spdxLicense.getSeeAlso().size() > 1 )
             {
                 //noinspection LoggingSimilarMessage
-                LOG.warn("SPDX license {} contains multiple URLs.  Only the first URL will be preserved in the Maven license created.", spdxLicense.getLicenseId());
+                LOG.warn( "SPDX license {} contains multiple URLs.  Only the first URL will be preserved in the Maven license created.",
+                        spdxLicense.getLicenseId() );
             }
             return retval;
         } 

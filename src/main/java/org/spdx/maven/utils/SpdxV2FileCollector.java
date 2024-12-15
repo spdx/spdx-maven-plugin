@@ -128,7 +128,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
      */
     private @Nullable SpdxDefaultFileInformation findDefaultFileInformation(String filePath, Map<String, SpdxDefaultFileInformation> pathSpecificInformation )
     {
-        LOG.debug("Checking for file path {}", filePath);
+        LOG.debug( "Checking for file path {}", filePath );
         SpdxDefaultFileInformation retval = pathSpecificInformation.get( filePath );
         if ( retval != null )
         {
@@ -149,7 +149,8 @@ public class SpdxV2FileCollector extends AbstractFileCollector
         } while ( retval == null && parentPathIndex > 0 );
         if ( retval != null )
         {
-            LOG.debug("Found directory containing file path for path specific information.  File path: {}", parentPath);
+            LOG.debug( "Found directory containing file path for path specific information.  File path: {}",
+                    parentPath );
         }
         return retval;
     }
@@ -321,7 +322,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                 }
                 catch ( InvalidSPDXAnalysisException e )
                 {
-                    LOG.error("Invalid license expressions found in source file {}", file.getName(), e);
+                    LOG.error( "Invalid license expressions found in source file {}", file.getName(), e );
                 }
                 if ( licenseComment == null )
                 {

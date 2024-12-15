@@ -139,17 +139,17 @@ public class SpdxDefaultFileInformation
      */
     public void logInfo()
     {
-        LOG.debug("Default File Comment: {}", getComment());
-        LOG.debug("Default File Copyright: {}", getCopyright());
-        LOG.debug("Default File License Comment: {}", getLicenseComment());
-        LOG.debug("Default File Notice: {}", getNotice());
-        LOG.debug("Default File Concluded License: {}", getConcludedLicense());
-        LOG.debug("Default File Declared License: {}", getDeclaredLicense());
+        LOG.debug( "Default File Comment: {}", getComment() );
+        LOG.debug( "Default File Copyright: {}", getCopyright() );
+        LOG.debug( "Default File License Comment: {}", getLicenseComment() );
+        LOG.debug( "Default File Notice: {}", getNotice() );
+        LOG.debug( "Default File Concluded License: {}", getConcludedLicense() );
+        LOG.debug( "Default File Declared License: {}", getDeclaredLicense() );
         if ( contributors != null )
         {
             for ( String contributor : contributors )
             {
-                LOG.debug("Default File Contributors: {}", contributor);
+                LOG.debug( "Default File Contributors: {}", contributor );
             }
         }
         if ( this.snippets != null )

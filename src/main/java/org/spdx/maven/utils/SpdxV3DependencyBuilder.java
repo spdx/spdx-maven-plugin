@@ -102,7 +102,8 @@ public class SpdxV3DependencyBuilder
      {
          if ( !(parentPackage instanceof SpdxPackage) )
          {
-             LOG.error("Invalid type for parent package.  Expected 'SpdxPackage', found {}", parentPackage.getClass().getName());
+             LOG.error( "Invalid type for parent package.  Expected 'SpdxPackage', found {}",
+                     parentPackage.getClass().getName() );
              return;
          }
          Artifact dependency = dependencyNode.getArtifact();
@@ -456,9 +457,9 @@ public class SpdxV3DependencyBuilder
         Optional<String> name = source.getName();
         
         SpdxPackage dest = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
-                        .setName(name.orElse("NONE"))
+                        .setName(name.orElse( "NONE" ))
                         .setCopyrightText( source.getCopyrightText() != null ? source.getCopyrightText() : "NOASSERTION" )
-                        .setDownloadLocation(downloadLocation.orElse("NOASSERTION"))
+                        .setDownloadLocation(downloadLocation.orElse( "NOASSERTION" ))
                         .build();
         
         Optional<SpdxPackageVerificationCode> pvc = source.getPackageVerificationCode();
@@ -739,7 +740,7 @@ public class SpdxV3DependencyBuilder
             try {
                 modelStore.close();
             } catch (Exception e) {
-                LOG.error("Error closing SPDX model store", e);
+                LOG.error( "Error closing SPDX model store", e );
             }
         }
     }
@@ -757,10 +758,10 @@ public class SpdxV3DependencyBuilder
         Optional<String> downloadLocation = source.getDownloadLocation();
         Optional<String> name = source.getName();
         SpdxPackage dest = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
-                        .setName(name.orElse("NONE"))
+                        .setName( name.orElse( "NONE" ) )
                         .setCopyrightText( source.getCopyrightText().orElse( "NOASSERTION" ) )
                         .addAllVerifiedUsing( source.getVerifiedUsings() )
-                        .setDownloadLocation(downloadLocation.orElse("NOASSERTION"))
+                        .setDownloadLocation( downloadLocation.orElse( "NOASSERTION" ) )
                         .addAllExternalIdentifier( source.getExternalIdentifiers() )
                         .addAllExternalRef( source.getExternalRefs() )
                         .addAllOriginatedBy( source.getOriginatedBys() )

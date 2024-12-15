@@ -79,16 +79,16 @@ public abstract class AbstractFileCollector
             for (Entry<Object, Object> entry : prop.entrySet()) {
                 String fileTypeStr = (String) entry.getKey();
                 FileType fileType = FileType.valueOf(fileTypeStr);
-                String[] extensions = ((String) entry.getValue()).split(",");
+                String[] extensions = ((String) entry.getValue()).split( "," );
                 for (String extension : extensions) {
                     try {
                         String trimmedExtension = extension.toUpperCase().trim();
                         if (EXT_TO_FILE_TYPE.containsKey(trimmedExtension)) {
-                            LOG.warn("Duplicate file extension: {}", trimmedExtension);
+                            LOG.warn( "Duplicate file extension: {}", trimmedExtension );
                         }
                         EXT_TO_FILE_TYPE.put(trimmedExtension, fileType);
                     } catch (Exception ex) {
-                        LOG.error("Error adding file extensions to filetype map", ex);
+                        LOG.error( "Error adding file extensions to filetype map", ex );
                     }
                 }
             }

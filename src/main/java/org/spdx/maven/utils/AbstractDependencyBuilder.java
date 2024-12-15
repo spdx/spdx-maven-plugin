@@ -156,7 +156,7 @@ public abstract class AbstractDependencyBuilder
             Artifact dependency = node.getArtifact();
             String filePath = dependency.getFile() != null ? dependency.getFile().getAbsolutePath() : "[NONE]";
             String scope = dependency.getScope() != null ? dependency.getScope() : "[NONE]";
-            LOG.debug("ArtifactId: {}, file path: {}, Scope: {}", dependency.getArtifactId(), filePath, scope);
+            LOG.debug( "ArtifactId: {}, file path: {}, Scope: {}", dependency.getArtifactId(), filePath, scope );
         }
     }
     
