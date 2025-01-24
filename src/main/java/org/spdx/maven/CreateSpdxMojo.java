@@ -117,13 +117,13 @@ public class CreateSpdxMojo extends AbstractMojo
     private MavenProjectHelper projectHelper;
 
     @Component
-    private ProjectBuilder mavenProjectBuilder;
+    protected ProjectBuilder mavenProjectBuilder;
 
     @Component
-    private MavenSession session;
+    protected MavenSession session;
 
     @Component(hint = "default")
-    private DependencyGraphBuilder dependencyGraphBuilder;
+    protected DependencyGraphBuilder dependencyGraphBuilder;
 
     // Parameters for the plugin
     /**
@@ -460,7 +460,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * @since 0.6.3
      */
     @Parameter( defaultValue = "true" )
-    private boolean createExternalRefs;
+    protected boolean createExternalRefs;
 
     /**
      * If true, all transitive dependencies will be included in the SPDX document.  If false,
@@ -469,7 +469,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * @since 0.6.3
      */
     @Parameter( defaultValue = "true" )
-    private boolean includeTransitiveDependencies;
+    protected boolean includeTransitiveDependencies;
 
      /**
       * Skip goal execution.
@@ -484,14 +484,14 @@ public class CreateSpdxMojo extends AbstractMojo
      * Otherwise, ${project.name} will be used
      */
     @Parameter( property = "spdx.useArtifactID" )
-    private boolean useArtifactID;
+    protected boolean useArtifactID;
 
     /**
      * If true, adds an external reference to every package with category "PACKAGE-MANAGER", type "purl"
      * and locator "pkg:maven/${project.groupId}/${project.artifactId}@${project.version}".
      */
     @Parameter( property = "spdx.generatePurls" )
-    private boolean generatePurls = true;
+    protected boolean generatePurls = true;
 
     public void execute() throws MojoExecutionException
     {
@@ -662,7 +662,7 @@ public class CreateSpdxMojo extends AbstractMojo
      * @throws LicenseMapperException on errors related to mapping Maven licenses to SPDX licenses
      * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      */
-    private void buildSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
+    protected void buildSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
         throws LicenseMapperException, InvalidSPDXAnalysisException, DependencyGraphBuilderException
     {
         AbstractDependencyBuilder dependencyBuilder;
