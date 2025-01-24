@@ -7,6 +7,7 @@ package org.spdx.maven.utils;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,6 +42,7 @@ public abstract class AbstractDependencyBuilder
     protected boolean generatePurls;
     protected boolean useArtifactID;
     protected boolean includeTransitiveDependencies;
+    private final HashSet<String> usedDependencies = new HashSet<>();
     DateFormat format = new SimpleDateFormat( SpdxConstantsCompatV2.SPDX_DATE_FORMAT );
 
     /**
@@ -74,12 +76,22 @@ public abstract class AbstractDependencyBuilder
                                                   CoreModelObject pkg ) throws LicenseMapperException, InvalidSPDXAnalysisException
     {
         List<DependencyNode> children = node.getChildren();
-
         logDependencies( children );
+        String name = "";
 
         for ( DependencyNode childNode : children )
         {
-            addMavenDependency( pkg, childNode, mavenProjectBuilder, session, mavenProject );
+            name = String.format( "%s:%s:%s", childNode.getArtifact().getGroupId(),
+                    childNode.getArtifact().getArtifactId(), childNode.getArtifact().getVersion() );
+            //To keep the repetition-check at O(1)
+            if ( usedDependencies.add( name ) )
+            {
+                addMavenDependency( pkg, childNode, mavenProjectBuilder, session, mavenProject );
+            }
+            else
+            {
+                LOG.info( "Duplicate dependency occurred for " + name );
+            }
         }
     }
     
