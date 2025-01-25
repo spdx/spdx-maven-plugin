@@ -81,6 +81,10 @@ loadScripts(document, 'script');</script>
 <dt>All Implemented Interfaces:</dt>
 <dd><code>org.apache.maven.plugin.ContextEnabled</code>, <code>org.apache.maven.plugin.Mojo</code></dd>
 </dl>
+<dl class="notes">
+<dt>Direct Known Subclasses:</dt>
+<dd><code><a href="AggregateSpdxMojo.html" title="class in org.spdx.maven">AggregateSpdxMojo</a></code></dd>
+</dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Mojo(name="createSPDX",
       defaultPhase=VERIFY,
@@ -124,17 +128,43 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#CREATOR_TOOL_MAVEN_PLUGIN" class="member-name-link">CREATOR_TOOL_MAVEN_PLUGIN</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#createExternalRefs" class="member-name-link">createExternalRefs</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">If true, external document references will be created for any dependencies which
+ contain SPDX documents.</div>
+</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#INCLUDE_ALL" class="member-name-link">INCLUDE_ALL</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#CREATOR_TOOL_MAVEN_PLUGIN" class="member-name-link">CREATOR_TOOL_MAVEN_PLUGIN</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected org.apache.maven.shared.dependency.graph.DependencyGraphBuilder</code></div>
+<div class="col-second even-row-color"><code><a href="#dependencyGraphBuilder" class="member-name-link">dependencyGraphBuilder</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#generatePurls" class="member-name-link">generatePurls</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">If true, adds an external reference to every package with category "PACKAGE-MANAGER", type "purl"
+ and locator "pkg:maven/${project.groupId}/${project.artifactId}@${project.version}".</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#INCLUDE_ALL" class="member-name-link">INCLUDE_ALL</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#includeTransitiveDependencies" class="member-name-link">includeTransitiveDependencies</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">If true, all transitive dependencies will be included in the SPDX document.</div>
+</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#JSON_OUTPUT_FORMAT" class="member-name-link">JSON_OUTPUT_FORMAT</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#RDF_OUTPUT_FORMAT" class="member-name-link">RDF_OUTPUT_FORMAT</a></code></div>
+<div class="col-first odd-row-color"><code>protected org.apache.maven.project.ProjectBuilder</code></div>
+<div class="col-second odd-row-color"><code><a href="#mavenProjectBuilder" class="member-name-link">mavenProjectBuilder</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#RDF_OUTPUT_FORMAT" class="member-name-link">RDF_OUTPUT_FORMAT</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected org.apache.maven.execution.MavenSession</code></div>
+<div class="col-second odd-row-color"><code><a href="#session" class="member-name-link">session</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#SPDX_JSON_ARTIFACT_TYPE" class="member-name-link">SPDX_JSON_ARTIFACT_TYPE</a></code></div>
@@ -142,6 +172,11 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#SPDX_RDF_ARTIFACT_TYPE" class="member-name-link">SPDX_RDF_ARTIFACT_TYPE</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#useArtifactID" class="member-name-link">useArtifactID</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">If true, use ${project.groupId}:${artifactId} as the SPDX package name.</div>
+</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.apache.maven.plugin.Mojo">Fields inherited from interface&nbsp;org.apache.maven.plugin.Mojo</h3>
@@ -172,9 +207,15 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#execute()" class="member-name-link">execute</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#buildSpdxDependencyInformation(org.spdx.maven.utils.AbstractDocumentBuilder,org.spdx.maven.OutputFormat)" class="member-name-link">buildSpdxDependencyInformation</a><wbr>(<a href="utils/AbstractDocumentBuilder.html" title="class in org.spdx.maven.utils">AbstractDocumentBuilder</a>&nbsp;builder,
+ <a href="OutputFormat.html" title="enum in org.spdx.maven">OutputFormat</a>&nbsp;outputFormatEnum)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Collect dependency information from Maven dependencies and adds it to the builder SPDX document</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#execute()" class="member-name-link">execute</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -279,6 +320,72 @@ loadScripts(document, 'script');</script>
 </dl>
 </section>
 </li>
+<li>
+<section class="detail" id="mavenProjectBuilder">
+<h3>mavenProjectBuilder</h3>
+<div class="member-signature"><span class="annotations">@Component
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">org.apache.maven.project.ProjectBuilder</span>&nbsp;<span class="element-name">mavenProjectBuilder</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="session">
+<h3>session</h3>
+<div class="member-signature"><span class="annotations">@Component
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">org.apache.maven.execution.MavenSession</span>&nbsp;<span class="element-name">session</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="dependencyGraphBuilder">
+<h3>dependencyGraphBuilder</h3>
+<div class="member-signature"><span class="annotations">@Component(hint="default")
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">org.apache.maven.shared.dependency.graph.DependencyGraphBuilder</span>&nbsp;<span class="element-name">dependencyGraphBuilder</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="createExternalRefs">
+<h3>createExternalRefs</h3>
+<div class="member-signature"><span class="annotations">@Parameter(defaultValue="true")
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">createExternalRefs</span></div>
+<div class="block">If true, external document references will be created for any dependencies which
+ contain SPDX documents.  If false, the dependent package information will be copied
+ from the SPDX document into the generated SPDX document.</div>
+<dl class="notes">
+<dt>Since:</dt>
+<dd>0.6.3</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="includeTransitiveDependencies">
+<h3>includeTransitiveDependencies</h3>
+<div class="member-signature"><span class="annotations">@Parameter(defaultValue="true")
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">includeTransitiveDependencies</span></div>
+<div class="block">If true, all transitive dependencies will be included in the SPDX document.  If false,
+ only direct dependencies will be included.</div>
+<dl class="notes">
+<dt>Since:</dt>
+<dd>0.6.3</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="useArtifactID">
+<h3>useArtifactID</h3>
+<div class="member-signature"><span class="annotations">@Parameter(property="spdx.useArtifactID")
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">useArtifactID</span></div>
+<div class="block">If true, use ${project.groupId}:${artifactId} as the SPDX package name.
+ Otherwise, ${project.name} will be used</div>
+</section>
+</li>
+<li>
+<section class="detail" id="generatePurls">
+<h3>generatePurls</h3>
+<div class="member-signature"><span class="annotations">@Parameter(property="spdx.generatePurls")
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">generatePurls</span></div>
+<div class="block">If true, adds an external reference to every package with category "PACKAGE-MANAGER", type "purl"
+ and locator "pkg:maven/${project.groupId}/${project.artifactId}@${project.version}".</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -309,6 +416,25 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Throws:</dt>
 <dd><code>org.apache.maven.plugin.MojoExecutionException</code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="buildSpdxDependencyInformation(org.spdx.maven.utils.AbstractDocumentBuilder,org.spdx.maven.OutputFormat)">
+<h3>buildSpdxDependencyInformation</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">buildSpdxDependencyInformation</span><wbr><span class="parameters">(<a href="utils/AbstractDocumentBuilder.html" title="class in org.spdx.maven.utils">AbstractDocumentBuilder</a>&nbsp;builder,
+ <a href="OutputFormat.html" title="enum in org.spdx.maven">OutputFormat</a>&nbsp;outputFormatEnum)</span>
+                                       throws <span class="exceptions"><a href="utils/LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a>,
+org.spdx.core.InvalidSPDXAnalysisException,
+org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException</span></div>
+<div class="block">Collect dependency information from Maven dependencies and adds it to the builder SPDX document</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>builder</code> - SPDX document builder</dd>
+<dt>Throws:</dt>
+<dd><code><a href="utils/LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a></code> - on errors related to mapping Maven licenses to SPDX licenses</dd>
+<dd><code>org.spdx.core.InvalidSPDXAnalysisException</code> - on SPDX parsing errors</dd>
+<dd><code>org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException</code></dd>
 </dl>
 </section>
 </li>
