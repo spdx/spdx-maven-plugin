@@ -18,10 +18,6 @@ package org.spdx.maven.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.SpdxNoAssertionLicense;
-
 import org.spdx.maven.SnippetInfo;
 
 import org.slf4j.Logger;
@@ -36,27 +32,27 @@ public class SpdxDefaultFileInformation
 {
     private static final Logger LOG = LoggerFactory.getLogger( SpdxDefaultFileInformation.class );
 
-    private AnyLicenseInfo declaredLicense;
+    private String declaredLicense;
     private String copyright = "NOASSERTION";
     private String notice = "";
     private String comment = "";
     private String[] contributors = new String[0];
-    private AnyLicenseInfo concludedLicense;
+    private String concludedLicense;
     private String licenseComment = "";
     private List<SnippetInfo> snippets = new ArrayList<>();
     
-    public SpdxDefaultFileInformation() throws InvalidSPDXAnalysisException
+    public SpdxDefaultFileInformation()
     {
-        declaredLicense = new SpdxNoAssertionLicense();
-        concludedLicense = new SpdxNoAssertionLicense();
+        declaredLicense = "NOASSERTION";
+        concludedLicense = "NOASSERTION";
     }
 
-    public AnyLicenseInfo getDeclaredLicense()
+    public String getDeclaredLicense()
     {
         return this.declaredLicense;
     }
 
-    public void setDeclaredLicense( AnyLicenseInfo license )
+    public void setDeclaredLicense( String license )
     {
         this.declaredLicense = license;
     }
@@ -101,12 +97,12 @@ public class SpdxDefaultFileInformation
         this.contributors = contributors;
     }
 
-    public AnyLicenseInfo getConcludedLicense()
+    public String getConcludedLicense()
     {
         return this.concludedLicense;
     }
 
-    public void setConcludedLicense( AnyLicenseInfo license )
+    public void setConcludedLicense( String license )
     {
         this.concludedLicense = license;
     }
@@ -143,17 +139,17 @@ public class SpdxDefaultFileInformation
      */
     public void logInfo()
     {
-        LOG.debug( "Default File Comment: " + getComment() );
-        LOG.debug( "Default File Copyright: " + getCopyright() );
-        LOG.debug( "Default File License Comment: " + getLicenseComment() );
-        LOG.debug( "Default File Notice: " + getNotice() );
-        LOG.debug( "Default File Concluded License: " + getConcludedLicense().toString() );
-        LOG.debug( "Default File Declared License: " + getDeclaredLicense().toString() );
+        LOG.debug( "Default File Comment: {}", getComment() );
+        LOG.debug( "Default File Copyright: {}", getCopyright() );
+        LOG.debug( "Default File License Comment: {}", getLicenseComment() );
+        LOG.debug( "Default File Notice: {}", getNotice() );
+        LOG.debug( "Default File Concluded License: {}", getConcludedLicense() );
+        LOG.debug( "Default File Declared License: {}", getDeclaredLicense() );
         if ( contributors != null )
         {
             for ( String contributor : contributors )
             {
-                LOG.debug( "Default File Contributors: " + contributor );
+                LOG.debug( "Default File Contributors: {}", contributor );
             }
         }
         if ( this.snippets != null )

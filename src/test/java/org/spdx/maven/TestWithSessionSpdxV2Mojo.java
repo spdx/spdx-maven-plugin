@@ -28,24 +28,42 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.spdx.core.DefaultModelStore;
+import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.jacksonstore.MultiFormatStore;
 import org.spdx.jacksonstore.MultiFormatStore.Format;
-import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.ModelCopyManager;
-import org.spdx.library.model.Relationship;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.SpdxModelFactory;
-import org.spdx.library.model.SpdxPackage;
+import org.spdx.library.SpdxModelFactory;
+import org.spdx.library.model.v2.Relationship;
+import org.spdx.library.model.v2.SpdxConstantsCompatV2;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.SpdxPackage;
 import org.spdx.spdxRdfStore.RdfStore;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.simple.InMemSpdxStore;
 
-public class TestWithSessionSpdxMojo extends AbstractMojoTestCase
+public class TestWithSessionSpdxV2Mojo extends AbstractMojoTestCase
 {
 
   private static final String UNIT_TEST_RESOURCE_DIR = "target/test-classes/unit/spdx-maven-plugin-test";
+  
+  @Before
+  protected void setUp() throws Exception
+  {
+      super.setUp();
+      SpdxModelFactory.init();
+      DefaultModelStore.initialize(new InMemSpdxStore(), "http://default/namespace", new ModelCopyManager());
+  }
+
+  @After
+  protected void tearDown() throws Exception
+  {
+      super.tearDown();
+  }
 
   @Test
   public void testDependencies() throws Exception
@@ -55,7 +73,7 @@ public class TestWithSessionSpdxMojo extends AbstractMojoTestCase
 
     Set<String> packages = new HashSet<>();
     Set<String> relationships = new HashSet<>();
-    SpdxModelFactory.getElements( result.getModelStore(), result.getDocumentUri(), result.getCopyManager(), SpdxPackage.class )
+    SpdxModelFactory.getSpdxObjects( result.getModelStore(), result.getCopyManager(), SpdxConstantsCompatV2.CLASS_SPDX_PACKAGE, null, result.getIdPrefix() )
         .forEach( ( element ) -> {
           SpdxPackage pkg = (SpdxPackage) element;
           try
@@ -122,11 +140,9 @@ public class TestWithSessionSpdxMojo extends AbstractMojoTestCase
     assertTrue( artifactFile.exists() );
     String outputFormat = (String) getVariableValueFromObject( mojo, "outputFormat" );
     ISerializableModelStore modelStore = buildModelStore( outputFormat );
-    ModelCopyManager copyManager = new ModelCopyManager();
     try ( InputStream is = new FileInputStream( artifactFile.getAbsolutePath() ) )
     {
-      String documentUri = modelStore.deSerialize( is, false );
-      return new SpdxDocument( modelStore, documentUri, copyManager, false );
+      return (SpdxDocument)modelStore.deSerialize( is, false );
     }
   }
 

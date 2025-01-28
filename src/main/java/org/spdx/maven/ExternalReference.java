@@ -15,23 +15,14 @@
  */
 package org.spdx.maven;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.ExternalRef;
-import org.spdx.library.model.ReferenceType;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.enumerations.ReferenceCategory;
-import org.spdx.library.referencetype.ListedReferenceTypes;
-
 /**
  * An External Reference allows a Package to reference an external source of additional information, metadata,
  * enumerations, asset identifiers, or downloadable content believed to be relevant to the Package.
  *
  * @author Gary O'Neall
- * @see ExternalRef
- * @see ReferenceType
- * @see ReferenceCategory
+ *
  */
+@SuppressWarnings("unused")
 public class ExternalReference
 {
     private String category;
@@ -42,37 +33,35 @@ public class ExternalReference
 
     private String comment;
 
-    public ExternalRef getExternalRef( SpdxDocument spdxDoc ) throws MojoExecutionException
+    /**
+     * @return the category
+     */
+    public String getCategory()
     {
-        ReferenceCategory cat = null;
-        
-        try {
-            cat = ReferenceCategory.valueOf( category.replaceAll( "-", "_" ) );
-        }
-        catch ( Exception ex )
-        {
-            throw new MojoExecutionException("External reference category " + category + " is not recognized as a valid, standard category." );
-        }
-        ReferenceType refType = null;
-        try
-        {
-            refType = ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName( type );
-        }
-        catch ( InvalidSPDXAnalysisException e )
-        {
-            throw new MojoExecutionException( "Error getting listed reference type for " + type, e );
-        }
-        if ( refType == null )
-        {
-            throw new MojoExecutionException( "Listed reference type not found for " + type );
-        }
-        try
-        {
-            return spdxDoc.createExternalRef( cat, refType, locator, comment );
-        }
-        catch ( InvalidSPDXAnalysisException e )
-        {
-            throw new MojoExecutionException( "Error creating External Reference", e );
-        }
+        return category;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType()
+    {
+        return type;
+    }
+
+    /**
+     * @return the locator
+     */
+    public String getLocator()
+    {
+        return locator;
+    }
+
+    /**
+     * @return the comment
+     */
+    public String getComment()
+    {
+        return comment;
     }
 }

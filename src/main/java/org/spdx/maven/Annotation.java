@@ -15,11 +15,6 @@
  */
 package org.spdx.maven;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.spdx.library.InvalidSPDXAnalysisException;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.enumerations.AnnotationType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +23,8 @@ import org.slf4j.LoggerFactory;
  * Simple class to hold an SPDX Annotation.
  *
  * @author Gary O'Neall
- * @see org.spdx.library.model.Annotation
- * @see AnnotationType
  */
+@SuppressWarnings("unused")
 public class Annotation
 {
     private static final Logger LOG = LoggerFactory.getLogger( Annotation.class );
@@ -125,38 +119,8 @@ public class Annotation
         this.annotationComment = annotationComment;
     }
 
-
-    /**
-     * @param spdxDoc SPDX document which will contain the annotation
-     * @return an SPDX model version of the annotation
-     */
-    public org.spdx.library.model.Annotation toSpdxAnnotation( SpdxDocument spdxDoc ) throws MojoExecutionException
-    {
-        AnnotationType annotationType = AnnotationType.OTHER;
-        try
-        {
-            annotationType = AnnotationType.valueOf( this.annotationType );
-        }
-        catch ( Exception ex )
-        {
-            throw new MojoExecutionException( "Invalid annotation type "+this.annotationType );
-        }
-        try
-        {
-            return spdxDoc.createAnnotation( this.annotator, 
-                                             annotationType,
-                                             annotationDate,
-                                             annotationComment );
-        }
-        catch ( InvalidSPDXAnalysisException e )
-        {
-            throw new MojoExecutionException( "Error creating annotation.", e );
-        }
-    }
-
     public void logInfo()
     {
-        LOG.debug(
-                "Annotator: " + this.annotator + ", Date: " + this.annotationDate + ", Type: " + this.annotationType );
+        LOG.debug( "Annotator: {}, Date: {}, Type: {}", this.annotator, this.annotationDate, this.annotationType );
     }
 }

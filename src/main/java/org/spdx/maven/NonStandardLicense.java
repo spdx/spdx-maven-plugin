@@ -16,9 +16,10 @@
 package org.spdx.maven;
 
 import java.net.URL;
+import java.util.Objects;
 
 /**
- * Non-standard license (e.g. license which is not in the SPDX standard license list http://spdx.org/licenses)
+ * Non-standard license (e.g. license which is not in the <a href="http://spdx.org/licenses">SPDX standard license list</a>)
  *
  * @author Gary O'Neall
  */
@@ -94,11 +95,7 @@ public class NonStandardLicense
      */
     public String getComment()
     {
-        if ( comment == null )
-        {
-            return "";
-        }
-        return comment;
+        return Objects.requireNonNullElse( comment, "" );
     }
 
     /**

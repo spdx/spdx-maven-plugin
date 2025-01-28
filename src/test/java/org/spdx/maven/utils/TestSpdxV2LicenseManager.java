@@ -27,24 +27,26 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.spdx.library.InvalidSPDXAnalysisException;
+import org.spdx.core.DefaultModelStore;
+import org.spdx.core.InvalidSPDXAnalysisException;
+import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.ModelCopyManager;
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.ConjunctiveLicenseSet;
-import org.spdx.library.model.license.ExtractedLicenseInfo;
-import org.spdx.library.model.license.LicenseInfoFactory;
-import org.spdx.library.model.license.SpdxListedLicense;
+import org.spdx.library.SpdxModelFactory;
+import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.ConjunctiveLicenseSet;
+import org.spdx.library.model.v2.license.ExtractedLicenseInfo;
+import org.spdx.library.model.v2.license.SpdxListedLicense;
 import org.spdx.maven.NonStandardLicense;
 import org.spdx.storage.simple.InMemSpdxStore;
 import org.apache.maven.model.License;
 
 /**
- * Unit tests for LicenseManager class
+ * Unit tests for SpdxV2LicenseManager class
  *
  * @author Gary O'Neall
  */
-public class TestLicenseManager
+public class TestSpdxV2LicenseManager
 {
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
     static final String APACHE_CROSS_REF_URL2 = "http://www.apache.org/licenses/LICENSE-2.0";
@@ -63,6 +65,7 @@ public class TestLicenseManager
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
     {
+        SpdxModelFactory.init();
     }
 
     /**
@@ -79,6 +82,7 @@ public class TestLicenseManager
     @Before
     public void setUp() throws Exception
     {
+        DefaultModelStore.initialize(new InMemSpdxStore(), "http://default/namespace", new ModelCopyManager());
         spdxDoc = new SpdxDocument( new InMemSpdxStore(), TEST_SPDX_DOCUMENT_URL, new ModelCopyManager(), true );
     }
 
@@ -92,7 +96,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.utils.LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument,boolean)}.
+     * Test method for {@link org.spdx.maven.utils.SpdxV2LicenseManager#LicenseManager(org.spdx.rdfparser.SpdxDocument,boolean)}.
      *
      * @throws LicenseMapperException
      */
@@ -100,11 +104,11 @@ public class TestLicenseManager
     public void testLicenseManager() throws LicenseMapperException
     {
         @SuppressWarnings( "unused" )
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, false );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
     }
 
     /**
-     * Test method for {@link org.spdx.maven.utils.LicenseManager#addExtractedLicense(org.spdx.maven.NonStandardLicense)}.
+     * Test method for {@link org.spdx.maven.utils.SpdxV2LicenseManager#addExtractedLicense(org.spdx.maven.NonStandardLicense)}.
      *
      * @throws MalformedURLException
      * @throws LicenseManagerException
@@ -114,7 +118,7 @@ public class TestLicenseManager
     @Test
     public void testAddNonStandardLicense() throws MalformedURLException, LicenseManagerException, InvalidSPDXAnalysisException, LicenseMapperException
     {
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, false );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
         NonStandardLicense lic = new NonStandardLicense();
         final String COMMENT = "comment";
         final String[] CROSS_REF_STR = new String[] {"http://www.licenseRef1", "http://www.licenseref2"};
@@ -159,7 +163,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.utils.LicenseManager#mavenLicenseListToSpdxLicense(java.util.List)}.
+     * Test method for {@link org.spdx.maven.utils.SpdxV2LicenseManager#mavenLicenseListToSpdxLicense(java.util.List)}.
      *
      * @throws LicenseManagerException
      * @throws LicenseMapperException
@@ -182,7 +186,7 @@ public class TestLicenseManager
         licenseList.add( apache );
         licenseList.add( apsl );
 
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, true );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
 
         AnyLicenseInfo result = licenseManager.mavenLicenseListToSpdxLicense( licenseList );
         assertTrue( result instanceof ConjunctiveLicenseSet );
@@ -206,7 +210,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.utils.LicenseManager#mavenLicenseToSpdxLicense(org.apache.maven.model.License)}.
+     * Test method for {@link org.spdx.maven.utils.SpdxV2LicenseManager#mavenLicenseToSpdxLicense(org.apache.maven.model.License)}.
      *
      * @throws LicenseManagerException
      * @throws MalformedURLException
@@ -222,7 +226,7 @@ public class TestLicenseManager
         License apache = new License();
         apache.setName( LICENSE1_NAME );
         apache.setUrl( APACHE_CROSS_REF_URL2 );
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, true );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
 
         AnyLicenseInfo result = licenseManager.mavenLicenseToSpdxLicense( apache );
         assertTrue( result instanceof SpdxListedLicense );
@@ -258,7 +262,7 @@ public class TestLicenseManager
     }
 
     /**
-     * Test method for {@link org.spdx.maven.utils.LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.AnyLicenseInfo)}.
+     * Test method for {@link org.spdx.maven.utils.SpdxV2LicenseManager#spdxLicenseToMavenLicense(org.spdx.rdfparser.AnyLicenseInfo)}.
      *
      * @throws LicenseManagerException
      * @throws LicenseMapperException
@@ -267,9 +271,9 @@ public class TestLicenseManager
     @Test
     public void testSpdxLicenseToMavenLicense() throws LicenseManagerException, LicenseMapperException, InvalidSPDXAnalysisException
     {
-        LicenseManager licenseManager = new LicenseManager( spdxDoc, false );
+        SpdxV2LicenseManager licenseManager = new SpdxV2LicenseManager( spdxDoc);
         // standard license
-        AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseString( APACHE_LICENSE_ID );
+        AnyLicenseInfo licenseInfo = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_LICENSE_ID );
         License result = licenseManager.spdxLicenseToMavenLicense( licenseInfo );
         assertEquals( result.getName(), ( (SpdxListedLicense) licenseInfo ).getName() );
         String resultUrl = result.getUrl().replace( "https", "http" );

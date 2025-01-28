@@ -15,16 +15,8 @@
  */
 package org.spdx.maven;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.spdx.library.model.SpdxDocument;
-import org.spdx.library.model.license.AnyLicenseInfo;
-import org.spdx.library.model.license.InvalidLicenseStringException;
-import org.spdx.library.model.license.LicenseInfoFactory;
 
 import org.spdx.maven.utils.SpdxBuilderException;
 
@@ -65,26 +57,26 @@ public class SnippetInfo
         LOG.debug( "Snippet information follows:" );
         if ( this.name != null )
         {
-            LOG.debug( "Name: " + this.name );
+            LOG.debug( "Name: {}", this.name );
         }
-        LOG.debug( "Byte range: " + this.byteRange );
+        LOG.debug( "Byte range: {}", this.byteRange );
         if ( this.comment != null )
         {
-            LOG.debug( "Comment: " + this.comment );
+            LOG.debug( "Comment: {}", this.comment );
         }
-        LOG.debug( "Concluded license: " + this.concludedLicense );
+        LOG.debug( "Concluded license: {}", this.concludedLicense );
         if ( this.copyrightText != null )
         {
-            LOG.debug( "Copyright: " + this.copyrightText );
+            LOG.debug( "Copyright: {}", this.copyrightText );
         }
         if ( this.licenseComment != null )
         {
-            LOG.debug( "License comment: " + this.licenseComment );
+            LOG.debug( "License comment: {}", this.licenseComment );
         }
-        LOG.debug( "License info in Snippet: " + this.licenseInfoInSnippet );
+        LOG.debug( "License info in Snippet: {}", this.licenseInfoInSnippet );
         if ( this.lineRange != null )
         {
-            LOG.debug( "Line range: " + this.lineRange );
+            LOG.debug( "Line range: {}", this.lineRange );
         }
     }
 
@@ -98,18 +90,9 @@ public class SnippetInfo
         return this.comment;
     }
 
-    public AnyLicenseInfo getLicenseConcluded( SpdxDocument spdxDoc ) throws InvalidLicenseStringException
+    public String getLicenseConcluded()
     {
-        return LicenseInfoFactory.parseSPDXLicenseString( this.concludedLicense, spdxDoc.getModelStore(), 
-                                                          spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
-    }
-
-    public Collection<AnyLicenseInfo> getLicenseInfoInSnippet( SpdxDocument spdxDoc ) throws InvalidLicenseStringException
-    {
-        List<AnyLicenseInfo> retval = new ArrayList<>();
-        retval.add( LicenseInfoFactory.parseSPDXLicenseString( this.licenseInfoInSnippet, spdxDoc.getModelStore(), 
-                                                                                spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() ));
-        return retval;                                                                    
+        return this.concludedLicense;
     }
 
     public String getCopyrightText()

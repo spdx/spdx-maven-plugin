@@ -31,7 +31,7 @@ public class SpdxBuilderException extends MojoExecutionException
     private static final long serialVersionUID = 1L;
 
     /**
-     * @param message
+     * @param message message
      */
     public SpdxBuilderException( String message )
     {
@@ -39,8 +39,8 @@ public class SpdxBuilderException extends MojoExecutionException
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message message
+     * @param cause   inner exception
      */
     public SpdxBuilderException( String message, Throwable cause )
     {
