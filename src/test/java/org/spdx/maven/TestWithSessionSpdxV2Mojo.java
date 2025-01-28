@@ -106,7 +106,7 @@ public class TestWithSessionSpdxV2Mojo extends AbstractMojoTestCase
 
     Set<String> packages = new HashSet<>();
     Set<String> relationships = new HashSet<>();
-    SpdxModelFactory.getElements( result.getModelStore(), result.getDocumentUri(), result.getCopyManager(), SpdxPackage.class )
+    SpdxModelFactory.getSpdxObjects( result.getModelStore(), result.getCopyManager(), SpdxConstantsCompatV2.CLASS_SPDX_PACKAGE, null, result.getIdPrefix() )
         .forEach( ( element ) -> {
           SpdxPackage pkg = (SpdxPackage) element;
           try
