@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.spdx.core.DefaultModelStore;
-import org.spdx.core.DefaultStoreNotInitialized;
+import org.spdx.core.DefaultStoreNotInitializedException;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.ModelCopyManager;
@@ -72,7 +72,7 @@ public class TestSpdxSourceFileParser
         assertEquals( 2, ( (DisjunctiveLicenseSet) parseLic( result.get( 2 ) ) ).getMembers().size() );
     }
     
-    private AnyLicenseInfo parseLic( String expression ) throws InvalidLicenseStringException, DefaultStoreNotInitialized
+    private AnyLicenseInfo parseLic( String expression ) throws InvalidLicenseStringException, DefaultStoreNotInitializedException
     {
         return LicenseInfoFactory.parseSPDXLicenseString( expression );
     }
