@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.License;
-import org.spdx.core.DefaultStoreNotInitialized;
+import org.spdx.core.DefaultStoreNotInitializedException;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.model.v2.SpdxDocument;
@@ -213,7 +213,7 @@ public class SpdxV2LicenseManager
                 throw new LicenseManagerException(
                         "Can not map maven license " + mavenLicense.getName() + "  Invalid listed or extracted license id matching the URL " + mavenLicense.getUrl() );
             }
-            catch ( DefaultStoreNotInitialized e )
+            catch ( DefaultStoreNotInitializedException e )
             {
                 throw new LicenseManagerException( "Default model store not initialized" );
             }
