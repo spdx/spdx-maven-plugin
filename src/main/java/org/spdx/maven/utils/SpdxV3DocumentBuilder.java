@@ -137,6 +137,8 @@ public class SpdxV3DocumentBuilder
             {
                 spdxDoc.setComment( projectInformation.getDocumentComment() );
             }
+            // created
+            requireNonNull( spdxDoc.getCreationInfo() ).setCreated( projectInformation.getCreated() );
             // creator
             fillCreatorInfo( projectInformation );
             // data license

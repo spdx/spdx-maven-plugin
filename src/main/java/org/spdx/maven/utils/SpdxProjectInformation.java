@@ -55,6 +55,7 @@ public class SpdxProjectInformation
     private ExternalReference[] externalRefs;
     private Set<Checksum> checksums;
     private Packaging packaging;
+    private String created;
     
     
 
@@ -353,6 +354,7 @@ public class SpdxProjectInformation
         LOG.debug( "SPDX Declared license: {}", this.getDeclaredLicense() );
         LOG.debug( "SPDX Download URL: {}", this.getDownloadUrl() );
         LOG.debug( "SPDX Home page: {}", this.getHomePage() );
+        LOG.debug( "SPDX Created: {}", this.getCreated() );
         if ( this.documentAnnotations != null && this.documentAnnotations.length > 0 )
         {
             LOG.debug( "Document annotations: " );
@@ -443,4 +445,8 @@ public class SpdxProjectInformation
     {
         return this.externalRefs;
     }
+
+    public void setCreated( String created ) { this.created = created; }
+
+    public String getCreated() { return this.created; }
 }

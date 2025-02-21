@@ -41,6 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
         <jena.version>3.10.0</jena.version>
+        <project.build.outputTimestamp>1740169111</project.build.outputTimestamp>
     </properties>
 
     <dependencies>

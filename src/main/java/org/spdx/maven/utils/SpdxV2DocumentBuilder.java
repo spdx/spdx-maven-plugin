@@ -10,12 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -123,6 +118,8 @@ public class SpdxV2DocumentBuilder
             {
                 spdxDoc.setComment( projectInformation.getDocumentComment() );
             }
+            // created
+            Objects.requireNonNull( spdxDoc.getCreationInfo() ).setCreated( projectInformation.getCreated() );
             // creator
             fillCreatorInfo( projectInformation );
             // data license

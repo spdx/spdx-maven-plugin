@@ -40,6 +40,7 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.core.SpdxCoreConstants.SpdxMajorVersion;
 import org.spdx.library.SpdxModelFactory;
+import org.spdx.library.model.v2.SpdxConstantsCompatV2;
 import org.spdx.maven.utils.LicenseMapperException;
 import org.spdx.maven.utils.SpdxBuilderException;
 import org.spdx.maven.utils.SpdxCollectionException;
@@ -60,13 +61,16 @@ import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * NOTE: Currently this is a prototype plugin for supporting SPDX in a Maven build.
+ * NOTE: Plugin for supporting SPDX in a Maven build.
  * <p>
- * Goal which creates a new SPDX file for the package being built.  Will replace any existing SPDX file.
+ * Goal which creates new SPDX file(s) for the package being built.  Will replace any existing SPDX file(s).
  * <p>
  * All SPDX document and SPDX package properties are supported as parameters to the plugin.
  * <p>
@@ -86,6 +90,7 @@ import java.util.Map.Entry;
  * <li>package supplier: project organization</li>
  * <li>package versionInfo: project version</li>
  * <li>files for analysis: build source files + project resource files</li>
+ * <li>created: creation time of the SPDX document</li>
  * </ul><p>
  * Additional SPDX fields are supplied as configuration parameters to this plugin.
  */
@@ -530,6 +535,17 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     @Parameter( defaultValue = "true" )
     private boolean includeCompileScope;
+
+    /**
+     * SPDX Creation timestamp either formatted as ISO 8601
+     * <code>yyyy-MM-dd'T'HH:mm:ssXXX</code> or as an int representing seconds since the epoch.
+     *
+     * Reference: Reproducible <a href="https://reproducible-builds.org/docs/source-date-epoch/">Code Source-Date-Epoch spec</a>
+     *
+     * @since 1.0.0
+     */
+    @Parameter( defaultValue = "${project.build.outputTimestamp}" )
+    private String created;
 
     public void execute() throws MojoExecutionException
     {
@@ -978,6 +994,36 @@ public class CreateSpdxMojo extends AbstractMojo
         
         final Packaging packaging = Packaging.valueOfPackaging(  mavenProject.getPackaging() );
         retval.setPackaging( packaging != null ? packaging : Packaging.JAR );
+        Date createdDate;
+        getLog().info( "Created: " + this.created );
+        if ( this.created == null || this.created.isEmpty() )
+        {
+            createdDate = new Date();
+        }
+        else
+        {
+            // The created parameter can be either a seconds from epoch or an ISO 8601 format
+            // We'll check for the int value first
+            if ( created.matches( "\\d+" ) )
+            {
+                createdDate = new Date( Integer.parseInt( created ) );
+            }
+            else
+            {
+                try
+                {
+                    createdDate = Date.from( Instant.parse( created ) );
+                }
+                catch ( DateTimeParseException ex)
+                {
+                    getLog().warn( "Invalid created date " + created + ".  Using current date-time" );
+                    createdDate = new Date();
+                }
+
+            }
+
+        }
+        retval.setCreated( new SimpleDateFormat( SpdxConstantsCompatV2.SPDX_DATE_FORMAT).format( createdDate ) );
         return retval;
     }
 
