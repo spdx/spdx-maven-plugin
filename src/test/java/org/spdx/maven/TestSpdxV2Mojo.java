@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -71,6 +74,8 @@ public class TestSpdxV2Mojo extends AbstractMojoTestCase
     public void testExecute() throws Exception
     {
         File testPom = new File( getBasedir(), UNIT_TEST_RESOURCE_DIR + "/pom.xml" );
+        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(testPom));
+        System.out.println("Created time test: "+ pluginPomDom.getChild( "properties" ).getChild( "project.build.outputTimestamp" ));
         //        CreateSpdxMojo mojo = (CreateSpdxMojo) configureMojo( myMojo, "spdx-maven-plugin", testPom );
         // if the below does not work due to a lookup error, run mvn test goal
         CreateSpdxMojo mojo = (CreateSpdxMojo) lookupMojo( "createSPDX", testPom );
@@ -183,6 +188,8 @@ public class TestSpdxV2Mojo extends AbstractMojoTestCase
         }
         assertTrue( foundCreator1 );
         assertTrue( foundCreator2 );
+        // created
+        assertEquals( "2025-02-21T20:18:31Z", result.getCreationInfo().getCreated() );
         // package parameters
         assertEquals( 1, result.getDocumentDescribes().size() );
         SpdxElement described = result.getDocumentDescribes().toArray( new SpdxElement[result.getDocumentDescribes().size()] )[0];
