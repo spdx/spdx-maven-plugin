@@ -137,8 +137,6 @@ public class SpdxV3DocumentBuilder
             {
                 spdxDoc.setComment( projectInformation.getDocumentComment() );
             }
-            // created
-            requireNonNull( spdxDoc.getCreationInfo() ).setCreated( projectInformation.getCreated() );
             // creator
             fillCreatorInfo( projectInformation );
             // data license
@@ -216,6 +214,7 @@ public class SpdxV3DocumentBuilder
     {
         CreationInfo creationInfo = spdxDoc.getCreationInfo();
         requireNonNull( creationInfo, "CreationInfo for the SPDX document must not be null" );
+        creationInfo.setCreated( projectInformation.getCreated() );
         String[] parameterCreators = projectInformation.getCreators();
         for ( String parameterCreator : parameterCreators )
         {

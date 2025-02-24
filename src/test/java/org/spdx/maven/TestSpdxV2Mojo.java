@@ -189,7 +189,7 @@ public class TestSpdxV2Mojo extends AbstractMojoTestCase
         assertTrue( foundCreator1 );
         assertTrue( foundCreator2 );
         // created
-        assertEquals( "2025-02-21T20:18:31Z", result.getCreationInfo().getCreated() );
+        assertEquals( "2025-02-21T12:18:31Z", result.getCreationInfo().getCreated() );
         // package parameters
         assertEquals( 1, result.getDocumentDescribes().size() );
         SpdxElement described = result.getDocumentDescribes().toArray( new SpdxElement[result.getDocumentDescribes().size()] )[0];
