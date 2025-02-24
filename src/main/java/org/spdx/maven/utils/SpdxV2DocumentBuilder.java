@@ -118,8 +118,6 @@ public class SpdxV2DocumentBuilder
             {
                 spdxDoc.setComment( projectInformation.getDocumentComment() );
             }
-            // created
-            Objects.requireNonNull( spdxDoc.getCreationInfo() ).setCreated( projectInformation.getCreated() );
             // creator
             fillCreatorInfo( projectInformation );
             // data license
@@ -194,7 +192,7 @@ public class SpdxV2DocumentBuilder
                 LOG.warn( "Invalid creator string ( {} ), {} will be skipped.", verify, parameterCreator );
             }
         }
-        SpdxCreatorInformation spdxCreator = spdxDoc.createCreationInfo( creators, format.format( new Date() ) );
+        SpdxCreatorInformation spdxCreator = spdxDoc.createCreationInfo( creators, projectInformation.getCreated() );
         spdxCreator.setComment( projectInformation.getCreatorComment() );
         spdxCreator.setLicenseListVersion( ListedLicenses.getListedLicenses().getLicenseListVersion() );
         spdxDoc.setCreationInfo( spdxCreator );

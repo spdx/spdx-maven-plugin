@@ -951,7 +951,7 @@ public class CreateSpdxMojo extends AbstractMojo
         if ( mainArtifact != null && mainArtifact.getFile() != null )
         {
             packageFileName = mainArtifact.getArtifactId() + "-" + mainArtifact.getVersion() + "." + mainArtifact.getType();
-            packageFile = new File(mainArtifact.getFile().getParent() + File.separator + packageFileName);
+            packageFile = new File( mainArtifact.getFile().getParent() + File.separator + packageFileName );
         }
 
         Set<Checksum> checksums = null;
@@ -959,7 +959,7 @@ public class CreateSpdxMojo extends AbstractMojo
         {
             try
             {
-                getLog().debug( "Generating checksum for file "+packageFile.getAbsolutePath() );
+                getLog().debug( "Generating checksum for file " + packageFile.getAbsolutePath() );
                 Set<String> algorithms = getChecksumAlgorithms();
                 checksums = AbstractFileCollector.generateChecksum( packageFile, algorithms );
             }
@@ -991,11 +991,14 @@ public class CreateSpdxMojo extends AbstractMojo
         retval.setDocumentAnnotations( this.documentAnnotations );
         retval.setPackageAnnotations( this.packageAnnotations );
         retval.setExternalRefs( this.externalReferences );
-        
-        final Packaging packaging = Packaging.valueOfPackaging(  mavenProject.getPackaging() );
+
+        final Packaging packaging = Packaging.valueOfPackaging( mavenProject.getPackaging() );
         retval.setPackaging( packaging != null ? packaging : Packaging.JAR );
         Date createdDate;
-        getLog().info( "Created: " + this.created );
+        if ( this.created == null || this.created.isEmpty() )
+        {
+            this.created = mavenProject.getModel().getProperties().getProperty( "project.build.outputTimestamp" );
+        }
         if ( this.created == null || this.created.isEmpty() )
         {
             createdDate = new Date();
@@ -1006,7 +1009,7 @@ public class CreateSpdxMojo extends AbstractMojo
             // We'll check for the int value first
             if ( created.matches( "\\d+" ) )
             {
-                createdDate = new Date( Integer.parseInt( created ) );
+                createdDate = new Date( Long.parseLong( created ) * 1000 );
             }
             else
             {
