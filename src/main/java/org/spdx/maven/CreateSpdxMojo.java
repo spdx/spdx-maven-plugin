@@ -1026,7 +1026,9 @@ public class CreateSpdxMojo extends AbstractMojo
             }
 
         }
-        retval.setCreated( new SimpleDateFormat( SpdxConstantsCompatV2.SPDX_DATE_FORMAT).format( createdDate ) );
+        SimpleDateFormat dateFormat = new SimpleDateFormat( SpdxConstantsCompatV2.SPDX_DATE_FORMAT);
+        dateFormat.setTimeZone( TimeZone.getTimeZone("GMT") );
+        retval.setCreated( dateFormat.format( createdDate ) );
         return retval;
     }
 

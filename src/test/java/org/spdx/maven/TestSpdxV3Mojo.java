@@ -195,7 +195,7 @@ public class TestSpdxV3Mojo extends AbstractMojoTestCase
         }
         assertTrue( foundCreator1 );
         assertTrue( foundCreator2 );
-        assertEquals( "2025-02-21T12:18:31Z", result.getCreationInfo().getCreated() );
+        assertEquals( "2025-02-21T20:18:31Z", result.getCreationInfo().getCreated() );
         assertEquals( 1, result.getCreationInfo().getCreatedUsings().size() );
         assertEquals( "spdx-maven-plugin", result.getCreationInfo().getCreatedUsings().iterator().next().getName().get() );
         // package parameters
