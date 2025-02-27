@@ -3,7 +3,7 @@
 
   <groupId>org.spdx</groupId>
   <artifactId>spdx-maven-plugin</artifactId>
-  <version>1.0.0-RC2-SNAPSHOT</version>
+  <version>1.0.0-RC2</version>
   <packaging>maven-plugin</packaging>
 
   <name>spdx-maven-plugin Maven Plugin</name>
@@ -17,7 +17,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.build.outputTimestamp>1738452678</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1740695666</project.build.outputTimestamp>
     <maven.compiler.release>11</maven.compiler.release>
     <maven.version>3.8.5</maven.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -38,7 +38,7 @@
     <url>https://github.com/spdx/spdx-maven-plugin</url>
     <connection>scm:git:git@github.com:spdx/spdx-maven-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:spdx/spdx-maven-plugin.git</developerConnection>
-    <tag>master</tag>
+    <tag>v1.0.0-RC2</tag>
   </scm>
 
   <repositories>
