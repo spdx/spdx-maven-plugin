@@ -92,9 +92,9 @@ loadScripts(document, 'script');</script>
       threadSafe=true)
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">CreateSpdxMojo</span>
 <span class="extends-implements">extends org.apache.maven.plugin.AbstractMojo</span></div>
-<div class="block">NOTE: Currently this is a prototype plugin for supporting SPDX in a Maven build.
+<div class="block">NOTE: Plugin for supporting SPDX in a Maven build.
  <p>
- Goal which creates a new SPDX file for the package being built.  Will replace any existing SPDX file.
+ Goal which creates new SPDX file(s) for the package being built.  Will replace any existing SPDX file(s).
  <p>
  All SPDX document and SPDX package properties are supported as parameters to the plugin.
  <p>
@@ -114,6 +114,7 @@ loadScripts(document, 'script');</script>
  <li>package supplier: project organization</li>
  <li>package versionInfo: project version</li>
  <li>files for analysis: build source files + project resource files</li>
+ <li>created: creation time of the SPDX document</li>
  </ul><p>
  Additional SPDX fields are supplied as configuration parameters to this plugin.</div>
 </section>
