@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,6 +62,7 @@ import org.spdx.library.model.v3_0_1.software.Sbom;
 import org.spdx.library.model.v3_0_1.software.SoftwarePurpose;
 import org.spdx.library.model.v3_0_1.software.SpdxFile;
 import org.spdx.library.model.v3_0_1.software.SpdxPackage;
+import org.spdx.maven.LicenseOverwrite;
 import org.spdx.maven.OutputFormat;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.IModelStore.IdType;
@@ -77,6 +80,7 @@ public class SpdxV3DependencyBuilder
 {   
     private final SpdxDocument spdxDoc;
     private final SpdxV3LicenseManager licenseManager;
+    private final Map<LicenseOverwrite, AnyLicenseInfo> licenseOverwrites = new HashMap<>();
     
     /**
      * @param builder The document builder
@@ -215,13 +219,34 @@ public class SpdxV3DependencyBuilder
         String copyright = "UNSPECIFIED";
         String notice = "UNSPECIFIED";
         String downloadLocation = "NOASSERTION";
-        AnyLicenseInfo declaredLicense = mavenLicensesToSpdxLicense( project.getLicenses() );
+
+        Optional<AnyLicenseInfo> declaredLicenseOverwrite = applyLicenseOverwrites( project, "declared" );
+        AnyLicenseInfo originalDeclaredLicense = mavenLicensesToSpdxLicense( project.getLicenses() );
+        AnyLicenseInfo declaredLicense = declaredLicenseOverwrite.orElse( originalDeclaredLicense );
+
         fileInfo.setComment( "" );
-        fileInfo.setConcludedLicense( "NOASSERTION" );
+        Optional<AnyLicenseInfo> concludedLicenseOverwrite = applyLicenseOverwrites( project, "concluded" );
+        String originalConcludedLicense = "NOASSERTION";
+        fileInfo.setConcludedLicense( concludedLicenseOverwrite
+                .map( AnyLicenseInfo::toString )
+                .orElse( originalConcludedLicense ) );
         fileInfo.setContributors( fileContributorList.toArray( new String[0] ) );
         fileInfo.setCopyright( copyright );
         fileInfo.setDeclaredLicense( declaredLicense.toString() );
-        fileInfo.setLicenseComment( "" );
+        
+        List<String> comment = new ArrayList<>();
+
+        if ( declaredLicenseOverwrite.isPresent() )
+        {
+            comment.add( "Declared license has been overwritten, original value: " + originalDeclaredLicense );
+        }
+
+        if ( concludedLicenseOverwrite.isPresent() )
+        {
+            comment.add( "Concluded license has been overwritten, original value: " + originalConcludedLicense );
+        } 
+
+        fileInfo.setLicenseComment( comment.stream().collect( Collectors.joining("\n") ) );
         fileInfo.setNotice( notice );
 
         SpdxPackage retval = spdxDoc.createSpdxPackage(  spdxDoc.getIdPrefix() + 
@@ -235,19 +260,30 @@ public class SpdxV3DependencyBuilder
         {
             retval.setPackageUrl( SpdxExternalRefBuilder.generatePurl( project ) );
         }
-        spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
+        Relationship.RelationshipBuilder declaredLicenseRelationship = spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
                                     spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
                     .setFrom( retval )
                     .addTo( declaredLicense )
-                    .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
-                    .build();
-        spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
+                    .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE );
+
+        if ( declaredLicenseOverwrite.isPresent() )
+        {
+            declaredLicenseRelationship.setComment( "Declared license has been overwritten, original value: " + originalDeclaredLicense );
+        }
+        declaredLicenseRelationship.build();
+
+        Relationship.RelationshipBuilder concludedLicenseRelationship = spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
                                     spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
                     .setFrom( retval )
                     .addTo( new NoAssertionLicense() )
-                    .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
-                    .build();
-        
+                    .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
+
+        if ( concludedLicenseOverwrite.isPresent() )
+        {
+                    concludedLicenseRelationship.setComment( "Concluded license has been overwritten, original value: " + originalConcludedLicense );
+        }
+        concludedLicenseRelationship.build();
+
         if ( project.getVersion() != null )
         {
             retval.setPackageVersion( project.getVersion() );
@@ -936,5 +972,23 @@ public class SpdxV3DependencyBuilder
             return MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License( mavenLicenses, spdxDoc );
         }
 
+    }
+
+    /**
+     * @param licenseOverwrite the configured license overwrite
+     * @param parsedLicense the the parsed licenseString of the licenseOverwrite
+     */
+    public void addLicenseOverwrite( LicenseOverwrite licenseOverwrite, AnyLicenseInfo parsedLicense )
+    {
+        this.licenseOverwrites.put( licenseOverwrite, parsedLicense );
+    }
+
+    Optional<AnyLicenseInfo> applyLicenseOverwrites( MavenProject mavenProject, String target )
+    {
+        return licenseOverwrites.entrySet().stream()
+                .filter( (overwrite) -> overwrite.getKey().appliesTo( mavenProject, target ) )
+                .reduce( (a, b) -> {
+            throw new IllegalStateException( "multiple matching license overwrites: " + a.getKey() + " vs. " + b.getKey() );
+        } ).map( Map.Entry::getValue );
     }
 }

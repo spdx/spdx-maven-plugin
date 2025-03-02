@@ -66,6 +66,8 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.Map.Entry;
+import org.spdx.library.LicenseInfoFactory;
+import org.spdx.library.model.v2.license.InvalidLicenseStringException;
 
 /**
  * NOTE: Plugin for supporting SPDX in a Maven build.
@@ -112,7 +114,7 @@ public class CreateSpdxMojo extends AbstractMojo
     public static final String JSON_OUTPUT_FORMAT = "JSON";
 
     public static final String RDF_OUTPUT_FORMAT = "RDF/XML";
-    
+
     static
     {
         SpdxModelFactory.init();
@@ -172,6 +174,26 @@ public class CreateSpdxMojo extends AbstractMojo
      */
     @Parameter
     private NonStandardLicense[] nonStandardLicenses;
+
+    /**
+     * License overwrites to dependencies, used to fix incorrect or missing license infos.
+     * <pre>
+     * &lt;configuration&gt;
+     *   &lt;licenseOverwrites&gt;
+     *     &lt;licenseOverwrite&gt;
+     *       &lt;target&gt;&lt;/target&gt; &lt;!-- Required, either both, concluded or declared --&gt;
+     *       &lt;groupId&gt;&lt;/groupId&gt; &lt;!-- Required --&gt;
+     *       &lt;artifactId&gt;&lt;/artifactId&gt; &lt;!-- Required --&gt;
+     *       &lt;version&gt;&lt;/version&gt;
+     *       &lt;licenseString&gt;&lt;/licenseString&gt; &lt;!-- Required, the SPDX license string --&gt;
+     *     &lt;/licenseOverwrite&gt;
+     *     &lt;!-- ... more ... --&gt;
+     *   &lt;/licenseOverwrites&gt;
+     * &lt;/configuration&gt;
+     * </pre>
+     */
+    @Parameter
+    private LicenseOverwrite[] licenseOverwrites;
 
     /**
      * Optional parameter if set to true will match a Maven license to an SPDX standard license if the Maven license URL
@@ -486,7 +508,7 @@ public class CreateSpdxMojo extends AbstractMojo
       */
     @Parameter( property = "spdx.skip" )
     private boolean skip = false;
-    
+
     /**
      * If true, use ${project.groupId}:${artifactId} as the SPDX package name.
      * Otherwise, ${project.name} will be used
@@ -675,12 +697,12 @@ public class CreateSpdxMojo extends AbstractMojo
                 builder = new SpdxV3DocumentBuilder( mavenProject, generatePurls, spdxFile, namespaceUri,
                         outputFormatEnum );
             }
-            else 
+            else
             {
                 builder = new SpdxV2DocumentBuilder( mavenProject, generatePurls, spdxFile, namespaceUri,
                         outputFormatEnum );
             }
-            
+
         }
         catch ( SpdxBuilderException e )
         {
@@ -722,17 +744,72 @@ public class CreateSpdxMojo extends AbstractMojo
         AbstractDependencyBuilder dependencyBuilder;
         if ( builder instanceof SpdxV3DocumentBuilder )
         {
-            dependencyBuilder = new SpdxV3DependencyBuilder( (SpdxV3DocumentBuilder)builder, createExternalRefs,
+            SpdxV3DocumentBuilder documentBuilder = (SpdxV3DocumentBuilder) builder;
+            SpdxV3DependencyBuilder dependencyBuilderV3 = new SpdxV3DependencyBuilder(
+                                                      documentBuilder, createExternalRefs,
                                                       generatePurls, useArtifactID,
                                                       includeTransitiveDependencies );
+            if ( licenseOverwrites != null )
+            {
+                org.spdx.library.model.v3_0_1.core.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
+
+                for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
+                {
+                    org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo parsedLicense;
+
+                    try
+                    {
+                        // parse the licenseString before use to fail fast with a broken configuration
+                        parsedLicense = LicenseInfoFactory.parseSPDXLicenseString(
+                                licenseOverwrite.getLicenseString(), spdxDoc.getModelStore(),
+                                spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), null );
+                    }
+                    catch ( InvalidLicenseStringException e )
+                    {
+                        // add some info the help the user fixing the configuration
+                        throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
+                    }
+
+                    dependencyBuilderV3.addLicenseOverwrite( licenseOverwrite, parsedLicense );
+                }
+            }
+            dependencyBuilder = dependencyBuilderV3;
         }
         else
         {
-            dependencyBuilder = new SpdxV2DependencyBuilder( (SpdxV2DocumentBuilder)builder,
-                                                      createExternalRefs, generatePurls, useArtifactID,
+            SpdxV2DocumentBuilder documentBuilder = (SpdxV2DocumentBuilder) builder;
+            SpdxV2DependencyBuilder dependencyBuilderV2 = new SpdxV2DependencyBuilder(
+                                                      documentBuilder, createExternalRefs,
+                                                      generatePurls, useArtifactID,
                                                       includeTransitiveDependencies );
-        }
 
+            if ( licenseOverwrites != null )
+            {
+                org.spdx.library.model.v2.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
+
+                for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
+                {
+                    org.spdx.library.model.v2.license.AnyLicenseInfo parsedLicense;
+
+                    try
+                    {
+                        // parse the licenseString before use to fail fast with a broken configuration
+                        parsedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2(
+                                licenseOverwrite.getLicenseString(), spdxDoc.getModelStore(),
+                                spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
+                    }
+                    catch ( InvalidLicenseStringException e )
+                    {
+                        // add some info the help the user fixing the configuration
+                        throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
+                    }
+
+                    dependencyBuilderV2.addLicenseOverwrite( licenseOverwrite, parsedLicense );
+                }
+            }
+
+            dependencyBuilder = dependencyBuilderV2;
+        }
         if ( session != null )
         {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
@@ -1107,7 +1184,7 @@ public class CreateSpdxMojo extends AbstractMojo
         if (includeRuntimeScope) scopes.add("runtime");
         if (includeSystemScope) scopes.add("system");
         if (includeTestScope) scopes.add("test");
-        
+
         getLog().debug( scopes.toString() );
         return new CumulativeScopeArtifactFilter(scopes);
     }
