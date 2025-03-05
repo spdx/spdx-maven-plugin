@@ -125,13 +125,17 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.spdx.core.CoreModelObject,org.apache.maven.shared.dependency.graph.DependencyNode,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject)" class="member-name-link">addMavenDependency</a><wbr>(org.spdx.core.CoreModelObject&nbsp;parentPackage,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addLicenseOverwrite(org.spdx.maven.LicenseOverwrite,org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo)" class="member-name-link">addLicenseOverwrite</a><wbr>(<a href="../LicenseOverwrite.html" title="class in org.spdx.maven">LicenseOverwrite</a>&nbsp;licenseOverwrite,
+ org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo&nbsp;parsedLicense)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.spdx.core.CoreModelObject,org.apache.maven.shared.dependency.graph.DependencyNode,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject)" class="member-name-link">addMavenDependency</a><wbr>(org.spdx.core.CoreModelObject&nbsp;parentPackage,
  org.apache.maven.shared.dependency.graph.DependencyNode&nbsp;dependencyNode,
  org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
  org.apache.maven.execution.MavenSession&nbsp;session,
  org.apache.maven.project.MavenProject&nbsp;mavenProject)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -192,6 +196,18 @@ org.spdx.core.InvalidSPDXAnalysisException</span></div>
 <dt>Throws:</dt>
 <dd><code><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a></code></dd>
 <dd><code>org.spdx.core.InvalidSPDXAnalysisException</code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="addLicenseOverwrite(org.spdx.maven.LicenseOverwrite,org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo)">
+<h3>addLicenseOverwrite</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addLicenseOverwrite</span><wbr><span class="parameters">(<a href="../LicenseOverwrite.html" title="class in org.spdx.maven">LicenseOverwrite</a>&nbsp;licenseOverwrite,
+ org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo&nbsp;parsedLicense)</span></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>licenseOverwrite</code> - the configured license overwrite</dd>
+<dd><code>parsedLicense</code> - the the parsed licenseString of the licenseOverwrite</dd>
 </dl>
 </section>
 </li>

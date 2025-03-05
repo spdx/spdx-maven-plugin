@@ -467,6 +467,32 @@
           
 <tr class="a">
             
+<td align="left"><code><a href="#licenseOverwrites">&lt;licenseOverwrites&gt;</a></code></td>
+            
+<td><code><a href="apidocs/org/spdx/maven/LicenseOverwrite.html">LicenseOverwrite[]</a></code></td>
+            
+<td><code>-</code></td>
+            
+<td>License overwrites to dependencies, used to fix incorrect or missing license infos. 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;licenseOverwrites&gt;
+    &lt;licenseOverwrite&gt;
+      &lt;target&gt;&lt;/target&gt; &lt;!-- Required, either both, concluded or declared --&gt;
+      &lt;groupId&gt;&lt;/groupId&gt; &lt;!-- Required --&gt;
+      &lt;artifactId&gt;&lt;/artifactId&gt; &lt;!-- Required --&gt;
+      &lt;version&gt;&lt;/version&gt;
+      &lt;licenseString&gt;&lt;/licenseString&gt; &lt;!-- Required, the SPDX license string --&gt;
+    &lt;/licenseOverwrite&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/licenseOverwrites&gt;
+&lt;/configuration&gt;
+</pre></div><br /></td>
+          </tr>
+          
+<tr class="b">
+            
 <td align="left"><code><a href="#matchLicensesOnCrossReferenceUrls">&lt;matchLicensesOnCrossReferenceUrls&gt;</a></code></td>
             
 <td><code>boolean</code></td>
@@ -476,7 +502,7 @@
 <td>Optional parameter if set to true will match a Maven license to an SPDX standard license if the Maven license URL matches any of the cross-reference license URLs for a standard license. Default value is true. Note: Several SPDX standard licenses contain the same cross-reference license URL. In this case, the SPDX standard license used in indeterminate.<br /><b>Default value is</b>: <code>true</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#nonStandardLicenses">&lt;nonStandardLicenses&gt;</a></code></td>
             
@@ -504,7 +530,7 @@
 </pre></div><br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#onlyUseLocalLicenses">&lt;onlyUseLocalLicenses&gt;</a></code></td>
             
@@ -515,7 +541,7 @@
 <td>Configure whether only locally cached license list should be used. (a) If set to true, only locally cached version of license list is used. (b) otherwise, the license list is queried over the internet.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#originator">&lt;originator&gt;</a></code></td>
             
@@ -528,7 +554,7 @@
 <p>The default for this is the Maven organization</p><br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#outputFormat">&lt;outputFormat&gt;</a></code></td>
             
@@ -539,7 +565,7 @@
 <td>Output file format for the SPDX file. One of: - JSON - JSON SPDX format - RDF/XML - RDF/XML format<br /><b>Default value is</b>: <code>JSON</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#packageAnnotations">&lt;packageAnnotations&gt;</a></code></td>
             
@@ -564,7 +590,7 @@
 </pre></div><br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#pathsWithSpecificSpdxInfo">&lt;pathsWithSpecificSpdxInfo&gt;</a></code></td>
             
@@ -611,7 +637,7 @@
 </pre></div><br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#skip">&lt;skip&gt;</a></code></td>
             
@@ -622,7 +648,7 @@
 <td>Skip goal execution.<br /><b>User property is</b>: <code>spdx.skip</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#sourceInfo">&lt;sourceInfo&gt;</a></code></td>
             
@@ -633,7 +659,7 @@
 <td>This field provides a place for the SPDX file creator to record any relevant background information or additional comments about the origin of the package. For example, this field might include comments indicating whether the package been was pulled from a source code management system or has been repackaged.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#spdxDocumentNamespace">&lt;spdxDocumentNamespace&gt;</a></code></td>
             
@@ -644,7 +670,7 @@
 <td>Document namespace - must be unique for the artifact and SPDX file<br /><b>Default value is</b>: <code>http://spdx.org/spdxpackages/${project.groupId}_${project.artifactId}-${project.version}</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#spdxFile">&lt;spdxFile&gt;</a></code></td>
             
@@ -655,7 +681,7 @@
 <td>SPDX File name<br /><b>Default value is</b>: <code>${project.reporting.outputDirectory}/${project.groupId}_${project.artifactId}-${project.version}.spdx</code>.<br /><b>User property is</b>: <code>spdxFileName</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#useArtifactID">&lt;useArtifactID&gt;</a></code></td>
             
@@ -1010,6 +1036,31 @@
 <ul>
           
 <li><b>Type</b>: <code>java.lang.String</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+        </ul><hr /></section><section>
+<h4><a name="a.3ClicenseOverwrites.3E"></a><b><a name="licenseOverwrites">&lt;licenseOverwrites&gt;</a></b></h4>
+        
+<div>License overwrites to dependencies, used to fix incorrect or missing license infos. 
+
+<div>
+<pre>&lt;configuration&gt;
+  &lt;licenseOverwrites&gt;
+    &lt;licenseOverwrite&gt;
+      &lt;target&gt;&lt;/target&gt; &lt;!-- Required, either both, concluded or declared --&gt;
+      &lt;groupId&gt;&lt;/groupId&gt; &lt;!-- Required --&gt;
+      &lt;artifactId&gt;&lt;/artifactId&gt; &lt;!-- Required --&gt;
+      &lt;version&gt;&lt;/version&gt;
+      &lt;licenseString&gt;&lt;/licenseString&gt; &lt;!-- Required, the SPDX license string --&gt;
+    &lt;/licenseOverwrite&gt;
+    &lt;!-- ... more ... --&gt;
+  &lt;/licenseOverwrites&gt;
+&lt;/configuration&gt;
+</pre></div></div>
+        
+<ul>
+          
+<li><b>Type</b>: <code><a href="apidocs/org/spdx/maven/LicenseOverwrite.html">org.spdx.maven.LicenseOverwrite[]</a></code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>

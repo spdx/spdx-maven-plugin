@@ -125,22 +125,26 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.spdx.core.CoreModelObject,org.apache.maven.shared.dependency.graph.DependencyNode,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject)" class="member-name-link">addMavenDependency</a><wbr>(org.spdx.core.CoreModelObject&nbsp;parentPackage,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addLicenseOverwrite(org.spdx.maven.LicenseOverwrite,org.spdx.library.model.v2.license.AnyLicenseInfo)" class="member-name-link">addLicenseOverwrite</a><wbr>(<a href="../LicenseOverwrite.html" title="class in org.spdx.maven">LicenseOverwrite</a>&nbsp;licenseOverwrite,
+ org.spdx.library.model.v2.license.AnyLicenseInfo&nbsp;parsedLicense)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMavenDependency(org.spdx.core.CoreModelObject,org.apache.maven.shared.dependency.graph.DependencyNode,org.apache.maven.project.ProjectBuilder,org.apache.maven.execution.MavenSession,org.apache.maven.project.MavenProject)" class="member-name-link">addMavenDependency</a><wbr>(org.spdx.core.CoreModelObject&nbsp;parentPackage,
  org.apache.maven.shared.dependency.graph.DependencyNode&nbsp;dependencyNode,
  org.apache.maven.project.ProjectBuilder&nbsp;mavenProjectBuilder,
  org.apache.maven.execution.MavenSession&nbsp;session,
  org.apache.maven.project.MavenProject&nbsp;mavenProject)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>protected static org.spdx.library.model.v2.SpdxPackage</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#findMatchingDescribedPackage(org.spdx.library.model.v2.SpdxDocument,java.lang.String)" class="member-name-link">findMatchingDescribedPackage</a><wbr>(org.spdx.library.model.v2.SpdxDocument&nbsp;externalSpdxDoc,
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>protected static org.spdx.library.model.v2.SpdxPackage</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#findMatchingDescribedPackage(org.spdx.library.model.v2.SpdxDocument,java.lang.String)" class="member-name-link">findMatchingDescribedPackage</a><wbr>(org.spdx.library.model.v2.SpdxDocument&nbsp;externalSpdxDoc,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;artifactId)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Searched the described packages for the SPDX document for the closest matching package to the artifactId</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>protected static org.spdx.library.model.v2.SpdxDocument</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#spdxDocumentFromFile(java.lang.String)" class="member-name-link">spdxDocumentFromFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;path)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>protected static org.spdx.library.model.v2.SpdxDocument</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#spdxDocumentFromFile(java.lang.String)" class="member-name-link">spdxDocumentFromFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;path)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates an SPDX document from a file</div>
 </div>
 </div>
@@ -241,6 +245,18 @@ org.spdx.core.InvalidSPDXAnalysisException</span></div>
 <dt>Throws:</dt>
 <dd><code><a href="LicenseMapperException.html" title="class in org.spdx.maven.utils">LicenseMapperException</a></code></dd>
 <dd><code>org.spdx.core.InvalidSPDXAnalysisException</code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="addLicenseOverwrite(org.spdx.maven.LicenseOverwrite,org.spdx.library.model.v2.license.AnyLicenseInfo)">
+<h3>addLicenseOverwrite</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addLicenseOverwrite</span><wbr><span class="parameters">(<a href="../LicenseOverwrite.html" title="class in org.spdx.maven">LicenseOverwrite</a>&nbsp;licenseOverwrite,
+ org.spdx.library.model.v2.license.AnyLicenseInfo&nbsp;parsedLicense)</span></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>licenseOverwrite</code> - the configured license overwrite</dd>
+<dd><code>parsedLicense</code> - the the parsed licenseString of the licenseOverwrite</dd>
 </dl>
 </section>
 </li>
