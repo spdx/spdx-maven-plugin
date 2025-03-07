@@ -420,6 +420,7 @@ public class SpdxV3DependencyBuilder
         try
         {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+            request.setProcessPlugins( false );
             request.setRemoteRepositories( mavenProject.getRemoteArtifactRepositories() );
             for ( ArtifactRepository ar : request.getRemoteRepositories() ) {
                 LOG.debug( "request Remote repository ID: {}", ar.getId() );
