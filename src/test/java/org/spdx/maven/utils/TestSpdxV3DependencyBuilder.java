@@ -132,3 +132,4 @@ public class TestSpdxV3DependencyBuilder
         return dependencyBuilder.applyLicenseOverwrites( mavenProject, "concluded" );
     }
 }
+

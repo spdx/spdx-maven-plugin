@@ -310,10 +310,10 @@ public class SpdxV2DependencyBuilder
             comment.add( "Concluded license has been overwritten, original value: " + originalConcludedLicense );
         } 
 
-        fileInfo.setLicenseComment( comment.stream().collect( Collectors.joining("\n") ) );
+        fileInfo.setLicenseComment( String.join( "\n", comment ) );
         fileInfo.setNotice( notice );
 
-        SpdxPackage retval = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
+        SpdxPackage retval = spdxDoc.createPackage( IdGenerator.getIdGenerator().generateId( project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion() ),
                                                     packageName, new SpdxNoAssertionLicense(), copyright, declaredLicense )
                         .setDownloadLocation( downloadLocation )
                         .setFilesAnalyzed( false )
@@ -457,7 +457,7 @@ public class SpdxV2DependencyBuilder
         // Name will be the artifact ID
         LOG.debug( "Dependency {}Using only artifact information to create dependent package",
                 artifact.getArtifactId() );
-        return spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
+        return spdxDoc.createPackage( IdGenerator.getIdGenerator().generateId( artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() ),
                                                  artifact.getArtifactId(), new SpdxNoAssertionLicense(), "NOASSERTION",
                                                  new SpdxNoAssertionLicense() )
                         .setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." )
@@ -527,7 +527,7 @@ public class SpdxV2DependencyBuilder
         SpdxPackage source = findMatchingDescribedPackage( externalSpdxDoc, artifactId );
         Optional<String> downloadLocation = source.getDownloadLocation();
         Optional<String> name = source.getName();
-        SpdxPackage dest = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
+        SpdxPackage dest = spdxDoc.createPackage( IdGenerator.getIdGenerator().generateId( externalSpdxDoc.getId() + source.getName() ),
                         name.orElse( "NONE" ), source.getLicenseConcluded(), source.getCopyrightText(),
                                                   source.getLicenseDeclared() )
                       .setFilesAnalyzed( false )
