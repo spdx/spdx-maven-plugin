@@ -80,6 +80,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
      * @param relationshipType        Type of relationship to the project package
      * @param projectPackage          Package to which the files belong
      * @param spdxDoc                 SPDX document which contains the extracted license infos that may be needed for license parsing
+     * @param algorithms              algorithms to use to generate checksums
      *
      * @throws SpdxCollectionException on incompatible types in an SPDX collection
      */
