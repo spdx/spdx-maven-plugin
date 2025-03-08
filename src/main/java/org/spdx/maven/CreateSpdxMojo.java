@@ -483,6 +483,16 @@ public class CreateSpdxMojo extends AbstractMojo
     private String outputFormat;
 
     /**
+     * Type of the SPDX file.  One of:
+     * - consolidated - include source code files to the license scan
+     * - build - exclude source code files from the license scan
+     *
+     * @since 1.0.0
+     */
+    @Parameter( defaultValue = "consolidated" )
+    private String sbomType;
+
+    /**
      * If true, external document references will be created for any dependencies which
      * contain SPDX documents.  If false, the dependent package information will be copied
      * from the SPDX document into the generated SPDX document.
@@ -611,8 +621,9 @@ public class CreateSpdxMojo extends AbstractMojo
             logFileSpecificInfo( pathSpecificInformation );
         }
 
-        builder.collectSpdxFileInformation( sources, mavenProject.getBasedir().getAbsolutePath(), defaultFileInformation, pathSpecificInformation, getChecksumAlgorithms() );
-
+        builder.collectSpdxFileInformation( sources, mavenProject.getBasedir().getAbsolutePath(), defaultFileInformation, 
+                pathSpecificInformation, getChecksumAlgorithms(), !"build".equals(sbomType) );
+    
         // add dependencies information
         try
         {

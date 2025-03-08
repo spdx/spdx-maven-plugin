@@ -102,14 +102,17 @@ public abstract class AbstractDocumentBuilder
      * @param sources                     Source directories to be included in the document
      * @param baseDir                     project base directory used to construct the relative paths for the SPDX
      *                                    files
+     * @param defaultFileInformation      Information on default SPDX field data for the files
      * @param pathSpecificInformation     Map of path to file information used to override the default file information
      * @param checksumAlgorithms          algorithms to use to generate checksums
+     * @param attachFiles                 attach scanned files to the output SPDX document (V2 only)
      * @throws SpdxBuilderException       on errors collecting files
      */
     public abstract void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                                         SpdxDefaultFileInformation defaultFileInformation,
                                                         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
-                                                        Set<String> checksumAlgorithms ) throws SpdxBuilderException;
+                                                        Set<String> checksumAlgorithms,
+                                                        boolean attachFiles ) throws SpdxBuilderException;
 
     /**
      * Saves the SPDX document to the file

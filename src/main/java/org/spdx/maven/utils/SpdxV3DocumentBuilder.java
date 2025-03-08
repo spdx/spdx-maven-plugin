@@ -486,7 +486,8 @@ public class SpdxV3DocumentBuilder
     public void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                             SpdxDefaultFileInformation defaultFileInformation,
                                             HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
-                                            Set<String> checksumAlgorithms ) throws SpdxBuilderException
+                                            Set<String> checksumAlgorithms,
+                                            boolean attachFiles) throws SpdxBuilderException
     {
         SpdxV3FileCollector fileCollector = new SpdxV3FileCollector( customIdToUri );
         try

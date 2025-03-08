@@ -624,9 +624,6 @@ public class TestSpdxV2FileCollector
     @Test
     public void testGenerateChecksums() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        SpdxV2FileCollector collector = new SpdxV2FileCollector();
-        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
         File spdxFile = new File( filePaths[0] );
 
         Set<String> checksumAlgorithmSet = new HashSet<>();
