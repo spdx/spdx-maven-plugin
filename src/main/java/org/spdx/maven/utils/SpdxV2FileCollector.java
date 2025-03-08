@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.function.Predicate;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
@@ -80,6 +81,8 @@ public class SpdxV2FileCollector extends AbstractFileCollector
      * @param relationshipType        Type of relationship to the project package
      * @param projectPackage          Package to which the files belong
      * @param spdxDoc                 SPDX document which contains the extracted license infos that may be needed for license parsing
+     * @param algorithms              algorithms to use to generate checksums
+     * @param collectSourceFiles      source files should be collected or not
      *
      * @throws SpdxCollectionException on incompatible types in an SPDX collection
      */
@@ -88,8 +91,11 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                              SpdxDefaultFileInformation defaultFileInformation,
                              Map<String, SpdxDefaultFileInformation> pathSpecificInformation,
                              SpdxPackage projectPackage, RelationshipType relationshipType,
-                             SpdxDocument spdxDoc, Set<String> algorithms ) throws SpdxCollectionException
+                             SpdxDocument spdxDoc, Set<String> algorithms,
+                             boolean collectSourceFiles ) throws SpdxCollectionException
     {
+        Predicate<FileType> typeFilter = ( fileType ) -> fileType != FileType.SOURCE || collectSourceFiles;
+
         for ( FileSet fileSet : fileSets )
         {
             String[] includedFiles = fileSetManager.getIncludedFiles( fileSet );
@@ -114,7 +120,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                 {
                     outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                 }
-                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, spdxDoc, algorithms );
+                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, spdxDoc, algorithms, typeFilter );
             }
         }
     }
@@ -164,17 +170,23 @@ public class SpdxV2FileCollector extends AbstractFileCollector
      * @param projectPackage   Package to which the files belong
      * @param spdxDoc          SPDX Document which will contain the files
      * @param algorithms       algorithms to use to generate checksums
+     * @param typeFilter              filter to restrict what kind of files should be collected
      * @throws SpdxCollectionException on incompatible type errors in an SPDX collection
      */
     private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, 
                               RelationshipType relationshipType, SpdxPackage projectPackage, 
-                              SpdxDocument spdxDoc, Set<String> algorithms ) throws SpdxCollectionException
+                              SpdxDocument spdxDoc, Set<String> algorithms, 
+                              Predicate<FileType> typeFilter ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() ) )
         {
             return; // already added from a previous scan
         }
-        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms, spdxDoc );
+        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms, spdxDoc, typeFilter );
+        if (spdxFile == null)
+        {
+            return;
+        }
         try
         {
             Relationship relationship = spdxDoc.createRelationship( projectPackage, relationshipType, "" );
@@ -261,17 +273,23 @@ public class SpdxV2FileCollector extends AbstractFileCollector
      * @param defaultFileInformation Information on default SPDX field data for the files
      * @param algorithms             algorithms to use to generate checksums
      * @param spdxDoc                SPDX document which will contain the SPDX file
+     * @param typeFilter              filter to restrict what kind of files should be collected
      * @return                       SPDX file based on file and default file information
      * @throws SpdxCollectionException on incompatible class types in an SPDX collection
      */
     private SpdxFile convertToSpdxFile( File file, String outputFileName, 
                                         SpdxDefaultFileInformation defaultFileInformation, 
                                         Set<String> algorithms,
-                                        SpdxDocument spdxDoc ) throws SpdxCollectionException
+                                        SpdxDocument spdxDoc,
+                                        Predicate<FileType> typeFilter ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
         ArrayList<FileType> fileTypes = new ArrayList<>();
         fileTypes.add( extensionToFileType( getExtension( file ) ) );
+        if ( fileTypes.stream().noneMatch( typeFilter ) )
+        {
+            return null;
+        }
         Set<Checksum> checksums;
         try
         {

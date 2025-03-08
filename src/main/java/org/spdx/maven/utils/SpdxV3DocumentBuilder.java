@@ -56,6 +56,8 @@ import org.spdx.storage.simple.InMemSpdxStore;
 import org.spdx.v3jsonldstore.JsonLDStore;
 
 import static java.util.Objects.requireNonNull;
+import java.util.function.Predicate;
+import org.spdx.library.model.v2.enumerations.FileType;
 
 /**
  * Builder for SPDX Spec version 3 SBOMs
@@ -479,13 +481,15 @@ public class SpdxV3DocumentBuilder
     public void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                             SpdxDefaultFileInformation defaultFileInformation,
                                             HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
-                                            Set<String> checksumAlgorithms ) throws SpdxBuilderException
+                                            Set<String> checksumAlgorithms,
+                                            boolean collectSourceFiles ) throws SpdxBuilderException
     {
         SpdxV3FileCollector fileCollector = new SpdxV3FileCollector( customIdToUri );
         try
         {
             fileCollector.collectFiles( sources, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc, checksumAlgorithms );
+                    pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc,
+                    checksumAlgorithms, collectSourceFiles );
             Relationship pkgRelationship = projectPackage.createRelationship( projectPackage.getIdPrefix() + projectPackage.getModelStore().getNextId( IdType.SpdxId ) )
                                                 .setFrom( projectPackage )
                                                 .setRelationshipType( RelationshipType.CONTAINS )
