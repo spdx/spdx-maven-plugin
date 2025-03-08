@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.function.Predicate;
 
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,6 +44,7 @@ import org.spdx.library.model.v2.license.SpdxListedLicense;
 import org.spdx.library.referencetype.ListedReferenceTypes;
 import org.spdx.library.model.v2.enumerations.AnnotationType;
 import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
+import org.spdx.library.model.v2.enumerations.FileType;
 import org.spdx.library.model.v2.enumerations.Purpose;
 import org.spdx.maven.Checksum;
 import org.spdx.maven.ExternalReference;
@@ -378,13 +380,15 @@ public class SpdxV2DocumentBuilder
     public void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                             SpdxDefaultFileInformation defaultFileInformation,
                                             HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
-                                            Set<String> checksumAlgorithms ) throws SpdxBuilderException
+                                            Set<String> checksumAlgorithms,
+                                            boolean collectSourceFiles ) throws SpdxBuilderException
     {
         SpdxV2FileCollector fileCollector = new SpdxV2FileCollector();
         try
         {
             fileCollector.collectFiles( sources, baseDir, defaultFileInformation,
-                    pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc, checksumAlgorithms );
+                    pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc,
+                    checksumAlgorithms, collectSourceFiles );
             projectPackage.getFiles().addAll( fileCollector.getFiles() );
             projectPackage.getLicenseInfoFromFiles().addAll( fileCollector.getLicenseInfoFromFiles() );
         }

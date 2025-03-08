@@ -18,6 +18,7 @@ package org.spdx.maven.utils;
 import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
@@ -113,6 +114,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
      * @param relationshipType        Type of relationship to the project package
      * @param projectPackage          Package to which the files belong
      * @param spdxDoc                 SPDX document which contains the extracted license infos that may be needed for license parsing
+     * @param algorithms              algorithms to use to generate checksums
+     * @param collectSourceFiles      source files should be collected or not
      *
      * @throws SpdxCollectionException on incompatible types in an SPDX collection
      */
@@ -120,8 +123,11 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                               SpdxDefaultFileInformation defaultFileInformation, 
                               Map<String, SpdxDefaultFileInformation> pathSpecificInformation, 
                               SpdxPackage projectPackage, RelationshipType relationshipType, 
-                              SpdxDocument spdxDoc, Set<String> algorithms ) throws SpdxCollectionException
+                              SpdxDocument spdxDoc, Set<String> algorithms, 
+                              boolean collectSourceFiles ) throws SpdxCollectionException
     {
+        Predicate<SoftwarePurpose> purposeFilter = ( purpose ) -> purpose != SoftwarePurpose.SOURCE || collectSourceFiles;
+
         for ( FileSet fileSet : fileSets )
         {
             String[] includedFiles = fileSetManager.getIncludedFiles( fileSet );
@@ -146,7 +152,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                 {
                     outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
                 }
-                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, spdxDoc, algorithms );
+                collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, spdxDoc, algorithms, purposeFilter );
             }
         }
     }
@@ -195,17 +201,23 @@ public class SpdxV3FileCollector extends AbstractFileCollector
      * @param projectPackage   Package to which the files belong
      * @param spdxDoc          SPDX Document which will contain the files
      * @param algorithms       algorithms to use to generate checksums
+     * @param purposeFilter    filter to restrict what kind of files should be collected
      * @throws SpdxCollectionException on incompatible types in an SPDX collection
      */
     private void collectFile( File file, String outputFileName, SpdxDefaultFileInformation fileInfo, 
                               RelationshipType relationshipType, SpdxPackage projectPackage, 
-                              SpdxDocument spdxDoc, Set<String> algorithms ) throws SpdxCollectionException
+                              SpdxDocument spdxDoc, Set<String> algorithms, 
+                              Predicate<SoftwarePurpose> purposeFilter ) throws SpdxCollectionException
     {
         if ( spdxFiles.containsKey( file.getPath() ) )
         {
             return; // already added from a previous scan
         }
-        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms, spdxDoc );
+        SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms, spdxDoc, purposeFilter );
+        if ( spdxFile == null )
+        {
+            return;
+        }
         try
         {
             spdxDoc.createRelationship( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
@@ -317,11 +329,16 @@ public class SpdxV3FileCollector extends AbstractFileCollector
     private SpdxFile convertToSpdxFile( File file, String outputFileName, 
                                         SpdxDefaultFileInformation defaultFileInformation, 
                                         Set<String> algorithms,
-                                        SpdxDocument spdxDoc ) throws SpdxCollectionException
+                                        SpdxDocument spdxDoc,
+                                        Predicate<SoftwarePurpose> purposeFilter ) throws SpdxCollectionException
     {
         String relativePath = convertFilePathToSpdxFileName( outputFileName );
         String extension = getExtension( file ).trim().toUpperCase();
         SoftwarePurpose purpose = EXT_TO_PURPOSE.getOrDefault( extension, SoftwarePurpose.OTHER );
+        if ( !purposeFilter.test( purpose ) )
+        {
+            return null;
+        }
         Collection<IntegrityMethod> hashes = new ArrayList<>();
         try
         {

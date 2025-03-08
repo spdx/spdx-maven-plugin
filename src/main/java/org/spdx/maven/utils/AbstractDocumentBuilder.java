@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
@@ -18,6 +19,7 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.spdx.core.CoreModelObject;
 import org.spdx.library.ModelCopyManager;
 import org.spdx.library.model.v2.SpdxConstantsCompatV2;
+import org.spdx.library.model.v2.enumerations.FileType;
 import org.spdx.maven.NonStandardLicense;
 import org.spdx.maven.OutputFormat;
 import org.spdx.storage.ISerializableModelStore;
@@ -102,14 +104,17 @@ public abstract class AbstractDocumentBuilder
      * @param sources                     Source directories to be included in the document
      * @param baseDir                     project base directory used to construct the relative paths for the SPDX
      *                                    files
+     * @param defaultFileInformation      Information on default SPDX field data for the files
      * @param pathSpecificInformation     Map of path to file information used to override the default file information
      * @param checksumAlgorithms          algorithms to use to generate checksums
+     * @param collectSourceFiles          source files should be collected or not
      * @throws SpdxBuilderException       on errors collecting files
      */
     public abstract void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                                         SpdxDefaultFileInformation defaultFileInformation,
                                                         HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
-                                                        Set<String> checksumAlgorithms ) throws SpdxBuilderException;
+                                                        Set<String> checksumAlgorithms,
+                                                        boolean collectSourceFiles ) throws SpdxBuilderException;
 
     /**
      * Saves the SPDX document to the file

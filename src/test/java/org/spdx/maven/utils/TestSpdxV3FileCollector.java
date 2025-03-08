@@ -273,7 +273,7 @@ public class TestSpdxV3FileCollector
         assertEquals( 0, spdxFiles.length );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, true );
         spdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( filePaths.length, spdxFiles.length );
         Arrays.sort( spdxFiles, elementComparer );
@@ -314,7 +314,7 @@ public class TestSpdxV3FileCollector
         assertEquals( 0, SpdxFiles.length );
 
         collector.collectFiles( Arrays.asList( skipBin ), this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, true );
         SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( filePaths.length - 2, SpdxFiles.length );
         Arrays.sort( SpdxFiles, elementComparer );
@@ -356,7 +356,7 @@ public class TestSpdxV3FileCollector
         assertEquals( 0, SpdxFiles.length );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, true );
         SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort( SpdxFiles, elementComparer );
@@ -425,7 +425,7 @@ public class TestSpdxV3FileCollector
         assertEquals( 0, snippets.size() );
 
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, true );
         snippets = collector.getSnippets();
         assertEquals( filePaths.length, snippets.size() );
         @SuppressWarnings( "unchecked" )
@@ -515,7 +515,7 @@ public class TestSpdxV3FileCollector
 
         //TODO: Test directory patterns
         collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                fileSpecificInfo, spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
+                fileSpecificInfo, spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, true );
         SpdxFiles = collector.getFiles().toArray( new SpdxFile[collector.getFiles().size()] );
         assertEquals( filePaths.length, SpdxFiles.length );
         Arrays.sort( SpdxFiles, elementComparer );
@@ -625,9 +625,6 @@ public class TestSpdxV3FileCollector
     @Test
     public void testGenerateChecksums() throws SpdxCollectionException, InvalidSPDXAnalysisException
     {
-        SpdxV3FileCollector collector = new SpdxV3FileCollector( customIdMap );
-        collector.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
-                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm );
         File spdxFile = new File( filePaths[0] );
 
         Set<String> checksumAlgorithmSet = new HashSet<>();
@@ -661,5 +658,19 @@ public class TestSpdxV3FileCollector
                 fail("Expected checksum : " + expectedChecksum + "not found in actual checksums : " + actualChecksums);
             }
         }
+    }
+
+    @Test
+    public void testCollectSourceFiles() throws SpdxCollectionException, InvalidSPDXAnalysisException
+    {
+        SpdxV3FileCollector collectorWithSourceFiles = new SpdxV3FileCollector( customIdMap );
+        collectorWithSourceFiles.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, true );
+
+        SpdxV3FileCollector collectorWithoutSourceFiles = new SpdxV3FileCollector( customIdMap );
+        collectorWithoutSourceFiles.collectFiles( this.fileSets, this.directory.getAbsolutePath(), this.defaultFileInformation,
+                new HashMap<>(), spdxPackage, RelationshipType.GENERATES, spdxDoc, sha1Algorithm, false );
+
+        assertTrue ( collectorWithSourceFiles.getFiles().size() != collectorWithoutSourceFiles.getFiles().size() );
     }
 }
