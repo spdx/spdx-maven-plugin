@@ -208,7 +208,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         SpdxFile spdxFile = convertToSpdxFile( file, outputFileName, fileInfo, algorithms, spdxDoc );
         try
         {
-            spdxDoc.createRelationship( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+            spdxDoc.createRelationship( spdxDoc.getIdPrefix() + IdGenerator.getIdGenerator().generateId( spdxFile.getId() + relationshipType + projectPackage.getId() ) )
                                 .setFrom( spdxFile )
                                 .addTo( projectPackage )
                                 .setRelationshipType( relationshipType )
@@ -264,7 +264,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                         .setEndIntegerRange( snippet.getLineRangeEnd() )
                         .build();
         
-        Snippet retval =  spdxFile.createSnippet( spdxFile.getIdPrefix() + spdxFile.getModelStore().getNextId( IdType.SpdxId ) )
+        Snippet retval =  spdxFile.createSnippet( spdxFile.getIdPrefix() +
+                IdGenerator.getIdGenerator().generateId( spdxFile.getId() + byteRange.getBeginIntegerRange() ) )
                         .setName( snippet.getName() )
                         .setCopyrightText( snippet.getCopyrightText() )
                         .setSnippetFromFile( spdxFile )
@@ -286,7 +287,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         final AnyLicenseInfo concludedLicense = LicenseInfoFactory
                         .parseSPDXLicenseString( snippet.getConcludedLicense(), spdxFile.getModelStore(), 
                                                  spdxFile.getIdPrefix(), spdxFile.getCopyManager(), customIdToUri );
-        retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+        retval.createRelationship( retval.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( retval.getId() + concludedLicense.getId() + RelationshipType.HAS_CONCLUDED_LICENSE ) )
                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                         .setFrom( retval )
                         .addTo( concludedLicense )
@@ -296,7 +298,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         final AnyLicenseInfo declaredLicense = LicenseInfoFactory
                         .parseSPDXLicenseString( snippet.getLicenseInfoInSnippet(), spdxFile.getModelStore(), 
                                                  spdxFile.getIdPrefix(), spdxFile.getCopyManager(), customIdToUri );
-        retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+        retval.createRelationship( retval.getIdPrefix() +
+                IdGenerator.getIdGenerator().generateId( retval.getId() + declaredLicense.getId() + RelationshipType.HAS_DECLARED_LICENSE ) )
                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                         .setFrom( retval )
                         .addTo( declaredLicense )
@@ -370,13 +373,21 @@ public class SpdxV3FileCollector extends AbstractFileCollector
                     }
                     else
                     {
-                        Set<AnyLicenseInfo> licenseSet = new HashSet<>();
+                        Set<AnyLicenseInfo> licenseSet = new TreeSet<>( new Comparator<AnyLicenseInfo>() {
+                            @Override
+                            public int compare( AnyLicenseInfo o1, AnyLicenseInfo o2 ) {
+                                return o1.getId().compareTo( o2.getId() );
+                            }
+                        } );
                         for ( String licenseExpression : fileSpdxLicenses )
                         {
                             licenseSet.add( LicenseInfoFactory.parseSPDXLicenseString( licenseExpression,
                                     spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), customIdToUri ) );
                         }
-                        license = spdxDoc.createConjunctiveLicenseSet( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                        StringBuilder reproducible = new StringBuilder( "AND" );
+                        licenseSet.forEach( lic -> reproducible.append( lic.getId() ) );
+                        license = spdxDoc.createConjunctiveLicenseSet( spdxDoc.getIdPrefix() +
+                                        IdGenerator.getIdGenerator().generateId( reproducible.toString() ) )
                                         .addAllMember( licenseSet )
                                         .build();
                     }
@@ -458,7 +469,8 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         //TODO: Add annotation
         try
         {
-            retval = spdxDoc.createSpdxFile( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+            retval = spdxDoc.createSpdxFile( spdxDoc.getIdPrefix() +
+                    IdGenerator.getIdGenerator().generateId( relativePath ) )
                             .setName( relativePath )
                             .setCopyrightText( copyright )
                             .setComment( comment )
@@ -472,13 +484,15 @@ public class SpdxV3FileCollector extends AbstractFileCollector
             {
                 retval.setContentType( mediaType );
             }
-            retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+            retval.createRelationship( retval.getIdPrefix() +
+                    IdGenerator.getIdGenerator().generateId( retval.getId() + concludedLicense.getId() + RelationshipType.HAS_CONCLUDED_LICENSE ) )
                                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                                         .setFrom( retval )
                                         .addTo( concludedLicense )
                                         .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
                                         .build();
-            retval.createRelationship( retval.getIdPrefix() + retval.getModelStore().getNextId( IdType.SpdxId ) )
+            retval.createRelationship( retval.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( retval.getId() + concludedLicense.getId() + RelationshipType.HAS_DECLARED_LICENSE ) )
                                         .setCompleteness( RelationshipCompleteness.COMPLETE )
                                         .setFrom( retval )
                                         .addTo( license )

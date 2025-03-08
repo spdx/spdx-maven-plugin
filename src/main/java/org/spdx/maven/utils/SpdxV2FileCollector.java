@@ -244,7 +244,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                                                                                      spdxDoc.getModelStore(), 
                                                                                      spdxDoc.getDocumentUri(), 
                                                                                      spdxDoc.getCopyManager() ) );
-        return spdxDoc.createSpdxSnippet( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
+        return spdxDoc.createSpdxSnippet( IdGenerator.getIdGenerator().generateId( spdxFile.getId() + snippet.getByteRangeStart() ),
                                                         snippet.getName(), concludedLicense,
                                                         licenseInfoInSnippet,
                                                         snippet.getCopyrightText(), spdxFile, 
@@ -392,7 +392,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                 LOG.error( "No SHA1 checksum was found for file {}", file.getName() );
                 sha1Value = DEFAULT_SHA1_VALUE;
             }
-            retval = spdxDoc.createSpdxFile( spdxDoc.getModelStore().getNextId( IdType.SpdxId ),
+            retval = spdxDoc.createSpdxFile( IdGenerator.getIdGenerator().generateId( relativePath ),
                                              relativePath, concludedLicense, seenLicenses, 
                                              copyright, 
                                              spdxDoc.createChecksum( ChecksumAlgorithm.SHA1, sha1Value ) )
