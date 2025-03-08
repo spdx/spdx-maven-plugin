@@ -190,7 +190,7 @@ public class SpdxV3DocumentBuilder
                                 .build();
                 creationInfo.setIdPrefix( element.getIdPrefix() );
                 creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent( annotation.getAnnotator(), creationInfo ) );
-                element.createAnnotation( element.getIdPrefix() + element.getModelStore().getNextId( IdType.SpdxId ) )
+                element.createAnnotation( element.getIdPrefix() + IdGenerator.getIdGenerator().generateId( element.getId() + annotation.getAnnotationComment() ) )
                        .setAnnotationType( annotationType )
                        .setStatement( annotation.getAnnotationComment() )
                        .setSubject( element )
@@ -222,8 +222,10 @@ public class SpdxV3DocumentBuilder
             {
                 if ( parameterCreator.startsWith( "Tool:" ))
                 {
-                    Tool tool = spdxDoc.createTool( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
-                                    .setName( parameterCreator.substring( "Tool:".length() ).trim() )
+                    String toolName = parameterCreator.substring( "Tool:".length() ).trim();
+                    Tool tool = spdxDoc.createTool( spdxDoc.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( toolName ) )
+                                    .setName( toolName )
                                     .build();
                     creationInfo.getCreatedUsings().add( tool );
                 }
@@ -270,7 +272,8 @@ public class SpdxV3DocumentBuilder
                                                      spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), customIdToUri );
             final Packaging packaging = Packaging.valueOfPackaging( project.getPackaging() );
             final SoftwarePurpose primaryPurpose = packaging != null ? packaging.getSoftwarePurpose() : SoftwarePurpose.LIBRARY;
-            pkg = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+            pkg = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() +
+                    IdGenerator.getIdGenerator().generateId( UNSPECIFIED.equals( downloadUrl ) ? projectInformation.getName() : downloadUrl ) )
                             .setName( projectInformation.getName() )
                             .setDownloadLocation( downloadUrl )
                             .setPrimaryPurpose( primaryPurpose )
@@ -278,14 +281,16 @@ public class SpdxV3DocumentBuilder
                             .addAllExternalIdentifier( SpdxExternalIdBuilder.getDefaultExternalIdentifiers( spdxDoc, generatePurls, project ) )
                             .build();
 
-            pkg.createRelationship( pkg.getIdPrefix() + pkg.getModelStore().getNextId( IdType.SpdxId ) )
+            pkg.createRelationship( pkg.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( pkg.getId() + declaredLicense.getId() + RelationshipType.HAS_DECLARED_LICENSE ) )
                             .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
                             .setCompleteness( RelationshipCompleteness.COMPLETE )
                             .setFrom( pkg )
                             .addTo( declaredLicense )
                             .build();
             
-            pkg.createRelationship( pkg.getIdPrefix() + pkg.getModelStore().getNextId( IdType.SpdxId ) )
+            pkg.createRelationship( pkg.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( pkg.getId() + concludedLicense.getId() + RelationshipType.HAS_CONCLUDED_LICENSE ) )
                             .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
                             .setCompleteness( RelationshipCompleteness.COMPLETE )
                             .setFrom( pkg )
@@ -323,7 +328,8 @@ public class SpdxV3DocumentBuilder
             // archive file name
             if ( projectInformation.getPackageArchiveFileName() != null )
             {
-                SpdxFile packageFile = pkg.createSpdxFile( pkg.getIdPrefix() + pkg.getModelStore().getNextId( IdType.SpdxId ) )
+                SpdxFile packageFile = pkg.createSpdxFile( pkg.getIdPrefix() +
+                                IdGenerator.getIdGenerator().generateId( pkg.getId() + projectInformation.getPackageArchiveFileName() ) )
                                 .setName( projectInformation.getPackageArchiveFileName() )
                                 .build();
                 
@@ -354,7 +360,8 @@ public class SpdxV3DocumentBuilder
                     }
                 }
                 
-                pkg.createRelationship( pkg.getIdPrefix() + pkg.getModelStore().getNextId( IdType.SpdxId ) )
+                pkg.createRelationship( pkg.getIdPrefix() +
+                                IdGenerator.getIdGenerator().generateId( pkg.getId() + packageFile.getId() + RelationshipType.HAS_DISTRIBUTION_ARTIFACT ) )
                                 .setFrom( pkg )
                                 .addTo( packageFile )
                                 .setCompleteness( RelationshipCompleteness.COMPLETE )
@@ -486,7 +493,8 @@ public class SpdxV3DocumentBuilder
         {
             fileCollector.collectFiles( sources, baseDir, defaultFileInformation,
                     pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc, checksumAlgorithms );
-            Relationship pkgRelationship = projectPackage.createRelationship( projectPackage.getIdPrefix() + projectPackage.getModelStore().getNextId( IdType.SpdxId ) )
+            Relationship pkgRelationship = projectPackage.createRelationship( projectPackage.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( projectPackage.getId() + "CONTAINS" + RelationshipType.CONTAINS ) )
                                                 .setFrom( projectPackage )
                                                 .setRelationshipType( RelationshipType.CONTAINS )
                                                 .build();

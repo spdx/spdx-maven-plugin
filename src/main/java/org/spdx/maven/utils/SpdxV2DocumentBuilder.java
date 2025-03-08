@@ -239,7 +239,7 @@ public class SpdxV2DocumentBuilder
                                                              spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
             final Packaging packaging = Packaging.valueOfPackaging( project.getPackaging() );
             final Purpose primaryPurpose = packaging != null ? packaging.getV2Purpose() : Purpose.LIBRARY;
-            pkg = spdxDoc.createPackage( spdxDoc.getModelStore().getNextId( IdType.SpdxId ), 
+            pkg = spdxDoc.createPackage( IdGenerator.getIdGenerator().generateId( UNSPECIFIED.equals( downloadUrl ) ? projectInformation.getName() : downloadUrl ),
                                                      projectInformation.getName(), concludedLicense,
                                                      copyrightText, declaredLicense )
                             .setDownloadLocation( downloadUrl )

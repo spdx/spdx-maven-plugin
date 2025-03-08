@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,18 +43,7 @@ import org.spdx.library.model.v2.SpdxPackageVerificationCode;
 import org.spdx.library.model.v2.enumerations.ChecksumAlgorithm;
 import org.spdx.library.model.v2.enumerations.Purpose;
 import org.spdx.library.model.v3_0_1.SpdxConstantsV3;
-import org.spdx.library.model.v3_0_1.core.Agent;
-import org.spdx.library.model.v3_0_1.core.CreationInfo;
-import org.spdx.library.model.v3_0_1.core.Element;
-import org.spdx.library.model.v3_0_1.core.ExternalElement;
-import org.spdx.library.model.v3_0_1.core.ExternalMap;
-import org.spdx.library.model.v3_0_1.core.Hash;
-import org.spdx.library.model.v3_0_1.core.HashAlgorithm;
-import org.spdx.library.model.v3_0_1.core.LifecycleScopeType;
-import org.spdx.library.model.v3_0_1.core.Relationship;
-import org.spdx.library.model.v3_0_1.core.RelationshipCompleteness;
-import org.spdx.library.model.v3_0_1.core.RelationshipType;
-import org.spdx.library.model.v3_0_1.core.SpdxDocument;
+import org.spdx.library.model.v3_0_1.core.*;
 import org.spdx.library.model.v3_0_1.expandedlicensing.NoAssertionLicense;
 import org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo;
 import org.spdx.library.model.v3_0_1.simplelicensing.LicenseExpression;
@@ -60,6 +51,7 @@ import org.spdx.library.model.v3_0_1.software.Sbom;
 import org.spdx.library.model.v3_0_1.software.SoftwarePurpose;
 import org.spdx.library.model.v3_0_1.software.SpdxFile;
 import org.spdx.library.model.v3_0_1.software.SpdxPackage;
+import org.spdx.maven.LicenseOverwrite;
 import org.spdx.maven.OutputFormat;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.storage.IModelStore.IdType;
@@ -77,6 +69,7 @@ public class SpdxV3DependencyBuilder
 {   
     private final SpdxDocument spdxDoc;
     private final SpdxV3LicenseManager licenseManager;
+    private final Map<LicenseOverwrite, AnyLicenseInfo> licenseOverwrites = new HashMap<>();
     
     /**
      * @param builder The document builder
@@ -117,7 +110,8 @@ public class SpdxV3DependencyBuilder
          Element dependencyPackage = createSpdxPackage( dependency, mavenProjectBuilder, session, 
                                                             mavenProject, useArtifactID );
          
-         spdxDoc.createLifecycleScopedRelationship(spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+         spdxDoc.createLifecycleScopedRelationship(spdxDoc.getIdPrefix() +
+                 IdGenerator.getIdGenerator().generateId( dependencyPackage.getId() + parentPackage.getId() + relType ) )
                    .setRelationshipType( relType )
                    .setCompleteness( RelationshipCompleteness.COMPLETE )
                    .setFrom( (SpdxPackage)parentPackage )
@@ -215,17 +209,38 @@ public class SpdxV3DependencyBuilder
         String copyright = "UNSPECIFIED";
         String notice = "UNSPECIFIED";
         String downloadLocation = "NOASSERTION";
-        AnyLicenseInfo declaredLicense = mavenLicensesToSpdxLicense( project.getLicenses() );
+
+        Optional<AnyLicenseInfo> declaredLicenseOverwrite = applyLicenseOverwrites( project, "declared" );
+        AnyLicenseInfo originalDeclaredLicense = mavenLicensesToSpdxLicense( project.getLicenses() );
+        AnyLicenseInfo declaredLicense = declaredLicenseOverwrite.orElse( originalDeclaredLicense );
+
         fileInfo.setComment( "" );
-        fileInfo.setConcludedLicense( "NOASSERTION" );
+        Optional<AnyLicenseInfo> concludedLicenseOverwrite = applyLicenseOverwrites( project, "concluded" );
+        String originalConcludedLicense = "NOASSERTION";
+        fileInfo.setConcludedLicense( concludedLicenseOverwrite
+                .map( AnyLicenseInfo::toString )
+                .orElse( originalConcludedLicense ) );
         fileInfo.setContributors( fileContributorList.toArray( new String[0] ) );
         fileInfo.setCopyright( copyright );
         fileInfo.setDeclaredLicense( declaredLicense.toString() );
-        fileInfo.setLicenseComment( "" );
+        
+        List<String> comment = new ArrayList<>();
+
+        if ( declaredLicenseOverwrite.isPresent() )
+        {
+            comment.add( "Declared license has been overwritten, original value: " + originalDeclaredLicense );
+        }
+
+        if ( concludedLicenseOverwrite.isPresent() )
+        {
+            comment.add( "Concluded license has been overwritten, original value: " + originalConcludedLicense );
+        } 
+
+        fileInfo.setLicenseComment( String.join( "\n", comment ) );
         fileInfo.setNotice( notice );
 
-        SpdxPackage retval = spdxDoc.createSpdxPackage(  spdxDoc.getIdPrefix() + 
-                                                         spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        SpdxPackage retval = spdxDoc.createSpdxPackage(  spdxDoc.getIdPrefix() +
+                IdGenerator.getIdGenerator().generateId( project.getGroupId() + ":" +  project.getArtifactId() + ":" + project.getVersion() ) )
                         .setName( packageName )
                         .setCopyrightText( copyright )
                         .setDownloadLocation( downloadLocation )
@@ -235,19 +250,30 @@ public class SpdxV3DependencyBuilder
         {
             retval.setPackageUrl( SpdxExternalRefBuilder.generatePurl( project ) );
         }
-        spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
-                                    spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        Relationship.RelationshipBuilder declaredLicenseRelationship = spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
+                                    IdGenerator.getIdGenerator().generateId( retval.getId() + declaredLicense.getId() + RelationshipType.HAS_DECLARED_LICENSE ) )
                     .setFrom( retval )
                     .addTo( declaredLicense )
-                    .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
-                    .build();
-        spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
-                                    spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                    .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE );
+
+        if ( declaredLicenseOverwrite.isPresent() )
+        {
+            declaredLicenseRelationship.setComment( "Declared license has been overwritten, original value: " + originalDeclaredLicense );
+        }
+        declaredLicenseRelationship.build();
+
+        Relationship.RelationshipBuilder concludedLicenseRelationship = spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
+                                    IdGenerator.getIdGenerator().generateId( retval.getId() + "NOASSERTION" + RelationshipType.HAS_CONCLUDED_LICENSE ) )
                     .setFrom( retval )
                     .addTo( new NoAssertionLicense() )
-                    .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
-                    .build();
-        
+                    .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
+
+        if ( concludedLicenseOverwrite.isPresent() )
+        {
+                    concludedLicenseRelationship.setComment( "Concluded license has been overwritten, original value: " + originalConcludedLicense );
+        }
+        concludedLicenseRelationship.build();
+
         if ( project.getVersion() != null )
         {
             retval.setPackageVersion( project.getVersion() );
@@ -259,8 +285,8 @@ public class SpdxV3DependencyBuilder
         }
         if ( project.getOrganization() != null )
         {
-            retval.getOriginatedBys().add( spdxDoc.createOrganization( spdxDoc.getIdPrefix() + 
-                                                              spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+            retval.getOriginatedBys().add( spdxDoc.createOrganization( spdxDoc.getIdPrefix() +
+                    IdGenerator.getIdGenerator().generateId( "ORGANIZATION: " + project.getOrganization().getName() ) )
                                               .setName( project.getOrganization().getName() )
                                               .build() );
         }
@@ -416,7 +442,8 @@ public class SpdxV3DependencyBuilder
         // Create a minimal SPDX package from dependency
         // Name will be the artifact ID
         LOG.debug( "Dependency {}Using only artifact information to create dependent package", artifact.getArtifactId() );
-        SpdxPackage pkg = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        SpdxPackage pkg = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() ) )
                         .setName( artifact.getArtifactId() )
                         .setComment( "This package was created for a Maven dependency.  No SPDX or license information could be found in the Maven POM file." )
                         .setPackageVersion( artifact.getBaseVersion() )
@@ -425,13 +452,13 @@ public class SpdxV3DependencyBuilder
                                                                                      mavenProject ) )
                         .build();
         spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
-                                    spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+                                    IdGenerator.getIdGenerator().generateId( pkg.getId() + "NOASSERTION" + RelationshipType.HAS_DECLARED_LICENSE ) )
                     .setFrom( pkg )
                     .addTo( new NoAssertionLicense() )
                     .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
                     .build();
-        spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
-                                    spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        spdxDoc.createRelationship( spdxDoc.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( pkg.getId() + "NOASSERTION" + RelationshipType.HAS_CONCLUDED_LICENSE ) )
                     .setFrom( pkg )
                     .addTo( new NoAssertionLicense() )
                     .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
@@ -456,7 +483,8 @@ public class SpdxV3DependencyBuilder
         Optional<String> downloadLocation = source.getDownloadLocation();
         Optional<String> name = source.getName();
         
-        SpdxPackage dest = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        SpdxPackage dest = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( path + artifactId ) )
                         .setName(name.orElse( "NONE" ))
                         .setCopyrightText( source.getCopyrightText() != null ? source.getCopyrightText() : "NOASSERTION" )
                         .setDownloadLocation(downloadLocation.orElse( "NOASSERTION" ))
@@ -485,16 +513,20 @@ public class SpdxV3DependencyBuilder
                             .setSpecVersion( SpdxConstantsV3.MODEL_SPEC_VERSION )
                             .build();
             creationInfo.getCreatedBys().add( Spdx2to3Converter.stringToAgent( fromAnnotation.getAnnotator(), creationInfo ) );
-            dest.createAnnotation( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
-                .setAnnotationType( Spdx2to3Converter.ANNOTATION_TYPE_MAP.get( fromAnnotation.getAnnotationType() ) )
+            AnnotationType annotationType = Spdx2to3Converter.ANNOTATION_TYPE_MAP.get( fromAnnotation.getAnnotationType() );
+            dest.createAnnotation( dest.getIdPrefix() +
+                            dest.getId() + annotationType + fromAnnotation.getComment() )
+                .setAnnotationType( annotationType )
                 .setStatement( fromAnnotation.getComment() )
                 .setSubject( dest )
                 .setCreationInfo( creationInfo )
                 .build();
         }
         org.spdx.library.model.v2.license.AnyLicenseInfo v2Declared = source.getLicenseDeclared();
-        LicenseExpression declaredLicense = dest.createLicenseExpression( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
-                        .setLicenseExpression( v2Declared == null ? "NOASSERTION" : v2Declared.toString() )
+        String declaredExpression = v2Declared == null ? "NOASSERTION" : v2Declared.toString();
+        LicenseExpression declaredLicense = dest.createLicenseExpression( dest.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( path + artifactId + "DECLARED" + declaredExpression ) )
+                        .setLicenseExpression( declaredExpression )
                         .build();
         Optional<String> licenseListVersion = v2Doc.getCreationInfo() == null ? Optional.empty() :
                 v2Doc.getCreationInfo().getLicenseListVersion();
@@ -502,20 +534,24 @@ public class SpdxV3DependencyBuilder
         {
             declaredLicense.setLicenseListVersion( licenseListVersion.get() );
         }
-        dest.createRelationship( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
+        dest.createRelationship( dest.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( dest.getId() + declaredLicense.getId() + RelationshipType.HAS_DECLARED_LICENSE ) )
                         .setRelationshipType( RelationshipType.HAS_DECLARED_LICENSE )
                         .setFrom( dest )
                         .addTo( declaredLicense )
                         .build();
-        
-        LicenseExpression concludedLicense = dest.createLicenseExpression( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
-                        .setLicenseExpression( source.getLicenseConcluded().toString() )
+
+        String concludedExpression = source.getLicenseConcluded().toString();
+        LicenseExpression concludedLicense = dest.createLicenseExpression( dest.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( path + artifactId + "DECLARED" + concludedExpression ) )
+                        .setLicenseExpression( concludedExpression )
                         .build();
         if ( licenseListVersion.isPresent() )
         {
             concludedLicense.setLicenseListVersion( licenseListVersion.get() );
         }
-        dest.createRelationship( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
+        dest.createRelationship( dest.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( dest.getId() + concludedLicense.getId() + RelationshipType.HAS_CONCLUDED_LICENSE ) )
                         .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE )
                         .setFrom( dest )
                         .addTo( concludedLicense )
@@ -565,7 +601,8 @@ public class SpdxV3DependencyBuilder
         Optional<String> pkgFileName = source.getPackageFileName();
         if ( pkgFileName.isPresent() )
         {
-            SpdxFile packageFile = dest.createSpdxFile( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
+            SpdxFile packageFile = dest.createSpdxFile( dest.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( path + artifactId + pkgFileName.get() ) )
                             .setName( pkgFileName.get() )
                             .build();
             for ( Checksum fromChecksum : source.getChecksums() )
@@ -575,7 +612,8 @@ public class SpdxV3DependencyBuilder
                                                      .setHashValue( fromChecksum.getValue() )
                                                      .build() );
             }
-            dest.createRelationship( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
+            dest.createRelationship( dest.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( dest.getId() + packageFile.getId() + RelationshipType.HAS_DISTRIBUTION_ARTIFACT ) )
                         .setFrom( dest )
                         .addTo( packageFile )
                         .setRelationshipType( RelationshipType.HAS_DISTRIBUTION_ARTIFACT )
@@ -690,7 +728,8 @@ public class SpdxV3DependencyBuilder
             sb.append( version );
         }
         String fullArtifactId = sb.toString();
-        SpdxFile fileArtifact = spdxDoc.createSpdxFile( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        SpdxFile fileArtifact = spdxDoc.createSpdxFile( spdxDoc.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( fullArtifactId ) )
                         .setName( spdxFile.getName() )
                         .setDescription( String.format( "SPDX File for %s", fullArtifactId ) )
                         .addVerifiedUsing( hash )
@@ -757,7 +796,8 @@ public class SpdxV3DependencyBuilder
         SpdxPackage source = findMatchingDescribedPackage( externalSpdxDoc, artifactId );
         Optional<String> downloadLocation = source.getDownloadLocation();
         Optional<String> name = source.getName();
-        SpdxPackage dest = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() + spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
+        SpdxPackage dest = spdxDoc.createSpdxPackage( spdxDoc.getIdPrefix() +
+                        IdGenerator.getIdGenerator().generateId( externalSpdxDoc.getId() + artifactId ) )
                         .setName( name.orElse( "NONE" ) )
                         .setCopyrightText( source.getCopyrightText().orElse( "NOASSERTION" ) )
                         .addAllVerifiedUsing( source.getVerifiedUsings() )
@@ -784,7 +824,8 @@ public class SpdxV3DependencyBuilder
                                 .collect( Collectors.toList() );
         for ( Relationship rel : sourceRelationships )
         {
-            dest.createRelationship( dest.getIdPrefix() + dest.getModelStore().getNextId( IdType.SpdxId ) )
+            dest.createRelationship( dest.getIdPrefix() +
+                            IdGenerator.getIdGenerator().generateId( dest.getId() + rel.getId() ) )
                                         .setFrom( dest )
                                         .setCompleteness( rel.getCompleteness().orElse( RelationshipCompleteness.NO_ASSERTION ) )
                                         .setRelationshipType( rel.getRelationshipType() )
@@ -936,5 +977,23 @@ public class SpdxV3DependencyBuilder
             return MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License( mavenLicenses, spdxDoc );
         }
 
+    }
+
+    /**
+     * @param licenseOverwrite the configured license overwrite
+     * @param parsedLicense the the parsed licenseString of the licenseOverwrite
+     */
+    public void addLicenseOverwrite( LicenseOverwrite licenseOverwrite, AnyLicenseInfo parsedLicense )
+    {
+        this.licenseOverwrites.put( licenseOverwrite, parsedLicense );
+    }
+
+    Optional<AnyLicenseInfo> applyLicenseOverwrites( MavenProject mavenProject, String target )
+    {
+        return licenseOverwrites.entrySet().stream()
+                .filter( (overwrite) -> overwrite.getKey().appliesTo( mavenProject, target ) )
+                .reduce( (a, b) -> {
+            throw new IllegalStateException( "multiple matching license overwrites: " + a.getKey() + " vs. " + b.getKey() );
+        } ).map( Map.Entry::getValue );
     }
 }
