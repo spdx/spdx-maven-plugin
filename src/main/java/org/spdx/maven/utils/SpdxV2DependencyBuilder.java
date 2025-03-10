@@ -290,10 +290,10 @@ public class SpdxV2DependencyBuilder
         fileInfo.setComment( "" );
 
         Optional<AnyLicenseInfo> concludedLicenseOverwrite = applyLicenseOverwrites( project, "concluded" );
-        String originalConcludedLicense = "NOASSERTION";
-        fileInfo.setConcludedLicense( concludedLicenseOverwrite
-                .map( AnyLicenseInfo::toString )
-                .orElse( originalConcludedLicense ) );
+        AnyLicenseInfo originalConcludedLicense = new SpdxNoAssertionLicense();
+        AnyLicenseInfo concludedLicense = concludedLicenseOverwrite.orElse( originalConcludedLicense );
+
+        fileInfo.setConcludedLicense( concludedLicense.toString() );
         fileInfo.setContributors( fileContributorList.toArray( new String[0] ) );
         fileInfo.setCopyright( copyright );
         fileInfo.setDeclaredLicense( declaredLicense.toString() );
@@ -319,6 +319,8 @@ public class SpdxV2DependencyBuilder
                         .setFilesAnalyzed( false )
                         .setExternalRefs( SpdxExternalRefBuilder.getDefaultExternalRefs( spdxDoc, generatePurls, project ) )
                         .build();
+        retval.setLicenseConcluded( concludedLicense );
+
         if ( project.getVersion() != null )
         {
             retval.setVersionInfo( project.getVersion() );

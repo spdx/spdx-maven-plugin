@@ -226,10 +226,10 @@ public class SpdxV3DependencyBuilder
 
         fileInfo.setComment( "" );
         Optional<AnyLicenseInfo> concludedLicenseOverwrite = applyLicenseOverwrites( project, "concluded" );
-        String originalConcludedLicense = "NOASSERTION";
-        fileInfo.setConcludedLicense( concludedLicenseOverwrite
-                .map( AnyLicenseInfo::toString )
-                .orElse( originalConcludedLicense ) );
+        AnyLicenseInfo originalConcludedLicense = new NoAssertionLicense();
+        AnyLicenseInfo concludedLicense = concludedLicenseOverwrite.orElse( originalConcludedLicense );
+
+        fileInfo.setConcludedLicense( concludedLicense.toString() );
         fileInfo.setContributors( fileContributorList.toArray( new String[0] ) );
         fileInfo.setCopyright( copyright );
         fileInfo.setDeclaredLicense( declaredLicense.toString() );
@@ -275,7 +275,7 @@ public class SpdxV3DependencyBuilder
         Relationship.RelationshipBuilder concludedLicenseRelationship = spdxDoc.createRelationship( spdxDoc.getIdPrefix() + 
                                     spdxDoc.getModelStore().getNextId( IdType.SpdxId ) )
                     .setFrom( retval )
-                    .addTo( new NoAssertionLicense() )
+                    .addTo( concludedLicense )
                     .setRelationshipType( RelationshipType.HAS_CONCLUDED_LICENSE );
 
         if ( concludedLicenseOverwrite.isPresent() )
