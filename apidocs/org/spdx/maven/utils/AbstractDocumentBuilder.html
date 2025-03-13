@@ -162,11 +162,12 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addNonStandardLicenses(org.spdx.maven.NonStandardLicense%5B%5D)" class="member-name-link">addNonStandardLicenses</a><wbr>(<a href="../NonStandardLicense.html" title="class in org.spdx.maven">NonStandardLicense</a>[]&nbsp;nonStandardLicenses)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.HashMap,java.util.Set)" class="member-name-link">collectSpdxFileInformation</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.HashMap,java.util.Set,boolean)" class="member-name-link">collectSpdxFileInformation</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;baseDir,
  <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
- <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;checksumAlgorithms)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;checksumAlgorithms,
+ boolean&nbsp;attachFiles)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Collect information at the file level, fill in the SPDX document</div>
 </div>
@@ -325,13 +326,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.HashMap,java.util.Set)">
+<section class="detail" id="collectSpdxFileInformation(java.util.List,java.lang.String,org.spdx.maven.utils.SpdxDefaultFileInformation,java.util.HashMap,java.util.Set,boolean)">
 <h3>collectSpdxFileInformation</h3>
 <div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">collectSpdxFileInformation</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.apache.maven.shared.model.fileset.FileSet&gt;&nbsp;sources,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;baseDir,
  <a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&nbsp;defaultFileInformation,
  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="SpdxDefaultFileInformation.html" title="class in org.spdx.maven.utils">SpdxDefaultFileInformation</a>&gt;&nbsp;pathSpecificInformation,
- <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;checksumAlgorithms)</span>
+ <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;checksumAlgorithms,
+ boolean&nbsp;attachFiles)</span>
                                          throws <span class="exceptions"><a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></span></div>
 <div class="block">Collect information at the file level, fill in the SPDX document</div>
 <dl class="notes">
@@ -339,8 +341,10 @@ loadScripts(document, 'script');</script>
 <dd><code>sources</code> - Source directories to be included in the document</dd>
 <dd><code>baseDir</code> - project base directory used to construct the relative paths for the SPDX
                                     files</dd>
+<dd><code>defaultFileInformation</code> - Information on default SPDX field data for the files</dd>
 <dd><code>pathSpecificInformation</code> - Map of path to file information used to override the default file information</dd>
 <dd><code>checksumAlgorithms</code> - algorithms to use to generate checksums</dd>
+<dd><code>attachFiles</code> - attach scanned files to the output SPDX document (V2 only)</dd>
 <dt>Throws:</dt>
 <dd><code><a href="SpdxBuilderException.html" title="class in org.spdx.maven.utils">SpdxBuilderException</a></code> - on errors collecting files</dd>
 </dl>
