@@ -211,7 +211,7 @@ public class MavenToSpdxLicenseMapper
      * returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
      * is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
      * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
-     * mapped SPDX licenses.
+     * mapped SPDX licenses or a single SpdxNoAssertionLicense if any of the multiple licenses can not be resolved.
      *
      * @param licenseList list of licenses
      * @param spdxDoc     SPDX document which will hold the licenses
@@ -231,6 +231,8 @@ public class MavenToSpdxLicenseMapper
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
+            } else {
+                return new SpdxNoAssertionLicense();
             }
         }
         if (spdxLicenses.isEmpty())
@@ -277,7 +279,7 @@ public class MavenToSpdxLicenseMapper
      * returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
      * is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
      * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
-     * mapped SPDX licenses.
+     * mapped SPDX licenses or a single NoAssertionLicense if any of the multiple licenses can not be resolved.
      *
      * @param licenseList list of Maven licenses
      * @param spdxDoc     SPDX document which will hold the licenses
@@ -298,6 +300,8 @@ public class MavenToSpdxLicenseMapper
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
+            } else {
+                return new NoAssertionLicense();
             }
         }
         if (spdxLicenses.isEmpty())
