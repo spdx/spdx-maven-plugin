@@ -19,6 +19,7 @@ import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.ModelCopyManager;
 import org.spdx.library.SpdxModelFactory;
 import org.spdx.library.model.v2.SpdxDocument;
+import org.spdx.library.model.v2.SpdxNoAssertion;
 import org.spdx.library.model.v3_0_1.core.Element;
 import org.spdx.storage.simple.InMemSpdxStore;
 
@@ -168,7 +169,7 @@ public class TestMavenToSpdxLicenseMapper
         licenseList.add( licenseM );
         org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList, spdxDoc );
-        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
+        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2(APACHE_SPDX_ID + " AND " + MIT_SPDX_ID );
         assertEquals( expected, result );
     }
     
@@ -200,7 +201,7 @@ public class TestMavenToSpdxLicenseMapper
         licenseList.add( licenseM );
         org.spdx.library.model.v2.license.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License(
                 licenseList, spdxDoc );
-        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( APACHE_SPDX_ID );
+        org.spdx.library.model.v2.license.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( "NOASSERTION" );
         assertEquals( expected, result );
     }
     
@@ -216,7 +217,7 @@ public class TestMavenToSpdxLicenseMapper
         licenseList.add( licenseM );
         org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License(
                 licenseList, spdxV3Doc );
-        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( APACHE_SPDX_ID );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( "NOASSERTION" );
         assertEquals( expected, result );
     }
 }
