@@ -174,7 +174,7 @@ loadScripts(document, 'script');</script>
  returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
  is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
  SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
- mapped SPDX licenses.</div>
+ mapped SPDX licenses or a single SpdxNoAssertionLicense if any of the multiple licenses can not be resolved.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>licenseList</code> - list of licenses</dd>
@@ -196,7 +196,7 @@ loadScripts(document, 'script');</script>
  returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
  is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
  SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
- mapped SPDX licenses.</div>
+ mapped SPDX licenses or a single NoAssertionLicense if any of the multiple licenses can not be resolved.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>licenseList</code> - list of Maven licenses</dd>
