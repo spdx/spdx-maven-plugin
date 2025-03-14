@@ -621,9 +621,12 @@ public class CreateSpdxMojo extends AbstractMojo
             logFileSpecificInfo( pathSpecificInformation );
         }
 
-        builder.collectSpdxFileInformation( sources, mavenProject.getBasedir().getAbsolutePath(), defaultFileInformation, 
-                pathSpecificInformation, getChecksumAlgorithms(), !"build".equals(sbomType) );
-    
+        if ( !"build".equals(sbomType) )
+        {
+            builder.collectSpdxFileInformation( sources, mavenProject.getBasedir().getAbsolutePath(), defaultFileInformation, 
+                    pathSpecificInformation, getChecksumAlgorithms() );
+        }
+
         // add dependencies information
         try
         {

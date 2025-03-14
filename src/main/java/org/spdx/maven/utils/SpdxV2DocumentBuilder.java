@@ -367,39 +367,33 @@ public class SpdxV2DocumentBuilder
     public void collectSpdxFileInformation( List<FileSet> sources, String baseDir,
                                             SpdxDefaultFileInformation defaultFileInformation,
                                             HashMap<String, SpdxDefaultFileInformation> pathSpecificInformation,
-                                            Set<String> checksumAlgorithms, boolean attachFiles ) throws SpdxBuilderException
+                                            Set<String> checksumAlgorithms ) throws SpdxBuilderException
     {
         SpdxV2FileCollector fileCollector = new SpdxV2FileCollector();
         try
         {
             fileCollector.collectFiles( sources, baseDir, defaultFileInformation,
                     pathSpecificInformation, projectPackage, RelationshipType.GENERATES, spdxDoc, checksumAlgorithms );
-            if ( attachFiles )
-            {
-                projectPackage.getFiles().addAll( fileCollector.getFiles() );
-            }
+            projectPackage.getFiles().addAll( fileCollector.getFiles() );
             projectPackage.getLicenseInfoFromFiles().addAll( fileCollector.getLicenseInfoFromFiles() );
         }
         catch ( SpdxCollectionException|InvalidSPDXAnalysisException e )
         {
             throw new SpdxBuilderException( "Error collecting SPDX file information", e );
         }
-        if ( attachFiles )
+        try
         {
-            try
-            {
-                String spdxFileName = spdxFile.getPath().replace( "\\", "/" );
-                projectPackage.setPackageVerificationCode( fileCollector.getVerificationCode( spdxFileName, spdxDoc ) );
-                projectPackage.setFilesAnalyzed( true );
-            }
-            catch ( NoSuchAlgorithmException e )
-            {
-                throw new SpdxBuilderException( "Unable to calculate verification code", e );
-            }
-            catch ( InvalidSPDXAnalysisException e )
-            {
-                throw new SpdxBuilderException( "Unable to update verification code", e );
-            }
+            String spdxFileName = spdxFile.getPath().replace( "\\", "/" );
+            projectPackage.setPackageVerificationCode( fileCollector.getVerificationCode( spdxFileName, spdxDoc ) );
+            projectPackage.setFilesAnalyzed( true );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new SpdxBuilderException( "Unable to calculate verification code", e );
+        }
+        catch ( InvalidSPDXAnalysisException e )
+        {
+            throw new SpdxBuilderException( "Unable to update verification code", e );
         }
     }
 
