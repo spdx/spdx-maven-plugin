@@ -38,7 +38,6 @@ import org.spdx.library.model.v2.license.AnyLicenseInfo;
 import org.spdx.library.model.v2.license.InvalidLicenseStringException;
 import org.spdx.maven.Checksum;
 import org.spdx.maven.SnippetInfo;
-import org.spdx.storage.IModelStore.IdType;
 
 import javax.annotation.Nullable;
 
@@ -251,7 +250,7 @@ public class SpdxV2FileCollector extends AbstractFileCollector
                                                         snippet.getCopyrightText(), spdxFile, 
                                                         snippet.getByteRangeStart(), snippet.getByteRangeEnd() )
                         .setComment( snippet.getComment() )
-                        .setLicenseComments( snippet.getLicensComment() )
+                        .setLicenseComments( snippet.getLicenseComment() )
                         .setLineRange( snippet.getLineRangeStart(), snippet.getLineRangeEnd() )
                         .build();
     }

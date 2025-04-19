@@ -100,6 +100,11 @@ public class SnippetInfo
         return this.copyrightText;
     }
 
+    /**
+     * @deprecated Use {@link #getLicenseComment()} instead.
+     * @return the licenseComment
+     */
+    @Deprecated
     public String getLicensComment()
     {
         return this.licenseComment;
