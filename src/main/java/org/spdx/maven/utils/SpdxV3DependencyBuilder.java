@@ -471,7 +471,7 @@ public class SpdxV3DependencyBuilder
      * Creates a copy from an SPDX version 2 file
      * @param path        Path to the SPDX spec version 2 file
      * @param artifactId  Maven artifact ID for the file
-     * @return SPDX V3 compliant element for the SPDX package represented by the arttifactId in the SPDX file
+     * @return SPDX V3 compliant element for the SPDX package represented by the artifactId in the SPDX file
      * @throws InvalidSPDXAnalysisException on SPDX parsing errors
      * @throws IOException on errors reading from the SPDX V2 document file
      * @throws FileNotFoundException on the SPDX V2 document file not being found

@@ -65,7 +65,7 @@ public abstract class AbstractDependencyBuilder
      * 
      * @param mavenProjectBuilder project builder for the repo containing the POM file
      * @param session Maven session for building the project
-     * @param mavenProject Mave project
+     * @param mavenProject Maven project
      * @param node Dependency node which contains all the dependencies
      * @param pkg SPDX Package to attach the dependencies to
      * @throws InvalidSPDXAnalysisException on errors generating SPDX

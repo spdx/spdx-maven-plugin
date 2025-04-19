@@ -532,15 +532,15 @@ public class TestSpdxV2FileCollector
             boolean foundDefault = false;
             boolean foundFileWithIds = false;
             boolean foundNewLicense = false;
-            AnyLicenseInfo defaultDecaredLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( DEFAULT_DECLARED_LICENSE );
-            AnyLicenseInfo fileWithIdstDecaredLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( FILE_WITH_IDS_DECLARED_LICENSE );
+            AnyLicenseInfo defaultDeclaredLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( DEFAULT_DECLARED_LICENSE );
+            AnyLicenseInfo fileWithIdsDeclaredLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( FILE_WITH_IDS_DECLARED_LICENSE );
             for ( AnyLicenseInfo lic : result )
             {
-                if ( lic.equals( defaultDecaredLicense ) )
+                if ( lic.equals( defaultDeclaredLicense ) )
                 {
                     foundDefault = true;
                 }
-                if ( lic.equals( fileWithIdstDecaredLicense ) )
+                if ( lic.equals( fileWithIdsDeclaredLicense ) )
                 {
                     foundFileWithIds = true;
                 }

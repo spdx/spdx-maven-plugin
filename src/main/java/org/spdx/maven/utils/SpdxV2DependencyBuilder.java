@@ -154,6 +154,8 @@ public class SpdxV2DependencyBuilder
     private final Map<LicenseOverwrite, AnyLicenseInfo> licenseOverwrites = new HashMap<>();
 
     /**
+     * Construct an SpdxV2DependencyBuilder
+     *
      * @param builder The document builder
      * @param createExternalRefs if true, create external references for dependencies
      * @param generatePurls if true, generate a Package URL and include as an external identifier for the dependencies

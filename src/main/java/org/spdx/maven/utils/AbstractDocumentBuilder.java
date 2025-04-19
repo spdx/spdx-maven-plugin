@@ -125,7 +125,7 @@ public abstract class AbstractDocumentBuilder
     public abstract void addNonStandardLicenses( NonStandardLicense[] nonStandardLicenses ) throws SpdxBuilderException;
 
     /**
-     * @return package representing the Mave project
+     * @return package representing the Maven project
      */
     public abstract CoreModelObject getProjectPackage();
 
