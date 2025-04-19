@@ -279,7 +279,7 @@ public class SpdxV3FileCollector extends AbstractFileCollector
         {
             comment = "";
         }
-        String licenseComment = snippet.getLicensComment();
+        String licenseComment = snippet.getLicenseComment();
         if ( Objects.nonNull( licenseComment ) && !licenseComment.isBlank() )
         {
             comment = comment + "; License: " + licenseComment;
