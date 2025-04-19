@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple structure to hold information obout default file information
+ * Simple structure to hold information about default file information
  *
  * @author Gary O'Neall
  */
