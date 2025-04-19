@@ -111,9 +111,9 @@
       <version>2.0.0</version>
     </dependency>
     <dependency>
-    	<groupId>org.spdx</groupId>
-    	<artifactId>spdx-v3jsonld-store</artifactId>
-    	<version>1.0.0</version>
+      <groupId>org.spdx</groupId>
+      <artifactId>spdx-v3jsonld-store</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
