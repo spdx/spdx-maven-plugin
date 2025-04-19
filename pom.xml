@@ -41,13 +41,6 @@
     <tag>master</tag>
   </scm>
 
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <distributionManagement>
     <repository>
       <id>ossrh</id>
@@ -105,17 +98,22 @@
     <dependency>
       <groupId>org.spdx</groupId>
       <artifactId>java-spdx-library</artifactId>
-      <version>2.0.0-RC2</version>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.spdx</groupId>
       <artifactId>spdx-rdf-store</artifactId>
-      <version>2.0.0-RC2</version>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.spdx</groupId>
       <artifactId>spdx-jackson-store</artifactId>
-      <version>2.0.0-RC2</version>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.spdx</groupId>
+    	<artifactId>spdx-v3jsonld-store</artifactId>
+    	<version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -153,11 +151,6 @@
       <artifactId>aether-transport-http</artifactId>
       <version>1.1.0</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.spdx</groupId>
-    	<artifactId>spdx-v3jsonld-store</artifactId>
-    	<version>1.0.0-RC3</version>
     </dependency>
   </dependencies>
 
