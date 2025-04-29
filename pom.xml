@@ -19,11 +19,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.outputTimestamp>1745865684</project.build.outputTimestamp>
     <maven.compiler.release>11</maven.compiler.release>
-    <maven.version>3.8.5</maven.version>
+    <maven.version>3.8.8</maven.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>spdx</sonar.organization>
     <sonar.projectKey>spdx-maven-plugin</sonar.projectKey>
-    <dependency-check-maven.version>8.0.1</dependency-check-maven.version>
+    <dependency-check-maven.version>8.0.2</dependency-check-maven.version>
   </properties>
 
   <licenses>
@@ -292,7 +292,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.11.2</version>
         <configuration>
           <notimestamp>true</notimestamp>
           <links>
@@ -371,6 +371,26 @@
                 <phase>verify</phase>
                 <goals>
                   <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <configuration>
+              <quiet>true</quiet>
+              <javadocExecutable>${env.JAVA_HOME}/bin/javadoc</javadocExecutable>
+<!--              <additionalOptions>
+                <option>-Xdoclint:none</option>
+              </additionalOptions>-->
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
                 </goals>
               </execution>
             </executions>
