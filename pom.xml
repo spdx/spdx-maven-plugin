@@ -382,9 +382,6 @@
             <configuration>
               <quiet>true</quiet>
               <javadocExecutable>${env.JAVA_HOME}/bin/javadoc</javadocExecutable>
-<!--              <additionalOptions>
-                <option>-Xdoclint:none</option>
-              </additionalOptions>-->
             </configuration>
             <executions>
               <execution>
