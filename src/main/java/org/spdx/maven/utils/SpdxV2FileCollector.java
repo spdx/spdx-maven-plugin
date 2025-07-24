@@ -97,23 +97,15 @@ public class SpdxV2FileCollector extends AbstractFileCollector
             {
                 String filePath = fileSet.getDirectory() + File.separator + includedFile;
                 File file = new File( filePath );
-                String relativeFilePath = file.getAbsolutePath().substring( baseDir.length() + 1 ).replace( '\\', '/' );
+                String relativeFilePath = toRelativeFilePath( file, baseDir );
                 SpdxDefaultFileInformation fileInfo = findDefaultFileInformation( relativeFilePath,
                         pathSpecificInformation );
                 if ( fileInfo == null )
                 {
                     fileInfo = defaultFileInformation;
                 }
-
-                String outputFileName;
-                if ( fileSet.getOutputDirectory() != null )
-                {
-                    outputFileName = fileSet.getOutputDirectory() + File.separator + includedFile;
-                }
-                else
-                {
-                    outputFileName = file.getAbsolutePath().substring( baseDir.length() + 1 );
-                }
+                String outputFileName = Objects.nonNull( fileSet.getOutputDirectory() ) ?
+                        fileSet.getOutputDirectory() + File.separator + includedFile : relativeFilePath;
                 collectFile( file, outputFileName, fileInfo, relationshipType, projectPackage, spdxDoc, algorithms );
             }
         }

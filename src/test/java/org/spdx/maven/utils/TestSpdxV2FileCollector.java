@@ -658,4 +658,25 @@ public class TestSpdxV2FileCollector
             }
         }
     }
+
+    @Test
+    public void testToRelativeFilePath()
+    {
+        // test simple case
+        String result = AbstractFileCollector.toRelativeFilePath( new File( "/abc/def/ghi/file.java" ),
+                "/abc/def" );
+        assertEquals( "ghi/file.java", result );
+        // test level up
+        result = AbstractFileCollector.toRelativeFilePath( new File( "/abc/file.java" ),
+                "/abc/def" );
+        assertEquals( "../file.java", result );
+        // test not relative
+        result = AbstractFileCollector.toRelativeFilePath( new File( "/ghi/file.java" ),
+                "/abc/def" );
+        assertEquals( "../../ghi/file.java", result );
+        // test DOS filenames
+        result = AbstractFileCollector.toRelativeFilePath( new File( "c:\\abc\\def\\ghi\\file.java" ),
+                "c:\\abc\\def" );
+        assertEquals( "ghi/file.java", result );
+    }
 }
