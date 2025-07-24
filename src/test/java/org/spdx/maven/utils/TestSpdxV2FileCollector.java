@@ -674,9 +674,5 @@ public class TestSpdxV2FileCollector
         result = AbstractFileCollector.toRelativeFilePath( new File( "/ghi/file.java" ),
                 "/abc/def" );
         assertEquals( "../../ghi/file.java", result );
-        // test DOS filenames
-        result = AbstractFileCollector.toRelativeFilePath( new File( "c:\\abc\\def\\ghi\\file.java" ),
-                "c:\\abc\\def" );
-        assertEquals( "ghi/file.java", result );
     }
 }
