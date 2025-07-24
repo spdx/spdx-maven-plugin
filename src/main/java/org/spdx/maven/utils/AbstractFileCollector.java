@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -233,6 +234,15 @@ public abstract class AbstractFileCollector
         }
 
         return checksums;
+    }
+
+    /**
+     * @param file file which is the target for the path string
+     * @param baseDir base directory of the SPDX archive or project containing the file
+     * @return a file path for the file relative to the baseDir
+     */
+    protected static String toRelativeFilePath( File file, String baseDir ) {
+        return Path.of( baseDir ).relativize( file.toPath() ).toString().replace( '\\', '/' );
     }
 
 }
