@@ -120,7 +120,7 @@ public class CreateSpdxMojo extends AbstractMojo
         SpdxModelFactory.init();
     }
 
-    @Component
+    @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject mavenProject;
 
     @Component
@@ -129,7 +129,7 @@ public class CreateSpdxMojo extends AbstractMojo
     @Component
     protected ProjectBuilder mavenProjectBuilder;
 
-    @Component
+    @Parameter( defaultValue = "${session}", readonly = true )
     protected MavenSession session;
 
     @Component(hint = "default")
