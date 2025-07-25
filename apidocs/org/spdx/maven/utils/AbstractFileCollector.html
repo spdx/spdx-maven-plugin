@@ -168,6 +168,10 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isSourceFile(java.util.Collection)" class="member-name-link">isSourceFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;org.spdx.library.model.v2.enumerations.FileType&gt;&nbsp;fileTypes)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>protected static <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#toRelativeFilePath(java.io.File,java.lang.String)" class="member-name-link">toRelativeFilePath</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;file,
+ <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;baseDir)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -312,6 +316,20 @@ org.spdx.core.InvalidSPDXAnalysisException</span></div>
 <dt>Throws:</dt>
 <dd><code><a href="SpdxCollectionException.html" title="class in org.spdx.maven.utils">SpdxCollectionException</a></code> - if the input algorithm is invalid or unavailable or if the file cannot be read</dd>
 <dd><code>org.spdx.core.InvalidSPDXAnalysisException</code> - on SPDX parsing errors</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="toRelativeFilePath(java.io.File,java.lang.String)">
+<h3>toRelativeFilePath</h3>
+<div class="member-signature"><span class="modifiers">protected static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">toRelativeFilePath</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;file,
+ <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;baseDir)</span></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>file</code> - file which is the target for the path string</dd>
+<dd><code>baseDir</code> - base directory of the SPDX archive or project containing the file</dd>
+<dt>Returns:</dt>
+<dd>a file path for the file relative to the baseDir</dd>
 </dl>
 </section>
 </li>
