@@ -164,7 +164,7 @@ Copyright (C) 2016 Faust Inc. All, and I mean ALL, rights are reserved.</fileNot
   	<dependency>
   		<groupId>org.apache.commons</groupId>
   		<artifactId>commons-lang3</artifactId>
-  		<version>3.4</version>
+  		<version>3.18.0</version>
   	</dependency>
   	<dependency>
   		<groupId>junit</groupId>
