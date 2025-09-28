@@ -4,11 +4,25 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     labels:
       - "dependencies"
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directory: "/.github/workflows"
     schedule:
       interval: "weekly"
+      day: "thursday"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    groups:
+      actions:
+        patterns:
+          - ".*"
     labels:
       - "dependencies"
