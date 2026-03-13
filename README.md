@@ -1,6 +1,6 @@
 # SPDX Maven Plugin
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.spdx/spdx-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.spdx/spdx-maven-plugin)
+[![Maven Central](https://img.shields.io/maven-central/v/org.spdx/spdx-maven-plugin)](https://central.sonatype.com/artifact/org.spdx/spdx-maven-plugin)
 [![javadoc](https://javadoc.io/badge2/org.spdx/spdx-maven-plugin/javadoc.svg)](https://javadoc.io/doc/org.spdx/spdx-maven-plugin)
 
 SPDX Maven Plugin is a plugin to Maven which produces [Software Package Data Exchange (SPDX)](https://spdx.dev/) documents for artifacts described in the [Maven POM file](https://maven.apache.org/pom.html).
