@@ -25,7 +25,7 @@ In the build plugins section, add the plugin with `createSPDX` goal:
         <groupId>org.spdx</groupId>
         <artifactId>spdx-maven-plugin</artifactId>
         <!-- please check for updates on https://search.maven.org/search?q=a:spdx-maven-plugin -->
-        <version>1.0.1</version>
+        <version>1.0.4</version>
         <executions>
             <execution>
                 <id>build-spdx</id>
@@ -43,7 +43,9 @@ In the build plugins section, add the plugin with `createSPDX` goal:
     </plugin>
 ```
 
-Then invoke with `mvn spdx:createSPDX` and your SPDX file will be generated in `./target/site/{groupId}_{artifactId}-{version}.spdx`.
+Then invoke with `mvn spdx:createSPDX` and your SPDX file will be generated in `./target/site/{groupId}_{artifactId}-{version}.spdx.json`.
+
+Invoking `mvn install`  will include your SPDX file in the repository distribution artifacts.
 
 ## Additional Configuration
 
