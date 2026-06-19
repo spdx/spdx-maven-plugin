@@ -50,7 +50,7 @@
         <!-- Force the dependency version greater or equal to 0.11.0 for Jena - resolves vulnerability -->
             <groupId>org.apache.thrift</groupId>
             <artifactId>libthrift</artifactId>
-            <version>0.14.2</version>
+            <version>0.23.0</version>
             <type>pom</type>
         </dependency>
         <dependency>
