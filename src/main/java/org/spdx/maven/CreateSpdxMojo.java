@@ -1189,7 +1189,7 @@ public class CreateSpdxMojo extends AbstractMojo
     /**
      * Create an ArtifactFilter based on the provided scopes
      */
-    private ArtifactFilter getArtifactFilter()
+    protected ArtifactFilter getArtifactFilter()
     {
         getLog().debug( "Creating Artifact filter" );
         List<String> scopes = new ArrayList<>();

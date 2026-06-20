@@ -1,5 +1,6 @@
 package org.spdx.maven;
 
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -52,7 +53,8 @@ public class AggregateSpdxMojo extends CreateSpdxMojo {
                 {
                     ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
                     request.setProject( project );
-                    DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, null );
+                    ArtifactFilter artifactFilter = getArtifactFilter();
+                    DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, artifactFilter );
                     dependencyBuilder.addMavenDependencies( mavenProjectBuilder, session, project, parentNode, builder.getProjectPackage() );
                 }
             }
