@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package aggregate_with_scope_filter;
+package aggregatescopefilter;
 
-public class AggregateWithScopeFilter
+import org.junit.Test;
+
+public class AggregateScopeFilterTest
 {
-    @SuppressWarnings("java:S106") // This is stub class. It is not used.
-    public static void main(String[] args)
+    @Test
+    public void testAggregateScopeFilter()
     {
-        System.out.println( "Apply scope filter in aggregateSPDX");
+        // Intentionally left blank since this is a stub package.
     }
 }
