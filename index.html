@@ -93,7 +93,7 @@
         &lt;groupId&gt;org.spdx&lt;/groupId&gt;
         &lt;artifactId&gt;spdx-maven-plugin&lt;/artifactId&gt;
         &lt;!-- please check for updates on https://search.maven.org/search?q=a:spdx-maven-plugin --&gt;
-        &lt;version&gt;1.0.1&lt;/version&gt;
+        &lt;version&gt;1.0.4&lt;/version&gt;
         &lt;executions&gt;
             &lt;execution&gt;
                 &lt;id&gt;build-spdx&lt;/id&gt;
@@ -110,7 +110,8 @@
         &lt;/configuration&gt;
     &lt;/plugin&gt;
 </code></pre></div>
-<p>Then invoke with <code>mvn spdx:createSPDX</code> and your SPDX file will be generated in <code>./target/site/{groupId}_{artifactId}-{version}.spdx</code>.</p></section><section>
+<p>Then invoke with <code>mvn spdx:createSPDX</code> and your SPDX file will be generated in <code>./target/site/{groupId}_{artifactId}-{version}.spdx.json</code>.</p>
+<p>Invoking <code>mvn install</code>  will include your SPDX file in the repository distribution artifacts.</p></section><section>
 <h2><a name="Additional_Configuration"></a>Additional Configuration</h2>
 <p>See <a class="externalLink" href="http://spdx.github.io/spdx-maven-plugin/createSPDX-mojo.html"><code>createSPDX</code> goal documentation</a> for complete details.</p>
 <p>All SPDX document and SPDX package properties are supported.  Some properties
