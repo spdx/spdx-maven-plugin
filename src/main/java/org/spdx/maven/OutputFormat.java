@@ -28,7 +28,7 @@ public enum OutputFormat
     
     RDF_XML("RDF/XML", "spdx.rdf.xml", ".rdf.xml", SpdxMajorVersion.VERSION_2),
     JSON("JSON", "spdx.json", ".json", SpdxMajorVersion.VERSION_2),
-    JSON_LD("JSON-LD", "spdx.json-ld.json", ".json-ld.json", SpdxMajorVersion.VERSION_3);
+    JSON_LD("JSON-LD", "spdx3.json", "3.json", SpdxMajorVersion.VERSION_3);
 
     private final String value;
     private final String artifactType;
