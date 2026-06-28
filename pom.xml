@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId> <!-- needed for the Jena RDF libraries used in the spdx-java-rdf store -->
-      <version>3.18.0</version>
+      <version>3.20.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
