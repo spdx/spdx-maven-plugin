@@ -107,14 +107,6 @@ public class CreateSpdxMojo extends AbstractMojo
 
     public static final String CREATOR_TOOL_MAVEN_PLUGIN = "Tool: spdx-maven-plugin";
 
-    public static final String SPDX_RDF_ARTIFACT_TYPE = "spdx.rdf.xml";
-
-    public static final String SPDX_JSON_ARTIFACT_TYPE = "spdx.json";
-
-    public static final String JSON_OUTPUT_FORMAT = "JSON";
-
-    public static final String RDF_OUTPUT_FORMAT = "RDF/XML";
-
     static
     {
         SpdxModelFactory.init();

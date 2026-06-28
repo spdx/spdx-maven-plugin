@@ -82,7 +82,7 @@ public class TestSpdxV3Mojo extends AbstractMojoTestCase
         assertTrue( spdxFile.exists() );
         // Test output artifact file is created
         File artifactFile = getTestFile(
-                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx.json-ld.json" );
+                "target/test-classes/unit/spdx-maven-plugin-test/spdx maven plugin test.spdx3.json" );
         assertTrue( artifactFile.exists() );
         ISerializableModelStore modelStore = new JsonLDStore( new InMemSpdxStore() );
         ModelCopyManager copyManager = new ModelCopyManager();

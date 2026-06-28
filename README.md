@@ -73,6 +73,17 @@ a unique license ID and the verbatim license text.
 
 See the file [`src/it/advanced/pom.xml`](src/it/advanced/pom.xml) for an example project using the spdx-maven-plugin.
 
+## File Naming Conventions
+
+The default output filename is `./target/site/{groupId}_{artifactId}-{version}.[extension]` where the `[extension]`
+is determined by the SPDX file output type:
+
+- `JSON` SPDX Spec version 2.3 (default) - `spdx.json`
+- `RDF/XML` SPDX Spec version 2.3 - `spdx.rdf.xml`
+- `JSON-LD` SPDX Spec version 3 - `spdx3.json`
+
+The output file name can be overridden using the `spdxFileName` property.
+
 ## Contributing
 
 See the [CONTRIBUTING.MD](CONTRIBUTING.md) documentation.
