@@ -13,10 +13,6 @@ import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.maven.utils.AbstractDependencyBuilder;
 import org.spdx.maven.utils.AbstractDocumentBuilder;
 import org.spdx.maven.utils.LicenseMapperException;
-import org.spdx.maven.utils.SpdxV2DependencyBuilder;
-import org.spdx.maven.utils.SpdxV2DocumentBuilder;
-import org.spdx.maven.utils.SpdxV3DependencyBuilder;
-import org.spdx.maven.utils.SpdxV3DocumentBuilder;
 
 
 import java.util.List;
@@ -31,17 +27,7 @@ public class AggregateSpdxMojo extends CreateSpdxMojo {
     @Override
     protected void buildSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
             throws DependencyGraphBuilderException, LicenseMapperException, InvalidSPDXAnalysisException {
-        AbstractDependencyBuilder dependencyBuilder;
-        if ( builder instanceof SpdxV3DocumentBuilder)
-        {
-            dependencyBuilder = new SpdxV3DependencyBuilder( ( SpdxV3DocumentBuilder ) builder, createExternalRefs,
-                    generatePurls, useArtifactID, includeTransitiveDependencies );
-        }
-        else
-        {
-            dependencyBuilder = new SpdxV2DependencyBuilder( ( SpdxV2DocumentBuilder ) builder, createExternalRefs,
-                    generatePurls, useArtifactID, includeTransitiveDependencies );
-        }
+        AbstractDependencyBuilder dependencyBuilder = createDependencyBuilder( builder );
         if ( session != null )
         {
             List<MavenProject> projects = session.getAllProjects(); //includes the current project

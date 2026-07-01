@@ -755,75 +755,7 @@ public class CreateSpdxMojo extends AbstractMojo
     protected void buildSpdxDependencyInformation( AbstractDocumentBuilder builder, OutputFormat outputFormatEnum )
         throws LicenseMapperException, InvalidSPDXAnalysisException, DependencyGraphBuilderException
     {
-        AbstractDependencyBuilder dependencyBuilder;
-        if ( builder instanceof SpdxV3DocumentBuilder )
-        {
-            SpdxV3DocumentBuilder documentBuilder = (SpdxV3DocumentBuilder) builder;
-            SpdxV3DependencyBuilder dependencyBuilderV3 = new SpdxV3DependencyBuilder(
-                                                      documentBuilder, createExternalRefs,
-                                                      generatePurls, useArtifactID,
-                                                      includeTransitiveDependencies );
-            if ( licenseOverwrites != null )
-            {
-                org.spdx.library.model.v3_0_1.core.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
-
-                for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
-                {
-                    org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo parsedLicense;
-
-                    try
-                    {
-                        // parse the licenseString before use to fail fast with a broken configuration
-                        parsedLicense = LicenseInfoFactory.parseSPDXLicenseString(
-                                licenseOverwrite.getLicenseString(), spdxDoc.getModelStore(),
-                                spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), null );
-                    }
-                    catch ( InvalidLicenseStringException e )
-                    {
-                        // add some info the help the user fixing the configuration
-                        throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
-                    }
-
-                    dependencyBuilderV3.addLicenseOverwrite( licenseOverwrite, parsedLicense );
-                }
-            }
-            dependencyBuilder = dependencyBuilderV3;
-        }
-        else
-        {
-            SpdxV2DocumentBuilder documentBuilder = (SpdxV2DocumentBuilder) builder;
-            SpdxV2DependencyBuilder dependencyBuilderV2 = new SpdxV2DependencyBuilder(
-                                                      documentBuilder, createExternalRefs,
-                                                      generatePurls, useArtifactID,
-                                                      includeTransitiveDependencies );
-
-            if ( licenseOverwrites != null )
-            {
-                org.spdx.library.model.v2.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
-
-                for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
-                {
-                    org.spdx.library.model.v2.license.AnyLicenseInfo parsedLicense;
-
-                    try
-                    {
-                        // parse the licenseString before use to fail fast with a broken configuration
-                        parsedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2(
-                                licenseOverwrite.getLicenseString(), spdxDoc.getModelStore(),
-                                spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
-                    }
-                    catch ( InvalidLicenseStringException e )
-                    {
-                        // add some info the help the user fixing the configuration
-                        throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
-                    }
-
-                    dependencyBuilderV2.addLicenseOverwrite( licenseOverwrite, parsedLicense );
-                }
-            }
-
-            dependencyBuilder = dependencyBuilderV2;
-        }
+        AbstractDependencyBuilder dependencyBuilder = createDependencyBuilder( builder );
         if ( session != null )
         {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
@@ -832,6 +764,77 @@ public class CreateSpdxMojo extends AbstractMojo
             DependencyNode parentNode = dependencyGraphBuilder.buildDependencyGraph( request, artifactFilter );
 
             dependencyBuilder.addMavenDependencies( mavenProjectBuilder, session, mavenProject, parentNode, builder.getProjectPackage() );
+        }
+    }
+
+    protected AbstractDependencyBuilder createDependencyBuilder( AbstractDocumentBuilder builder )
+            throws InvalidSPDXAnalysisException
+    {
+        if ( builder instanceof SpdxV3DocumentBuilder )
+        {
+            SpdxV3DocumentBuilder documentBuilder = (SpdxV3DocumentBuilder) builder;
+            SpdxV3DependencyBuilder dependencyBuilder = new SpdxV3DependencyBuilder(
+                    documentBuilder, createExternalRefs, generatePurls, useArtifactID, includeTransitiveDependencies );
+            addLicenseOverwrites( documentBuilder, dependencyBuilder );
+            return dependencyBuilder;
+        }
+
+        SpdxV2DocumentBuilder documentBuilder = (SpdxV2DocumentBuilder) builder;
+        SpdxV2DependencyBuilder dependencyBuilder = new SpdxV2DependencyBuilder(
+                documentBuilder, createExternalRefs, generatePurls, useArtifactID, includeTransitiveDependencies );
+        addLicenseOverwrites( documentBuilder, dependencyBuilder );
+        return dependencyBuilder;
+    }
+
+    private void addLicenseOverwrites( SpdxV3DocumentBuilder documentBuilder, SpdxV3DependencyBuilder dependencyBuilder )
+            throws InvalidSPDXAnalysisException
+    {
+        if ( licenseOverwrites == null )
+        {
+            return;
+        }
+        org.spdx.library.model.v3_0_1.core.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
+        for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
+        {
+            org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo parsedLicense;
+            try
+            {
+                // parse the licenseString before use to fail fast with a broken configuration
+                parsedLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseOverwrite.getLicenseString(),
+                        spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), null );
+            }
+            catch ( InvalidLicenseStringException e )
+            {
+                // add some info the help the user fixing the configuration
+                throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
+            }
+            dependencyBuilder.addLicenseOverwrite( licenseOverwrite, parsedLicense );
+        }
+    }
+
+    private void addLicenseOverwrites( SpdxV2DocumentBuilder documentBuilder, SpdxV2DependencyBuilder dependencyBuilder )
+            throws InvalidSPDXAnalysisException
+    {
+        if ( licenseOverwrites == null )
+        {
+            return;
+        }
+        org.spdx.library.model.v2.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
+        for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
+        {
+            org.spdx.library.model.v2.license.AnyLicenseInfo parsedLicense;
+            try
+            {
+                // parse the licenseString before use to fail fast with a broken configuration
+                parsedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( licenseOverwrite.getLicenseString(),
+                        spdxDoc.getModelStore(), spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
+            }
+            catch ( InvalidLicenseStringException e )
+            {
+                // add some info the help the user fixing the configuration
+                throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
+            }
+            dependencyBuilder.addLicenseOverwrite( licenseOverwrite, parsedLicense );
         }
     }
 
