@@ -796,19 +796,19 @@ public class CreateSpdxMojo extends AbstractMojo
         org.spdx.library.model.v3_0_1.core.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
         for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
         {
-            org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo parsedLicense;
             try
             {
                 // parse the licenseString before use to fail fast with a broken configuration
-                parsedLicense = LicenseInfoFactory.parseSPDXLicenseString( licenseOverwrite.getLicenseString(),
+                org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo parsedLicense
+                        = LicenseInfoFactory.parseSPDXLicenseString( licenseOverwrite.getLicenseString(),
                         spdxDoc.getModelStore(), spdxDoc.getIdPrefix(), spdxDoc.getCopyManager(), null );
+                dependencyBuilder.addLicenseOverwrite( licenseOverwrite, parsedLicense );
             }
             catch ( InvalidLicenseStringException e )
             {
                 // add some info the help the user fixing the configuration
                 throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
             }
-            dependencyBuilder.addLicenseOverwrite( licenseOverwrite, parsedLicense );
         }
     }
 
@@ -822,19 +822,19 @@ public class CreateSpdxMojo extends AbstractMojo
         org.spdx.library.model.v2.SpdxDocument spdxDoc = documentBuilder.getSpdxDoc();
         for ( LicenseOverwrite licenseOverwrite : licenseOverwrites )
         {
-            org.spdx.library.model.v2.license.AnyLicenseInfo parsedLicense;
             try
             {
                 // parse the licenseString before use to fail fast with a broken configuration
-                parsedLicense = LicenseInfoFactory.parseSPDXLicenseStringCompatV2( licenseOverwrite.getLicenseString(),
+                org.spdx.library.model.v2.license.AnyLicenseInfo parsedLicense =
+                        LicenseInfoFactory.parseSPDXLicenseStringCompatV2( licenseOverwrite.getLicenseString(),
                         spdxDoc.getModelStore(), spdxDoc.getDocumentUri(), spdxDoc.getCopyManager() );
+                dependencyBuilder.addLicenseOverwrite( licenseOverwrite, parsedLicense );
             }
             catch ( InvalidLicenseStringException e )
             {
                 // add some info the help the user fixing the configuration
                 throw new InvalidLicenseStringException( "Invalid license overwrite configuration for " + licenseOverwrite, e );
             }
-            dependencyBuilder.addLicenseOverwrite( licenseOverwrite, parsedLicense );
         }
     }
 
