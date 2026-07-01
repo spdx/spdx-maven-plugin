@@ -3,9 +3,6 @@
  *
  * This test verifies that dependencies with 'test' scope are excluded when
  * includeTestScope is set to false in the aggregateSPDX goal.
- * 
- * Note: This test is expected to fail because of a bug in the current implementation
- * where scope filters are not applied during aggregation.
  */
 
 File spdxFile = new File(basedir, "target/site/org.spdx.it_simple-it-1.0-SNAPSHOT.spdx.json")
