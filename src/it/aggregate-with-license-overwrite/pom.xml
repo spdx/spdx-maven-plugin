@@ -52,12 +52,12 @@
               <groupId>commons-collections</groupId>
               <artifactId>commons-collections</artifactId>
               <version>3.2.2</version>
-              <licenseString>LicenseRef-TEST_LICENSE</licenseString>
+              <licenseString>LicenseRef-TEST-LICENSE</licenseString>
             </licenseOverwrite>
           </licenseOverwrites>
           <nonStandardLicenses>
             <nonStandardLicense>
-              <licenseId>LicenseRef-TEST_LICENSE</licenseId>
+              <licenseId>LicenseRef-TEST-LICENSE</licenseId>
               <name>Test License</name>
               <extractedText>Test-only synthetic license text.</extractedText>
             </nonStandardLicense>
