@@ -16,9 +16,9 @@ assert packageStart >= 0 : "Could not find commons-collections:3.2.2 in generate
 
 String packageBlock = content.substring( packageStart, Math.min( content.length(), packageStart + 400 ) )
 
-assert packageBlock.contains( "\"licenseDeclared\" : \"LicenseRef-TEST_LICENSE\"" ) :
-    "Expected commons-collections:3.2.2 to have licenseDeclared LicenseRef-TEST_LICENSE, but block was:\n" + packageBlock
-assert packageBlock.contains( "\"licenseConcluded\" : \"LicenseRef-TEST_LICENSE\"" ) :
-    "Expected commons-collections:3.2.2 to have licenseConcluded LicenseRef-TEST_LICENSE, but block was:\n" + packageBlock
+assert packageBlock.contains( "\"licenseDeclared\" : \"LicenseRef-TEST-LICENSE\"" ) :
+    "Expected commons-collections:3.2.2 to have licenseDeclared LicenseRef-TEST-LICENSE, but block was:\n" + packageBlock
+assert packageBlock.contains( "\"licenseConcluded\" : \"LicenseRef-TEST-LICENSE\"" ) :
+    "Expected commons-collections:3.2.2 to have licenseConcluded LicenseRef-TEST-LICENSE, but block was:\n" + packageBlock
 
 return true
