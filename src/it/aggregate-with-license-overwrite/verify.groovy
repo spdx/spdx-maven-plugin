@@ -1,3 +1,9 @@
+/**
+ * Regression test for: https://github.com/spdx/spdx-maven-plugin/issues/251
+ *
+ * This test verifies that configured license overrides are applied when executing `aggregateSPDX`.
+ */
+
 File spdxFile = new File( basedir, "target/site/org.spdx.it_aggregate-with-license-overwrite-1.0-SNAPSHOT.spdx.json" )
 
 assert spdxFile.isFile()
