@@ -22,17 +22,14 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.maven.model.License;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.model.v2.SpdxDocument;
 import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.InvalidLicenseExpression;
 import org.spdx.library.model.v2.license.SpdxListedLicense;
 import org.spdx.library.model.v2.license.SpdxNoAssertionLicense;
 import org.spdx.library.model.v3_0_1.core.Element;
@@ -231,6 +228,27 @@ public class MavenToSpdxLicenseMapper
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
+            }
+                else if ( isLicenseExpression( license.getName() ) )
+            {
+                try
+                {
+                    AnyLicenseInfo expression =
+                            LicenseInfoFactory.parseSPDXLicenseStringCompatV2( license.getName() );
+                    if ( expression instanceof InvalidLicenseExpression )
+                    {
+                        LOG.warn( "Invalid license expression found: {}", expression );
+                        return new SpdxNoAssertionLicense();
+                    }
+                    else
+                    {
+                        spdxLicenses.add( expression );
+                    }
+                } catch ( InvalidSPDXAnalysisException ex )
+                {
+                    LOG.warn( "Exception parsing possible license expression: {}", license.getName() );
+                    return new SpdxNoAssertionLicense();
+                }
             } else {
                 return new SpdxNoAssertionLicense();
             }
@@ -249,33 +267,57 @@ public class MavenToSpdxLicenseMapper
         }
     }
 
-    private SpdxListedLicense mavenLicenseToSpdxV2ListedLicense( License license )
+    /**
+     * Converts a Maven license into an SPDX license ID if it could be found
+     * @param license Maven license
+     * @return the SPDX listed license or null if the Maven license could not be mapped to an SPDX listed license ID
+     */
+    private String mavenLicenseToSpdxLicenseId( License license )
     {
         if ( license == null )
         {
             return null;
         }
-        if ( license.getUrl() == null || license.getUrl().isEmpty() )
+        if ( Objects.nonNull( license.getUrl() ) && !license.getUrl().isEmpty() )
+        {
+            String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll( "https", "http" ) );
+            if ( Objects.nonNull( spdxId ) ) {
+                return spdxId;
+            }
+        }
+        // see if the license name matches the SPDX listed license ID - per Maven license naming conventions
+        if ( Objects.nonNull( license.getName() ) && LicenseInfoFactory.isSpdxListedLicenseId( license.getName().trim() ))
+        {
+            return license.getName().trim();
+        }
+        else
         {
             return null;
         }
-        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll( "https", "http" ) );
-        if ( spdxId == null )
+    }
+
+    private SpdxListedLicense mavenLicenseToSpdxV2ListedLicense( License license )
+    {
+        String licenseId = mavenLicenseToSpdxLicenseId( license );
+        if ( Objects.nonNull( licenseId ) )
         {
-            return null;
+            try
+            {
+                return LicenseInfoFactory.getListedLicenseByIdCompatV2( licenseId );
+            }
+            catch ( InvalidSPDXAnalysisException e )
+            {
+                return null;
+            }
         }
-        try
-        {
-            return LicenseInfoFactory.getListedLicenseByIdCompatV2( spdxId );
-        }
-        catch ( InvalidSPDXAnalysisException e )
+        else
         {
             return null;
         }
     }
     
     /**
-     * Map a list of Maven licenses to an SPDX Spec version 2 license.  If no licenses are supplied, SpdxNoAssertion license is
+     * Map a list of Maven licenses to an SPDX Spec version 3 license.  If no licenses are supplied, SpdxNoAssertion license is
      * returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
      * is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
      * SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
@@ -300,7 +342,30 @@ public class MavenToSpdxLicenseMapper
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
-            } else {
+            }
+            else if ( isLicenseExpression( license.getName() ) )
+            {
+                try
+                {
+                    org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expression =
+                            LicenseInfoFactory.parseSPDXLicenseString( license.getName() );
+                    if ( expression instanceof org.spdx.library.model.v3_0_1.simplelicensing.InvalidLicenseExpression )
+                    {
+                        LOG.warn( "Invalid license expression found: {}", expression );
+                        return new NoAssertionLicense();
+                    }
+                    else
+                    {
+                        spdxLicenses.add( expression );
+                    }
+                } catch ( InvalidSPDXAnalysisException ex )
+                {
+                    LOG.warn( "Exception parsing possible license expression: {}", license.getName() );
+                    return new NoAssertionLicense();
+                }
+            }
+            else
+            {
                 return new NoAssertionLicense();
             }
         }
@@ -320,26 +385,31 @@ public class MavenToSpdxLicenseMapper
         }
     }
 
+    private boolean isLicenseExpression( String str )
+    {
+        if ( Objects.isNull( str ) )
+        {
+            return false;
+        }
+        String upper = str.toUpperCase();
+        return upper.contains( " AND " ) || upper.contains( " OR " ) || upper.contains( " WITH " );
+    }
+
     private ListedLicense mavenLicenseToSpdxV3ListedLicense( License license )
     {
-        if ( license == null )
+        String licenseId = mavenLicenseToSpdxLicenseId( license );
+        if ( Objects.nonNull( licenseId ) )
         {
-            return null;
+            try
+            {
+                return LicenseInfoFactory.getListedLicenseById( licenseId );
+            }
+            catch ( InvalidSPDXAnalysisException e )
+            {
+                return null;
+            }
         }
-        if ( license.getUrl() == null || license.getUrl().isEmpty() )
-        {
-            return null;
-        }
-        String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll( "https", "http" ) );
-        if ( spdxId == null )
-        {
-            return null;
-        }
-        try
-        {
-            return LicenseInfoFactory.getListedLicenseById( spdxId );
-        }
-        catch ( InvalidSPDXAnalysisException e )
+        else
         {
             return null;
         }

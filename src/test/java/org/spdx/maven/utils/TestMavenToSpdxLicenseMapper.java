@@ -20,6 +20,7 @@ import org.spdx.library.ModelCopyManager;
 import org.spdx.library.SpdxModelFactory;
 import org.spdx.library.model.v2.SpdxDocument;
 import org.spdx.library.model.v2.SpdxNoAssertion;
+import org.spdx.library.model.v2.license.AnyLicenseInfo;
 import org.spdx.library.model.v3_0_1.core.Element;
 import org.spdx.storage.simple.InMemSpdxStore;
 
@@ -219,5 +220,68 @@ public class TestMavenToSpdxLicenseMapper
                 licenseList, spdxV3Doc );
         org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expected = LicenseInfoFactory.parseSPDXLicenseString( "NOASSERTION" );
         assertEquals( expected, result );
+    }
+
+    @Test
+    public void testListedLicenseV2() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setName( "Apache-2.0" );
+        licenseList.add( license );
+        AnyLicenseInfo result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License( licenseList, spdxDoc );
+        assertTrue( result instanceof org.spdx.library.model.v2.license.SpdxListedLicense );
+        assertEquals( "Apache-2.0", ((org.spdx.library.model.v2.license.SpdxListedLicense)result).getLicenseId() );
+    }
+
+    @Test
+    public void testListedLicenseV3() throws LicenseMapperException, InvalidSPDXAnalysisException
+    {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setName( "Apache-2.0" );
+        licenseList.add( license );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result =
+                MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License( licenseList, spdxV3Doc );
+        assertTrue( result instanceof org.spdx.library.model.v3_0_1.expandedlicensing.ListedLicense );
+        assertEquals( "Apache-2.0", result.getId() );
+    }
+
+    @Test
+    public void testLicenseExpressionV2() throws LicenseMapperException, InvalidSPDXAnalysisException {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setName( "MIT AND Apache-2.0" );
+        licenseList.add( license );
+        AnyLicenseInfo result =
+                MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License( licenseList, spdxDoc );
+        assertTrue( result instanceof org.spdx.library.model.v2.license.ConjunctiveLicenseSet );
+        assertEquals( 2, ((org.spdx.library.model.v2.license.ConjunctiveLicenseSet)result).getMembers().size() );
+        license.setName( "MIT OR Apache-2.0" );
+        result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License( licenseList, spdxDoc );
+        assertTrue( result instanceof org.spdx.library.model.v2.license.DisjunctiveLicenseSet );
+        assertEquals( 2, ((org.spdx.library.model.v2.license.DisjunctiveLicenseSet)result).getMembers().size() );
+        license.setName( "GPL-2.0 WITH 389-exception" );
+        result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV2License( licenseList, spdxDoc );
+        assertTrue( result instanceof org.spdx.library.model.v2.license.WithExceptionOperator );
+    }
+
+    @Test
+    public void testLicenseExpressionV3() throws LicenseMapperException, InvalidSPDXAnalysisException {
+        List<License> licenseList = new ArrayList<>();
+        License license = new License();
+        license.setName( "MIT AND Apache-2.0" );
+        licenseList.add( license );
+        org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo result =
+                MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License( licenseList, spdxV3Doc );
+        assertTrue( result instanceof org.spdx.library.model.v3_0_1.expandedlicensing.ConjunctiveLicenseSet );
+        assertEquals( 2, ((org.spdx.library.model.v3_0_1.expandedlicensing.ConjunctiveLicenseSet)result).getMembers().size() );
+        license.setName( "MIT OR Apache-2.0" );
+        result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License( licenseList, spdxV3Doc );
+        assertTrue( result instanceof org.spdx.library.model.v3_0_1.expandedlicensing.DisjunctiveLicenseSet );
+        assertEquals( 2, ((org.spdx.library.model.v3_0_1.expandedlicensing.DisjunctiveLicenseSet)result).getMembers().size() );
+        license.setName( "GPL-2.0 WITH 389-exception" );
+        result = MavenToSpdxLicenseMapper.getInstance().mavenLicenseListToSpdxV3License( licenseList, spdxV3Doc );
+        assertTrue( result instanceof org.spdx.library.model.v3_0_1.expandedlicensing.WithAdditionOperator );
     }
 }
