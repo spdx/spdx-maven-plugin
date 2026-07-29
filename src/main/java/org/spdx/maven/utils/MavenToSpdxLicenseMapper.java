@@ -29,6 +29,7 @@ import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.library.LicenseInfoFactory;
 import org.spdx.library.model.v2.SpdxDocument;
 import org.spdx.library.model.v2.license.AnyLicenseInfo;
+import org.spdx.library.model.v2.license.InvalidLicenseExpression;
 import org.spdx.library.model.v2.license.SpdxListedLicense;
 import org.spdx.library.model.v2.license.SpdxNoAssertionLicense;
 import org.spdx.library.model.v3_0_1.core.Element;
@@ -227,6 +228,27 @@ public class MavenToSpdxLicenseMapper
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
+            }
+                else if ( isLicenseExpression( license.getName() ) )
+            {
+                try
+                {
+                    AnyLicenseInfo expression =
+                            LicenseInfoFactory.parseSPDXLicenseStringCompatV2( license.getName() );
+                    if ( expression instanceof InvalidLicenseExpression )
+                    {
+                        LOG.warn( "Invalid license expression found: {}", expression );
+                        return new SpdxNoAssertionLicense();
+                    }
+                    else
+                    {
+                        spdxLicenses.add( expression );
+                    }
+                } catch ( InvalidSPDXAnalysisException ex )
+                {
+                    LOG.warn( "Exception parsing possible license expression: {}", license.getName() );
+                    return new SpdxNoAssertionLicense();
+                }
             } else {
                 return new SpdxNoAssertionLicense();
             }
@@ -320,7 +342,30 @@ public class MavenToSpdxLicenseMapper
             if ( listedLicense != null )
             {
                 spdxLicenses.add( listedLicense );
-            } else {
+            }
+            else if ( isLicenseExpression( license.getName() ) )
+            {
+                try
+                {
+                    org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo expression =
+                            LicenseInfoFactory.parseSPDXLicenseString( license.getName() );
+                    if ( expression instanceof org.spdx.library.model.v3_0_1.simplelicensing.InvalidLicenseExpression )
+                    {
+                        LOG.warn( "Invalid license expression found: {}", expression );
+                        return new NoAssertionLicense();
+                    }
+                    else
+                    {
+                        spdxLicenses.add( expression );
+                    }
+                } catch ( InvalidSPDXAnalysisException ex )
+                {
+                    LOG.warn( "Exception parsing possible license expression: {}", license.getName() );
+                    return new NoAssertionLicense();
+                }
+            }
+            else
+            {
                 return new NoAssertionLicense();
             }
         }
@@ -338,6 +383,16 @@ public class MavenToSpdxLicenseMapper
                             .addAllMember( new HashSet<>( spdxLicenses ) )
                             .build();
         }
+    }
+
+    private boolean isLicenseExpression( String str )
+    {
+        if ( Objects.isNull( str ) )
+        {
+            return false;
+        }
+        String upper = str.toUpperCase();
+        return upper.contains( " AND " ) || upper.contains( " OR " ) || upper.contains( " WITH " );
     }
 
     private ListedLicense mavenLicenseToSpdxV3ListedLicense( License license )
