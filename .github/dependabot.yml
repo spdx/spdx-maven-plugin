@@ -8,7 +8,8 @@ updates:
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
     exclude-paths:
-      "/src/it/**"
+      - "/src/it/**"
+      - "/src/test/**"
     ignore:
       - dependency-name: "*"
         update-types:
