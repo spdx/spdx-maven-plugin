@@ -120,7 +120,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#mavenLicenseListToSpdxV3License(java.util.List,org.spdx.library.model.v3_0_1.core.Element)" class="member-name-link">mavenLicenseListToSpdxV3License</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.apache.maven.model.License&gt;&nbsp;licenseList,
  org.spdx.library.model.v3_0_1.core.Element&nbsp;spdxDoc)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Map a list of Maven licenses to an SPDX Spec version 2 license.</div>
+<div class="block">Map a list of Maven licenses to an SPDX Spec version 3 license.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#urlToSpdxId(java.lang.String)" class="member-name-link">urlToSpdxId</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;url)</code></div>
@@ -193,7 +193,7 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.spdx.library.model.v3_0_1.simplelicensing.AnyLicenseInfo</span>&nbsp;<span class="element-name">mavenLicenseListToSpdxV3License</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.apache.maven.model.License&gt;&nbsp;licenseList,
  org.spdx.library.model.v3_0_1.core.Element&nbsp;spdxDoc)</span>
                                                                                              throws <span class="exceptions">org.spdx.core.InvalidSPDXAnalysisException</span></div>
-<div class="block">Map a list of Maven licenses to an SPDX Spec version 2 license.  If no licenses are supplied, SpdxNoAssertion license is
+<div class="block">Map a list of Maven licenses to an SPDX Spec version 3 license.  If no licenses are supplied, SpdxNoAssertion license is
  returned.  if a single license is supplied, and a URL can be found matching a listed license, the listed license
  is returned.  if a single license is supplied, and a URL can not be found matching a listed license,
  SpdxNoAssertion is returned.  If multiple licenses are supplied, a conjunctive license is returned containing all
