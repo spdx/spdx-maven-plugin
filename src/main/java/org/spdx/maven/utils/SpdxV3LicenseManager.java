@@ -189,7 +189,7 @@ public class SpdxV3LicenseManager
             throw new LicenseManagerException(
                     "Can not map maven license " + mavenLicense.getName() + "  No URL exists to provide a mapping" );
         }
-        String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl().replaceAll("https:", "http:") );
+        String licenseId = this.urlStringToSpdxLicenseId.get( mavenLicense.getUrl().replaceFirst("(?i)^https:", "http:") );
         if ( licenseId == null )
         {
             throw new LicenseManagerException(
