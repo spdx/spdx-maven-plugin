@@ -167,7 +167,7 @@ public class MavenToSpdxLicenseMapper
             {
                 for ( String url:licenseJson.getSeeAlso() )
                 {
-                    url = url.replaceAll( "https", "http" );
+                    url = url.replaceFirst( "(?i)^https:", "http:" );
                     if ( this.urlStringToSpdxLicenseId.containsKey( url ) )
                     {
                         urlsWithMultipleIds.add( url );
@@ -280,7 +280,7 @@ public class MavenToSpdxLicenseMapper
         }
         if ( Objects.nonNull( license.getUrl() ) && !license.getUrl().isEmpty() )
         {
-            String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceAll( "https", "http" ) );
+            String spdxId = this.urlStringToSpdxLicenseId.get( license.getUrl().replaceFirst( "(?i)^https:", "http:" ) );
             if ( Objects.nonNull( spdxId ) ) {
                 return spdxId;
             }
