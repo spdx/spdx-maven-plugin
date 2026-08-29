@@ -7,6 +7,8 @@ updates:
       day: "sunday"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
+    exclude-paths:
+      "/src/it/**"
     ignore:
       - dependency-name: "*"
         update-types:
