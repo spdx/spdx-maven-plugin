@@ -364,6 +364,30 @@
                 </goals>
               </execution>
             </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>4.0.23</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.gmavenplus</groupId>
+            <artifactId>gmavenplus-plugin</artifactId>
+            <version>3.0.2</version>
+            <executions>
+              <execution>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>addTestSources</goal>
+                  <goal>compileTests</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <targetBytecode>17</targetBytecode>
+            </configuration>
           </plugin>
         </plugins>
       </build>
