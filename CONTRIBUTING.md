@@ -30,3 +30,21 @@ Coding Style
 ------------
 
 This project follows the [Maven Code Style](https://maven.apache.org/developers/conventions/code.html).
+
+AI usage policy
+---------------
+
+AI tools (e.g., LLMs, code assistants, and proofreaders) are permitted as
+assistive supplements, not replacements for human judgment.
+
+- **Code review:**
+  AI tools may act as a preliminary "peer reviewer" to catch syntax or style
+  issues, similar to a non-AI code analysis tool.
+  However, a human must perform the final review, validate logic,
+  and take full responsibility for all decisions.
+- **Automation:**
+  AI is acceptable for offloading repetitive, well-understood, and
+  time-consuming boilerplate tasks.
+- **Verification:**
+  All AI-generated suggestions must be manually verified for security,
+  performance, and project alignment.
