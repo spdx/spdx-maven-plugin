@@ -52,6 +52,7 @@ public class TestSpdxV2LicenseManager
     static final String APACHE_CROSS_REF_URL2 = "http://www.apache.org/licenses/LICENSE-2.0";
     static final String APACHE_CROSS_REF_URL3 = "http://opensource.org/licenses/Apache-2.0";
     static final String APACHE_CROSS_REF_URL4 = "http://opensource.org/license/apache-2-0";
+    static final String APACHE_CROSS_REF_URL5 = "http://opensource.org/license/apache-2.0";
     static final String APACHE_LICENSE_ID = "Apache-2.0";
     static final String APACHE_LICENSE_NAME = "Apache License 2.0";
     static final String APSL_CROSS_REF_URL = "http://www.opensource.apple.com/source/IOSerialFamily/IOSerialFamily-7/APPLE_LICENSE";
@@ -279,7 +280,7 @@ public class TestSpdxV2LicenseManager
         assertEquals( result.getName(), ( (SpdxListedLicense) licenseInfo ).getName() );
         String resultUrl = result.getUrl().replace( "https", "http" );
         assertTrue( APACHE_CROSS_REF_URL2.equals( resultUrl ) || APACHE_CROSS_REF_URL3.equals( resultUrl ) ||
-                APACHE_CROSS_REF_URL4.equals( resultUrl ) );
+                APACHE_CROSS_REF_URL4.equals( resultUrl ) || APACHE_CROSS_REF_URL5.equals( resultUrl ) );
 
         // non standard license
         final String LICENSE_ID = "LicenseRef-nonStd1";
