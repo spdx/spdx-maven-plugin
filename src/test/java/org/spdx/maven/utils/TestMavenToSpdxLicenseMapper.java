@@ -27,10 +27,10 @@ import org.spdx.storage.simple.InMemSpdxStore;
 public class TestMavenToSpdxLicenseMapper
 {
     private static final String TEST_SPDX_DOCUMENT_URL = "http://www.spdx.org/documents/test";
-    private static final String APACHE2_URL = "http://www.apache.org/licenses/LICENSE-2.0";
+    private static final String APACHE2_URL = "http://opensource.org/license/apache-2.0";
     private static final String APACHE_SPDX_ID = "Apache-2.0";
 
-    private static final String MIT_URL = "http://opensource.org/license/mit/";
+    private static final String MIT_URL = "http://opensource.org/license/MIT";
     private static final String MIT_SPDX_ID = "MIT";
 
     SpdxDocument spdxDoc = null;

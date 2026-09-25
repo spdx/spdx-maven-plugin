@@ -162,13 +162,14 @@ public class MavenToSpdxLicenseMapper
         for ( LicenseJsonTOC.LicenseJson licenseJson:jsonToc.getLicenses() )
         {
             String licenseId = licenseJson.getLicenseId();
-            this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX + licenseId, licenseId );
+            this.urlStringToSpdxLicenseId.put( SPDX_LICENSE_URL_PREFIX.replaceFirst( "(?i)^https:", "http:" ) + licenseId, licenseId );
             if ( licenseJson.getSeeAlso() != null )
             {
                 for ( String url:licenseJson.getSeeAlso() )
                 {
                     url = url.replaceFirst( "(?i)^https:", "http:" );
-                    if ( this.urlStringToSpdxLicenseId.containsKey( url ) )
+                    if ( this.urlStringToSpdxLicenseId.containsKey( url ) &&
+                            !licenseId.equals( this.urlStringToSpdxLicenseId.get( url ) ) )
                     {
                         urlsWithMultipleIds.add( url );
                     }
